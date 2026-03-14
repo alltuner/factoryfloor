@@ -58,10 +58,12 @@ struct ContentView: View {
                 .id(workstream.id)
                 .navigationTitle(workstream.name)
                 .navigationSubtitle(project.name)
-            } else if let project = activeProject {
+            } else if let project = activeProject,
+                      let projectIndex = projects.firstIndex(where: { $0.id == project.id }) {
                 ProjectOverviewView(
-                    project: project,
-                    onSelectWorkstream: { wsID in selection = .workstream(wsID) }
+                    project: $projects[projectIndex],
+                    onSelectWorkstream: { wsID in selection = .workstream(wsID) },
+                    onProjectChanged: { ProjectStore.save(projects) }
                 )
                 .navigationTitle(project.name)
                 .navigationSubtitle("ff2")

@@ -14,8 +14,10 @@ struct ProjectSidebar: View {
     @Binding var selection: SidebarSelection?
     let onProjectsChanged: () -> Void
 
-    @State private var pendingDirectory: String?
-    @State private var pendingName: String = ""
+    @State private var showingAddProjectChoice = false
+    @State private var showingNewProjectName = false
+    @State private var newProjectName = ""
+    @State private var newProjectError = ""
     @State private var isDropTargeted = false
     @State private var addingWorkstreamForProject: UUID?
     @State private var newWorkstreamName = ""
@@ -142,7 +144,7 @@ struct ProjectSidebar: View {
                 Spacer()
 
                 HStack {
-                    Button(action: openDirectoryPicker) {
+                    Button(action: { showingAddProjectChoice = true }) {
                         Image(systemName: "plus")
                             .font(.system(size: 16))
                     }
@@ -187,12 +189,28 @@ struct ProjectSidebar: View {
         .onDrop(of: [.fileURL], isTargeted: $isDropTargeted) { providers in
             handleDrop(providers)
         }
-        .sheet(item: $pendingDirectory) { directory in
-            ConfirmProjectSheet(
-                directory: directory,
-                name: $pendingName,
-                onAdd: { addProject(name: pendingName, directory: directory) },
-                onCancel: { pendingDirectory = nil }
+        .sheet(isPresented: $showingAddProjectChoice) {
+            AddProjectChoiceSheet(
+                onNewProject: {
+                    showingAddProjectChoice = false
+                    newProjectName = ""
+                    newProjectError = ""
+                    showingNewProjectName = true
+                },
+                onExistingDirectory: {
+                    showingAddProjectChoice = false
+                    openDirectoryPicker()
+                },
+                onCancel: { showingAddProjectChoice = false }
+            )
+        }
+        .sheet(isPresented: $showingNewProjectName) {
+            NewProjectSheet(
+                name: $newProjectName,
+                error: $newProjectError,
+                baseDirectory: baseDirectory,
+                onAdd: { createNewProject() },
+                onCancel: { showingNewProjectName = false }
             )
         }
         .sheet(item: $addingWorkstreamForProject) { projectID in
@@ -203,7 +221,7 @@ struct ProjectSidebar: View {
             )
         }
         .onReceive(NotificationCenter.default.publisher(for: .addProject)) { _ in
-            openDirectoryPicker()
+            showingAddProjectChoice = true
         }
         .onReceive(NotificationCenter.default.publisher(for: .addNew)) { _ in
             if case .workstream(let wsID) = selection,
@@ -212,7 +230,7 @@ struct ProjectSidebar: View {
             } else if case .project(let pid) = selection {
                 startAddingWorkstream(for: pid)
             } else {
-                openDirectoryPicker()
+                showingAddProjectChoice = true
             }
         }
         .onReceive(NotificationCenter.default.publisher(for: .openDirectory)) { notification in
@@ -316,16 +334,33 @@ struct ProjectSidebar: View {
         panel.message = NSLocalizedString("Choose a project directory", comment: "")
         panel.prompt = NSLocalizedString("Select", comment: "")
         guard panel.runModal() == .OK, let url = panel.url else { return }
-        pendingName = url.lastPathComponent
-        pendingDirectory = url.path
+        addProject(name: url.lastPathComponent, directory: url.path)
+    }
+
+    private func createNewProject() {
+        let name = newProjectName.trimmingCharacters(in: .whitespaces)
+        guard !name.isEmpty else { return }
+
+        let dirURL = URL(fileURLWithPath: baseDirectory).appendingPathComponent(name)
+        if FileManager.default.fileExists(atPath: dirURL.path) {
+            newProjectError = NSLocalizedString("A file or directory with this name already exists.", comment: "")
+            return
+        }
+
+        do {
+            try FileManager.default.createDirectory(at: dirURL, withIntermediateDirectories: true)
+        } catch {
+            newProjectError = error.localizedDescription
+            return
+        }
+
+        showingNewProjectName = false
+        addProject(name: name, directory: dirURL.path)
     }
 
     private func addProject(name: String, directory: String) {
-        // If a project with this directory already exists, just select it
         if let existing = projects.first(where: { $0.directory == directory }) {
             selection = .project(existing.id)
-            pendingDirectory = nil
-            pendingName = ""
             return
         }
 
@@ -333,8 +368,6 @@ struct ProjectSidebar: View {
         let project = Project(name: projectName, directory: directory)
         projects.append(project)
         selection = .project(project.id)
-        pendingDirectory = nil
-        pendingName = ""
         onProjectsChanged()
     }
 }
@@ -474,47 +507,121 @@ private struct SidebarIconButton: View {
     }
 }
 
-private struct ConfirmProjectSheet: View {
-    let directory: String
+private struct AddProjectChoiceSheet: View {
+    let onNewProject: () -> Void
+    let onExistingDirectory: () -> Void
+    let onCancel: () -> Void
+
+    var body: some View {
+        VStack(spacing: 20) {
+            Text("Add Project")
+                .font(.headline)
+
+            VStack(spacing: 12) {
+                Button(action: onNewProject) {
+                    HStack {
+                        Image(systemName: "folder.badge.plus")
+                            .font(.system(size: 20))
+                            .frame(width: 32)
+                        VStack(alignment: .leading, spacing: 2) {
+                            Text("New Project")
+                                .font(.system(.body, weight: .medium))
+                            Text("Create a new directory in the base folder")
+                                .font(.caption)
+                                .foregroundStyle(.secondary)
+                        }
+                        Spacer()
+                        Image(systemName: "chevron.right")
+                            .foregroundStyle(.tertiary)
+                    }
+                    .padding(12)
+                    .background(Color.primary.opacity(0.04))
+                    .clipShape(RoundedRectangle(cornerRadius: 8))
+                }
+                .buttonStyle(.plain)
+
+                Button(action: onExistingDirectory) {
+                    HStack {
+                        Image(systemName: "folder")
+                            .font(.system(size: 20))
+                            .frame(width: 32)
+                        VStack(alignment: .leading, spacing: 2) {
+                            Text("Existing Directory")
+                                .font(.system(.body, weight: .medium))
+                            Text("Select an existing directory from disk")
+                                .font(.caption)
+                                .foregroundStyle(.secondary)
+                        }
+                        Spacer()
+                        Image(systemName: "chevron.right")
+                            .foregroundStyle(.tertiary)
+                    }
+                    .padding(12)
+                    .background(Color.primary.opacity(0.04))
+                    .clipShape(RoundedRectangle(cornerRadius: 8))
+                }
+                .buttonStyle(.plain)
+            }
+
+            Button("Cancel", action: onCancel)
+                .keyboardShortcut(.cancelAction)
+        }
+        .padding(20)
+        .frame(width: 380)
+    }
+}
+
+private struct NewProjectSheet: View {
     @Binding var name: String
+    @Binding var error: String
+    let baseDirectory: String
     let onAdd: () -> Void
     let onCancel: () -> Void
 
     var body: some View {
         VStack(spacing: 16) {
-            Text("Add Project")
+            Text("New Project")
                 .font(.headline)
 
             VStack(alignment: .leading, spacing: 4) {
-                Text("Directory")
+                Text("Base directory")
                     .font(.caption)
                     .foregroundStyle(.secondary)
-                Text(directory)
-                    .font(.system(.body, design: .monospaced))
-                    .lineLimit(2)
-                    .truncationMode(.middle)
+                Text(abbreviatePath(baseDirectory))
+                    .font(.system(.caption, design: .monospaced))
+                    .foregroundStyle(.tertiary)
             }
             .frame(maxWidth: .infinity, alignment: .leading)
 
-            VStack(alignment: .leading, spacing: 4) {
-                Text("Project Name")
+            TextField("Project Name", text: $name)
+                .textFieldStyle(.roundedBorder)
+                .onSubmit { if !name.trimmingCharacters(in: .whitespaces).isEmpty { onAdd() } }
+
+            if !error.isEmpty {
+                Text(error)
                     .font(.caption)
-                    .foregroundStyle(.secondary)
-                TextField("Project Name", text: $name)
-                    .textFieldStyle(.roundedBorder)
+                    .foregroundStyle(.red)
             }
 
             HStack {
                 Button("Cancel", action: onCancel)
                     .keyboardShortcut(.cancelAction)
                 Spacer()
-                Button("Add", action: onAdd)
+                Button("Create", action: onAdd)
                     .keyboardShortcut(.defaultAction)
-                    .disabled(name.isEmpty)
+                    .disabled(name.trimmingCharacters(in: .whitespaces).isEmpty)
             }
         }
         .padding(20)
-        .frame(width: 400)
+        .frame(width: 380)
+    }
+
+    private func abbreviatePath(_ path: String) -> String {
+        let home = FileManager.default.homeDirectoryForCurrentUser.path
+        if path.hasPrefix(home) {
+            return "~" + path.dropFirst(home.count)
+        }
+        return path
     }
 }
 

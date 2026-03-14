@@ -1,11 +1,15 @@
 // ABOUTME: Overview shown when a project is selected but no workstream is active.
-// ABOUTME: Displays project header and workstream cards in a grid.
+// ABOUTME: Displays project header with editable alias, and workstream cards.
 
 import SwiftUI
 
 struct ProjectOverviewView: View {
-    let project: Project
+    @Binding var project: Project
     let onSelectWorkstream: (UUID) -> Void
+    let onProjectChanged: () -> Void
+
+    @State private var editingAlias = false
+    @State private var aliasText = ""
 
     private let columns = [
         GridItem(.adaptive(minimum: 280, maximum: 400), spacing: 20)
@@ -16,11 +20,40 @@ struct ProjectOverviewView: View {
             VStack(spacing: 32) {
                 // Project header
                 VStack(spacing: 8) {
-                    Text(project.name)
-                        .font(.system(size: 32, weight: .bold))
+                    if editingAlias {
+                        TextField("Project Name", text: $aliasText)
+                            .font(.system(size: 28, weight: .bold))
+                            .multilineTextAlignment(.center)
+                            .textFieldStyle(.plain)
+                            .frame(maxWidth: 400)
+                            .onSubmit { commitAlias() }
+                            .onExitCommand { editingAlias = false }
+                    } else {
+                        Text(project.name)
+                            .font(.system(size: 32, weight: .bold))
+                            .onTapGesture {
+                                aliasText = project.name
+                                editingAlias = true
+                            }
+                    }
                     Text(project.directory)
                         .font(.system(.body, design: .monospaced))
                         .foregroundStyle(.secondary)
+
+                    if editingAlias {
+                        HStack(spacing: 8) {
+                            Button("Cancel") { editingAlias = false }
+                                .keyboardShortcut(.cancelAction)
+                            Button("Save") { commitAlias() }
+                                .keyboardShortcut(.defaultAction)
+                                .disabled(aliasText.trimmingCharacters(in: .whitespaces).isEmpty)
+                        }
+                        .font(.caption)
+                    } else {
+                        Text("Click name to set alias")
+                            .font(.caption)
+                            .foregroundStyle(.tertiary)
+                    }
                 }
                 .frame(maxWidth: .infinity)
                 .padding(.top, 48)
@@ -57,6 +90,14 @@ struct ProjectOverviewView: View {
             }
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
+    }
+
+    private func commitAlias() {
+        let name = aliasText.trimmingCharacters(in: .whitespaces)
+        guard !name.isEmpty else { return }
+        project.name = name
+        editingAlias = false
+        onProjectChanged()
     }
 }
 
