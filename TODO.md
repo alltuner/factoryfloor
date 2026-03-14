@@ -16,7 +16,7 @@
 - [ ] Keyboard shortcuts for switching between projects/workstreams (Cmd+1, Cmd+2, etc.)
 
 ## Terminal
-- [ ] Terminal resize flicker on session restart (reduced but not fully eliminated)
+- [x] Terminal resize flicker on session restart
 - [ ] Sidebar toggle animation still causes minor flicker at the end
 - [ ] Occlude non-visible terminal surfaces to save GPU (reverted, needs careful timing with initial render)
 
