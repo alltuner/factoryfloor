@@ -52,11 +52,11 @@ struct ProjectSidebar: View {
     private func projectBinding(for id: UUID) -> Binding<Project> {
         Binding(
             get: {
-                if let idx = projectIndex[id] { return projects[idx] }
-                return projects.first(where: { $0.id == id })!
+                if let idx = projectIndex[id], idx < projects.count { return projects[idx] }
+                return projects.first(where: { $0.id == id }) ?? Project(name: "", directory: "")
             },
             set: { newValue in
-                if let idx = projectIndex[id] {
+                if let idx = projectIndex[id], idx < projects.count {
                     projects[idx] = newValue
                 }
             }
