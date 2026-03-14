@@ -5,50 +5,55 @@ import SwiftUI
 
 struct ContentView: View {
     @State private var projects: [Project] = ProjectStore.load()
-    @State private var selectedWorkstreamID: UUID?
-    @State private var focusedProjectID: UUID?
+    @State private var selection: SidebarSelection? = ContentView.initialSelection()
     @StateObject private var surfaceCache = TerminalSurfaceCache()
 
-    /// The currently relevant project, derived from selected workstream or explicit focus.
+    private static func initialSelection() -> SidebarSelection? {
+        let projects = ProjectStore.load()
+        guard let mostRecent = projects.max(by: { $0.lastAccessedAt < $1.lastAccessedAt }) else { return nil }
+        return .project(mostRecent.id)
+    }
+
     private var activeProject: Project? {
-        if let wsID = selectedWorkstreamID {
+        guard let selection else { return nil }
+        switch selection {
+        case .project(let id):
+            return projects.first(where: { $0.id == id })
+        case .workstream(let wsID):
             return projects.first(where: { $0.workstreams.contains(where: { $0.id == wsID }) })
         }
-        if let pid = focusedProjectID {
-            return projects.first(where: { $0.id == pid })
-        }
-        return nil
+    }
+
+    private var activeWorkstream: Workstream? {
+        guard let wsID = selection?.workstreamID,
+              let project = activeProject else { return nil }
+        return project.workstreams.first(where: { $0.id == wsID })
     }
 
     var body: some View {
         NavigationSplitView {
             ProjectSidebar(
                 projects: $projects,
-                selectedWorkstreamID: $selectedWorkstreamID,
-                focusedProjectID: $focusedProjectID,
+                selection: $selection,
                 onProjectsChanged: { ProjectStore.save(projects) }
             )
             .navigationSplitViewColumnWidth(min: 160, ideal: 200, max: 350)
         } detail: {
-            if let selectedWorkstreamID,
-               let project = activeProject,
-               let workstream = project.workstreams.first(where: { $0.id == selectedWorkstreamID }) {
+            if let workstream = activeWorkstream, let project = activeProject {
                 TerminalContainerView(
-                    workstreamID: selectedWorkstreamID,
-                    workingDirectory: project.directory
+                    workstreamID: workstream.id,
+                    workingDirectory: project.directory,
+                    projectName: project.name,
+                    workstreamName: workstream.name
                 )
-                .id(selectedWorkstreamID)
+                .id(workstream.id)
                 .navigationTitle(workstream.name)
                 .navigationSubtitle(project.name)
             } else if let project = activeProject {
-                VStack(spacing: 12) {
-                    Text("No workstream selected")
-                        .font(.title2)
-                        .foregroundStyle(.secondary)
-                    Text("Create a workstream to get started.")
-                        .foregroundStyle(.tertiary)
-                }
-                .frame(maxWidth: .infinity, maxHeight: .infinity)
+                ProjectOverviewView(
+                    project: project,
+                    onSelectWorkstream: { wsID in selection = .workstream(wsID) }
+                )
                 .navigationTitle(project.name)
                 .navigationSubtitle("ff2")
             } else {

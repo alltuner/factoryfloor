@@ -9,12 +9,9 @@ extension Notification.Name {
     static let addNew = Notification.Name("ff2.addNew")
 }
 
-/// Selection in the sidebar is a workstream ID.
-/// From it we can find the parent project.
 struct ProjectSidebar: View {
     @Binding var projects: [Project]
-    @Binding var selectedWorkstreamID: UUID?
-    @Binding var focusedProjectID: UUID?
+    @Binding var selection: SidebarSelection?
     let onProjectsChanged: () -> Void
 
     @State private var pendingDirectory: String?
@@ -24,78 +21,133 @@ struct ProjectSidebar: View {
     @State private var newWorkstreamName = ""
     @State private var projectToDelete: UUID?
     @State private var expandedProjects: Set<UUID> = []
+    @AppStorage("ff2.sortOrder") private var sortOrder: ProjectSortOrder = .recent
+
+    private var sortedProjectIDs: [UUID] {
+        let sorted: [Project]
+        switch sortOrder {
+        case .recent:
+            sorted = projects.sorted { $0.lastAccessedAt > $1.lastAccessedAt }
+        case .alphabetical:
+            sorted = projects.sorted { $0.name.localizedCaseInsensitiveCompare($1.name) == .orderedAscending }
+        }
+        return sorted.map(\.id)
+    }
+
+    private func projectBinding(for id: UUID) -> Binding<Project> {
+        Binding(
+            get: { projects.first(where: { $0.id == id })! },
+            set: { newValue in
+                if let index = projects.firstIndex(where: { $0.id == id }) {
+                    projects[index] = newValue
+                }
+            }
+        )
+    }
 
     var body: some View {
+        GeometryReader { geo in
         VStack(spacing: 0) {
-            List(selection: $selectedWorkstreamID) {
-                ForEach($projects) { $project in
+            ScrollViewReader { scrollProxy in
+            List(selection: $selection) {
+                ForEach(sortedProjectIDs, id: \.self) { projectID in
+                    let projectBind = projectBinding(for: projectID)
+                    let project = projectBind.wrappedValue
                     let hasChildren = !project.workstreams.isEmpty
-                    let label = ProjectRow(
+
+                    ProjectHeaderRow(
                         project: project,
+                        isExpanded: expandedProjects.contains(project.id),
+                        onToggle: hasChildren ? {
+                            withAnimation(.easeInOut(duration: 0.15)) {
+                                if expandedProjects.contains(project.id) {
+                                    expandedProjects.remove(project.id)
+                                } else {
+                                    expandedProjects.insert(project.id)
+                                }
+                            }
+                        } : nil,
                         onAdd: { startAddingWorkstream(for: project.id) },
                         onDelete: { projectToDelete = project.id }
                     )
-                    .onTapGesture { focusedProjectID = project.id }
+                    .tag(SidebarSelection.project(project.id))
 
-                    if hasChildren {
-                        DisclosureGroup(
-                            isExpanded: Binding(
-                                get: { expandedProjects.contains(project.id) },
-                                set: { isExpanded in
-                                    if isExpanded {
-                                        expandedProjects.insert(project.id)
-                                    } else {
-                                        expandedProjects.remove(project.id)
-                                    }
-                                }
+                    if hasChildren && expandedProjects.contains(project.id) {
+                        ForEach(project.workstreams.sorted { $0.lastAccessedAt > $1.lastAccessedAt }) { workstream in
+                            WorkstreamRow(
+                                name: workstream.name,
+                                onArchive: { archiveWorkstream(workstream.id, in: &projectBind.wrappedValue) }
                             )
-                        ) {
-                            ForEach(project.workstreams) { workstream in
-                                WorkstreamRow(
-                                    name: workstream.name,
-                                    onArchive: { archiveWorkstream(workstream.id, in: &$project.wrappedValue) }
-                                )
-                                .tag(workstream.id)
-                            }
-                        } label: {
-                            label
+                            .tag(SidebarSelection.workstream(workstream.id))
+                            .padding(.leading, 22)
                         }
-                    } else {
-                        label
                     }
                 }
             }
             .listStyle(.sidebar)
-            .overlay {
-                if projects.isEmpty {
-                    VStack(spacing: 8) {
-                        Image(systemName: "folder.badge.plus")
-                            .font(.system(size: 32))
-                            .foregroundStyle(.tertiary)
-                        Text("Drop a folder here")
-                            .font(.caption)
-                            .foregroundStyle(.tertiary)
+            .safeAreaInset(edge: .top) {
+                if !projects.isEmpty {
+                    Picker("", selection: $sortOrder) {
+                        ForEach(ProjectSortOrder.allCases, id: \.self) { order in
+                            Text(order.rawValue).tag(order)
+                        }
                     }
+                    .pickerStyle(.segmented)
+                    .padding(.horizontal, 12)
+                    .padding(.vertical, 8)
                 }
             }
-
-            Divider()
-
-            HStack {
-                Button(action: openDirectoryPicker) {
-                    Image(systemName: "plus")
+            .onChange(of: selection) { _, sel in
+                guard let sel else { return }
+                withAnimation {
+                    scrollProxy.scrollTo(sel, anchor: .center)
                 }
-                .buttonStyle(.plain)
-                .padding(8)
+            }
+            } // ScrollViewReader
 
+            VStack(spacing: 8) {
                 Spacer()
+                Image(systemName: "folder.badge.plus")
+                    .font(.system(size: 28))
+                    .foregroundStyle(.tertiary)
+                Text("Drop a folder here")
+                    .font(.system(.body, weight: .medium))
+                    .foregroundStyle(.tertiary)
+                Text("\(Image(systemName: "command"))\(Image(systemName: "shift")) N to add a project")
+                    .font(.caption)
+                    .foregroundStyle(.quaternary)
+                Spacer()
+
+                HStack {
+                    Button(action: openDirectoryPicker) {
+                        Image(systemName: "plus")
+                    }
+                    .buttonStyle(.plain)
+                    .padding(8)
+
+                    Spacer()
+                }
+            }
+            .frame(maxWidth: .infinity)
+            .frame(height: max(80, geo.size.height * 0.2))
+        }
+        }
+        .onChange(of: selection) { _, sel in
+            guard let sel else { return }
+            if case .workstream(let wsID) = sel {
+                if let project = projects.first(where: { $0.workstreams.contains(where: { $0.id == wsID }) }) {
+                    expandedProjects.insert(project.id)
+                }
             }
         }
-        .onChange(of: selectedWorkstreamID) { _, wsID in
-            guard let wsID else { return }
-            if let project = projects.first(where: { $0.workstreams.contains(where: { $0.id == wsID }) }) {
-                expandedProjects.insert(project.id)
-                focusedProjectID = project.id
+        .onReceive(NotificationCenter.default.publisher(for: .terminalActivity)) { notification in
+            guard let wsID = notification.object as? UUID else { return }
+            if let projectIndex = projects.firstIndex(where: { $0.workstreams.contains(where: { $0.id == wsID }) }),
+               let wsIndex = projects[projectIndex].workstreams.firstIndex(where: { $0.id == wsID }) {
+                let now = Date()
+                projects[projectIndex].lastAccessedAt = now
+                projects[projectIndex].workstreams[wsIndex].lastAccessedAt = now
+                onProjectsChanged()
             }
         }
         .overlay {
@@ -128,13 +180,18 @@ struct ProjectSidebar: View {
             openDirectoryPicker()
         }
         .onReceive(NotificationCenter.default.publisher(for: .addNew)) { _ in
-            // Only add a workstream if the user is actively in a project (has a workstream selected)
-            if let wsID = selectedWorkstreamID,
+            if case .workstream(let wsID) = selection,
                let project = projects.first(where: { $0.workstreams.contains(where: { $0.id == wsID }) }) {
                 startAddingWorkstream(for: project.id)
+            } else if case .project(let pid) = selection {
+                startAddingWorkstream(for: pid)
             } else {
                 openDirectoryPicker()
             }
+        }
+        .onReceive(NotificationCenter.default.publisher(for: .openDirectory)) { notification in
+            guard let directory = notification.object as? String else { return }
+            addProject(name: URL(fileURLWithPath: directory).lastPathComponent, directory: directory)
         }
         .alert(
             "Remove Project",
@@ -174,7 +231,7 @@ struct ProjectSidebar: View {
 
         let workstream = Workstream(name: name)
         projects[index].workstreams.append(workstream)
-        selectedWorkstreamID = workstream.id
+        selection = .workstream(workstream.id)
         onProjectsChanged()
     }
 
@@ -183,8 +240,8 @@ struct ProjectSidebar: View {
     private func archiveWorkstream(_ workstreamID: UUID, in project: inout Project) {
         surfaceCache.removeSurface(for: workstreamID)
         project.workstreams.removeAll { $0.id == workstreamID }
-        if selectedWorkstreamID == workstreamID {
-            selectedWorkstreamID = project.workstreams.first?.id
+        if case .workstream(let id) = selection, id == workstreamID {
+            selection = project.workstreams.first.map { .workstream($0.id) } ?? .project(project.id)
         }
         onProjectsChanged()
     }
@@ -192,16 +249,16 @@ struct ProjectSidebar: View {
     // MARK: - Project management
 
     private func deleteProject(id: UUID) {
-        // Clean up all workstream surfaces for this project
         if let project = projects.first(where: { $0.id == id }) {
             for ws in project.workstreams {
                 surfaceCache.removeSurface(for: ws.id)
             }
         }
         projects.removeAll { $0.id == id }
-        if let selected = selectedWorkstreamID,
-           !projects.contains(where: { $0.workstreams.contains(where: { $0.id == selected }) }) {
-            selectedWorkstreamID = nil
+        if case .project(let pid) = selection, pid == id { selection = nil }
+        if case .workstream(let wsID) = selection,
+           !projects.contains(where: { $0.workstreams.contains(where: { $0.id == wsID }) }) {
+            selection = nil
         }
         projectToDelete = nil
         onProjectsChanged()
@@ -235,17 +292,25 @@ struct ProjectSidebar: View {
     }
 
     private func addProject(name: String, directory: String) {
+        // If a project with this directory already exists, just select it
+        if let existing = projects.first(where: { $0.directory == directory }) {
+            selection = .project(existing.id)
+            pendingDirectory = nil
+            pendingName = ""
+            return
+        }
+
         let projectName = name.isEmpty ? URL(fileURLWithPath: directory).lastPathComponent : name
         let project = Project(name: projectName, directory: directory)
         projects.append(project)
+        selection = .project(project.id)
         pendingDirectory = nil
         pendingName = ""
         onProjectsChanged()
     }
-
 }
 
-// Make String and UUID work as Identifiable sheet items
+// Make String work as an Identifiable sheet item
 extension String: @retroactive Identifiable {
     public var id: String { self }
 }
@@ -261,15 +326,36 @@ extension FileManager {
     }
 }
 
-private struct ProjectRow: View {
+private struct ProjectHeaderRow: View {
     let project: Project
+    let isExpanded: Bool
+    let onToggle: (() -> Void)?
     let onAdd: () -> Void
     let onDelete: () -> Void
 
     @State private var isHovering = false
+    @State private var isChevronHovering = false
 
     var body: some View {
-        HStack {
+        HStack(alignment: .center, spacing: 6) {
+            Group {
+                if onToggle != nil {
+                    Button(action: { onToggle?() }) {
+                        Image(systemName: isExpanded ? "chevron.down" : "chevron.right")
+                            .font(.system(size: 10, weight: .semibold))
+                            .foregroundStyle(isChevronHovering ? .primary : .secondary)
+                            .frame(width: 22, height: 22)
+                            .background(isChevronHovering ? Color.primary.opacity(0.1) : .clear)
+                            .clipShape(RoundedRectangle(cornerRadius: 4))
+                    }
+                    .buttonStyle(.plain)
+                    .onHover { isChevronHovering = $0 }
+                } else {
+                    Color.clear
+                }
+            }
+            .frame(width: 22)
+
             VStack(alignment: .leading, spacing: 2) {
                 HStack(spacing: 6) {
                     Text(project.name)
@@ -295,19 +381,10 @@ private struct ProjectRow: View {
             Spacer()
 
             if isHovering {
-                Button(action: onAdd) {
-                    Image(systemName: "plus")
-                        .font(.caption)
-                        .foregroundStyle(.secondary)
+                HStack(spacing: 8) {
+                    SidebarIconButton(icon: "plus", action: onAdd)
+                    SidebarIconButton(icon: "trash", action: onDelete)
                 }
-                .buttonStyle(.plain)
-
-                Button(action: onDelete) {
-                    Image(systemName: "trash")
-                        .font(.caption)
-                        .foregroundStyle(.secondary)
-                }
-                .buttonStyle(.plain)
             }
         }
         .frame(maxWidth: .infinity, alignment: .leading)
@@ -339,16 +416,31 @@ private struct WorkstreamRow: View {
             Spacer()
 
             if isHovering {
-                Button(action: onArchive) {
-                    Image(systemName: "archivebox")
-                        .font(.caption)
-                        .foregroundStyle(.secondary)
-                }
-                .buttonStyle(.plain)
+                SidebarIconButton(icon: "archivebox", action: onArchive)
             }
         }
         .frame(maxWidth: .infinity, alignment: .leading)
         .contentShape(Rectangle())
+        .onHover { isHovering = $0 }
+    }
+}
+
+private struct SidebarIconButton: View {
+    let icon: String
+    let action: () -> Void
+
+    @State private var isHovering = false
+
+    var body: some View {
+        Button(action: action) {
+            Image(systemName: icon)
+                .font(.system(size: 11))
+                .foregroundStyle(isHovering ? .primary : .secondary)
+                .frame(width: 22, height: 22)
+                .background(isHovering ? Color.primary.opacity(0.1) : .clear)
+                .clipShape(RoundedRectangle(cornerRadius: 4))
+        }
+        .buttonStyle(.plain)
         .onHover { isHovering = $0 }
     }
 }

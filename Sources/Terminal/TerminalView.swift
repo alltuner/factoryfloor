@@ -6,18 +6,26 @@ import os
 
 private let logger = Logger(subsystem: "ff2", category: "terminal-view")
 
+extension Notification.Name {
+    static let terminalActivity = Notification.Name("ff2.terminalActivity")
+}
+
 final class TerminalView: NSView, NSTextInputClient {
     private(set) var surface: ghostty_surface_t?
+    var workstreamID: UUID?
     private var trackingArea: NSTrackingArea?
     private var markedText = NSMutableAttributedString()
     private var keyTextAccumulator: [String]?
     private var resizeDebounceWork: DispatchWorkItem?
+    private var hasReceivedFirstResize = false
+    private var activityDebounceWork: DispatchWorkItem?
 
-    init(app: ghostty_app_t, workingDirectory: String? = nil) {
+    init(app: ghostty_app_t, workingDirectory: String? = nil, environmentVars: [String: String] = [:]) {
         super.init(frame: NSRect(x: 0, y: 0, width: 800, height: 600))
 
         wantsLayer = true
         layer?.isOpaque = true
+        alphaValue = 0 // Hidden until first real resize
 
         var config = ghostty_surface_config_new()
         config.userdata = Unmanaged.passUnretained(self).toOpaque()
@@ -31,13 +39,29 @@ final class TerminalView: NSView, NSTextInputClient {
         config.font_size = 0 // inherit from ghostty config
         config.context = GHOSTTY_SURFACE_CONTEXT_WINDOW
 
-        if let workingDirectory {
-            workingDirectory.withCString { cstr in
-                config.working_directory = cstr
+        // Build C env vars array. Keep the strings alive until surface is created.
+        var envKeys = environmentVars.map { $0.key.utf8CString }
+        var envValues = environmentVars.map { $0.value.utf8CString }
+        var cEnvVars = (0..<environmentVars.count).map { i in
+            envKeys[i].withUnsafeBufferPointer { keyBuf in
+                envValues[i].withUnsafeBufferPointer { valBuf in
+                    ghostty_env_var_s(key: keyBuf.baseAddress, value: valBuf.baseAddress)
+                }
+            }
+        }
+
+        cEnvVars.withUnsafeMutableBufferPointer { envBuf in
+            config.env_vars = envBuf.baseAddress
+            config.env_var_count = envBuf.count
+
+            if let workingDirectory {
+                workingDirectory.withCString { cstr in
+                    config.working_directory = cstr
+                    self.surface = ghostty_surface_new(app, &config)
+                }
+            } else {
                 self.surface = ghostty_surface_new(app, &config)
             }
-        } else {
-            self.surface = ghostty_surface_new(app, &config)
         }
 
         guard surface != nil else {
@@ -95,10 +119,13 @@ final class TerminalView: NSView, NSTextInputClient {
         let h = UInt32(newSize.height * scale)
         guard w > 0 && h > 0 else { return }
 
-        // Debounce rapid resizes (e.g., sidebar toggle animation) to avoid flicker.
-        // If we're in an animation, batch the resize to the end.
+        // During animations (sidebar toggle), hide the surface to avoid mid-animation
+        // rendering at intermediate sizes, then show it at the final size.
         resizeDebounceWork?.cancel()
         if NSAnimationContext.current.duration > 0 {
+            // Mark occluded so ghostty stops rendering during animation
+            ghostty_surface_set_occlusion(surface, true)
+
             let work = DispatchWorkItem { [weak self] in
                 guard let self, let surface = self.surface else { return }
                 let currentScale = self.window?.backingScaleFactor ?? 2.0
@@ -107,6 +134,12 @@ final class TerminalView: NSView, NSTextInputClient {
                 if cw > 0 && ch > 0 {
                     ghostty_surface_set_size(surface, cw, ch)
                 }
+                // Give ghostty one frame to render at the correct size before showing
+                ghostty_surface_refresh(surface)
+                DispatchQueue.main.async {
+                    ghostty_surface_set_occlusion(surface, false)
+                }
+                self.revealIfNeeded()
             }
             resizeDebounceWork = work
             DispatchQueue.main.asyncAfter(
@@ -115,6 +148,16 @@ final class TerminalView: NSView, NSTextInputClient {
             )
         } else {
             ghostty_surface_set_size(surface, w, h)
+            revealIfNeeded()
+        }
+    }
+
+    private func revealIfNeeded() {
+        guard !hasReceivedFirstResize else { return }
+        hasReceivedFirstResize = true
+        // Show after a tiny delay so ghostty renders the first frame at the correct size
+        DispatchQueue.main.async {
+            self.alphaValue = 1
         }
     }
 
@@ -142,7 +185,7 @@ final class TerminalView: NSView, NSTextInputClient {
     }
 
     func surfaceClosed() {
-        // Terminal process exited; could notify the UI here in the future
+        NotificationCenter.default.post(name: .terminalSurfaceClosed, object: self)
     }
 
     // MARK: - Keyboard
@@ -163,15 +206,27 @@ final class TerminalView: NSView, NSTextInputClient {
         interpretKeyEvents([event])
 
         if let textList = keyTextAccumulator, !textList.isEmpty {
-            // We got composed text from the input system
             for text in textList {
                 _ = sendKeyEvent(action, event: event, text: text)
             }
         } else {
-            // No composed text; send the key with ghostty-safe characters
             let text = Self.ghosttyCharacters(for: event)
             _ = sendKeyEvent(action, event: event, text: text)
         }
+
+        reportActivity()
+    }
+
+    /// Debounced activity notification (at most once per 30 seconds).
+    private func reportActivity() {
+        guard let workstreamID else { return }
+        guard activityDebounceWork == nil else { return }
+        NotificationCenter.default.post(name: .terminalActivity, object: workstreamID)
+        let work = DispatchWorkItem { [weak self] in
+            self?.activityDebounceWork = nil
+        }
+        activityDebounceWork = work
+        DispatchQueue.main.asyncAfter(deadline: .now() + 30, execute: work)
     }
 
     override func keyUp(with event: NSEvent) {
