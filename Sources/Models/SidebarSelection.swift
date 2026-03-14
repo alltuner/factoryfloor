@@ -6,6 +6,7 @@ import Foundation
 enum SidebarSelection: Hashable {
     case project(UUID)
     case workstream(UUID)
+    case settings
 
     var projectID: UUID? {
         if case .project(let id) = self { return id }

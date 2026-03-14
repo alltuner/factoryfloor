@@ -5,6 +5,7 @@ import SwiftUI
 
 extension Notification.Name {
     static let openDirectory = Notification.Name("ff2.openDirectory")
+    static let openSettings = Notification.Name("ff2.openSettings")
 }
 
 @main
@@ -64,6 +65,13 @@ struct FF2App: App {
                     NotificationCenter.default.post(name: .addProject, object: nil)
                 }
                 .keyboardShortcut("n", modifiers: [.command, .shift])
+            }
+            // Cmd+,: toggle settings
+            CommandGroup(after: .appSettings) {
+                Button("Settings") {
+                    NotificationCenter.default.post(name: .openSettings, object: nil)
+                }
+                .keyboardShortcut(",", modifiers: .command)
             }
         }
     }

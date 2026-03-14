@@ -1,10 +1,9 @@
-// ABOUTME: Application settings panel.
+// ABOUTME: Application settings pane displayed in the detail area.
 // ABOUTME: Language override and future configuration options.
 
 import SwiftUI
 
 struct SettingsView: View {
-    @Environment(\.dismiss) private var dismiss
     @AppStorage("ff2.languageOverride") private var languageOverride: String = ""
 
     private var availableLanguages: [(code: String, name: String)] {
@@ -19,11 +18,8 @@ struct SettingsView: View {
     }
 
     var body: some View {
-        VStack(spacing: 20) {
-            Text("Settings")
-                .font(.title2.weight(.semibold))
-
-            Form {
+        Form {
+            Section("Language") {
                 Picker("Language", selection: $languageOverride) {
                     ForEach(availableLanguages, id: \.code) { lang in
                         Text(lang.name).tag(lang.code)
@@ -32,19 +28,16 @@ struct SettingsView: View {
                 .onChange(of: languageOverride) { _, newValue in
                     applyLanguage(newValue)
                 }
-            }
-            .formStyle(.grouped)
 
-            Spacer()
-
-            HStack {
-                Spacer()
-                Button("Done") { dismiss() }
-                    .keyboardShortcut(.defaultAction)
+                if !languageOverride.isEmpty {
+                    Text("Restart the app for the language change to take effect.")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                }
             }
         }
-        .padding(24)
-        .frame(width: 400, height: 300)
+        .formStyle(.grouped)
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
     }
 
     private func applyLanguage(_ code: String) {

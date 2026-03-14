@@ -22,8 +22,8 @@ targets:
     platform: macOS
     sources:
       - Sources
-    resources:
-      - Resources
+      - path: Localization
+        buildPhase: resources
     settings:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: com.ff2.app

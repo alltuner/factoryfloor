@@ -6,6 +6,7 @@ import SwiftUI
 struct ContentView: View {
     @State private var projects: [Project] = ProjectStore.load()
     @State private var selection: SidebarSelection? = ContentView.initialSelection()
+    @State private var selectionBeforeSettings: SidebarSelection?
     @StateObject private var surfaceCache = TerminalSurfaceCache()
     @State private var saveWork: DispatchWorkItem?
 
@@ -22,6 +23,8 @@ struct ContentView: View {
             return projects.first(where: { $0.id == id })
         case .workstream(let wsID):
             return projects.first(where: { $0.workstreams.contains(where: { $0.id == wsID }) })
+        case .settings:
+            return nil
         }
     }
 
@@ -40,7 +43,11 @@ struct ContentView: View {
             )
             .navigationSplitViewColumnWidth(min: 160, ideal: 200, max: 350)
         } detail: {
-            if let workstream = activeWorkstream, let project = activeProject {
+            if selection == .settings {
+                SettingsView()
+                    .navigationTitle("Settings")
+                    .navigationSubtitle("ff2")
+            } else if let workstream = activeWorkstream, let project = activeProject {
                 TerminalContainerView(
                     workstreamID: workstream.id,
                     workingDirectory: project.directory,
@@ -70,6 +77,18 @@ struct ContentView: View {
             }
         }
         .environmentObject(surfaceCache)
+        .onChange(of: selection) { oldValue, newValue in
+            if newValue == .settings {
+                selectionBeforeSettings = oldValue
+            }
+        }
+        .onReceive(NotificationCenter.default.publisher(for: .openSettings)) { _ in
+            if selection == .settings {
+                selection = selectionBeforeSettings
+            } else {
+                selection = .settings
+            }
+        }
         .onChange(of: projects) { _, newValue in
             // Debounce saves to avoid rapid I/O from activity updates
             saveWork?.cancel()

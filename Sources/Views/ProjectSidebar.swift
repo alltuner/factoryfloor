@@ -21,7 +21,6 @@ struct ProjectSidebar: View {
     @State private var newWorkstreamName = ""
     @State private var projectToDelete: UUID?
     @State private var expandedProjects: Set<UUID> = []
-    @State private var showingSettings = false
     @State private var cachedSortedIDs: [UUID] = []
     @AppStorage("ff2.sortOrder") private var sortOrder: ProjectSortOrder = .recent
 
@@ -151,7 +150,7 @@ struct ProjectSidebar: View {
 
                     Spacer()
 
-                    Button(action: { showingSettings = true }) {
+                    Button(action: { selection = .settings }) {
                         Image(systemName: "gear")
                     }
                     .buttonStyle(.plain)
@@ -183,9 +182,6 @@ struct ProjectSidebar: View {
         }
         .onDrop(of: [.fileURL], isTargeted: $isDropTargeted) { providers in
             handleDrop(providers)
-        }
-        .sheet(isPresented: $showingSettings) {
-            SettingsView()
         }
         .sheet(item: $pendingDirectory) { directory in
             ConfirmProjectSheet(

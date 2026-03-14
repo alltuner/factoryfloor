@@ -1,0 +1,41 @@
+/* Menu */
+"New" = "New";
+"New Project" = "New Project";
+
+/* Content View */
+"No project selected" = "No project selected";
+"Add a project from the sidebar to get started." = "Add a project from the sidebar to get started.";
+
+/* Project Overview */
+"No workstreams yet" = "No workstreams yet";
+"Workstreams" = "Workstreams";
+"Click to open" = "Click to open";
+
+/* Sidebar */
+"Drop a folder here" = "Drop a folder here";
+"Recent" = "Recent";
+"A-Z" = "A-Z";
+
+/* Alerts */
+"Remove Project" = "Remove Project";
+"Cancel" = "Cancel";
+"Remove" = "Remove";
+
+/* Sheets */
+"Add Project" = "Add Project";
+"Directory" = "Directory";
+"Project Name" = "Project Name";
+"Add" = "Add";
+"Add Workstream" = "Add Workstream";
+"Workstream Name" = "Workstream Name";
+
+/* File Picker */
+"Choose a project directory" = "Choose a project directory";
+"Select" = "Select";
+
+/* Settings */
+"Settings" = "Settings";
+"Language" = "Language";
+"System Default" = "System Default";
+"Restart the app for the language change to take effect." = "Restart the app for the language change to take effect.";
+"Done" = "Done";
