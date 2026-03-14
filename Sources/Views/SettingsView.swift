@@ -16,11 +16,6 @@ struct SettingsView: View {
             // MARK: - Environment
             Section {
                 ToolRow(
-                    name: "tmux",
-                    status: appEnv.toolStatus.tmux,
-                    version: appEnv.toolStatus.tmuxVersion
-                )
-                ToolRow(
                     name: "claude",
                     status: appEnv.toolStatus.claude,
                     version: appEnv.toolStatus.claudeVersion
@@ -35,6 +30,11 @@ struct SettingsView: View {
                     name: "git",
                     status: appEnv.toolStatus.git,
                     version: appEnv.toolStatus.gitVersion
+                )
+                ToolRow(
+                    name: "tmux",
+                    status: appEnv.toolStatus.tmux,
+                    version: appEnv.toolStatus.tmuxVersion
                 )
             } header: {
                 HStack {
