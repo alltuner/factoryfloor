@@ -18,5 +18,14 @@ struct FF2App: App {
         }
         .windowStyle(.automatic)
         .defaultSize(width: 1200, height: 800)
+        .commands {
+            // Replace default Cmd+N (new window) with "add project"
+            CommandGroup(replacing: .newItem) {
+                Button("New Project") {
+                    NotificationCenter.default.post(name: .addProject, object: nil)
+                }
+                .keyboardShortcut("n", modifiers: .command)
+            }
+        }
     }
 }
