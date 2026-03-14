@@ -587,9 +587,14 @@ private struct NewProjectSheet: View {
                 Text("Base directory")
                     .font(.caption)
                     .foregroundStyle(.secondary)
-                Text(abbreviatePath(baseDirectory))
-                    .font(.system(.caption, design: .monospaced))
-                    .foregroundStyle(.tertiary)
+                HStack(spacing: 4) {
+                    Text(abbreviatePath(baseDirectory))
+                        .font(.system(.caption, design: .monospaced))
+                        .foregroundStyle(.tertiary)
+                    Text("(change in Settings)")
+                        .font(.system(size: 10))
+                        .foregroundStyle(.quaternary)
+                }
             }
             .frame(maxWidth: .infinity, alignment: .leading)
 
