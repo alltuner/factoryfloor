@@ -94,6 +94,17 @@ struct ContentView: View {
                 selection = .settings
             }
         }
+        .onReceive(NotificationCenter.default.publisher(for: .clearProjects)) { _ in
+            for project in projects {
+                for ws in project.workstreams {
+                    surfaceCache.removeWorkstreamSurfaces(for: ws.id)
+                }
+            }
+            projects.removeAll()
+            selection = nil
+            selectionBeforeSettings = nil
+            ProjectStore.save([])
+        }
         .onChange(of: projects) { _, newValue in
             // Debounce saves to avoid rapid I/O from activity updates
             saveWork?.cancel()

@@ -12,6 +12,7 @@ struct SettingsView: View {
     @AppStorage("ff2.baseDirectory") private var baseDirectory: String = NSSearchPathForDirectoriesInDomains(.documentDirectory, .userDomainMask, true).first ?? ""
 
     @EnvironmentObject private var appEnv: AppEnvironment
+    @State private var showingClearConfirm = false
 
     var body: some View {
         Form {
@@ -136,9 +137,33 @@ struct SettingsView: View {
                         .foregroundStyle(.secondary)
                 }
             }
+
+            // MARK: - Danger
+            Section {
+                Button(role: .destructive, action: { showingClearConfirm = true }) {
+                    HStack {
+                        Image(systemName: "trash")
+                        Text("Clear project list")
+                    }
+                }
+                Text("Removes all projects and workstreams from the sidebar. No files or directories on disk will be deleted.")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+            } header: {
+                Text("Danger Zone")
+                    .foregroundStyle(.red)
+            }
         }
         .formStyle(.grouped)
         .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .alert("Clear project list?", isPresented: $showingClearConfirm) {
+            Button("Cancel", role: .cancel) {}
+            Button("Clear All", role: .destructive) {
+                NotificationCenter.default.post(name: .clearProjects, object: nil)
+            }
+        } message: {
+            Text("This will remove all projects and workstreams from the sidebar. No files on disk will be deleted. This cannot be undone.")
+        }
     }
 
     private func abbreviatePath(_ path: String) -> String {
