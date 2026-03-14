@@ -9,6 +9,7 @@ extension Notification.Name {
     static let retryBrowser = Notification.Name("ff2.retryBrowser")
     static let switchToAgent = Notification.Name("ff2.switchToAgent")
     static let switchToTerminal = Notification.Name("ff2.switchToTerminal")
+    static let openExternalBrowser = Notification.Name("ff2.openExternalBrowser")
 }
 
 @main
@@ -92,6 +93,13 @@ struct FF2App: App {
                     NotificationCenter.default.post(name: .retryBrowser, object: nil)
                 }
                 .keyboardShortcut("b", modifiers: [.command, .shift])
+
+                Divider()
+
+                Button("Open in External Browser") {
+                    NotificationCenter.default.post(name: .openExternalBrowser, object: nil)
+                }
+                .keyboardShortcut("o", modifiers: [.command, .shift])
             }
         }
     }

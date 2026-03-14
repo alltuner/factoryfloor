@@ -39,6 +39,7 @@ struct TerminalContainerView: View {
 
     @EnvironmentObject var surfaceCache: TerminalSurfaceCache
     @EnvironmentObject var appEnv: AppEnvironment
+    @AppStorage("ff2.defaultBrowser") private var defaultBrowser: String = ""
     @State private var activeTab: WorkstreamTab = .claude
 
     private var claudeID: UUID { workstreamID }
@@ -101,6 +102,16 @@ struct TerminalContainerView: View {
         }
         .onReceive(NotificationCenter.default.publisher(for: .retryBrowser)) { _ in
             activeTab = .browser
+        }
+        .onReceive(NotificationCenter.default.publisher(for: .openExternalBrowser)) { _ in
+            guard let url = URL(string: "http://localhost:8000") else { return }
+            if defaultBrowser.isEmpty {
+                NSWorkspace.shared.open(url)
+            } else if let appURL = NSWorkspace.shared.urlForApplication(withBundleIdentifier: defaultBrowser) {
+                NSWorkspace.shared.open([url], withApplicationAt: appURL, configuration: NSWorkspace.OpenConfiguration())
+            } else {
+                NSWorkspace.shared.open(url)
+            }
         }
     }
 
