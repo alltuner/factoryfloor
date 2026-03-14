@@ -1,0 +1,40 @@
+/* Menu */
+"New" = "Nou";
+"New Project" = "Nou projecte";
+
+/* Content View */
+"No project selected" = "Cap projecte seleccionat";
+"Add a project from the sidebar to get started." = "Afegeix un projecte des de la barra lateral per començar.";
+
+/* Project Overview */
+"No workstreams yet" = "Encara no hi ha fluxos de treball";
+"Workstreams" = "Fluxos de treball";
+"Click to open" = "Fes clic per obrir";
+
+/* Sidebar */
+"Drop a folder here" = "Deixa anar una carpeta aquí";
+"Recent" = "Recents";
+"A-Z" = "A-Z";
+
+/* Alerts */
+"Remove Project" = "Eliminar projecte";
+"Cancel" = "Cancel·lar";
+"Remove" = "Eliminar";
+
+/* Sheets */
+"Add Project" = "Afegir projecte";
+"Directory" = "Directori";
+"Project Name" = "Nom del projecte";
+"Add" = "Afegir";
+"Add Workstream" = "Afegir flux de treball";
+"Workstream Name" = "Nom del flux de treball";
+
+/* File Picker */
+"Choose a project directory" = "Tria un directori de projecte";
+"Select" = "Seleccionar";
+
+/* Settings */
+"Settings" = "Configuració";
+"Language" = "Idioma";
+"System Default" = "Per defecte del sistema";
+"Done" = "Fet";
