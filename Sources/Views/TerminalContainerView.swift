@@ -25,6 +25,11 @@ func derivedUUID(from base: UUID, salt: String) -> UUID {
     return UUID(uuid: bytes)
 }
 
+enum TerminalTab: Hashable {
+    case claude
+    case workspace
+}
+
 struct TerminalContainerView: View {
     let workstreamID: UUID
     let workingDirectory: String
@@ -33,6 +38,7 @@ struct TerminalContainerView: View {
 
     @EnvironmentObject var surfaceCache: TerminalSurfaceCache
     @EnvironmentObject var appEnv: AppEnvironment
+    @State private var activeTab: TerminalTab = .claude
 
     private var claudeID: UUID { workstreamID }
     private var workspaceID: UUID { derivedUUID(from: workstreamID, salt: "workspace") }
@@ -42,24 +48,43 @@ struct TerminalContainerView: View {
     }
 
     var body: some View {
-        VSplitView {
-            // Claude terminal (main, takes ~70%)
-            SingleTerminalView(
-                surfaceID: claudeID,
-                workingDirectory: workingDirectory,
-                command: claudePath,
-                environmentVars: envVars
-            )
-            .frame(minHeight: 100)
+        VStack(spacing: 0) {
+            // Tab bar
+            HStack(spacing: 0) {
+                TabButton(title: "Claude Code", icon: "sparkle", isActive: activeTab == .claude) {
+                    activeTab = .claude
+                }
+                TabButton(title: "Terminal", icon: "terminal", isActive: activeTab == .workspace) {
+                    activeTab = .workspace
+                }
+                Spacer()
+            }
+            .padding(.horizontal, 8)
+            .padding(.vertical, 4)
+            .background(.bar)
 
-            // Workspace terminal (secondary)
-            SingleTerminalView(
-                surfaceID: workspaceID,
-                workingDirectory: workingDirectory,
-                initialInput: "ls\n",
-                environmentVars: envVars
-            )
-            .frame(minHeight: 60, idealHeight: 150)
+            Divider()
+
+            // Terminal content
+            ZStack {
+                SingleTerminalView(
+                    surfaceID: claudeID,
+                    workingDirectory: workingDirectory,
+                    command: claudePath,
+                    isFocused: activeTab == .claude,
+                    environmentVars: envVars
+                )
+                .opacity(activeTab == .claude ? 1 : 0)
+
+                SingleTerminalView(
+                    surfaceID: workspaceID,
+                    workingDirectory: workingDirectory,
+                    initialInput: "ls\n",
+                    isFocused: activeTab == .workspace,
+                    environmentVars: envVars
+                )
+                .opacity(activeTab == .workspace ? 1 : 0)
+            }
         }
     }
 
@@ -71,12 +96,40 @@ struct TerminalContainerView: View {
     }
 }
 
+private struct TabButton: View {
+    let title: String
+    let icon: String
+    let isActive: Bool
+    let action: () -> Void
+
+    @State private var isHovering = false
+
+    var body: some View {
+        Button(action: action) {
+            HStack(spacing: 4) {
+                Image(systemName: icon)
+                    .font(.system(size: 11))
+                Text(title)
+                    .font(.system(size: 12, weight: isActive ? .semibold : .regular))
+            }
+            .padding(.horizontal, 10)
+            .padding(.vertical, 5)
+            .background(isActive ? Color.accentColor.opacity(0.15) : (isHovering ? Color.primary.opacity(0.05) : .clear))
+            .clipShape(RoundedRectangle(cornerRadius: 5))
+            .foregroundStyle(isActive ? .primary : .secondary)
+        }
+        .buttonStyle(.plain)
+        .onHover { isHovering = $0 }
+    }
+}
+
 /// NSViewRepresentable for a single terminal surface.
 struct SingleTerminalView: NSViewRepresentable {
     let surfaceID: UUID
     let workingDirectory: String
     var command: String?
     var initialInput: String?
+    var isFocused: Bool = true
     var environmentVars: [String: String] = [:]
 
     @EnvironmentObject var surfaceCache: TerminalSurfaceCache
@@ -112,7 +165,7 @@ struct SingleTerminalView: NSViewRepresentable {
         }
 
         DispatchQueue.main.async {
-            terminalView.setFocused(true)
+            terminalView.setFocused(isFocused)
         }
     }
 }
