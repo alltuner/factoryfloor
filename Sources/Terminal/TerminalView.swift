@@ -6,9 +6,11 @@ import os
 
 private let logger = Logger(subsystem: "ff2", category: "terminal-view")
 
-final class TerminalView: NSView {
+final class TerminalView: NSView, NSTextInputClient {
     private(set) var surface: ghostty_surface_t?
     private var trackingArea: NSTrackingArea?
+    private var markedText = NSMutableAttributedString()
+    private var keyTextAccumulator: [String]?
 
     init(app: ghostty_app_t, workingDirectory: String? = nil) {
         super.init(frame: NSRect(x: 0, y: 0, width: 800, height: 600))
@@ -130,59 +132,172 @@ final class TerminalView: NSView {
             return
         }
 
-        let mods = ghostty_surface_key_translation_mods(surface, Self.eventMods(event))
-        var keyEvent = ghostty_input_key_s(
-            action: GHOSTTY_ACTION_PRESS,
-            mods: mods,
-            consumed_mods: GHOSTTY_MODS_NONE,
-            keycode: UInt32(event.keyCode),
-            text: nil,
-            unshifted_codepoint: 0,
-            composing: false
-        )
+        let action = event.isARepeat ? GHOSTTY_ACTION_REPEAT : GHOSTTY_ACTION_PRESS
 
-        // Provide the text for the key event
-        if let chars = event.characters, !chars.isEmpty {
-            chars.withCString { cstr in
-                keyEvent.text = cstr
-                if let scalar = chars.unicodeScalars.first {
-                    keyEvent.unshifted_codepoint = scalar.value
-                }
-                _ = ghostty_surface_key(surface, keyEvent)
+        // Use interpretKeyEvents to handle text composition (IME, dead keys, etc).
+        // keyTextAccumulator collects text produced by insertText calls during this.
+        keyTextAccumulator = []
+        defer { keyTextAccumulator = nil }
+
+        interpretKeyEvents([event])
+
+        if let textList = keyTextAccumulator, !textList.isEmpty {
+            // We got composed text from the input system
+            for text in textList {
+                _ = sendKeyEvent(action, event: event, text: text)
             }
         } else {
-            _ = ghostty_surface_key(surface, keyEvent)
+            // No composed text; send the key with ghostty-safe characters
+            let text = Self.ghosttyCharacters(for: event)
+            _ = sendKeyEvent(action, event: event, text: text)
         }
     }
 
     override func keyUp(with event: NSEvent) {
-        guard let surface else { return }
-        let mods = Self.eventMods(event)
-        var keyEvent = ghostty_input_key_s(
-            action: GHOSTTY_ACTION_RELEASE,
-            mods: mods,
-            consumed_mods: GHOSTTY_MODS_NONE,
-            keycode: UInt32(event.keyCode),
-            text: nil,
-            unshifted_codepoint: 0,
-            composing: false
-        )
-        _ = ghostty_surface_key(surface, keyEvent)
+        _ = sendKeyEvent(GHOSTTY_ACTION_RELEASE, event: event)
     }
 
     override func flagsChanged(with event: NSEvent) {
+        _ = sendKeyEvent(GHOSTTY_ACTION_PRESS, event: event)
+    }
+
+    /// Build and send a ghostty_input_key_s from an NSEvent.
+    private func sendKeyEvent(
+        _ action: ghostty_input_action_e,
+        event: NSEvent,
+        text: String? = nil
+    ) -> Bool {
+        guard let surface else { return false }
+
+        var keyEv = ghostty_input_key_s()
+        keyEv.action = action
+        keyEv.keycode = UInt32(event.keyCode)
+        keyEv.mods = Self.eventMods(event)
+
+        // ctrl and command don't contribute to text translation
+        let consumedFlags = event.modifierFlags.subtracting([.control, .command])
+        keyEv.consumed_mods = Self.flagsToGhosttyMods(consumedFlags)
+
+        // Unshifted codepoint: the character with NO modifiers applied.
+        // Must use byApplyingModifiers([]) not charactersIgnoringModifiers,
+        // because the latter still changes behavior with ctrl pressed.
+        keyEv.unshifted_codepoint = 0
+        if event.type == .keyDown || event.type == .keyUp {
+            if let chars = event.characters(byApplyingModifiers: []),
+               let codepoint = chars.unicodeScalars.first {
+                keyEv.unshifted_codepoint = codepoint.value
+            }
+        }
+
+        keyEv.text = nil
+        keyEv.composing = false
+
+        // For text, only pass it if it's not a control character (>= 0x20).
+        // Ghostty's KeyEncoder handles ctrl character mapping internally.
+        if let text, !text.isEmpty,
+           let firstByte = text.utf8.first, firstByte >= 0x20 {
+            return text.withCString { ptr in
+                keyEv.text = ptr
+                return ghostty_surface_key(surface, keyEv)
+            }
+        } else {
+            return ghostty_surface_key(surface, keyEv)
+        }
+    }
+
+    /// Returns text suitable for ghostty key events.
+    /// For control characters, strips the ctrl modifier so ghostty can handle encoding.
+    private static func ghosttyCharacters(for event: NSEvent) -> String? {
+        guard let characters = event.characters else { return nil }
+
+        if characters.count == 1, let scalar = characters.unicodeScalars.first {
+            // Control character: return the char without ctrl applied
+            if scalar.value < 0x20 {
+                return event.characters(byApplyingModifiers: event.modifierFlags.subtracting(.control))
+            }
+            // Private Use Area: function keys, no text
+            if scalar.value >= 0xF700 && scalar.value <= 0xF8FF {
+                return nil
+            }
+        }
+
+        return characters
+    }
+
+    // MARK: - NSTextInputClient
+
+    func insertText(_ string: Any, replacementRange: NSRange) {
+        guard NSApp.currentEvent != nil else { return }
+
+        let chars: String
+        switch string {
+        case let v as NSAttributedString: chars = v.string
+        case let v as String: chars = v
+        default: return
+        }
+
+        if var acc = keyTextAccumulator {
+            acc.append(chars)
+            keyTextAccumulator = acc
+            return
+        }
+
+        // Direct text input outside of keyDown
         guard let surface else { return }
-        let mods = Self.eventMods(event)
-        var keyEvent = ghostty_input_key_s(
-            action: GHOSTTY_ACTION_PRESS,
-            mods: mods,
-            consumed_mods: GHOSTTY_MODS_NONE,
-            keycode: UInt32(event.keyCode),
-            text: nil,
-            unshifted_codepoint: 0,
-            composing: false
-        )
-        _ = ghostty_surface_key(surface, keyEvent)
+        chars.withCString { ptr in
+            ghostty_surface_text(surface, ptr, UInt(chars.utf8.count))
+        }
+    }
+
+    func setMarkedText(_ string: Any, selectedRange: NSRange, replacementRange: NSRange) {
+        switch string {
+        case let v as NSAttributedString: markedText = NSMutableAttributedString(attributedString: v)
+        case let v as String: markedText = NSMutableAttributedString(string: v)
+        default: return
+        }
+    }
+
+    func unmarkText() {
+        markedText.mutableString.setString("")
+    }
+
+    func selectedRange() -> NSRange {
+        NSRange(location: NSNotFound, length: 0)
+    }
+
+    func markedRange() -> NSRange {
+        guard markedText.length > 0 else {
+            return NSRange(location: NSNotFound, length: 0)
+        }
+        return NSRange(location: 0, length: markedText.length)
+    }
+
+    func hasMarkedText() -> Bool {
+        markedText.length > 0
+    }
+
+    func attributedSubstring(forProposedRange range: NSRange, actualRange: NSRangePointer?) -> NSAttributedString? {
+        nil
+    }
+
+    func validAttributesForMarkedText() -> [NSAttributedString.Key] {
+        []
+    }
+
+    func firstRect(forCharacterRange range: NSRange, actualRange: NSRangePointer?) -> NSRect {
+        guard let surface else { return .zero }
+        var x: Double = 0, y: Double = 0, w: Double = 0, h: Double = 0
+        ghostty_surface_ime_point(surface, &x, &y, &w, &h)
+        let point = window?.convertPoint(toScreen: convert(NSPoint(x: x, y: y), to: nil)) ?? .zero
+        return NSRect(x: point.x, y: point.y, width: w, height: h)
+    }
+
+    func characterIndex(for point: NSPoint) -> Int {
+        0
+    }
+
+    override func doCommand(by selector: Selector) {
+        // Let the input system handle commands we don't care about
     }
 
     // MARK: - Mouse
@@ -241,8 +356,11 @@ final class TerminalView: NSView {
     // MARK: - Modifier translation
 
     private static func eventMods(_ event: NSEvent) -> ghostty_input_mods_e {
+        flagsToGhosttyMods(event.modifierFlags)
+    }
+
+    private static func flagsToGhosttyMods(_ flags: NSEvent.ModifierFlags) -> ghostty_input_mods_e {
         var mods = GHOSTTY_MODS_NONE.rawValue
-        let flags = event.modifierFlags
         if flags.contains(.shift) { mods |= GHOSTTY_MODS_SHIFT.rawValue }
         if flags.contains(.control) { mods |= GHOSTTY_MODS_CTRL.rawValue }
         if flags.contains(.option) { mods |= GHOSTTY_MODS_ALT.rawValue }
