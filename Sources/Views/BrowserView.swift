@@ -41,6 +41,12 @@ struct BrowserView: View {
                 }
                 .buttonStyle(.plain)
 
+                Button(action: { navigateTo(defaultURL) }) {
+                    Image(systemName: "house")
+                        .font(.system(size: 11))
+                }
+                .buttonStyle(.plain)
+
                 TextField("URL", text: $urlText)
                     .textFieldStyle(.roundedBorder)
                     .font(.system(size: 12, design: .monospaced))
