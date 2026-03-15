@@ -112,6 +112,13 @@ struct ContentView: View {
             default: NSApp.appearance = nil
             }
         }
+        .onReceive(NotificationCenter.default.publisher(for: .switchToProject)) { _ in
+            // Go back to project view from any workstream
+            if let wsID = selection?.workstreamID,
+               let project = projects.first(where: { $0.workstreams.contains(where: { $0.id == wsID }) }) {
+                selection = .project(project.id)
+            }
+        }
         .onReceive(Timer.publish(every: 15, on: .main, in: .common).autoconnect()) { _ in
             appEnvironment.refreshAllRepoInfo(projects: projects)
             appEnvironment.refreshPathValidity(projects: projects)

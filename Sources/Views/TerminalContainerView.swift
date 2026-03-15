@@ -55,28 +55,35 @@ struct TerminalContainerView: View {
         tmuxMode && appEnv.toolStatus.tmux.isInstalled
     }
 
+    private var workstreamPort: Int {
+        PortAllocator.port(for: workingDirectory)
+    }
+
     private var claudeCommand: String? {
-        let basePath = appEnv.toolStatus.claude.path
-        var cmd: String?
-        if let basePath {
-            let sessionID = workstreamID.uuidString.lowercased()
-            let wsNameEscaped = workstreamName.replacingOccurrences(of: "\"", with: "\\\"")
-            var flags = "--name \"\(wsNameEscaped)\""
-            if useTmux {
-                flags += " --teammate-mode tmux"
-            }
-            if bypassPermissions {
-                flags += " --dangerously-skip-permissions"
-            }
-            // Extra flags only for new sessions (not resume)
-            var newSessionFlags = flags
-            if autoRenameBranch {
-                let promptPath = SystemPrompts.autoRenameBranchPromptPath()
-                newSessionFlags += " --system-prompt-file \"\(promptPath)\""
-            }
-            // Try resuming the workstream's session, fall back to creating one with a fixed ID
-            cmd = "sh -c \"\(basePath) --resume \(sessionID) \(flags) 2>/dev/null || (echo 'Starting new session...' && \(basePath) --session-id \(sessionID) \(newSessionFlags))\""
+        guard let basePath = appEnv.toolStatus.claude.path else { return nil }
+        let sessionID = workstreamID.uuidString.lowercased()
+
+        // Common flags for both resume and new session
+        var resume = CommandBuilder(basePath)
+        resume.option("--resume", sessionID)
+        resume.option("--name", workstreamName)
+        if useTmux { resume.flag("--teammate-mode"); resume.arg("tmux") }
+        if bypassPermissions { resume.flag("--dangerously-skip-permissions") }
+
+        // New session gets extra flags
+        var fresh = CommandBuilder(basePath)
+        fresh.option("--session-id", sessionID)
+        fresh.option("--name", workstreamName)
+        if useTmux { fresh.flag("--teammate-mode"); fresh.arg("tmux") }
+        if bypassPermissions { fresh.flag("--dangerously-skip-permissions") }
+        if autoRenameBranch {
+            fresh.option("--system-prompt-file", SystemPrompts.autoRenameBranchPromptPath())
         }
+
+        let cmd = CommandBuilder.withFallback(
+            resume.command, fresh.command,
+            message: "Starting new session..."
+        )
 
         if useTmux, let tmuxPath = appEnv.toolStatus.tmux.path {
             let session = TmuxSession.sessionName(project: projectName, workstream: workstreamName, role: "agent")
@@ -95,16 +102,16 @@ struct TerminalContainerView: View {
         VStack(spacing: 0) {
             // Tab bar
             HStack(spacing: 0) {
-                TabButton(title: "Info", icon: "info.circle", shortcut: "0", isActive: activeTab == .info) {
+                TabButton(title: "Info", icon: "info.circle", shortcut: "1", isActive: activeTab == .info) {
                     activeTab = .info
                 }
-                TabButton(title: "Coding Agent", icon: "sparkle", shortcut: "1", isActive: activeTab == .claude) {
+                TabButton(title: "Coding Agent", icon: "sparkle", shortcut: "2", isActive: activeTab == .claude) {
                     activeTab = .claude
                 }
-                TabButton(title: "Terminal", icon: "terminal", shortcut: "2", isActive: activeTab == .workspace) {
+                TabButton(title: "Terminal", icon: "terminal", shortcut: "3", isActive: activeTab == .workspace) {
                     activeTab = .workspace
                 }
-                TabButton(title: "Browser", icon: "globe", shortcut: "3", isActive: activeTab == .browser) {
+                TabButton(title: "Browser", icon: "globe", shortcut: "4", isActive: activeTab == .browser) {
                     activeTab = .browser
                 }
                 Spacer()
@@ -141,7 +148,7 @@ struct TerminalContainerView: View {
                     environmentVars: envVars
                 )
             case .browser:
-                BrowserView(defaultURL: "http://localhost:8000")
+                BrowserView(defaultURL: "http://localhost:\(workstreamPort)")
             }
         }
         .onAppear { prewarmSurfaces() }
@@ -174,7 +181,7 @@ struct TerminalContainerView: View {
             }
         }
         .onReceive(NotificationCenter.default.publisher(for: .openExternalBrowser)) { _ in
-            guard let url = URL(string: "http://localhost:8000") else { return }
+            guard let url = URL(string: "http://localhost:\(workstreamPort)") else { return }
             if defaultBrowser.isEmpty {
                 NSWorkspace.shared.open(url)
             } else if let appURL = NSWorkspace.shared.urlForApplication(withBundleIdentifier: defaultBrowser) {
@@ -204,6 +211,7 @@ struct TerminalContainerView: View {
             "FF_WORKSTREAM": workstreamName,
             "FF_PROJECT_DIR": projectDirectory,
             "FF_WORKTREE_DIR": workingDirectory,
+            "FF_PORT": "\(workstreamPort)",
         ]
         if agentTeams {
             vars["CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS"] = "1"
