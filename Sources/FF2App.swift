@@ -121,15 +121,13 @@ struct FF2App: App {
                 }
                 .keyboardShortcut("e", modifiers: [.command, .shift])
             }
-            // Hidden shortcuts (active but not in menus)
+            // Contextual shortcuts (in menu but minimal labels)
             CommandGroup(after: .toolbar) {
-                Button("") { NotificationCenter.default.post(name: .dismissOverlay, object: nil) }
-                    .keyboardShortcut(.escape, modifiers: []).hidden()
-                Button("") { NotificationCenter.default.post(name: .switchToProject, object: nil) }
-                    .keyboardShortcut("0", modifiers: .command).hidden()
+                Button("Back to Project") { NotificationCenter.default.post(name: .switchToProject, object: nil) }
+                    .keyboardShortcut("0", modifiers: .command)
                 ForEach(1...9, id: \.self) { n in
-                    Button("") { NotificationCenter.default.post(name: .switchByNumber, object: n) }
-                        .keyboardShortcut(KeyEquivalent(Character("\(n)")), modifiers: .command).hidden()
+                    Button("Switch to \(n)") { NotificationCenter.default.post(name: .switchByNumber, object: n) }
+                        .keyboardShortcut(KeyEquivalent(Character("\(n)")), modifiers: .command)
                 }
             }
         }

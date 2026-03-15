@@ -170,10 +170,12 @@ struct ContentView: View {
                 selectionBeforeSettings = oldValue
             }
         }
-        .onReceive(NotificationCenter.default.publisher(for: .dismissOverlay)) { _ in
+        .onKeyPress(.escape) {
             if selection == .settings || selection == .help {
                 selection = selectionBeforeSettings
+                return .handled
             }
+            return .ignored
         }
         .onReceive(NotificationCenter.default.publisher(for: .toggleSidebar)) { _ in
             NSApp.sendAction(#selector(NSSplitViewController.toggleSidebar(_:)), to: nil, from: nil)
