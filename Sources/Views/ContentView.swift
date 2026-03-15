@@ -81,7 +81,13 @@ struct ContentView: View {
         }
         .environmentObject(surfaceCache)
         .environmentObject(appEnvironment)
-        .onAppear { appEnvironment.refresh() }
+        .onAppear {
+            appEnvironment.refresh()
+            appEnvironment.refreshAllRepoInfo(projects: projects)
+        }
+        .onReceive(Timer.publish(every: 15, on: .main, in: .common).autoconnect()) { _ in
+            appEnvironment.refreshAllRepoInfo(projects: projects)
+        }
         .onChange(of: selection) { oldValue, newValue in
             if newValue == .settings {
                 selectionBeforeSettings = oldValue

@@ -1,5 +1,5 @@
 // ABOUTME: Overview shown when a project is selected but no workstream is active.
-// ABOUTME: Displays project header with editable alias, and workstream cards.
+// ABOUTME: Native Form layout with editable name, repo info, and workstream cards.
 
 import SwiftUI
 
@@ -8,9 +8,7 @@ struct ProjectOverviewView: View {
     let onSelectWorkstream: (UUID) -> Void
     let onProjectChanged: () -> Void
 
-    @State private var editingAlias = false
-    @State private var aliasText = ""
-    @State private var repoInfo: GitRepoInfo?
+    @EnvironmentObject var appEnv: AppEnvironment
 
     private let columns = [
         GridItem(.adaptive(minimum: 280, maximum: 400), spacing: 20)
@@ -18,52 +16,67 @@ struct ProjectOverviewView: View {
 
     var body: some View {
         ScrollView {
-            VStack(spacing: 32) {
-                // Project header
-                VStack(spacing: 8) {
-                    if editingAlias {
-                        TextField("Project Name", text: $aliasText)
-                            .font(.system(size: 28, weight: .bold))
-                            .multilineTextAlignment(.center)
-                            .textFieldStyle(.plain)
-                            .frame(maxWidth: 400)
-                            .onSubmit { commitAlias() }
-                            .onExitCommand { editingAlias = false }
-                    } else {
-                        Text(project.name)
-                            .font(.system(size: 32, weight: .bold))
-                            .onTapGesture {
-                                aliasText = project.name
-                                editingAlias = true
-                            }
-                    }
-                    Text(project.directory)
-                        .font(.system(.body, design: .monospaced))
-                        .foregroundStyle(.secondary)
+            VStack(spacing: 24) {
+                // Project details form
+                Form {
+                    Section("Project") {
+                        TextField("Name", text: $project.name)
+                            .onChange(of: project.name) { _, _ in onProjectChanged() }
 
-                    if editingAlias {
-                        HStack(spacing: 8) {
-                            Button("Cancel") { editingAlias = false }
-                                .keyboardShortcut(.cancelAction)
-                            Button("Save") { commitAlias() }
-                                .keyboardShortcut(.defaultAction)
-                                .disabled(aliasText.trimmingCharacters(in: .whitespaces).isEmpty)
+                        LabeledContent("Directory") {
+                            Text(project.directory)
+                                .font(.system(.body, design: .monospaced))
+                                .foregroundStyle(.secondary)
+                                .lineLimit(1)
+                                .truncationMode(.middle)
                         }
-                        .font(.caption)
-                    } else {
-                        Text("Click name to set alias")
-                            .font(.caption)
-                            .foregroundStyle(.tertiary)
+                    }
+
+                    if let info = appEnv.repoInfo(for: project.directory) {
+                        Section("Repository") {
+                            if info.isRepo {
+                                LabeledContent("Branch") {
+                                    HStack(spacing: 4) {
+                                        Image(systemName: "arrow.triangle.branch")
+                                            .font(.caption)
+                                        Text(info.branch ?? "unknown")
+                                    }
+                                    .foregroundStyle(.secondary)
+                                }
+
+                                if let count = info.commitCount {
+                                    LabeledContent("Commits") {
+                                        Text("\(count)")
+                                            .foregroundStyle(.secondary)
+                                    }
+                                }
+
+                                if let remote = info.remoteURL {
+                                    LabeledContent("Remote") {
+                                        Text(remote)
+                                            .font(.system(.body, design: .monospaced))
+                                            .foregroundStyle(.secondary)
+                                            .lineLimit(1)
+                                            .truncationMode(.middle)
+                                    }
+                                }
+
+                                LabeledContent("Status") {
+                                    Text(info.isDirty ? "Uncommitted changes" : "Clean")
+                                        .foregroundStyle(info.isDirty ? .orange : .green)
+                                }
+                            } else {
+                                LabeledContent("Status") {
+                                    Text("Not a git repository")
+                                        .foregroundStyle(.secondary)
+                                }
+                            }
+                        }
                     }
                 }
-                .frame(maxWidth: .infinity)
-                .padding(.top, 48)
-
-                // Git info
-                if let info = repoInfo {
-                    RepoInfoCard(info: info)
-                        .padding(.horizontal, 24)
-                }
+                .formStyle(.grouped)
+                .scrollDisabled(true)
+                .frame(maxHeight: 400)
 
                 // Workstreams section
                 if project.workstreams.isEmpty {
@@ -97,67 +110,7 @@ struct ProjectOverviewView: View {
             }
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
-        .onAppear { repoInfo = GitOperations.repoInfo(at: project.directory) }
-    }
-
-    private func commitAlias() {
-        let name = aliasText.trimmingCharacters(in: .whitespaces)
-        guard !name.isEmpty else { return }
-        project.name = name
-        editingAlias = false
-        onProjectChanged()
-    }
-}
-
-private struct RepoInfoCard: View {
-    let info: GitRepoInfo
-
-    var body: some View {
-        VStack(alignment: .leading, spacing: 12) {
-            HStack {
-                Image(systemName: info.isRepo ? "checkmark.circle.fill" : "xmark.circle")
-                    .foregroundStyle(info.isRepo ? .green : .secondary)
-                Text(info.isRepo ? "Git Repository" : "Not a Git Repository")
-                    .font(.system(.body, weight: .medium))
-                Spacer()
-                if info.isDirty {
-                    Text("Uncommitted changes")
-                        .font(.caption)
-                        .foregroundStyle(.orange)
-                }
-            }
-
-            if info.isRepo {
-                HStack(spacing: 24) {
-                    if let branch = info.branch {
-                        Label(branch, systemImage: "arrow.triangle.branch")
-                            .font(.caption)
-                            .foregroundStyle(.secondary)
-                    }
-                    if let count = info.commitCount {
-                        Label("\(count) commits", systemImage: "clock")
-                            .font(.caption)
-                            .foregroundStyle(.secondary)
-                    }
-                }
-
-                if let remote = info.remoteURL {
-                    Text(remote)
-                        .font(.system(.caption, design: .monospaced))
-                        .foregroundStyle(.tertiary)
-                        .lineLimit(1)
-                        .truncationMode(.middle)
-                }
-            }
-        }
-        .padding(16)
-        .frame(maxWidth: .infinity, alignment: .leading)
-        .background(Color.primary.opacity(0.04))
-        .clipShape(RoundedRectangle(cornerRadius: 10))
-        .overlay(
-            RoundedRectangle(cornerRadius: 10)
-                .strokeBorder(Color.primary.opacity(0.08), lineWidth: 1)
-        )
+        .onAppear { appEnv.refreshRepoInfo(for: project.directory) }
     }
 }
 
