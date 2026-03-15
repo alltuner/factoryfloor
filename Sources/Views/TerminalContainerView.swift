@@ -87,16 +87,16 @@ struct TerminalContainerView: View {
         VStack(spacing: 0) {
             // Tab bar
             HStack(spacing: 0) {
-                TabButton(title: "Info", icon: "info.circle", isActive: activeTab == .info) {
+                TabButton(title: "Info", icon: "info.circle", shortcut: "0", isActive: activeTab == .info) {
                     activeTab = .info
                 }
-                TabButton(title: "Coding Agent", icon: "sparkle", isActive: activeTab == .claude) {
+                TabButton(title: "Coding Agent", icon: "sparkle", shortcut: "1", isActive: activeTab == .claude) {
                     activeTab = .claude
                 }
-                TabButton(title: "Terminal", icon: "terminal", isActive: activeTab == .workspace) {
+                TabButton(title: "Terminal", icon: "terminal", shortcut: "2", isActive: activeTab == .workspace) {
                     activeTab = .workspace
                 }
-                TabButton(title: "Browser", icon: "globe", isActive: activeTab == .browser) {
+                TabButton(title: "Browser", icon: "globe", shortcut: "3", isActive: activeTab == .browser) {
                     activeTab = .browser
                 }
                 Spacer()
@@ -136,6 +136,9 @@ struct TerminalContainerView: View {
             }
         }
         .onAppear { prewarmSurfaces() }
+        .onReceive(NotificationCenter.default.publisher(for: .switchToInfo)) { _ in
+            activeTab = .info
+        }
         .onReceive(NotificationCenter.default.publisher(for: .switchToAgent)) { _ in
             activeTab = .claude
         }
@@ -201,6 +204,7 @@ struct TerminalContainerView: View {
 private struct TabButton: View {
     let title: String
     let icon: String
+    var shortcut: String? = nil
     let isActive: Bool
     let action: () -> Void
 
@@ -213,6 +217,11 @@ private struct TabButton: View {
                     .font(.system(size: 11))
                 Text(title)
                     .font(.system(size: 12, weight: isActive ? .semibold : .regular))
+                if let shortcut {
+                    Text("\(Image(systemName: "command"))\(shortcut)")
+                        .font(.system(size: 9))
+                        .foregroundStyle(.tertiary)
+                }
             }
             .padding(.horizontal, 10)
             .padding(.vertical, 5)

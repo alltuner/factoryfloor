@@ -7,6 +7,7 @@ extension Notification.Name {
     static let openDirectory = Notification.Name("ff2.openDirectory")
     static let openSettings = Notification.Name("ff2.openSettings")
     static let retryBrowser = Notification.Name("ff2.retryBrowser")
+    static let switchToInfo = Notification.Name("ff2.switchToInfo")
     static let switchToAgent = Notification.Name("ff2.switchToAgent")
     static let switchToTerminal = Notification.Name("ff2.switchToTerminal")
     static let openExternalBrowser = Notification.Name("ff2.openExternalBrowser")
@@ -81,22 +82,27 @@ struct FF2App: App {
                 }
                 .keyboardShortcut(",", modifiers: .command)
             }
-            // Cmd+Shift+A/T/B: switch workstream tabs
+            // Cmd+0/1/2/3: switch workstream tabs
             CommandGroup(after: .toolbar) {
+                Button("Info") {
+                    NotificationCenter.default.post(name: .switchToInfo, object: nil)
+                }
+                .keyboardShortcut("0", modifiers: .command)
+
                 Button("Coding Agent") {
                     NotificationCenter.default.post(name: .switchToAgent, object: nil)
                 }
-                .keyboardShortcut("a", modifiers: [.command, .shift])
+                .keyboardShortcut("1", modifiers: .command)
 
                 Button("Terminal") {
                     NotificationCenter.default.post(name: .switchToTerminal, object: nil)
                 }
-                .keyboardShortcut("t", modifiers: [.command, .shift])
+                .keyboardShortcut("2", modifiers: .command)
 
                 Button("Browser") {
                     NotificationCenter.default.post(name: .retryBrowser, object: nil)
                 }
-                .keyboardShortcut("b", modifiers: [.command, .shift])
+                .keyboardShortcut("3", modifiers: .command)
 
                 Divider()
 
