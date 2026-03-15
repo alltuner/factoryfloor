@@ -11,6 +11,7 @@ extension Notification.Name {
     static let switchToTerminal = Notification.Name("ff2.switchToTerminal")
     static let openExternalBrowser = Notification.Name("ff2.openExternalBrowser")
     static let clearProjects = Notification.Name("ff2.clearProjects")
+    static let openExternalTerminal = Notification.Name("ff2.openExternalTerminal")
 }
 
 @main
@@ -101,6 +102,11 @@ struct FF2App: App {
                     NotificationCenter.default.post(name: .openExternalBrowser, object: nil)
                 }
                 .keyboardShortcut("o", modifiers: [.command, .shift])
+
+                Button("Open in External Terminal") {
+                    NotificationCenter.default.post(name: .openExternalTerminal, object: nil)
+                }
+                .keyboardShortcut("e", modifiers: [.command, .shift])
             }
         }
     }

@@ -110,6 +110,24 @@ struct ContentView: View {
             appEnvironment.refreshAllRepoInfo(projects: projects)
             appEnvironment.refreshPathValidity(projects: projects)
         }
+        .onChange(of: appEnvironment.missingProjectIDs) { _, missing in
+            guard !missing.isEmpty else { return }
+            for id in missing {
+                if let project = projects.first(where: { $0.id == id }) {
+                    for ws in project.workstreams {
+                        surfaceCache.removeWorkstreamSurfaces(for: ws.id)
+                    }
+                }
+            }
+            projects.removeAll { missing.contains($0.id) }
+            if let sel = selection, case .project(let pid) = sel, missing.contains(pid) {
+                selection = nil
+            }
+            if let sel = selection, case .workstream(_) = sel, activeProject == nil {
+                selection = nil
+            }
+            ProjectStore.save(projects)
+        }
         .onChange(of: selection) { oldValue, newValue in
             if newValue == .settings {
                 selectionBeforeSettings = oldValue
@@ -132,6 +150,29 @@ struct ContentView: View {
             selectionBeforeSettings = nil
             selection = .settings
             ProjectStore.save([])
+        }
+        .onReceive(NotificationCenter.default.publisher(for: .openExternalTerminal)) { _ in
+            let dir: String?
+            if let ws = activeWorkstream, let project = activeProject {
+                dir = ws.workingDirectory(projectDirectory: project.directory)
+            } else if let project = activeProject {
+                dir = project.directory
+            } else {
+                dir = nil
+            }
+            guard let dir else { return }
+            let terminalBundleID = UserDefaults.standard.string(forKey: "ff2.defaultTerminal") ?? ""
+            if !terminalBundleID.isEmpty,
+               let appURL = NSWorkspace.shared.urlForApplication(withBundleIdentifier: terminalBundleID) {
+                let config = NSWorkspace.OpenConfiguration()
+                NSWorkspace.shared.open([URL(fileURLWithPath: dir)], withApplicationAt: appURL, configuration: config)
+            } else {
+                // Fallback: open Terminal.app with the directory
+                let script = "tell application \"Terminal\" to do script \"cd \(dir.replacingOccurrences(of: "\"", with: "\\\"")) && clear\""
+                if let appleScript = NSAppleScript(source: script) {
+                    appleScript.executeAndReturnError(nil)
+                }
+            }
         }
         .onChange(of: projects) { _, newValue in
             // Debounce saves to avoid rapid I/O from activity updates

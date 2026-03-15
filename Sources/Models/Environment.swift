@@ -81,22 +81,36 @@ final class AppEnvironment: ObservableObject {
     // MARK: - Path Validity
 
     func isPathValid(_ path: String?) -> Bool {
-        guard let path else { return true } // No worktree path means using project dir
-        return pathValidityCache[path] ?? true // Assume valid until checked
+        guard let path else { return true }
+        return pathValidityCache[path] ?? true
     }
+
+    /// Returns IDs of projects whose directories no longer exist.
+    @Published var missingProjectIDs: Set<UUID> = []
 
     func refreshPathValidity(projects: [Project]) {
         Task.detached {
             var results: [String: Bool] = [:]
+            var missing: Set<UUID> = []
+
             for project in projects {
+                // Check project directory
+                var isDir: ObjCBool = false
+                let exists = FileManager.default.fileExists(atPath: project.directory, isDirectory: &isDir) && isDir.boolValue
+                if !exists {
+                    missing.insert(project.id)
+                }
+
+                // Check worktree paths
                 for ws in project.workstreams {
                     guard let path = ws.worktreePath else { continue }
-                    var isDir: ObjCBool = false
-                    results[path] = FileManager.default.fileExists(atPath: path, isDirectory: &isDir) && isDir.boolValue
+                    var wsIsDir: ObjCBool = false
+                    results[path] = FileManager.default.fileExists(atPath: path, isDirectory: &wsIsDir) && wsIsDir.boolValue
                 }
             }
             await MainActor.run {
                 self.pathValidityCache.merge(results) { _, new in new }
+                self.missingProjectIDs = missing
             }
         }
     }
