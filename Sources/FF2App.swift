@@ -12,6 +12,8 @@ extension Notification.Name {
     static let openExternalBrowser = Notification.Name("ff2.openExternalBrowser")
     static let clearProjects = Notification.Name("ff2.clearProjects")
     static let openExternalTerminal = Notification.Name("ff2.openExternalTerminal")
+    static let nextTab = Notification.Name("ff2.nextTab")
+    static let prevTab = Notification.Name("ff2.prevTab")
 }
 
 @main
@@ -107,6 +109,18 @@ struct FF2App: App {
                     NotificationCenter.default.post(name: .openExternalTerminal, object: nil)
                 }
                 .keyboardShortcut("e", modifiers: [.command, .shift])
+
+                Divider()
+
+                Button("Next Tab") {
+                    NotificationCenter.default.post(name: .nextTab, object: nil)
+                }
+                .keyboardShortcut("]", modifiers: [.command, .shift])
+
+                Button("Previous Tab") {
+                    NotificationCenter.default.post(name: .prevTab, object: nil)
+                }
+                .keyboardShortcut("[", modifiers: [.command, .shift])
             }
         }
     }

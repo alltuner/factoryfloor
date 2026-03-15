@@ -123,6 +123,20 @@ struct TerminalContainerView: View {
         .onReceive(NotificationCenter.default.publisher(for: .retryBrowser)) { _ in
             activeTab = .browser
         }
+        .onReceive(NotificationCenter.default.publisher(for: .nextTab)) { _ in
+            switch activeTab {
+            case .claude: activeTab = .workspace
+            case .workspace: activeTab = .browser
+            case .browser: activeTab = .claude
+            }
+        }
+        .onReceive(NotificationCenter.default.publisher(for: .prevTab)) { _ in
+            switch activeTab {
+            case .claude: activeTab = .browser
+            case .workspace: activeTab = .claude
+            case .browser: activeTab = .workspace
+            }
+        }
         .onReceive(NotificationCenter.default.publisher(for: .openExternalBrowser)) { _ in
             guard let url = URL(string: "http://localhost:8000") else { return }
             if defaultBrowser.isEmpty {
