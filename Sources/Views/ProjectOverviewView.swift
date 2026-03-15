@@ -10,6 +10,7 @@ struct ProjectOverviewView: View {
     let onProjectChanged: () -> Void
 
     @EnvironmentObject var appEnv: AppEnvironment
+    @AppStorage("ff2.workstreamSortOrder") private var workstreamSortOrder: ProjectSortOrder = .recent
 
     var body: some View {
         Form {
@@ -132,7 +133,7 @@ struct ProjectOverviewView: View {
                     }
                     .padding(.vertical, 8)
                 } else {
-                    let sorted = project.workstreams.sorted { $0.lastAccessedAt > $1.lastAccessedAt }
+                    let sorted = sortedWorkstreams(project.workstreams)
                     ForEach(Array(sorted.enumerated()), id: \.element.id) { index, workstream in
                         WorkstreamRow(
                             workstream: workstream,
@@ -147,6 +148,15 @@ struct ProjectOverviewView: View {
                 HStack {
                     Text("Workstreams")
                     Spacer()
+                    if project.workstreams.count > 1 {
+                        Picker("", selection: $workstreamSortOrder) {
+                            ForEach(ProjectSortOrder.allCases, id: \.self) { order in
+                                Text(order.rawValue).tag(order)
+                            }
+                        }
+                        .pickerStyle(.segmented)
+                        .frame(width: 120)
+                    }
                     Text("\(project.workstreams.count)")
                         .font(.caption)
                         .foregroundStyle(.secondary)
@@ -158,6 +168,15 @@ struct ProjectOverviewView: View {
         .onAppear {
             appEnv.refreshRepoInfo(for: project.directory)
             appEnv.refreshGitHubInfo(for: project.directory)
+        }
+    }
+
+    private func sortedWorkstreams(_ workstreams: [Workstream]) -> [Workstream] {
+        switch workstreamSortOrder {
+        case .recent:
+            return workstreams.sorted { $0.lastAccessedAt > $1.lastAccessedAt }
+        case .alphabetical:
+            return workstreams.sorted { $0.name.localizedCaseInsensitiveCompare($1.name) == .orderedAscending }
         }
     }
 
