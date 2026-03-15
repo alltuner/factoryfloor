@@ -83,9 +83,18 @@ struct SettingsView: View {
                     .foregroundStyle(.secondary)
 
                 LabeledContent("Branch prefix") {
-                    TextField("", text: $branchPrefix)
-                        .textFieldStyle(.roundedBorder)
-                        .frame(maxWidth: 150)
+                    TextField("", text: Binding(
+                        get: { branchPrefix },
+                        set: { newValue in
+                            // Only allow lowercase letters and hyphens, no leading/trailing hyphens, no double hyphens
+                            let filtered = String(newValue.lowercased().filter { $0.isLetter || $0 == "-" })
+                                .replacingOccurrences(of: "--", with: "-")
+                            let trimmed = filtered.trimmingCharacters(in: CharacterSet(charactersIn: "-"))
+                            branchPrefix = trimmed
+                        }
+                    ))
+                    .textFieldStyle(.roundedBorder)
+                    .frame(maxWidth: 150)
                 }
                 Text("e.g. \(branchPrefix.isEmpty ? "ff2" : branchPrefix)/deploy-ludicrous-speed")
                     .font(.system(.caption, design: .monospaced))
