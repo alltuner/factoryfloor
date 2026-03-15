@@ -7,6 +7,7 @@ struct SettingsView: View {
     @AppStorage("ff2.languageOverride") private var languageOverride: String = ""
     @AppStorage("ff2.tmuxMode") private var tmuxMode: Bool = false
     @AppStorage("ff2.bypassPermissions") private var bypassPermissions: Bool = false
+    @AppStorage("ff2.agentTeams") private var agentTeams: Bool = false
     @AppStorage("ff2.defaultTerminal") private var defaultTerminal: String = ""
     @AppStorage("ff2.defaultBrowser") private var defaultBrowser: String = ""
     @AppStorage("ff2.branchPrefix") private var branchPrefix: String = "ff2"
@@ -119,6 +120,11 @@ struct SettingsView: View {
                 Text("When enabled, the coding agent will not ask for confirmation before making changes. Use with caution: the agent will be able to edit files, run commands, and make git commits without asking.")
                     .font(.caption)
                     .foregroundStyle(bypassPermissions ? .orange : .secondary)
+
+                Toggle("Agent Teams", isOn: $agentTeams)
+                Text("Enables experimental multi-agent coordination. Agents can spawn teammates, delegate tasks, and collaborate across workstreams.")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
             }
 
             // MARK: - Applications

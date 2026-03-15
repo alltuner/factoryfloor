@@ -42,6 +42,7 @@ struct TerminalContainerView: View {
     @EnvironmentObject var appEnv: AppEnvironment
     @AppStorage("ff2.defaultBrowser") private var defaultBrowser: String = ""
     @AppStorage("ff2.tmuxMode") private var tmuxMode: Bool = false
+    @AppStorage("ff2.agentTeams") private var agentTeams: Bool = false
     @State private var activeTab: WorkstreamTab = .claude
 
     private var claudeID: UUID { workstreamID }
@@ -160,10 +161,14 @@ struct TerminalContainerView: View {
     }
 
     private var envVars: [String: String] {
-        [
+        var vars = [
             "FF_PROJECT": projectName,
             "FF_WORKSTREAM": workstreamName,
         ]
+        if agentTeams {
+            vars["CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS"] = "1"
+        }
+        return vars
     }
 }
 

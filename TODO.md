@@ -15,6 +15,12 @@
 - [ ] Reorder projects via drag-and-drop in sidebar
 - [ ] Keyboard shortcuts for switching between projects/workstreams (Cmd+1, Cmd+2, etc.)
 - [ ] External Chrome integration: launch Chrome with --remote-debugging-port, connect via CDP for WebMCP/Claude browser interaction
+- [ ] Setup scripts: run commands when a worktree is created (e.g., npm install, pip install)
+- [ ] Run scripts: configurable ways to start dev servers, build, or run the app (multiple per project)
+- [ ] Teardown scripts: cleanup commands when archiving a workstream
+- [ ] PR management: create, view, and manage pull requests from workstreams
+- [ ] GitHub integration: link workstreams to issues/PRs, show status
+- [ ] Branch renaming: rename worktree branches based on the task at hand
 
 ## Terminal
 - [x] Terminal resize flicker on session restart
