@@ -107,7 +107,7 @@ struct ProjectSidebar: View {
             }
             .listStyle(.sidebar)
             .safeAreaInset(edge: .top) {
-                if !projects.isEmpty {
+                if projects.count > 1 {
                     Picker("", selection: $sortOrder) {
                         ForEach(ProjectSortOrder.allCases, id: \.self) { order in
                             Text(order.rawValue).tag(order)

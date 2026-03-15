@@ -64,6 +64,19 @@ struct ContentView: View {
                 ProjectOverviewView(
                     project: $projects[projectIndex],
                     onSelectWorkstream: { wsID in selection = .workstream(wsID) },
+                    onArchiveWorkstream: { wsID in
+                        let project = projects[projectIndex]
+                        if let ws = project.workstreams.first(where: { $0.id == wsID }) {
+                            GitOperations.removeWorktree(
+                                projectPath: project.directory,
+                                workstreamName: ws.name,
+                                projectName: project.name
+                            )
+                        }
+                        surfaceCache.removeWorkstreamSurfaces(for: wsID)
+                        projects[projectIndex].workstreams.removeAll { $0.id == wsID }
+                        ProjectStore.save(projects)
+                    },
                     onProjectChanged: { ProjectStore.save(projects) }
                 )
                 .navigationTitle(project.name)

@@ -6,6 +6,7 @@ import SwiftUI
 struct ProjectOverviewView: View {
     @Binding var project: Project
     let onSelectWorkstream: (UUID) -> Void
+    let onArchiveWorkstream: (UUID) -> Void
     let onProjectChanged: () -> Void
 
     @EnvironmentObject var appEnv: AppEnvironment
@@ -90,27 +91,12 @@ struct ProjectOverviewView: View {
                     .padding(.vertical, 8)
                 } else {
                     ForEach(project.workstreams.sorted { $0.lastAccessedAt > $1.lastAccessedAt }) { workstream in
-                        Button(action: { onSelectWorkstream(workstream.id) }) {
-                            HStack {
-                                Image(systemName: "terminal")
-                                    .foregroundStyle(.secondary)
-                                    .frame(width: 20)
-                                VStack(alignment: .leading, spacing: 2) {
-                                    Text(workstream.name)
-                                        .font(.system(.body, design: .monospaced))
-                                    if let path = workstream.worktreePath {
-                                        Text(abbreviatePath(path))
-                                            .font(.caption)
-                                            .foregroundStyle(.tertiary)
-                                    }
-                                }
-                                Spacer()
-                                Image(systemName: "chevron.right")
-                                    .font(.caption)
-                                    .foregroundStyle(.tertiary)
-                            }
-                        }
-                        .buttonStyle(.plain)
+                        WorkstreamRow(
+                            workstream: workstream,
+                            onSelect: { onSelectWorkstream(workstream.id) },
+                            onArchive: { onArchiveWorkstream(workstream.id) },
+                            abbreviatePath: abbreviatePath
+                        )
                     }
                 }
             } header: {
@@ -134,5 +120,51 @@ struct ProjectOverviewView: View {
             return "~" + path.dropFirst(home.count)
         }
         return path
+    }
+}
+
+private struct WorkstreamRow: View {
+    let workstream: Workstream
+    let onSelect: () -> Void
+    let onArchive: () -> Void
+    let abbreviatePath: (String) -> String
+
+    @State private var isHovering = false
+
+    var body: some View {
+        Button(action: onSelect) {
+            HStack {
+                Image(systemName: "terminal")
+                    .foregroundStyle(.secondary)
+                    .frame(width: 20)
+                VStack(alignment: .leading, spacing: 2) {
+                    Text(workstream.name)
+                        .font(.system(.body, design: .monospaced))
+                    if let path = workstream.worktreePath {
+                        Text(abbreviatePath(path))
+                            .font(.caption)
+                            .foregroundStyle(.tertiary)
+                    }
+                }
+                Spacer()
+                if isHovering {
+                    Button(action: {
+                        // Stop propagation to parent button
+                        onArchive()
+                    }) {
+                        Image(systemName: "archivebox")
+                            .font(.system(size: 12))
+                            .foregroundStyle(.secondary)
+                            .frame(width: 24, height: 24)
+                            .background(Color.primary.opacity(0.08))
+                            .clipShape(RoundedRectangle(cornerRadius: 4))
+                    }
+                    .buttonStyle(.plain)
+                }
+            }
+        }
+        .buttonStyle(.plain)
+        .contentShape(Rectangle())
+        .onHover { isHovering = $0 }
     }
 }
