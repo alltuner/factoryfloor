@@ -8,6 +8,7 @@ struct SettingsView: View {
     @AppStorage("ff2.tmuxMode") private var tmuxMode: Bool = false
     @AppStorage("ff2.bypassPermissions") private var bypassPermissions: Bool = false
     @AppStorage("ff2.agentTeams") private var agentTeams: Bool = false
+    @AppStorage("ff2.autoRenameBranch") private var autoRenameBranch: Bool = false
     @AppStorage("ff2.defaultTerminal") private var defaultTerminal: String = ""
     @AppStorage("ff2.defaultBrowser") private var defaultBrowser: String = ""
     @AppStorage("ff2.branchPrefix") private var branchPrefix: String = "ff2"
@@ -139,6 +140,11 @@ struct SettingsView: View {
 
                 Toggle("Agent Teams", isOn: $agentTeams)
                 Text("Enables experimental multi-agent coordination. Agents can spawn teammates, delegate tasks, and collaborate across workstreams.")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+
+                Toggle("Auto-rename branch", isOn: $autoRenameBranch)
+                Text("The agent will rename the worktree branch to match the task on the first request (e.g., fix-login-timeout).")
                     .font(.caption)
                     .foregroundStyle(.secondary)
             }

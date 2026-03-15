@@ -45,6 +45,7 @@ struct TerminalContainerView: View {
     @AppStorage("ff2.defaultBrowser") private var defaultBrowser: String = ""
     @AppStorage("ff2.tmuxMode") private var tmuxMode: Bool = false
     @AppStorage("ff2.agentTeams") private var agentTeams: Bool = false
+    @AppStorage("ff2.autoRenameBranch") private var autoRenameBranch: Bool = false
     @State private var activeTab: WorkstreamTab = .info
 
     private var claudeID: UUID { workstreamID }
@@ -67,8 +68,14 @@ struct TerminalContainerView: View {
             if bypassPermissions {
                 flags += " --dangerously-skip-permissions"
             }
+            // Extra flags only for new sessions (not resume)
+            var newSessionFlags = flags
+            if autoRenameBranch {
+                let promptPath = SystemPrompts.autoRenameBranchPromptPath()
+                newSessionFlags += " --system-prompt-file \"\(promptPath)\""
+            }
             // Try resuming the workstream's session, fall back to creating one with a fixed ID
-            cmd = "sh -c \"\(basePath) --resume \(sessionID) \(flags) 2>/dev/null || (echo 'Starting new session...' && \(basePath) --session-id \(sessionID) \(flags))\""
+            cmd = "sh -c \"\(basePath) --resume \(sessionID) \(flags) 2>/dev/null || (echo 'Starting new session...' && \(basePath) --session-id \(sessionID) \(newSessionFlags))\""
         }
 
         if useTmux, let tmuxPath = appEnv.toolStatus.tmux.path {
