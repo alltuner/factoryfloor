@@ -58,6 +58,9 @@ struct TerminalContainerView: View {
             let sessionID = workstreamID.uuidString.lowercased()
             let wsNameEscaped = workstreamName.replacingOccurrences(of: "\"", with: "\\\"")
             var flags = "--name \"\(wsNameEscaped)\""
+            if useTmux {
+                flags += " --teammate-mode tmux"
+            }
             if bypassPermissions {
                 flags += " --dangerously-skip-permissions"
             }
