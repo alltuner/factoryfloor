@@ -3,7 +3,6 @@
 ## Pre-release
 - [ ] Homebrew tap (alltuner/homebrew-tap) and cask formula
 - [ ] Code signing and notarization for distribution
-- [ ] All Tuner Labs logo image in help view (needs asset)
 - [ ] Occlude non-visible terminal surfaces to save GPU (reverted, needs careful timing)
 
 ## Future

@@ -1,5 +1,6 @@
 ---
 title: Home
+translationKey: home
 ---
 <!-- Hero -->
 <section class="min-h-screen flex flex-col justify-center relative pt-20 overflow-hidden">

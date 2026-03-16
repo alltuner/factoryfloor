@@ -1,10 +1,16 @@
 <!DOCTYPE html>
-<html lang="en" class="scroll-smooth dark">
+<html lang="{{ .Site.Language.Lang }}" class="scroll-smooth dark">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>{{ .Title }} - {{ .Site.Title }}</title>
 <meta name="description" content="{{ .Site.Params.description }}">
+<link rel="canonical" href="{{ .Permalink }}">
+{{ range .Translations }}
+<link rel="alternate" hreflang="{{ .Lang }}" href="{{ .Permalink }}">
+{{ end }}
+<link rel="alternate" hreflang="{{ .Site.Language.Lang }}" href="{{ .Permalink }}">
+<link rel="alternate" hreflang="x-default" href="{{ .Permalink }}">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600;700&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600;9..40,700&display=swap" rel="stylesheet">

@@ -18,13 +18,18 @@
         <!-- Language switcher -->
         <div class="flex items-center gap-2 text-xs font-mono">
           {{ $currentLang := .Site.Language.Lang }}
+          {{/* Get the page path without the language prefix */}}
+          {{ $pagePath := .RelPermalink }}
+          {{ if ne $currentLang "en" }}
+            {{ $pagePath = strings.TrimPrefix (printf "/%s" $currentLang) .RelPermalink }}
+          {{ end }}
           {{ $langs := sort .Site.Languages ".Weight" "asc" }}
           {{ range $i, $lang := $langs }}
             {{ if eq $lang.Lang $currentLang }}
               <span class="text-fg uppercase font-semibold">{{ $lang.Lang }}</span>
             {{ else }}
-              {{ $href := "/" }}
-              {{ if ne $lang.Lang "en" }}{{ $href = printf "/%s/" $lang.Lang }}{{ end }}
+              {{ $href := $pagePath }}
+              {{ if ne $lang.Lang "en" }}{{ $href = printf "/%s%s" $lang.Lang $pagePath }}{{ end }}
               <a href="{{ $href }}" class="text-fg-muted no-underline hover:text-fg transition-colors uppercase">{{ $lang.Lang }}</a>
             {{ end }}
             {{ if lt $i (sub (len $langs) 1) }}<span class="text-fg-faint">|</span>{{ end }}
