@@ -26,7 +26,7 @@
 - [ ] Occlude non-visible terminal surfaces to save GPU (needs careful timing)
 - [ ] Swift 6 migration (strict concurrency)
 - [ ] System notifications when agent needs attention (bell/urgency from Ghostty)
-- [ ] Terminal tab: show last command in tab label
+- [x] Terminal tab: show running command in tab label (via ghostty SET_TITLE action)
 - [ ] Restore full app state on launch (active tab within workstream; sidebar selection and expanded state already persisted)
 
 ## Done
