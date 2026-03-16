@@ -137,28 +137,16 @@ struct ProjectSidebar: View {
             }
             } // ScrollViewReader
 
-            VStack(spacing: 8) {
-                Spacer()
-                Image(systemName: "folder.badge.plus")
-                    .font(.system(size: 28))
-                    .foregroundStyle(.tertiary)
-                Text("Drop a directory here")
-                    .font(.system(.body, weight: .medium))
-                    .foregroundStyle(.tertiary)
-                (Text(Image(systemName: "command")) + Text(Image(systemName: "shift")) + Text(" N ") + Text("to add a project"))
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
-                Spacer()
-
+            // Bottom bar (always visible)
+            VStack(spacing: 4) {
                 // Credit
-                VStack(spacing: 3) {
+                VStack(spacing: 2) {
                     HStack(spacing: 0) {
                         Text("by ")
                             .foregroundStyle(.tertiary)
                         Link("David Poblador i Garcia.", destination: URL(string: "https://davidpoblador.com/")!)
                             .foregroundStyle(.secondary)
                     }
-                    .font(.system(size: 10))
                     HStack(spacing: 0) {
                         Text("Help ")
                             .foregroundStyle(.tertiary)
@@ -167,9 +155,8 @@ struct ProjectSidebar: View {
                         Text(" the development.")
                             .foregroundStyle(.tertiary)
                     }
-                    .font(.system(size: 10))
                 }
-                .padding(.vertical, 6)
+                .font(.system(size: 10))
 
                 HStack {
                     SidebarBottomButton(icon: "plus") {
@@ -184,8 +171,8 @@ struct ProjectSidebar: View {
                     }
                 }
             }
-            .frame(maxWidth: .infinity)
-            .frame(height: max(80, geo.size.height * 0.2))
+            .padding(.horizontal, 4)
+            .padding(.bottom, 4)
         }
         }
         .onReceive(NotificationCenter.default.publisher(for: .terminalActivity)) { notification in
