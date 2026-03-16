@@ -183,16 +183,13 @@ struct SettingsView: View {
                 }
             }
 
-            // MARK: - Updates
-            Section("Updates") {
+            // MARK: - Danger
+            Section("Danger Zone") {
                 Toggle("Bleeding edge", isOn: $bleedingEdge)
                 Text("Receive pre-release builds with the latest features. These may be less stable.")
                     .font(.caption)
                     .foregroundStyle(bleedingEdge ? .orange : .secondary)
-            }
 
-            // MARK: - Danger
-            Section("Danger Zone") {
                 LabeledContent("Clear project list") {
                     Button("Clear All...", role: .destructive, action: { showingClearConfirm = true })
                         .buttonStyle(.plain)
