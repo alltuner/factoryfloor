@@ -55,3 +55,11 @@ if [ -z "$RESOLVED" ]; then
 fi
 
 open "factoryfloor://$RESOLVED"
+
+# Show sponsor message occasionally (~1 in 5 runs)
+if [ $(( RANDOM % 5 )) -eq 0 ]; then
+  echo ""
+  echo "  ☕ Enjoying Factory Floor? Support development:"
+  echo "     https://buymeacoffee.com/alltuner"
+  echo ""
+fi
