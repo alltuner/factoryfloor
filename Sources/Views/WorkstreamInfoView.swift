@@ -114,25 +114,12 @@ struct WorkstreamInfoView: View {
                             }
                         }
 
-                        // Shortcuts
-                        Section("Shortcuts") {
-                            ShortcutInfoRow(keys: "\u{21A9}", description: "Coding Agent")
-                            ShortcutInfoRow(keys: "I", description: "Toggle Info")
-                            ShortcutInfoRow(keys: "T", description: "New Terminal")
-                            ShortcutInfoRow(keys: "W", description: "Close Tab")
-                            ShortcutInfoRow(keys: "B", description: "New Browser")
-                            ShortcutInfoRow(keys: "0", description: "Back to Project")
-                            ShortcutInfoRow(keys: "1-9", description: "Switch Tab")
-                            ShortcutInfoRow(keys: "\u{21E7}[ ]", shift: true, description: "Cycle Tabs")
-                            ShortcutInfoRow(keys: "\u{21E7}O", shift: true, description: "External Browser")
-                            ShortcutInfoRow(keys: "\u{21E7}E", shift: true, description: "External Terminal")
-                        }
                     }
                     .formStyle(.grouped)
                     .scrollDisabled(true)
                 }
             }
-            .frame(height: docExpanded ? geo.size.height * 0.2 : geo.size.height * 0.8)
+            .frame(height: docExpanded ? geo.size.height * 0.3 : geo.size.height * 0.7)
             .onTapGesture {
                 withAnimation(.easeInOut(duration: 0.2)) { docExpanded = false }
             }
@@ -263,26 +250,6 @@ struct DirectoryRow: View {
             return "~" + p.dropFirst(home.count)
         }
         return p
-    }
-}
-
-private struct ShortcutInfoRow: View {
-    let keys: String
-    var shift: Bool = false
-    let description: String
-
-    var body: some View {
-        LabeledContent(description) {
-            HStack(spacing: 2) {
-                Image(systemName: "command")
-                if shift {
-                    Image(systemName: "shift")
-                }
-                Text(keys)
-            }
-            .font(.system(size: 12, design: .monospaced))
-            .foregroundStyle(.secondary)
-        }
     }
 }
 
