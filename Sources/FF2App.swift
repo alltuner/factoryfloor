@@ -86,7 +86,7 @@ struct FF2App: App {
                 Button("Help") {
                     NotificationCenter.default.post(name: .openHelp, object: nil)
                 }
-                .keyboardShortcut("/", modifiers: [.command, .shift])
+                .keyboardShortcut("/", modifiers: .command)
             }
             // View menu
             CommandGroup(after: .sidebar) {

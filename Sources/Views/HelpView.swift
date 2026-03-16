@@ -11,7 +11,7 @@ struct HelpView: View {
                 VStack(spacing: 8) {
                     Image(nsImage: NSApp.applicationIconImage)
                         .resizable()
-                        .frame(width: 96, height: 96)
+                        .frame(width: 128, height: 128)
                     Text(AppConstants.appName)
                         .font(.system(size: 28, weight: .bold))
                     Text("Version \(Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "0.1.0")")
@@ -51,7 +51,7 @@ struct HelpView: View {
                 Form {
                     Section {
                         ShortcutRow(keys: ",", description: "Settings")
-                        ShortcutRow(keys: "?", shift: true, description: "Help")
+                        ShortcutRow(keys: "/", description: "Help")
                         ShortcutRow(keys: "N", description: "New workstream or project")
                         ShortcutRow(keys: "N", shift: true, description: "New project")
                     } header: {
