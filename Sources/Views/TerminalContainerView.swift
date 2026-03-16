@@ -204,17 +204,14 @@ struct TerminalContainerView: View {
     }
 
     private var envVars: [String: String] {
-        var vars = [
-            "FF_PROJECT": projectName,
-            "FF_WORKSTREAM": workstreamName,
-            "FF_PROJECT_DIR": projectDirectory,
-            "FF_WORKTREE_DIR": workingDirectory,
-            "FF_PORT": "\(workstreamPort)",
-        ]
-        if agentTeams {
-            vars["CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS"] = "1"
-        }
-        return vars
+        WorkstreamEnvironment.variables(
+            projectName: projectName,
+            workstreamName: workstreamName,
+            projectDirectory: projectDirectory,
+            workingDirectory: workingDirectory,
+            port: workstreamPort,
+            agentTeams: agentTeams
+        )
     }
 }
 
