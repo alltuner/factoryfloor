@@ -24,7 +24,7 @@ All projektdata (namn, kataloger, arbetsflödeskonfigurationer) lagras lokalt i 
 
 Factory Floor integrerar med verktyg som du själv installerar och konfigurerar:
 
-- **Claude Code** (Anthropic) - omfattas av [Anthropics integritetspolicy](https://www.anthropic.com/privacy)
+- **Claude Code** (Anthropic) - när du använder kodningsagenten skickas din kod och konversationskontext till Anthropics API för bearbetning. Det är en direkt anslutning mellan din dator och Anthropic, som omfattas av [Anthropics integritetspolicy](https://www.anthropic.com/privacy). Factory Floor fångar inte upp, lagrar eller vidarebefordrar dessa data.
 - **GitHub CLI** - omfattas av [GitHubs integritetspolicy](https://docs.github.com/en/site-policy/privacy-policies/github-general-privacy-statement)
 - **Ghostty** - den inbyggda terminalmotorn körs lokalt utan nätverksaktivitet
 

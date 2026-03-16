@@ -24,7 +24,7 @@ All project data (names, directories, workstream configurations) is stored local
 
 Factory Floor integrates with tools you install and configure yourself:
 
-- **Claude Code** (Anthropic) - subject to [Anthropic's privacy policy](https://www.anthropic.com/privacy)
+- **Claude Code** (Anthropic) - when using the Coding Agent, your code and conversation context are sent to Anthropic's API for processing. This is a direct connection between your machine and Anthropic, subject to [Anthropic's privacy policy](https://www.anthropic.com/privacy). Factory Floor does not intercept, store, or relay this data.
 - **GitHub CLI** - subject to [GitHub's privacy policy](https://docs.github.com/en/site-policy/privacy-policies/github-general-privacy-statement)
 - **Ghostty** - the embedded terminal engine runs locally with no network activity
 

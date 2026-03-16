@@ -24,7 +24,7 @@ Totes les dades de projecte (noms, directoris, configuracions de fluxos de treba
 
 Factory Floor s'integra amb eines que tu instal·les i configures:
 
-- **Claude Code** (Anthropic) - subjecte a la [política de privacitat d'Anthropic](https://www.anthropic.com/privacy)
+- **Claude Code** (Anthropic) - quan utilitzes l'agent de codi, el teu codi i el context de la conversa s'envien a l'API d'Anthropic per al seu processament. Es tracta d'una connexió directa entre el teu ordinador i Anthropic, subjecta a la [política de privacitat d'Anthropic](https://www.anthropic.com/privacy). Factory Floor no intercepta, emmagatzema ni retransmet aquestes dades.
 - **GitHub CLI** - subjecte a la [política de privacitat de GitHub](https://docs.github.com/en/site-policy/privacy-policies/github-general-privacy-statement)
 - **Ghostty** - el motor de terminal integrat s'executa localment sense activitat de xarxa
 
