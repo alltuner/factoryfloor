@@ -20,14 +20,16 @@ struct ProjectOverviewView: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
             // Header (outside Form to avoid row styling)
-            VStack(alignment: .leading, spacing: 4) {
+            VStack(spacing: 4) {
                 TextField("", text: $project.name)
                     .font(.system(size: 22, weight: .bold))
                     .textFieldStyle(.plain)
+                    .multilineTextAlignment(.center)
                     .onChange(of: project.name) { _, _ in onProjectChanged() }
 
                 DirectoryRow(path: project.directory, defaultTerminal: defaultTerminal)
             }
+            .frame(maxWidth: .infinity)
             .padding(.horizontal, 20)
             .padding(.top, 20)
             .padding(.bottom, 8)

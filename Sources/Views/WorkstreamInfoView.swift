@@ -32,7 +32,11 @@ struct WorkstreamInfoView: View {
             ScrollView {
                 VStack(spacing: 0) {
                     // Workstream header
-                    VStack(alignment: .leading, spacing: 4) {
+                    VStack(spacing: 4) {
+                        Text(projectName)
+                            .font(.system(size: 13))
+                            .foregroundStyle(.secondary)
+
                         Text(workstreamName)
                             .font(.system(size: 22, weight: .bold, design: .monospaced))
 
@@ -46,11 +50,8 @@ struct WorkstreamInfoView: View {
                         }
 
                         DirectoryRow(path: workingDirectory, defaultTerminal: defaultTerminal)
-
-                        Text(projectName)
-                            .font(.caption)
-                            .foregroundStyle(.tertiary)
                     }
+                    .frame(maxWidth: .infinity)
                     .padding(.horizontal, 20)
                     .padding(.top, 16)
                     .padding(.bottom, 4)
@@ -212,27 +213,25 @@ struct DirectoryRow: View {
     var defaultTerminal: String = ""
 
     var body: some View {
-        HStack(spacing: 6) {
+        HStack(spacing: 4) {
             Text(abbreviatePath(path))
-                .font(.system(.body, design: .monospaced))
+                .font(.system(.caption, design: .monospaced))
                 .foregroundStyle(.secondary)
                 .lineLimit(1)
                 .truncationMode(.middle)
 
-            Spacer()
-
             Button(action: copyPath) {
                 Image(systemName: "doc.on.doc")
-                    .font(.system(size: 11))
-                    .foregroundStyle(.secondary)
+                    .font(.system(size: 9))
+                    .foregroundStyle(.tertiary)
             }
             .buttonStyle(.plain)
             .help("Copy path")
 
             Button(action: openInTerminal) {
                 Image(systemName: "terminal")
-                    .font(.system(size: 11))
-                    .foregroundStyle(.secondary)
+                    .font(.system(size: 9))
+                    .foregroundStyle(.tertiary)
             }
             .buttonStyle(.plain)
             .help("Open in external terminal")
