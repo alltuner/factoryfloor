@@ -3,14 +3,8 @@
 ## Pre-release
 - [ ] Homebrew tap (alltuner/homebrew-tap) and cask formula
 - [ ] CI: automate build, sign, notarize, DMG, and release upload via GitHub Actions
-- [ ] Occlude non-visible terminal surfaces to save GPU (needs careful timing)
-- [ ] Swift 6 migration (strict concurrency)
-- [ ] Debug builds: different icon and bundle ID so debug/release can run in parallel
-- [ ] System notifications when agent needs attention (bell/urgency from Ghostty)
 - [ ] Confirm before quit (Cmd+Q) when workstreams are active
 - [ ] Browser tab: show page title in tab label
-- [ ] Terminal tab: show last command in tab label
-- [ ] Restore full app state on launch (active tab within workstream; sidebar selection and expanded state already persisted)
 - [ ] Change workstream navigation shortcuts from Cmd+1-9 to Cmd+Shift+1-9 (Cmd+1-9 collides with terminal tab switching); make it work from within any workspace tab
 - [ ] Website: legal/privacy policy page
 - [ ] Funding: add Buy Me a Coffee and GitHub Sponsors options (website + FUNDING.yml)
@@ -26,6 +20,11 @@
 - [ ] Drag-and-drop to reorder tabs
 - [ ] Website: favicon, OG image, SEO meta tags
 - [ ] Pin ghostty submodule update to CI (auto-test against new Ghostty releases)
+- [ ] Occlude non-visible terminal surfaces to save GPU (needs careful timing)
+- [ ] Swift 6 migration (strict concurrency)
+- [ ] System notifications when agent needs attention (bell/urgency from Ghostty)
+- [ ] Terminal tab: show last command in tab label
+- [ ] Restore full app state on launch (active tab within workstream; sidebar selection and expanded state already persisted)
 
 ## Done
 - [x] Embedded Ghostty terminals (Metal GPU-rendered via libghostty)
@@ -85,3 +84,5 @@
 - [x] GitHub Pages deploy workflow
 - [x] GitHub repo (alltuner/factoryfloor, public, topics, description)
 - [x] Distribution guide (docs/distribution.md)
+- [x] Debug builds: different icon and bundle ID so debug/release can run in parallel
+- [x] Markdown info view: cmark-gfm WKWebView renderer with full HTML support
