@@ -1,0 +1,57 @@
+#!/bin/bash
+# ABOUTME: CLI launcher for Factory Floor.
+# ABOUTME: Opens a directory in the app via the factoryfloor:// URL scheme.
+
+set -e
+
+usage() {
+  echo "Usage: ff [directory]"
+  echo ""
+  echo "Open a directory in Factory Floor."
+  echo "If no directory is specified, opens the current directory."
+  echo ""
+  echo "Options:"
+  echo "  --install    Install this script to /usr/local/bin/ff"
+  echo "  --help       Show this help message"
+}
+
+install() {
+  local SCRIPT_PATH
+  SCRIPT_PATH="$(cd "$(dirname "$0")" && pwd)/$(basename "$0")"
+  local TARGET="/usr/local/bin/ff"
+
+  if [ -L "$TARGET" ] || [ -f "$TARGET" ]; then
+    echo "Updating $TARGET..."
+  else
+    echo "Installing ff to $TARGET..."
+  fi
+
+  if [ -w "$(dirname "$TARGET")" ]; then
+    ln -sf "$SCRIPT_PATH" "$TARGET"
+  else
+    sudo ln -sf "$SCRIPT_PATH" "$TARGET"
+  fi
+
+  echo "Done. You can now use 'ff' from any terminal."
+}
+
+case "${1:-}" in
+  --help|-h)
+    usage
+    exit 0
+    ;;
+  --install)
+    install
+    exit 0
+    ;;
+esac
+
+DIR="${1:-.}"
+RESOLVED=$(cd "$DIR" 2>/dev/null && pwd)
+
+if [ -z "$RESOLVED" ]; then
+  echo "Error: directory '$DIR' not found" >&2
+  exit 1
+fi
+
+open "factoryfloor://$RESOLVED"
