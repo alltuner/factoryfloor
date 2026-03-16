@@ -75,3 +75,7 @@
 "Prune" = "Limpiar";
 "Clean" = "Limpio";
 "Uncommitted changes" = "Cambios sin confirmar";
+
+/* Projects */
+"Symlink .env files" = "Enlazar archivos .env";
+"Symlink .env and .env.local from the main repository into new worktrees." = "Crea enlaces simbólicos de .env y .env.local del repositorio principal en los nuevos árboles de trabajo.";

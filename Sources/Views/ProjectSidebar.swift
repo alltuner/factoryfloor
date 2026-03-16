@@ -287,6 +287,7 @@ struct ProjectSidebar: View {
     // MARK: - Workstream management
 
     @AppStorage("ff2.bypassPermissions") private var defaultBypass: Bool = false
+    @AppStorage("ff2.symlinkEnv") private var symlinkEnv: Bool = true
 
     private func addWorkstream(for projectID: UUID, bypassPermissions: Bool? = nil) {
         guard let index = projects.firstIndex(where: { $0.id == projectID }) else { return }
@@ -301,7 +302,8 @@ struct ProjectSidebar: View {
             projectPath: project.directory,
             projectName: project.name,
             workstreamName: name,
-            branchPrefix: branchPrefix
+            branchPrefix: branchPrefix,
+            symlinkEnv: symlinkEnv
         )
 
         let bypass = bypassPermissions ?? defaultBypass

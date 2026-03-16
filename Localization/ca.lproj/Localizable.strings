@@ -75,3 +75,7 @@
 "Prune" = "Netejar";
 "Clean" = "Net";
 "Uncommitted changes" = "Canvis sense confirmar";
+
+/* Projects */
+"Symlink .env files" = "Enllaçar fitxers .env";
+"Symlink .env and .env.local from the main repository into new worktrees." = "Crea enllaços simbòlics de .env i .env.local del repositori principal als nous arbres de treball.";

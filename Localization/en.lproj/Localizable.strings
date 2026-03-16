@@ -75,3 +75,7 @@
 "Prune" = "Prune";
 "Clean" = "Clean";
 "Uncommitted changes" = "Uncommitted changes";
+
+/* Projects */
+"Symlink .env files" = "Symlink .env files";
+"Symlink .env and .env.local from the main repository into new worktrees." = "Symlink .env and .env.local from the main repository into new worktrees.";

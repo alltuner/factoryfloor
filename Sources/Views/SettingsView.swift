@@ -13,6 +13,7 @@ struct SettingsView: View {
     @AppStorage("ff2.defaultBrowser") private var defaultBrowser: String = ""
     @AppStorage("ff2.branchPrefix") private var branchPrefix: String = "ff2"
     @AppStorage("ff2.appearance") private var appearance: String = "system"
+    @AppStorage("ff2.symlinkEnv") private var symlinkEnv: Bool = true
     @AppStorage("ff2.baseDirectory") private var baseDirectory: String = NSSearchPathForDirectoriesInDomains(.documentDirectory, .userDomainMask, true).first ?? ""
 
     @EnvironmentObject private var appEnv: AppEnvironment
@@ -100,6 +101,11 @@ struct SettingsView: View {
                 Text("e.g. \(branchPrefix.isEmpty ? "ff2" : branchPrefix)/deploy-ludicrous-speed")
                     .font(.system(.caption, design: .monospaced))
                     .foregroundStyle(.tertiary)
+
+                Toggle("Symlink .env files", isOn: $symlinkEnv)
+                Text("Symlink .env and .env.local from the main repository into new worktrees.")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
             }
 
             // MARK: - Terminal & Browser

@@ -84,7 +84,7 @@ enum GitOperations {
 
     /// Create a git worktree for a workstream, branching off the default branch.
     /// Returns the worktree path on success, nil on failure.
-    static func createWorktree(projectPath: String, projectName: String, workstreamName: String, branchPrefix: String = "ff2") -> String? {
+    static func createWorktree(projectPath: String, projectName: String, workstreamName: String, branchPrefix: String = "ff2", symlinkEnv: Bool = true) -> String? {
         let worktreeDir = AppConstants.worktreesDirectory
             .appendingPathComponent(sanitize(projectName))
             .appendingPathComponent(sanitize(workstreamName))
@@ -118,8 +118,9 @@ enum GitOperations {
             guard fallback != nil else { return nil }
         }
 
-        // Symlink .env files from the main repo
-        symlinkEnvFiles(from: projectPath, to: worktreeDir.path)
+        if symlinkEnv {
+            symlinkEnvFiles(from: projectPath, to: worktreeDir.path)
+        }
 
         return worktreeDir.path
     }
