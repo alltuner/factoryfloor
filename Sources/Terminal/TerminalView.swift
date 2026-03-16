@@ -99,6 +99,8 @@ final class TerminalView: NSView, NSTextInputClient {
             logger.error("ghostty_surface_new failed")
             return
         }
+
+        updateTrackingAreas()
     }
 
     @available(*, unavailable)
@@ -115,6 +117,22 @@ final class TerminalView: NSView, NSTextInputClient {
     // MARK: - View lifecycle
 
     override var acceptsFirstResponder: Bool { true }
+
+    override func becomeFirstResponder() -> Bool {
+        let result = super.becomeFirstResponder()
+        if result, let surface {
+            ghostty_surface_set_focus(surface, true)
+        }
+        return result
+    }
+
+    override func resignFirstResponder() -> Bool {
+        let result = super.resignFirstResponder()
+        if result, let surface {
+            ghostty_surface_set_focus(surface, false)
+        }
+        return result
+    }
 
     override func viewDidMoveToWindow() {
         super.viewDidMoveToWindow()
@@ -409,6 +427,8 @@ final class TerminalView: NSView, NSTextInputClient {
     // MARK: - Mouse
 
     override func mouseDown(with event: NSEvent) {
+        // Claim first responder so this surface gets keyboard input
+        window?.makeFirstResponder(self)
         guard let surface else { return }
         let mods = Self.eventMods(event)
         _ = ghostty_surface_mouse_button(surface, GHOSTTY_MOUSE_PRESS, GHOSTTY_MOUSE_LEFT, mods)

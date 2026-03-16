@@ -112,6 +112,16 @@ struct FF2App: App {
                 }
                 .keyboardShortcut("b", modifiers: .command)
 
+                Button("Next Tab") {
+                    NotificationCenter.default.post(name: .nextTab, object: nil)
+                }
+                .keyboardShortcut("]", modifiers: [.command, .shift])
+
+                Button("Previous Tab") {
+                    NotificationCenter.default.post(name: .prevTab, object: nil)
+                }
+                .keyboardShortcut("[", modifiers: [.command, .shift])
+
                 Button("Focus Agent") {
                     NotificationCenter.default.post(name: .focusAgent, object: nil)
                 }

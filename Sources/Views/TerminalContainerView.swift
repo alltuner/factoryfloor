@@ -10,6 +10,8 @@ extension Notification.Name {
     static let toggleBrowser = Notification.Name("factoryfloor.toggleBrowser")
     static let focusAgent = Notification.Name("factoryfloor.focusAgent")
     static let closeTerminal = Notification.Name("factoryfloor.closeTerminal")
+    static let nextTab = Notification.Name("factoryfloor.nextTab")
+    static let prevTab = Notification.Name("factoryfloor.prevTab")
 }
 
 /// Deterministic UUID derived from a base UUID and a salt string.
@@ -115,12 +117,12 @@ struct TerminalContainerView: View {
         VStack(spacing: 0) {
             // Tab bar
             HStack(spacing: 0) {
-                ForEach(tabs, id: \.self) { tab in
+                ForEach(Array(tabs.enumerated()), id: \.element) { index, tab in
                     WorkspaceTabButton(
                         tab: tab,
                         label: tabLabel(tab),
                         icon: tabIcon(tab),
-                        shortcut: tabShortcut(tab),
+                        shortcut: index < 9 ? "\u{2318}\(index + 1)" : nil,
                         isActive: activeTab == tab,
                         onSelect: { activeTab = tab },
                         onClose: tab.isCloseable ? { closeTab(tab) } : nil
@@ -184,7 +186,7 @@ struct TerminalContainerView: View {
                     environmentVars: terminalEnvVars
                 )
             case .browser(let id):
-                BrowserView(defaultURL: "http://localhost:\(workstreamPort)")
+                BrowserView(defaultURL: "http://localhost:\(workstreamPort)/")
                     .id(id)
             }
         }
@@ -218,8 +220,16 @@ struct TerminalContainerView: View {
             guard let n = notification.object as? Int, n >= 1, n <= tabs.count else { return }
             activeTab = tabs[n - 1]
         }
+        .onReceive(NotificationCenter.default.publisher(for: .nextTab)) { _ in
+            guard let idx = tabs.firstIndex(of: activeTab) else { return }
+            activeTab = tabs[(idx + 1) % tabs.count]
+        }
+        .onReceive(NotificationCenter.default.publisher(for: .prevTab)) { _ in
+            guard let idx = tabs.firstIndex(of: activeTab) else { return }
+            activeTab = tabs[(idx - 1 + tabs.count) % tabs.count]
+        }
         .onReceive(NotificationCenter.default.publisher(for: .openExternalBrowser)) { _ in
-            guard let url = URL(string: "http://localhost:\(workstreamPort)") else { return }
+            guard let url = URL(string: "http://localhost:\(workstreamPort)/") else { return }
             if defaultBrowser.isEmpty {
                 NSWorkspace.shared.open(url)
             } else if let appURL = NSWorkspace.shared.urlForApplication(withBundleIdentifier: defaultBrowser) {
@@ -260,9 +270,23 @@ struct TerminalContainerView: View {
     private func addTerminal() {
         terminalCount += 1
         let id = derivedUUID(from: workstreamID, salt: "terminal-\(terminalCount)")
+
+        // Prewarm the surface before showing the tab, giving Ghostty
+        // time to initialize the PTY (same pattern as the agent surface).
+        if let app = TerminalApp.shared.app {
+            _ = surfaceCache.surface(
+                for: id, app: app, workingDirectory: workingDirectory,
+                environmentVars: terminalEnvVars
+            )
+        }
+
         let tab = WorkspaceTab.terminal(id)
         tabs.append(tab)
-        activeTab = tab
+
+        // Small delay to let the surface initialize before focusing
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+            activeTab = tab
+        }
     }
 
     private func addBrowser() {
@@ -470,8 +494,7 @@ struct SingleTerminalView: NSViewRepresentable {
         }
 
         if isFocused {
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.05) {
-                surfaceCache.focusExclusively(surfaceID)
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
                 terminalView.window?.makeFirstResponder(terminalView)
             }
         }
