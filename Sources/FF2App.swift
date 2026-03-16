@@ -18,8 +18,27 @@ extension Notification.Name {
     static let openExternalTerminal = Notification.Name("factoryfloor.openExternalTerminal")
 }
 
+final class AppDelegate: NSObject, NSApplicationDelegate {
+    func applicationShouldTerminate(_ sender: NSApplication) -> NSApplication.TerminateReply {
+        let projects = ProjectStore.load()
+        let hasWorkstreams = projects.contains { !$0.workstreams.isEmpty }
+        guard hasWorkstreams else { return .terminateNow }
+
+        let alert = NSAlert()
+        alert.messageText = NSLocalizedString("Quit Factory Floor?", comment: "")
+        alert.informativeText = NSLocalizedString("Active workstreams will be stopped.", comment: "")
+        alert.alertStyle = .warning
+        alert.addButton(withTitle: NSLocalizedString("Quit", comment: ""))
+        alert.addButton(withTitle: NSLocalizedString("Cancel", comment: ""))
+
+        return alert.runModal() == .alertFirstButtonReturn ? .terminateNow : .terminateCancel
+    }
+}
+
 @main
 struct FF2App: App {
+    @NSApplicationDelegateAdaptor(AppDelegate.self) var appDelegate
+
     init() {
         // ghostty_init must happen before any ghostty API calls, but it's fast.
         // TerminalApp.shared is lazy and deferred to first access (when a terminal is needed).

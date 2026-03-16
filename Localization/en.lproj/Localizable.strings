@@ -79,3 +79,8 @@
 /* Projects */
 "Symlink .env files" = "Symlink .env files";
 "Symlink .env and .env.local from the main repository into new worktrees." = "Symlink .env and .env.local from the main repository into new worktrees.";
+
+/* Quit confirmation */
+"Quit Factory Floor?" = "Quit Factory Floor?";
+"Active workstreams will be stopped." = "Active workstreams will be stopped.";
+"Quit" = "Quit";
