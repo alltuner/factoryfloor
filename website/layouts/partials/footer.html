@@ -12,9 +12,9 @@
         <div class="flex items-center gap-2 text-xs font-mono">
           {{ range .Site.Languages }}
             {{ if eq .Lang $.Site.Language.Lang }}
-              <span class="text-fg">{{ .LanguageName }}</span>
+              <span class="text-fg uppercase">{{ .Lang }}</span>
             {{ else }}
-              <a href="{{ "" | relLangURL }}" class="text-fg-muted no-underline hover:text-fg transition-colors">{{ .LanguageName }}</a>
+              <a href="{{ "" | relLangURL }}" class="text-fg-muted no-underline hover:text-fg transition-colors uppercase">{{ .Lang }}</a>
             {{ end }}
             {{ if ne .Lang (index (last 1 (sort $.Site.Languages ".Weight" "asc")) 0).Lang }}
               <span class="text-fg-faint">|</span>

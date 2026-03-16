@@ -11,14 +11,16 @@
     <path d="M20,220 L80,220 L80,200 L120,200 L120,220 L170,220 L170,195 L220,195 L220,220 L240,220 L240,130 L256,130 L256,220 L280,220 L280,205 L320,205 L320,220 L340,220 L340,200 L360,190 L380,200 L400,190 L420,200 L440,190 L460,200 L480,200 L480,220 L520,220 L520,140 L538,140 L538,220 L560,220 L560,190 L630,190 L630,220 L660,220 L660,115 L676,115 L676,220 L700,220 L700,200 L735,200 L735,180 L770,180 L770,220 L800,220 L800,150 L816,150 L816,220 L882,220 Q882,100 915,100 Q948,100 948,220 L1040,220 L1040,205 L1080,205 L1080,220 L1120,220 L1120,190 L1160,190 L1160,220 L1180,220" fill="none" stroke="url(#skyGrad)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" opacity="0.6"/>
   </svg>
   <div class="max-w-[1100px] mx-auto flex items-center justify-between">
-    <a href="{{ "" | relLangURL }}" class="font-mono font-bold text-xl text-fg no-underline">
-      <span class="text-wine-light mr-0.5">~</span>factory floor
+    <a href="{{ "" | relLangURL }}" class="flex items-center gap-2 font-mono font-bold text-lg text-fg no-underline">
+      <svg class="w-5 h-5 text-wine-light" viewBox="0 0 271 271" xmlns="http://www.w3.org/2000/svg"><path d="m226.6-28.5a48 48 0 0 0-48 48 48 48 0 0 0 43.2 47.6V46.1a20.2 20.2 0 0 1-16-19.7v-.2h0V6.5h8.4v19.8h0a11.8 12.5 0 0 0 0 .2 11.8 12.5 0 0 0 11.8 12.5 11.8 12.5 0 0 0 11.8-12.5 11.8 12.5 0 0 0 0-.2h0V17h8.4v9.3h0v.2a20.2 20.2 0 0 1-16 19.7v21a48 48 0 0 0 44.5-47.7 48 48 0 0 0-48-48zm-20.8 12.8h8.4v12.4h-8.4zm32 0h8.3V7.2h-8.4zm-11.8 43.2a3.7 3.7 0 0 1 3.7 3.7 3.7 3.7 0 0 1-3.7 3.8 3.7 3.7 0 0 1-3.8-3.8 3.7 3.7 0 0 1 3.8-3.7z" fill="currentColor" transform="matrix(2.6 0 0 2.6 -453.7 85.2)"/></svg>
+      Factory Floor
     </a>
-    <ul class="flex items-center gap-8 list-none">
+    <ul class="flex items-center gap-6 list-none">
       <li class="hidden md:block"><a href="#features" class="font-mono text-sm text-fg-muted no-underline transition-colors hover:text-fg">{{ T "nav_features" }}</a></li>
       <li class="hidden md:block"><a href="#how-it-works" class="font-mono text-sm text-fg-muted no-underline transition-colors hover:text-fg">{{ T "nav_how" }}</a></li>
       <li class="hidden md:block"><a href="#config" class="font-mono text-sm text-fg-muted no-underline transition-colors hover:text-fg">{{ T "nav_config" }}</a></li>
-      <li><a href="{{ .Site.Params.githubURL }}" class="bg-wine text-[#F7F4F3] px-4 py-2 rounded-md font-mono text-xs no-underline transition-all hover:bg-wine-light hover:-translate-y-px">GitHub</a></li>
+      <li><a href="{{ .Site.Params.githubURL }}/releases" class="text-fg-muted no-underline transition-colors hover:text-fg" aria-label="Download"><svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg></a></li>
+      <li><a href="{{ .Site.Params.githubURL }}" class="text-fg-muted no-underline transition-colors hover:text-fg" aria-label="GitHub"><svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/></svg></a></li>
       <li>
         <button id="theme-toggle" class="w-8 h-8 rounded-md border border-fg-faint bg-transparent text-fg-muted flex items-center justify-center cursor-pointer transition-all hover:text-fg hover:bg-fg-faint" aria-label="Toggle theme">
           <svg class="icon-moon w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
