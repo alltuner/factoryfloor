@@ -9,16 +9,22 @@ struct HelpView: View {
             VStack(spacing: 24) {
                 // App header
                 VStack(spacing: 8) {
-                    Image(systemName: "terminal.fill")
-                        .font(.system(size: 48))
-                        .foregroundStyle(.secondary)
+                    Image(nsImage: NSApp.applicationIconImage)
+                        .resizable()
+                        .frame(width: 96, height: 96)
                     Text(AppConstants.appName)
                         .font(.system(size: 28, weight: .bold))
                     Text("Version \(Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "0.1.0")")
                         .font(.caption)
                         .foregroundStyle(.secondary)
+                    (Text("Made with ") + Text("\u{2764}\u{FE0F}") + Text(" in Poblenou, Barcelona"))
+                        .font(.system(size: 10))
+                        .foregroundStyle(.tertiary)
                 }
                 .padding(.top, 32)
+
+                PoblenouSkylineView()
+                    .padding(.horizontal, 40)
 
                 // Shortcuts
                 Form {
@@ -77,11 +83,6 @@ struct HelpView: View {
             }
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
-        .background(alignment: .bottom) {
-            PoblenouSkylineView()
-                .padding(.horizontal, 40)
-                .padding(.bottom, 10)
-        }
     }
 }
 

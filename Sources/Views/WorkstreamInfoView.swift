@@ -30,28 +30,6 @@ struct WorkstreamInfoView: View {
             // Top pane: metadata (tapping it collapses docs)
             ScrollView {
                 VStack(spacing: 0) {
-                    // App header
-                    VStack(spacing: 8) {
-                        Image(nsImage: NSApp.applicationIconImage)
-                            .resizable()
-                            .frame(width: 96, height: 96)
-                        Text(AppConstants.appName)
-                            .font(.system(size: 20, weight: .bold))
-                        Text("Version \(Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "0.1.0")")
-                            .font(.caption)
-                            .foregroundStyle(.secondary)
-                        (Text("Made with ") + Text("\u{2764}\u{FE0F}") + Text(" in Poblenou, Barcelona"))
-                            .font(.system(size: 10))
-                            .foregroundStyle(.tertiary)
-                    }
-                    .padding(.top, 24)
-                    .padding(.bottom, 8)
-
-                    // Skyline
-                    PoblenouSkylineView()
-                        .padding(.horizontal, 40)
-                        .padding(.bottom, 16)
-
                     // Workstream metadata
                     Form {
                         Section("Workstream") {
