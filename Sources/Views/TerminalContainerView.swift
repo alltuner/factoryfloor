@@ -25,11 +25,13 @@ func derivedUUID(from base: UUID, salt: String) -> UUID {
     return UUID(uuid: bytes)
 }
 
-enum WorkstreamTab: Hashable {
+enum WorkstreamTab: Hashable, CaseIterable {
     case info
     case claude
     case workspace
     case browser
+    case setup
+    case run
 }
 
 struct TerminalContainerView: View {
@@ -47,9 +49,12 @@ struct TerminalContainerView: View {
     @AppStorage("ff2.agentTeams") private var agentTeams: Bool = false
     @AppStorage("ff2.autoRenameBranch") private var autoRenameBranch: Bool = false
     @State private var activeTab: WorkstreamTab = .info
+    @State private var scriptConfig: ScriptConfig = .empty
 
     private var claudeID: UUID { workstreamID }
     private var workspaceID: UUID { derivedUUID(from: workstreamID, salt: "workspace") }
+    private var setupID: UUID { derivedUUID(from: workstreamID, salt: "setup") }
+    private var runID: UUID { derivedUUID(from: workstreamID, salt: "run") }
 
     private var useTmux: Bool {
         tmuxMode && appEnv.toolStatus.tmux.isInstalled
@@ -96,6 +101,32 @@ struct TerminalContainerView: View {
         nil
     }
 
+    private var setupCommand: String? {
+        guard let cmd = scriptConfig.setup else { return nil }
+        if useTmux, let tmuxPath = appEnv.toolStatus.tmux.path {
+            let session = TmuxSession.sessionName(project: projectName, workstream: workstreamName, role: "setup")
+            return TmuxSession.wrapCommand(tmuxPath: tmuxPath, sessionName: session, command: cmd)
+        }
+        return cmd
+    }
+
+    private var runCommand: String? {
+        guard let cmd = scriptConfig.run else { return nil }
+        if useTmux, let tmuxPath = appEnv.toolStatus.tmux.path {
+            let session = TmuxSession.sessionName(project: projectName, workstream: workstreamName, role: "run")
+            return TmuxSession.wrapCommand(tmuxPath: tmuxPath, sessionName: session, command: cmd)
+        }
+        return cmd
+    }
+
+    /// Tabs that are visible based on script config.
+    private var visibleTabs: [WorkstreamTab] {
+        var tabs: [WorkstreamTab] = [.info, .claude, .workspace, .browser]
+        if scriptConfig.setup != nil { tabs.append(.setup) }
+        if scriptConfig.run != nil { tabs.append(.run) }
+        return tabs
+    }
+
     var body: some View {
         VStack(spacing: 0) {
             // Tab bar
@@ -112,6 +143,16 @@ struct TerminalContainerView: View {
                 TabButton(title: "Browser", icon: "globe", shortcut: "4", isActive: activeTab == .browser) {
                     activeTab = .browser
                 }
+                if scriptConfig.setup != nil {
+                    TabButton(title: "Setup", icon: "hammer", shortcut: "5", isActive: activeTab == .setup) {
+                        activeTab = .setup
+                    }
+                }
+                if scriptConfig.run != nil {
+                    TabButton(title: "Run", icon: "play", shortcut: "6", isActive: activeTab == .run) {
+                        activeTab = .run
+                    }
+                }
                 Spacer()
             }
             .padding(.horizontal, 8)
@@ -127,7 +168,8 @@ struct TerminalContainerView: View {
                     workstreamName: workstreamName,
                     workingDirectory: workingDirectory,
                     projectName: projectName,
-                    projectDirectory: projectDirectory
+                    projectDirectory: projectDirectory,
+                    scriptConfig: scriptConfig
                 )
             case .claude:
                 SingleTerminalView(
@@ -147,9 +189,28 @@ struct TerminalContainerView: View {
                 )
             case .browser:
                 BrowserView(defaultURL: "http://localhost:\(workstreamPort)")
+            case .setup:
+                SingleTerminalView(
+                    surfaceID: setupID,
+                    workingDirectory: workingDirectory,
+                    command: setupCommand,
+                    isFocused: true,
+                    environmentVars: envVars
+                )
+            case .run:
+                SingleTerminalView(
+                    surfaceID: runID,
+                    workingDirectory: workingDirectory,
+                    command: runCommand,
+                    isFocused: true,
+                    environmentVars: envVars
+                )
             }
         }
-        .onAppear { prewarmSurfaces() }
+        .onAppear {
+            scriptConfig = ScriptConfig.load(from: projectDirectory)
+            prewarmSurfaces()
+        }
         .onReceive(NotificationCenter.default.publisher(for: .switchByNumber)) { notification in
             guard let n = notification.object as? Int else { return }
             switch n {
@@ -157,24 +218,20 @@ struct TerminalContainerView: View {
             case 2: activeTab = .claude
             case 3: activeTab = .workspace
             case 4: activeTab = .browser
+            case 5 where scriptConfig.setup != nil: activeTab = .setup
+            case 6 where scriptConfig.run != nil: activeTab = .run
             default: break
             }
         }
         .onReceive(NotificationCenter.default.publisher(for: .nextTab)) { _ in
-            switch activeTab {
-            case .info: activeTab = .claude
-            case .claude: activeTab = .workspace
-            case .workspace: activeTab = .browser
-            case .browser: activeTab = .info
-            }
+            let tabs = visibleTabs
+            guard let idx = tabs.firstIndex(of: activeTab) else { return }
+            activeTab = tabs[(idx + 1) % tabs.count]
         }
         .onReceive(NotificationCenter.default.publisher(for: .prevTab)) { _ in
-            switch activeTab {
-            case .info: activeTab = .browser
-            case .claude: activeTab = .info
-            case .workspace: activeTab = .claude
-            case .browser: activeTab = .workspace
-            }
+            let tabs = visibleTabs
+            guard let idx = tabs.firstIndex(of: activeTab) else { return }
+            activeTab = tabs[(idx - 1 + tabs.count) % tabs.count]
         }
         .onReceive(NotificationCenter.default.publisher(for: .openExternalBrowser)) { _ in
             guard let url = URL(string: "http://localhost:\(workstreamPort)") else { return }
@@ -189,6 +246,7 @@ struct TerminalContainerView: View {
     }
 
     /// Pre-create terminal surfaces so they're ready when tabs are switched.
+    /// Setup runs immediately; Run is lazy (created when the user opens the tab).
     private func prewarmSurfaces() {
         guard let app = TerminalApp.shared.app else { return }
         _ = surfaceCache.surface(
@@ -199,6 +257,12 @@ struct TerminalContainerView: View {
             for: workspaceID, app: app, workingDirectory: workingDirectory,
             command: workspaceCommand, environmentVars: envVars
         )
+        if scriptConfig.setup != nil {
+            _ = surfaceCache.surface(
+                for: setupID, app: app, workingDirectory: workingDirectory,
+                command: setupCommand, environmentVars: envVars
+            )
+        }
     }
 
     private var envVars: [String: String] {
@@ -337,10 +401,12 @@ final class TerminalSurfaceCache: ObservableObject {
         surfaceParams.removeValue(forKey: id)
     }
 
-    /// Remove both claude and workspace surfaces for a workstream.
+    /// Remove all surfaces for a workstream.
     func removeWorkstreamSurfaces(for workstreamID: UUID) {
         removeSurface(for: workstreamID)
         removeSurface(for: derivedUUID(from: workstreamID, salt: "workspace"))
+        removeSurface(for: derivedUUID(from: workstreamID, salt: "setup"))
+        removeSurface(for: derivedUUID(from: workstreamID, salt: "run"))
     }
 
     private func handleSurfaceClosed(_ closedView: TerminalView) {

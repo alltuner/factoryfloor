@@ -8,6 +8,7 @@ struct WorkstreamInfoView: View {
     let workingDirectory: String
     let projectName: String
     let projectDirectory: String
+    var scriptConfig: ScriptConfig = .empty
 
     @EnvironmentObject var appEnv: AppEnvironment
     @State private var branchName: String?
@@ -73,10 +74,49 @@ struct WorkstreamInfoView: View {
                         }
                     }
                 }
+                // Scripts
+                if scriptConfig.hasAnyScript {
+                    Section {
+                        if let setup = scriptConfig.setup {
+                            LabeledContent("Setup") {
+                                Text(setup)
+                                    .font(.system(.caption, design: .monospaced))
+                                    .foregroundStyle(.secondary)
+                                    .lineLimit(2)
+                            }
+                        }
+                        if let run = scriptConfig.run {
+                            LabeledContent("Run") {
+                                Text(run)
+                                    .font(.system(.caption, design: .monospaced))
+                                    .foregroundStyle(.secondary)
+                                    .lineLimit(2)
+                            }
+                        }
+                        if let teardown = scriptConfig.teardown {
+                            LabeledContent("Teardown") {
+                                Text(teardown)
+                                    .font(.system(.caption, design: .monospaced))
+                                    .foregroundStyle(.secondary)
+                                    .lineLimit(2)
+                            }
+                        }
+                    } header: {
+                        HStack {
+                            Text("Scripts")
+                            Spacer()
+                            if let source = scriptConfig.source {
+                                Text(source)
+                                    .font(.caption)
+                                    .foregroundStyle(.tertiary)
+                            }
+                        }
+                    }
+                }
             }
             .formStyle(.grouped)
             .scrollDisabled(true)
-            .frame(maxHeight: branchName.flatMap({ appEnv.githubPR(for: projectDirectory, branch: $0) }) != nil ? 320 : 200)
+            .frame(maxHeight: scriptConfig.hasAnyScript ? 420 : (branchName.flatMap({ appEnv.githubPR(for: projectDirectory, branch: $0) }) != nil ? 320 : 200))
 
             // Document tabs
             if !docFiles.isEmpty {
