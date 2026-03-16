@@ -177,6 +177,20 @@ Factory Floor is built on the shoulders of these projects:
 - **[Hugo](https://gohugo.io)** + **[Tailwind CSS](https://tailwindcss.com)** — Website
 - **[Umami](https://umami.is)** — Privacy-friendly website analytics
 
+## Support the project
+
+Factory Floor is an open source project built by [David Poblador i Garcia](https://davidpoblador.com/) through [All Tuner Labs](https://www.alltuner.com/).
+
+If this project helped you ship faster, automate your workflow, or experiment with coding agents, consider supporting its development.
+
+❤️ **Sponsor development**
+https://github.com/sponsors/alltuner
+
+☕ **One-time support**
+https://buymeacoffee.com/alltuner
+
+Your support helps fund the continued development of Factory Floor and other open source developer tools such as [VibeTuner](https://github.com/alltuner/vibetuner).
+
 ## License
 
 [MIT](LICENSE)
