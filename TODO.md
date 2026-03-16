@@ -29,6 +29,7 @@
 
 ## Terminal
 - [ ] Occlude non-visible terminal surfaces to save GPU (reverted, needs careful timing)
+- [ ] CommandBuilder withFallback quoting needs more testing with edge cases
 
 ## Infrastructure
 - [ ] Auto-update mechanism (Sparkle or similar)
