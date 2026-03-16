@@ -99,46 +99,37 @@ struct TerminalContainerView: View {
             toolbar
             Divider()
 
-            // Content: agent is always rendered, info/browser overlay on top
-            ZStack {
-                // Coding Agent (always present, always running) + terminal splits
+            // Content: show one view at a time
+            if showingInfo {
+                WorkstreamInfoView(
+                    workstreamName: workstreamName,
+                    workingDirectory: workingDirectory,
+                    projectName: projectName,
+                    projectDirectory: projectDirectory,
+                    scriptConfig: scriptConfig
+                )
+            } else if showingBrowser {
+                BrowserView(defaultURL: "http://localhost:\(workstreamPort)")
+            } else {
                 VStack(spacing: 0) {
                     SingleTerminalView(
                         surfaceID: claudeID,
                         workingDirectory: workingDirectory,
                         command: claudeCommand,
-                        isFocused: !showingInfo && !showingBrowser && terminalIDs.isEmpty,
+                        isFocused: terminalIDs.isEmpty,
                         environmentVars: envVars
                     )
 
-                    // Terminal split panels
                     ForEach(terminalIDs, id: \.self) { id in
                         Divider()
                         SingleTerminalView(
                             surfaceID: id,
                             workingDirectory: workingDirectory,
-                            isFocused: id == terminalIDs.last && !showingInfo && !showingBrowser,
+                            isFocused: id == terminalIDs.last,
                             environmentVars: envVars
                         )
                         .frame(minHeight: 100)
                     }
-                }
-
-                // Info overlay
-                if showingInfo {
-                    WorkstreamInfoView(
-                        workstreamName: workstreamName,
-                        workingDirectory: workingDirectory,
-                        projectName: projectName,
-                        projectDirectory: projectDirectory,
-                        scriptConfig: scriptConfig
-                    )
-                    .background(.ultraThinMaterial)
-                }
-
-                // Browser overlay
-                if showingBrowser {
-                    BrowserView(defaultURL: "http://localhost:\(workstreamPort)")
                 }
             }
         }
