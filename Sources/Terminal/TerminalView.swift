@@ -11,6 +11,13 @@ extension Notification.Name {
 }
 
 final class TerminalView: NSView, NSTextInputClient {
+    /// Maps ghostty surface pointers to their owning views.
+    static var surfaceRegistry: [UnsafeMutableRawPointer: TerminalView] = [:]
+
+    static func view(for surface: ghostty_surface_t) -> TerminalView? {
+        surfaceRegistry[surface]
+    }
+
     private(set) var surface: ghostty_surface_t?
     var workstreamID: UUID?
     private var trackingArea: NSTrackingArea?
@@ -94,11 +101,12 @@ final class TerminalView: NSView, NSTextInputClient {
             applyAndCreate(&config)
         }
 
-        guard surface != nil else {
+        guard let surface else {
             logger.error("ghostty_surface_new failed")
             return
         }
 
+        Self.surfaceRegistry[surface] = self
         updateTrackingAreas()
     }
 
@@ -109,6 +117,7 @@ final class TerminalView: NSView, NSTextInputClient {
 
     deinit {
         if let surface {
+            Self.surfaceRegistry.removeValue(forKey: surface)
             ghostty_surface_free(surface)
         }
     }

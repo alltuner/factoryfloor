@@ -29,7 +29,24 @@ final class TerminalApp {
                 let app = Unmanaged<TerminalApp>.fromOpaque(userdata).takeUnretainedValue()
                 DispatchQueue.main.async { app.tick() }
             },
-            action_cb: { _, _, _ in return false },
+            action_cb: { _, target, action in
+                guard target.tag == GHOSTTY_TARGET_SURFACE else { return false }
+                switch action.tag {
+                case GHOSTTY_ACTION_SET_TITLE:
+                    guard let cstr = action.action.set_title.title else { return false }
+                    let title = String(cString: cstr)
+                    guard let view = TerminalView.view(for: target.target.surface),
+                          let wsID = view.workstreamID else { return false }
+                    NotificationCenter.default.post(
+                        name: .terminalTitleChanged,
+                        object: wsID,
+                        userInfo: ["title": title]
+                    )
+                    return true
+                default:
+                    return false
+                }
+            },
             read_clipboard_cb: { userdata, location, state in
                 guard let userdata else { return false }
                 guard let state else { return false }

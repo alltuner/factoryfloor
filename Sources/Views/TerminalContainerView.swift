@@ -12,6 +12,7 @@ extension Notification.Name {
     static let closeTerminal = Notification.Name("factoryfloor.closeTerminal")
     static let nextTab = Notification.Name("factoryfloor.nextTab")
     static let prevTab = Notification.Name("factoryfloor.prevTab")
+    static let terminalTitleChanged = Notification.Name("factoryfloor.terminalTitleChanged")
 }
 
 /// Deterministic UUID derived from a base UUID and a salt string.
@@ -69,6 +70,7 @@ struct TerminalContainerView: View {
     @State private var scriptConfig: ScriptConfig = .empty
     @State private var branchPR: GitHubPR?
     @State private var browserTitles: [UUID: String] = [:]
+    @State private var terminalTitles: [UUID: String] = [:]
 
     private var claudeID: UUID { workstreamID }
 
@@ -246,6 +248,10 @@ struct TerminalContainerView: View {
             guard let tabID = notification.object as? UUID else { return }
             browserTitles[tabID] = notification.userInfo?["title"] as? String
         }
+        .onReceive(NotificationCenter.default.publisher(for: .terminalTitleChanged)) { notification in
+            guard let surfaceID = notification.object as? UUID else { return }
+            terminalTitles[surfaceID] = notification.userInfo?["title"] as? String
+        }
         .onReceive(NotificationCenter.default.publisher(for: .openExternalBrowser)) { _ in
             guard let url = URL(string: "http://localhost:\(workstreamPort)/") else { return }
             if defaultBrowser.isEmpty {
@@ -264,7 +270,9 @@ struct TerminalContainerView: View {
         switch tab {
         case .info: return "Info"
         case .agent: return "Agent"
-        case .terminal: return nil
+        case .terminal(let id):
+            guard let title = terminalTitles[id], !title.isEmpty else { return nil }
+            return title.count > 20 ? String(title.prefix(20)) + "..." : title
         case .browser(let id):
             guard let title = browserTitles[id], !title.isEmpty else { return nil }
             return title.count > 20 ? String(title.prefix(20)) + "..." : title
