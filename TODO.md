@@ -26,7 +26,6 @@
 - [ ] Split panes within a workstream
 - [ ] External Chrome integration: launch with --remote-debugging-port for WebMCP/CDP
 - [ ] PR management: create and manage PRs from workstreams (currently view-only)
-- [ ] Extract env var injection logic to a shared module
 
 ## Terminal
 - [ ] Occlude non-visible terminal surfaces to save GPU (reverted, needs careful timing)
@@ -84,6 +83,7 @@
 - [x] Sidebar toggle animation flicker fix
 - [x] Git worktree list and prune in project overview
 - [x] Fix auto-rename branch (--append-system-prompt instead of --system-prompt-file)
+- [x] Extract env var injection logic to WorkstreamEnvironment module
 
 ## Probably not needed
 - [ ] Claude Agent SDK integration (TypeScript): CLI + tmux + session-id covers our needs
