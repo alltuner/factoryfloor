@@ -143,14 +143,16 @@ struct WorkstreamInfoView: View {
 
                         // Shortcuts
                         Section("Shortcuts") {
-                            ShortcutInfoRow(keys: "\u{2318}\u{21A9}", description: "Coding Agent")
-                            ShortcutInfoRow(keys: "\u{2318}I", description: "Toggle Info")
-                            ShortcutInfoRow(keys: "\u{2318}T", description: "New Terminal")
-                            ShortcutInfoRow(keys: "\u{2318}W", description: "Close Terminal")
-                            ShortcutInfoRow(keys: "\u{2318}B", description: "Toggle Browser")
-                            ShortcutInfoRow(keys: "\u{2318}0", description: "Back to Project")
-                            ShortcutInfoRow(keys: "\u{2318}\u{21E7}O", description: "External Browser")
-                            ShortcutInfoRow(keys: "\u{2318}\u{21E7}E", description: "External Terminal")
+                            ShortcutInfoRow(keys: "\u{21A9}", description: "Coding Agent")
+                            ShortcutInfoRow(keys: "I", description: "Toggle Info")
+                            ShortcutInfoRow(keys: "T", description: "New Terminal")
+                            ShortcutInfoRow(keys: "W", description: "Close Tab")
+                            ShortcutInfoRow(keys: "B", description: "New Browser")
+                            ShortcutInfoRow(keys: "0", description: "Back to Project")
+                            ShortcutInfoRow(keys: "1-9", description: "Switch Tab")
+                            ShortcutInfoRow(keys: "\u{21E7}[ ]", shift: true, description: "Cycle Tabs")
+                            ShortcutInfoRow(keys: "\u{21E7}O", shift: true, description: "External Browser")
+                            ShortcutInfoRow(keys: "\u{21E7}E", shift: true, description: "External Terminal")
                         }
                     }
                     .formStyle(.grouped)
@@ -240,13 +242,20 @@ struct WorkstreamInfoView: View {
 
 private struct ShortcutInfoRow: View {
     let keys: String
+    var shift: Bool = false
     let description: String
 
     var body: some View {
         LabeledContent(description) {
-            Text(keys)
-                .font(.system(size: 12, design: .monospaced))
-                .foregroundStyle(.secondary)
+            HStack(spacing: 2) {
+                Image(systemName: "command")
+                if shift {
+                    Image(systemName: "shift")
+                }
+                Text(keys)
+            }
+            .font(.system(size: 12, design: .monospaced))
+            .foregroundStyle(.secondary)
         }
     }
 }

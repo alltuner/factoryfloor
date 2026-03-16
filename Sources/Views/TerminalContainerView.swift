@@ -122,7 +122,7 @@ struct TerminalContainerView: View {
                         tab: tab,
                         label: tabLabel(tab),
                         icon: tabIcon(tab),
-                        shortcut: index < 9 ? "\u{2318}\(index + 1)" : nil,
+                        shortcut: index < 9 ? "\(index + 1)" : nil,
                         isActive: activeTab == tab,
                         onSelect: { activeTab = tab },
                         onClose: tab.isCloseable ? { closeTab(tab) } : nil
@@ -132,8 +132,8 @@ struct TerminalContainerView: View {
                 Spacer()
 
                 // Add buttons
-                AddTabButton(label: "Terminal", icon: "terminal", shortcut: "\u{2318}T", action: addTerminal)
-                AddTabButton(label: "Browser", icon: "globe", shortcut: "\u{2318}B", action: addBrowser)
+                AddTabButton(label: "Terminal", icon: "terminal", shortcut: "T", action: addTerminal)
+                AddTabButton(label: "Browser", icon: "globe", shortcut: "B", action: addBrowser)
 
                 // PR badge
                 if let pr = branchPR, let url = URL(string: pr.url) {
@@ -261,8 +261,8 @@ struct TerminalContainerView: View {
 
     private func tabShortcut(_ tab: WorkspaceTab) -> String? {
         switch tab {
-        case .agent: return "\u{2318}\u{21A9}"
-        case .info: return "\u{2318}I"
+        case .agent: return "\u{21A9}"
+        case .info: return "I"
         case .terminal, .browser: return nil
         }
     }
@@ -393,7 +393,7 @@ private struct WorkspaceTabButton: View {
                         .font(.system(size: 12, weight: isActive ? .semibold : .regular))
                 }
                 if let shortcut {
-                    Text(shortcut)
+                    (Text(Image(systemName: "command")) + Text(shortcut))
                         .font(.system(size: 9))
                         .foregroundStyle(.tertiary)
                 }
@@ -435,7 +435,7 @@ private struct AddTabButton: View {
                     .font(.system(size: 11))
                 Text(label)
                     .font(.system(size: 11))
-                Text(shortcut)
+                (Text(Image(systemName: "command")) + Text(shortcut))
                     .font(.system(size: 9))
                     .foregroundStyle(.tertiary)
             }

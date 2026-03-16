@@ -150,6 +150,19 @@ struct ProjectSidebar: View {
                     .foregroundStyle(.secondary)
                 Spacer()
 
+                // Credit line
+                VStack(spacing: 3) {
+                    Link("David Poblador i Garcia", destination: URL(string: "https://davidpoblador.com/")!)
+                        .font(.system(size: 10))
+                        .foregroundStyle(.secondary)
+                        .underline()
+                    Link("Support the development", destination: URL(string: "https://factory-floor.com/fund")!)
+                        .font(.system(size: 10))
+                        .foregroundStyle(.secondary)
+                        .underline()
+                }
+                .padding(.vertical, 6)
+
                 HStack {
                     Button(action: { showingAddProjectChoice = true }) {
                         Image(systemName: "plus")
@@ -178,17 +191,6 @@ struct ProjectSidebar: View {
                     .buttonStyle(.plain)
                     .padding(8)
                 }
-
-                // Credit line
-                VStack(spacing: 2) {
-                    Text("by David Poblador")
-                        .font(.system(size: 9))
-                        .foregroundStyle(.quaternary)
-                    Link("Support the development", destination: URL(string: "https://factory-floor.com/fund")!)
-                        .font(.system(size: 9))
-                        .foregroundStyle(.tertiary)
-                }
-                .padding(.bottom, 4)
             }
             .frame(maxWidth: .infinity)
             .frame(height: max(80, geo.size.height * 0.2))
