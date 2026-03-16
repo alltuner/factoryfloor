@@ -14,26 +14,51 @@
   --wine: #5B2333;
   --wine-light: #7a3348;
   --wine-glow: rgba(91, 35, 51, 0.4);
-  --smoke: #F7F4F3;
-  --smoke-dim: rgba(247, 244, 243, 0.7);
-  --smoke-faint: rgba(247, 244, 243, 0.12);
-  --taupe: #928E8D;
-  --raisin: #2C2826;
-  --raisin-deep: #1a1816;
-  --raisin-surface: #3a3634;
   --mono: 'JetBrains Mono', 'SF Mono', 'Fira Code', monospace;
   --sans: 'DM Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+
+  /* Dark theme (default) */
+  --bg: #1a1816;
+  --bg-surface: #2C2826;
+  --bg-elevated: #3a3634;
+  --fg: #F7F4F3;
+  --fg-dim: rgba(247, 244, 243, 0.7);
+  --fg-faint: rgba(247, 244, 243, 0.12);
+  --fg-muted: #928E8D;
+  --nav-bg: rgba(26, 24, 22, 0.8);
+  --code-key: var(--code-key);
+  --code-str: var(--code-str);
+  --code-success: var(--code-str);
+  --shadow: var(--shadow);
+}
+
+[data-theme="light"] {
+  --bg: #F7F4F3;
+  --bg-surface: #ede9e7;
+  --bg-elevated: #e0dbda;
+  --fg: #2C2826;
+  --fg-dim: rgba(44, 40, 38, 0.75);
+  --fg-faint: rgba(44, 40, 38, 0.1);
+  --fg-muted: #6e6a69;
+  --nav-bg: rgba(247, 244, 243, 0.85);
+  --wine-light: #5B2333;
+  --wine-glow: rgba(91, 35, 51, 0.15);
+  --code-key: #8b5e2f;
+  --code-str: #3a6e48;
+  --code-success: #3a6e48;
+  --shadow: rgba(0,0,0,0.1);
 }
 
 html { scroll-behavior: smooth; }
 
 body {
   font-family: var(--sans);
-  background: var(--raisin-deep);
-  color: var(--smoke);
+  background: var(--bg);
+  color: var(--fg);
   line-height: 1.6;
   overflow-x: hidden;
   -webkit-font-smoothing: antialiased;
+  transition: background 0.3s, color 0.3s;
 }
 
 /* ---- Noise overlay ---- */
@@ -68,8 +93,8 @@ nav {
   padding: 1rem 2rem;
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
-  background: rgba(26, 24, 22, 0.8);
-  border-bottom: 1px solid var(--smoke-faint);
+  background: var(--nav-bg);
+  border-bottom: 1px solid var(--fg-faint);
   transition: all 0.3s;
 }
 
@@ -85,7 +110,7 @@ nav .logo {
   font-family: var(--mono);
   font-weight: 700;
   font-size: 1.2rem;
-  color: var(--smoke);
+  color: var(--fg);
   text-decoration: none;
   letter-spacing: -0.02em;
 }
@@ -103,18 +128,18 @@ nav .nav-links {
 }
 
 nav .nav-links a {
-  color: var(--taupe);
+  color: var(--fg-muted);
   text-decoration: none;
   font-size: 0.85rem;
   font-family: var(--mono);
   transition: color 0.2s;
 }
 
-nav .nav-links a:hover { color: var(--smoke); }
+nav .nav-links a:hover { color: var(--fg); }
 
 .btn-nav {
   background: var(--wine);
-  color: var(--smoke) !important;
+  color: var(--fg) !important;
   padding: 0.45rem 1rem;
   border-radius: 6px;
   font-size: 0.8rem !important;
@@ -125,6 +150,38 @@ nav .nav-links a:hover { color: var(--smoke); }
   background: var(--wine-light) !important;
   transform: translateY(-1px);
 }
+
+/* ---- Theme toggle ---- */
+.theme-toggle {
+  background: none;
+  border: 1px solid var(--fg-faint);
+  color: var(--fg-muted);
+  width: 32px;
+  height: 32px;
+  border-radius: 6px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: color 0.2s, border-color 0.2s, background 0.2s;
+  flex-shrink: 0;
+}
+
+.theme-toggle:hover {
+  color: var(--fg);
+  border-color: rgba(147, 142, 141, 0.3);
+  background: var(--fg-faint);
+}
+
+.theme-toggle svg { width: 16px; height: 16px; }
+.theme-toggle .icon-sun,
+.theme-toggle .icon-moon,
+.theme-toggle .icon-system { display: none; }
+
+[data-theme="light"] .theme-toggle .icon-sun { display: block; }
+[data-theme="dark"] .theme-toggle .icon-moon { display: block; }
+html:not([data-theme]) .theme-toggle .icon-system { display: block; }
+/* System default: show system icon initially, JS sets data-theme */
 
 /* ---- Hero ---- */
 .hero {
@@ -158,13 +215,13 @@ nav .nav-links a:hover { color: var(--smoke); }
   display: inline-flex;
   align-items: center;
   gap: 0.5rem;
-  background: var(--smoke-faint);
-  border: 1px solid rgba(247, 244, 243, 0.08);
+  background: var(--fg-faint);
+  border: 1px solid var(--fg-faint);
   padding: 0.35rem 0.9rem;
   border-radius: 100px;
   font-family: var(--mono);
   font-size: 0.75rem;
-  color: var(--taupe);
+  color: var(--fg-muted);
   margin-bottom: 2rem;
   animation: fadeUp 0.8s ease both;
 }
@@ -201,7 +258,7 @@ nav .nav-links a:hover { color: var(--smoke); }
 
 .hero .subtitle {
   font-size: clamp(1.05rem, 2vw, 1.25rem);
-  color: var(--taupe);
+  color: var(--fg-muted);
   max-width: 540px;
   line-height: 1.7;
   margin-bottom: 2.5rem;
@@ -220,7 +277,7 @@ nav .nav-links a:hover { color: var(--smoke); }
   align-items: center;
   gap: 0.5rem;
   background: var(--wine);
-  color: var(--smoke);
+  color: var(--fg);
   padding: 0.75rem 1.5rem;
   border-radius: 8px;
   text-decoration: none;
@@ -242,19 +299,19 @@ nav .nav-links a:hover { color: var(--smoke); }
   align-items: center;
   gap: 0.5rem;
   background: transparent;
-  color: var(--smoke-dim);
+  color: var(--fg-dim);
   padding: 0.75rem 1.5rem;
   border-radius: 8px;
   text-decoration: none;
   font-family: var(--mono);
   font-size: 0.85rem;
   font-weight: 400;
-  border: 1px solid var(--smoke-faint);
+  border: 1px solid var(--fg-faint);
   transition: all 0.2s;
 }
 
 .btn-secondary:hover {
-  background: var(--smoke-faint);
+  background: var(--fg-faint);
   border-color: rgba(247, 244, 243, 0.2);
   transform: translateY(-2px);
 }
@@ -262,11 +319,11 @@ nav .nav-links a:hover { color: var(--smoke); }
 /* Terminal preview in hero */
 .hero-terminal {
   margin-top: 4rem;
-  background: var(--raisin);
-  border: 1px solid var(--smoke-faint);
+  background: var(--bg-surface);
+  border: 1px solid var(--fg-faint);
   border-radius: 12px;
   overflow: hidden;
-  box-shadow: 0 25px 80px rgba(0,0,0,0.5), 0 0 0 1px rgba(247,244,243,0.04);
+  box-shadow: 0 25px 80px var(--shadow), 0 0 0 1px rgba(247,244,243,0.04);
   animation: fadeUp 0.8s ease 0.4s both;
 }
 
@@ -275,8 +332,8 @@ nav .nav-links a:hover { color: var(--smoke); }
   align-items: center;
   gap: 6px;
   padding: 12px 16px;
-  background: var(--raisin-surface);
-  border-bottom: 1px solid var(--smoke-faint);
+  background: var(--bg-elevated);
+  border-bottom: 1px solid var(--fg-faint);
 }
 
 .terminal-dot {
@@ -294,7 +351,7 @@ nav .nav-links a:hover { color: var(--smoke); }
   text-align: center;
   font-family: var(--mono);
   font-size: 0.7rem;
-  color: var(--taupe);
+  color: var(--fg-muted);
   margin-right: 50px;
 }
 
@@ -303,20 +360,20 @@ nav .nav-links a:hover { color: var(--smoke); }
   gap: 0;
   padding: 0 12px;
   background: rgba(44, 40, 38, 0.6);
-  border-bottom: 1px solid var(--smoke-faint);
+  border-bottom: 1px solid var(--fg-faint);
 }
 
 .terminal-tab {
   padding: 8px 14px;
   font-family: var(--mono);
   font-size: 0.7rem;
-  color: var(--taupe);
+  color: var(--fg-muted);
   border-bottom: 2px solid transparent;
   cursor: default;
 }
 
 .terminal-tab.active {
-  color: var(--smoke);
+  color: var(--fg);
   border-bottom-color: var(--wine-light);
   background: rgba(247, 244, 243, 0.03);
 }
@@ -330,16 +387,16 @@ nav .nav-links a:hover { color: var(--smoke); }
 }
 
 .terminal-body .prompt-char { color: var(--wine-light); }
-.terminal-body .cmd { color: var(--smoke); }
-.terminal-body .flag { color: var(--taupe); }
-.terminal-body .arg { color: #c49a6c; }
-.terminal-body .output { color: var(--taupe); }
-.terminal-body .success { color: #6b9e78; }
+.terminal-body .cmd { color: var(--fg); }
+.terminal-body .flag { color: var(--fg-muted); }
+.terminal-body .arg { color: var(--code-key); }
+.terminal-body .output { color: var(--fg-muted); }
+.terminal-body .success { color: var(--code-str); }
 .terminal-body .cursor {
   display: inline-block;
   width: 8px;
   height: 16px;
-  background: var(--smoke);
+  background: var(--fg);
   vertical-align: text-bottom;
   animation: cursorBlink 1s step-end infinite;
 }
@@ -370,7 +427,7 @@ nav .nav-links a:hover { color: var(--smoke); }
 }
 
 .section-desc {
-  color: var(--taupe);
+  color: var(--fg-muted);
   max-width: 560px;
   font-size: 1rem;
   line-height: 1.7;
@@ -379,7 +436,7 @@ nav .nav-links a:hover { color: var(--smoke); }
 /* ---- Divider ---- */
 .divider {
   height: 1px;
-  background: linear-gradient(90deg, transparent 0%, var(--smoke-faint) 50%, transparent 100%);
+  background: linear-gradient(90deg, transparent 0%, var(--fg-faint) 50%, transparent 100%);
   margin: 0 auto;
   max-width: 1100px;
 }
@@ -390,20 +447,20 @@ nav .nav-links a:hover { color: var(--smoke); }
   grid-template-columns: repeat(3, 1fr);
   gap: 1px;
   margin-top: 3.5rem;
-  background: var(--smoke-faint);
-  border: 1px solid var(--smoke-faint);
+  background: var(--fg-faint);
+  border: 1px solid var(--fg-faint);
   border-radius: 12px;
   overflow: hidden;
 }
 
 .feature-card {
-  background: var(--raisin-deep);
+  background: var(--bg);
   padding: 2rem;
   transition: background 0.3s;
 }
 
 .feature-card:hover {
-  background: var(--raisin);
+  background: var(--bg-surface);
 }
 
 .feature-icon {
@@ -429,7 +486,7 @@ nav .nav-links a:hover { color: var(--smoke); }
 
 .feature-card p {
   font-size: 0.85rem;
-  color: var(--taupe);
+  color: var(--fg-muted);
   line-height: 1.6;
 }
 
@@ -449,7 +506,7 @@ nav .nav-links a:hover { color: var(--smoke); }
   left: calc(16.67% + 1rem);
   right: calc(16.67% + 1rem);
   height: 1px;
-  background: linear-gradient(90deg, var(--wine-light), var(--taupe));
+  background: linear-gradient(90deg, var(--wine-light), var(--fg-muted));
   opacity: 0.3;
 }
 
@@ -465,7 +522,7 @@ nav .nav-links a:hover { color: var(--smoke); }
   align-items: center;
   justify-content: center;
   margin: 0 auto 1.5rem;
-  background: var(--raisin);
+  background: var(--bg-surface);
   border: 2px solid var(--wine);
   border-radius: 50%;
   font-family: var(--mono);
@@ -485,7 +542,7 @@ nav .nav-links a:hover { color: var(--smoke); }
 
 .step p {
   font-size: 0.85rem;
-  color: var(--taupe);
+  color: var(--fg-muted);
   line-height: 1.6;
 }
 
@@ -499,8 +556,8 @@ nav .nav-links a:hover { color: var(--smoke); }
 }
 
 .code-block {
-  background: var(--raisin);
-  border: 1px solid var(--smoke-faint);
+  background: var(--bg-surface);
+  border: 1px solid var(--fg-faint);
   border-radius: 10px;
   overflow: hidden;
 }
@@ -510,11 +567,11 @@ nav .nav-links a:hover { color: var(--smoke); }
   align-items: center;
   justify-content: space-between;
   padding: 0.7rem 1rem;
-  background: var(--raisin-surface);
-  border-bottom: 1px solid var(--smoke-faint);
+  background: var(--bg-elevated);
+  border-bottom: 1px solid var(--fg-faint);
   font-family: var(--mono);
   font-size: 0.7rem;
-  color: var(--taupe);
+  color: var(--fg-muted);
 }
 
 .code-body {
@@ -525,9 +582,9 @@ nav .nav-links a:hover { color: var(--smoke); }
   overflow-x: auto;
 }
 
-.code-body .key { color: #c49a6c; }
-.code-body .str { color: #6b9e78; }
-.code-body .punct { color: var(--taupe); }
+.code-body .key { color: var(--code-key); }
+.code-body .str { color: var(--code-str); }
+.code-body .punct { color: var(--fg-muted); }
 
 .fallback-list {
   display: flex;
@@ -540,8 +597,8 @@ nav .nav-links a:hover { color: var(--smoke); }
   align-items: center;
   gap: 1rem;
   padding: 1rem 1.2rem;
-  background: var(--raisin);
-  border: 1px solid var(--smoke-faint);
+  background: var(--bg-surface);
+  border: 1px solid var(--fg-faint);
   border-radius: 8px;
   transition: border-color 0.2s;
 }
@@ -568,17 +625,35 @@ nav .nav-links a:hover { color: var(--smoke); }
 
 .fallback-info p {
   font-size: 0.75rem;
-  color: var(--taupe);
+  color: var(--fg-muted);
 }
 
 /* ---- Shortcuts ---- */
+.shortcut-group {
+  margin-top: 2rem;
+}
+
+.shortcut-group:first-child {
+  margin-top: 3.5rem;
+}
+
+.shortcut-group-title {
+  font-family: var(--mono);
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--wine-light);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  margin-bottom: 0.5rem;
+  padding-left: 0.5rem;
+}
+
 .shortcuts-grid {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
   gap: 1px;
-  margin-top: 3.5rem;
-  background: var(--smoke-faint);
-  border: 1px solid var(--smoke-faint);
+  background: var(--fg-faint);
+  border: 1px solid var(--fg-faint);
   border-radius: 12px;
   overflow: hidden;
 }
@@ -588,15 +663,15 @@ nav .nav-links a:hover { color: var(--smoke); }
   align-items: center;
   justify-content: space-between;
   padding: 1rem 1.5rem;
-  background: var(--raisin-deep);
+  background: var(--bg);
   transition: background 0.2s;
 }
 
-.shortcut-row:hover { background: var(--raisin); }
+.shortcut-row:hover { background: var(--bg-surface); }
 
 .shortcut-desc {
   font-size: 0.85rem;
-  color: var(--smoke-dim);
+  color: var(--fg-dim);
 }
 
 .shortcut-keys {
@@ -612,34 +687,27 @@ kbd {
   min-width: 28px;
   height: 26px;
   padding: 0 6px;
-  background: var(--raisin-surface);
-  border: 1px solid rgba(247, 244, 243, 0.1);
+  background: var(--bg-elevated);
+  border: 1px solid var(--fg-faint);
   border-bottom-width: 2px;
   border-radius: 5px;
   font-family: var(--mono);
   font-size: 0.7rem;
-  color: var(--smoke-dim);
+  color: var(--fg-dim);
 }
 
-/* ---- Skyline ---- */
-.skyline-section {
-  padding: 0;
-  overflow: hidden;
-  position: relative;
-}
-
-.skyline-svg {
+/* ---- Footer skyline ---- */
+.footer-skyline {
   width: 100%;
-  height: auto;
+  height: 60px;
   display: block;
-  opacity: 0.15;
-  filter: drop-shadow(0 0 20px var(--wine-glow));
+  margin-top: 2rem;
 }
 
 /* ---- Footer ---- */
 footer {
   padding: 3rem 0;
-  border-top: 1px solid var(--smoke-faint);
+  border-top: 1px solid var(--fg-faint);
   position: relative;
 }
 
@@ -653,7 +721,7 @@ footer {
 
 .footer-left {
   font-size: 0.8rem;
-  color: var(--taupe);
+  color: var(--fg-muted);
 }
 
 .footer-left a {
@@ -662,7 +730,7 @@ footer {
   transition: color 0.2s;
 }
 
-.footer-left a:hover { color: var(--smoke); }
+.footer-left a:hover { color: var(--fg); }
 
 .footer-right {
   display: flex;
@@ -670,14 +738,14 @@ footer {
 }
 
 .footer-right a {
-  color: var(--taupe);
+  color: var(--fg-muted);
   text-decoration: none;
   font-family: var(--mono);
   font-size: 0.75rem;
   transition: color 0.2s;
 }
 
-.footer-right a:hover { color: var(--smoke); }
+.footer-right a:hover { color: var(--fg); }
 
 /* ---- Animations ---- */
 @keyframes fadeUp {
@@ -725,6 +793,13 @@ footer {
       <li><a href="#how-it-works" class="hide-mobile">How it works</a></li>
       <li><a href="#config" class="hide-mobile">Config</a></li>
       <li><a href="https://github.com/anthropics/ff2" class="btn-nav">GitHub</a></li>
+      <li>
+        <button class="theme-toggle" aria-label="Toggle theme" title="Toggle theme">
+          <svg class="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+          <svg class="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+          <svg class="icon-system" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+        </button>
+      </li>
     </ul>
   </div>
 </nav>
@@ -883,8 +958,14 @@ footer {
       <div class="section-label">Configuration</div>
       <h2 class="section-title">Drop-in script config.</h2>
       <p class="section-desc">
-        Add a <code style="font-family:var(--mono);background:var(--raisin-surface);padding:2px 6px;border-radius:4px;font-size:0.9em">.ff2.json</code>
-        to your repo, or use your existing tool config.
+        Automate your workstream lifecycle with setup, run, and teardown scripts.
+        Install dependencies when a worktree is created, start dev servers on demand,
+        and clean up resources when archiving. Add a
+        <code style="font-family:var(--mono);background:var(--bg-elevated);padding:2px 6px;border-radius:4px;font-size:0.9em">.ff2.json</code>
+        to your repo, or use your existing config from
+        <a href="https://emdash.sh" style="color:var(--wine-light)">emdash</a>,
+        <a href="https://conductor.build" style="color:var(--wine-light)">conductor</a>, or
+        <a href="https://superset.sh" style="color:var(--wine-light)">superset</a>.
       </p>
     </div>
 
@@ -894,17 +975,17 @@ footer {
           <span>.ff2.json</span>
           <span style="opacity:0.5">project root</span>
         </div>
-        <div class="code-body">
-<span class="punct">{</span>
+        <div class="code-body"><span class="punct">{</span>
   <span class="key">"setup"</span><span class="punct">:</span> <span class="str">"npm install"</span><span class="punct">,</span>
+
   <span class="key">"run"</span><span class="punct">:</span> <span class="str">"PORT=$FF_PORT npm run dev"</span><span class="punct">,</span>
+
   <span class="key">"teardown"</span><span class="punct">:</span> <span class="str">"docker-compose down"</span>
-<span class="punct">}</span>
-        </div>
+<span class="punct">}</span></div>
       </div>
 
       <div>
-        <p style="font-size:0.85rem;color:var(--taupe);margin-bottom:1.5rem;line-height:1.6">
+        <p style="font-size:0.85rem;color:var(--fg-muted);margin-bottom:1.5rem;line-height:1.6">
           No config file? ff2 looks for these formats in order:
         </p>
         <div class="fallback-list">
@@ -915,27 +996,27 @@ footer {
               <p>Native config with setup, run, teardown</p>
             </div>
           </div>
-          <div class="fallback-item">
+          <a class="fallback-item" href="https://emdash.sh" style="text-decoration:none;color:inherit">
             <span class="fallback-number">2</span>
             <div class="fallback-info">
               <h4>.emdash.json</h4>
               <p>emdash.sh format (scripts object)</p>
             </div>
-          </div>
-          <div class="fallback-item">
+          </a>
+          <a class="fallback-item" href="https://conductor.build" style="text-decoration:none;color:inherit">
             <span class="fallback-number">3</span>
             <div class="fallback-info">
               <h4>conductor.json</h4>
               <p>conductor.build format (scripts.archive for teardown)</p>
             </div>
-          </div>
-          <div class="fallback-item">
+          </a>
+          <a class="fallback-item" href="https://superset.sh" style="text-decoration:none;color:inherit">
             <span class="fallback-number">4</span>
             <div class="fallback-info">
               <h4>.superset/config.json</h4>
               <p>superset.sh format (arrays, no run command)</p>
             </div>
-          </div>
+          </a>
         </div>
       </div>
     </div>
@@ -956,62 +1037,103 @@ footer {
       </p>
     </div>
 
-    <div class="shortcuts-grid reveal">
-      <div class="shortcut-row">
-        <span class="shortcut-desc">New workstream</span>
-        <span class="shortcut-keys"><kbd>&#8984;</kbd><kbd>N</kbd></span>
+    <div class="reveal">
+      <div class="shortcut-group">
+        <h3 class="shortcut-group-title">Global</h3>
+        <div class="shortcuts-grid">
+          <div class="shortcut-row">
+            <span class="shortcut-desc">New workstream or project</span>
+            <span class="shortcut-keys"><kbd>&#8984;</kbd><kbd>N</kbd></span>
+          </div>
+          <div class="shortcut-row">
+            <span class="shortcut-desc">New project</span>
+            <span class="shortcut-keys"><kbd>&#8984;</kbd><kbd>&#8679;</kbd><kbd>N</kbd></span>
+          </div>
+          <div class="shortcut-row">
+            <span class="shortcut-desc">Settings</span>
+            <span class="shortcut-keys"><kbd>&#8984;</kbd><kbd>,</kbd></span>
+          </div>
+          <div class="shortcut-row">
+            <span class="shortcut-desc">Help</span>
+            <span class="shortcut-keys"><kbd>&#8984;</kbd><kbd>&#8679;</kbd><kbd>/</kbd></span>
+          </div>
+        </div>
       </div>
-      <div class="shortcut-row">
-        <span class="shortcut-desc">Back to project</span>
-        <span class="shortcut-keys"><kbd>&#8984;</kbd><kbd>0</kbd></span>
+
+      <div class="shortcut-group">
+        <h3 class="shortcut-group-title">Project view</h3>
+        <div class="shortcuts-grid">
+          <div class="shortcut-row">
+            <span class="shortcut-desc">Open workstream by position</span>
+            <span class="shortcut-keys"><kbd>&#8984;</kbd><kbd>1-9</kbd></span>
+          </div>
+        </div>
       </div>
-      <div class="shortcut-row">
-        <span class="shortcut-desc">Info tab</span>
-        <span class="shortcut-keys"><kbd>&#8984;</kbd><kbd>1</kbd></span>
-      </div>
-      <div class="shortcut-row">
-        <span class="shortcut-desc">Coding Agent</span>
-        <span class="shortcut-keys"><kbd>&#8984;</kbd><kbd>2</kbd></span>
-      </div>
-      <div class="shortcut-row">
-        <span class="shortcut-desc">Terminal</span>
-        <span class="shortcut-keys"><kbd>&#8984;</kbd><kbd>3</kbd></span>
-      </div>
-      <div class="shortcut-row">
-        <span class="shortcut-desc">Browser</span>
-        <span class="shortcut-keys"><kbd>&#8984;</kbd><kbd>4</kbd></span>
-      </div>
-      <div class="shortcut-row">
-        <span class="shortcut-desc">Setup</span>
-        <span class="shortcut-keys"><kbd>&#8984;</kbd><kbd>5</kbd></span>
-      </div>
-      <div class="shortcut-row">
-        <span class="shortcut-desc">Run</span>
-        <span class="shortcut-keys"><kbd>&#8984;</kbd><kbd>6</kbd></span>
-      </div>
-      <div class="shortcut-row">
-        <span class="shortcut-desc">Cycle tabs</span>
-        <span class="shortcut-keys"><kbd>&#8984;</kbd><kbd>&#8679;</kbd><kbd>[</kbd> <kbd>]</kbd></span>
-      </div>
-      <div class="shortcut-row">
-        <span class="shortcut-desc">External browser</span>
-        <span class="shortcut-keys"><kbd>&#8984;</kbd><kbd>&#8679;</kbd><kbd>O</kbd></span>
-      </div>
-      <div class="shortcut-row">
-        <span class="shortcut-desc">External terminal</span>
-        <span class="shortcut-keys"><kbd>&#8984;</kbd><kbd>&#8679;</kbd><kbd>E</kbd></span>
-      </div>
-      <div class="shortcut-row">
-        <span class="shortcut-desc">Settings</span>
-        <span class="shortcut-keys"><kbd>&#8984;</kbd><kbd>,</kbd></span>
+
+      <div class="shortcut-group">
+        <h3 class="shortcut-group-title">Workstream view</h3>
+        <div class="shortcuts-grid">
+          <div class="shortcut-row">
+            <span class="shortcut-desc">Back to project</span>
+            <span class="shortcut-keys"><kbd>&#8984;</kbd><kbd>0</kbd></span>
+          </div>
+          <div class="shortcut-row">
+            <span class="shortcut-desc">Info tab</span>
+            <span class="shortcut-keys"><kbd>&#8984;</kbd><kbd>1</kbd></span>
+          </div>
+          <div class="shortcut-row">
+            <span class="shortcut-desc">Coding Agent</span>
+            <span class="shortcut-keys"><kbd>&#8984;</kbd><kbd>2</kbd></span>
+          </div>
+          <div class="shortcut-row">
+            <span class="shortcut-desc">Terminal</span>
+            <span class="shortcut-keys"><kbd>&#8984;</kbd><kbd>3</kbd></span>
+          </div>
+          <div class="shortcut-row">
+            <span class="shortcut-desc">Browser</span>
+            <span class="shortcut-keys"><kbd>&#8984;</kbd><kbd>4</kbd></span>
+          </div>
+          <div class="shortcut-row">
+            <span class="shortcut-desc">Setup</span>
+            <span class="shortcut-keys"><kbd>&#8984;</kbd><kbd>5</kbd></span>
+          </div>
+          <div class="shortcut-row">
+            <span class="shortcut-desc">Run</span>
+            <span class="shortcut-keys"><kbd>&#8984;</kbd><kbd>6</kbd></span>
+          </div>
+          <div class="shortcut-row">
+            <span class="shortcut-desc">Cycle tabs</span>
+            <span class="shortcut-keys"><kbd>&#8984;</kbd><kbd>&#8679;</kbd><kbd>[</kbd> <kbd>]</kbd></span>
+          </div>
+          <div class="shortcut-row">
+            <span class="shortcut-desc">External browser</span>
+            <span class="shortcut-keys"><kbd>&#8984;</kbd><kbd>&#8679;</kbd><kbd>O</kbd></span>
+          </div>
+          <div class="shortcut-row">
+            <span class="shortcut-desc">External terminal</span>
+            <span class="shortcut-keys"><kbd>&#8984;</kbd><kbd>&#8679;</kbd><kbd>E</kbd></span>
+          </div>
+        </div>
       </div>
     </div>
   </div>
 </section>
 
-<!-- Skyline -->
-<div class="skyline-section">
-  <svg class="skyline-svg" viewBox="0 200 1200 60" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+<!-- Footer -->
+<footer>
+  <div class="container">
+    <div class="footer-inner">
+      <div class="footer-left">
+        Built by <a href="https://davidpoblador.com">David Poblador i Garcia</a>
+        &middot; with the support of <a href="https://alltuner.com">All Tuner Labs</a>
+      </div>
+      <div class="footer-right">
+        <a href="https://github.com/anthropics/ff2">GitHub</a>
+        <a href="https://davidpoblador.com">Contact</a>
+      </div>
+    </div>
+  </div>
+  <svg class="footer-skyline" viewBox="0 100 1200 130" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
     <defs>
       <linearGradient id="skyGrad" x1="0%" y1="0%" x2="100%" y2="0%">
         <stop offset="0%" stop-color="transparent"/>
@@ -1026,28 +1148,46 @@ footer {
       stroke-width="2"
       stroke-linecap="round"
       stroke-linejoin="round"
+      opacity="0.4"
     />
   </svg>
-</div>
-
-<!-- Footer -->
-<footer>
-  <div class="container">
-    <div class="footer-inner">
-      <div class="footer-left">
-        Built by <a href="https://davidpoblador.com">David Poblador i Garcia</a>
-        &middot; with the support of <a href="https://alltuner.com">All Tuner Labs</a>
-        &middot; Poblenou skyline from <a href="https://alltuner.com">alltuner.com</a>
-      </div>
-      <div class="footer-right">
-        <a href="https://github.com/anthropics/ff2">GitHub</a>
-        <a href="https://davidpoblador.com">Contact</a>
-      </div>
-    </div>
-  </div>
 </footer>
 
 <script>
+// Theme toggle: cycles dark -> light -> system
+(function() {
+  const themes = ['dark', 'light', 'system'];
+  const toggle = document.querySelector('.theme-toggle');
+  const html = document.documentElement;
+
+  function getSystemTheme() {
+    return window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark';
+  }
+
+  function applyTheme(pref) {
+    const effective = pref === 'system' ? getSystemTheme() : pref;
+    html.setAttribute('data-theme', effective);
+    html.setAttribute('data-pref', pref);
+    toggle.querySelectorAll('svg').forEach(s => s.style.display = 'none');
+    if (pref === 'light') toggle.querySelector('.icon-sun').style.display = 'block';
+    else if (pref === 'dark') toggle.querySelector('.icon-moon').style.display = 'block';
+    else toggle.querySelector('.icon-system').style.display = 'block';
+  }
+
+  applyTheme(localStorage.getItem('ff2-theme') || 'dark');
+
+  toggle.addEventListener('click', () => {
+    const current = html.getAttribute('data-pref') || 'dark';
+    const next = themes[(themes.indexOf(current) + 1) % themes.length];
+    localStorage.setItem('ff2-theme', next);
+    applyTheme(next);
+  });
+
+  window.matchMedia('(prefers-color-scheme: light)').addEventListener('change', () => {
+    if (html.getAttribute('data-pref') === 'system') applyTheme('system');
+  });
+})();
+
 // Intersection Observer for reveal animations
 const observer = new IntersectionObserver((entries) => {
   entries.forEach(entry => {
@@ -1058,14 +1198,6 @@ const observer = new IntersectionObserver((entries) => {
 }, { threshold: 0.1, rootMargin: '0px 0px -50px 0px' });
 
 document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
-
-// Smooth nav background on scroll
-const nav = document.querySelector('nav');
-window.addEventListener('scroll', () => {
-  nav.style.borderBottomColor = window.scrollY > 50
-    ? 'rgba(247, 244, 243, 0.08)'
-    : 'rgba(247, 244, 243, 0.04)';
-});
 </script>
 
 </body>

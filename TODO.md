@@ -6,6 +6,7 @@
 - [ ] Choose final app name (currently "ff2" is a working name)
 - [ ] Update bundle ID (`com.ff2.app` in project.yml), URL scheme, AppConstants
 - [ ] Build and ship a standalone CLI binary (like `code` for VS Code)
+- [ ] Homebrew cask for installation
 - [ ] Code signing and notarization for distribution
 - [ ] App icon
 - [ ] All Tuner Labs logo image in help view (needs asset)
@@ -21,6 +22,7 @@
 - [ ] CommandBuilder withFallback quoting needs more testing with edge cases
 
 ## Infrastructure
+- [ ] GitHub Pages deploy workflow for website
 - [ ] Auto-update mechanism (Sparkle or similar)
 - [ ] Crash reporting
 - [ ] Move persistence from UserDefaults to a proper file (for larger state)
