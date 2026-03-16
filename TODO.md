@@ -2,8 +2,15 @@
 
 ## Pre-release
 - [ ] Homebrew tap (alltuner/homebrew-tap) and cask formula
-- [ ] Code signing and notarization for distribution
-- [ ] Occlude non-visible terminal surfaces to save GPU (reverted, needs careful timing)
+- [ ] CI: automate build, sign, notarize, DMG, and release upload via GitHub Actions
+- [ ] Occlude non-visible terminal surfaces to save GPU (needs careful timing)
+- [ ] Swift 6 migration (strict concurrency)
+- [ ] System notifications when agent needs attention (bell/urgency from Ghostty)
+- [ ] Confirm before quit (Cmd+Q) when workstreams are active
+- [ ] Browser tab: show page title in tab label
+- [ ] Terminal tab: show last command in tab label
+- [ ] Drag-and-drop to reorder tabs
+- [ ] Website: favicon, OG image, SEO meta tags
 
 ## Future
 - [ ] External Chrome integration: launch with --remote-debugging-port for WebMCP/CDP
@@ -11,83 +18,64 @@
 - [ ] Auto-update mechanism (Sparkle or similar)
 - [ ] Crash reporting
 - [ ] Move persistence from UserDefaults to a proper file (for larger state)
+- [ ] Horizontal terminal splits within a tab
+- [ ] Pin ghostty submodule update to CI (auto-test against new Ghostty releases)
 
 ## Done
 - [x] Embedded Ghostty terminals (Metal GPU-rendered via libghostty)
 - [x] Project and workstream management with sidebar tree
 - [x] Git worktrees for workstreams (branch off default branch)
-- [x] .env/.env.local symlinks in worktrees
-- [x] Tmux mode for session persistence across app restarts (dedicated socket)
+- [x] .env/.env.local symlinks in worktrees (guarded by setting)
+- [x] Tmux mode for Coding Agent session persistence
 - [x] Claude session resume via --session-id/--resume
-- [x] Auto-respawn on process exit (tmux pane-died hook)
-- [x] Auto-rename branch via system prompt injection
+- [x] Auto-respawn agent on process exit (tmux pane-died hook)
+- [x] Auto-rename branch via --append-system-prompt
 - [x] Per-workstream permission mode (bypass prompts, context menu on +)
 - [x] Agent Teams setting (CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS)
-- [x] --teammate-mode tmux flag
 - [x] Deterministic port allocation per workstream (FF_PORT env var)
-- [x] Four workstream tabs: Info, Coding Agent, Terminal, Browser
-- [x] Embedded WKWebView browser with nav bar, home button
-- [x] Info tab with rendered README.md and CLAUDE.md (MarkdownView SPM package)
-- [x] GitHub integration: repo info, open PRs, branch PR status (via gh CLI)
-- [x] Context-sensitive Cmd+0-9 shortcuts (project view: workstreams, workstream: tabs)
-- [x] Cmd+Shift+[/] tab cycling
-- [x] Cmd+Shift+O external browser, Cmd+Shift+E external terminal
-- [x] Ctrl+Cmd+S sidebar toggle
-- [x] Esc closes settings/help
-- [x] Help view with grouped shortcuts, credits, Poblenou skyline
-- [x] Settings: environment detection, tmux, bypass, teams, auto-rename, appearance, language, base dir, branch prefix, external apps, danger zone
-- [x] Project overview with editable alias, git/GitHub info, workstream list
-- [x] Drag-and-drop directories to sidebar
-- [x] factoryfloor:// URL scheme for single-instance behavior
-- [x] CLI launch with directory argument
-- [x] Auto-generated workstream names (operation-adjective-component)
-- [x] Async git repo info, path validity, GitHub data with periodic refresh
-- [x] Auto-remove projects with missing directories
-- [x] Worktree path validation with visual feedback (warning icon + strikethrough)
-- [x] Localization: en, ca, es, sv
-- [x] Performance: cached sorted IDs, O(1) lookups, debounced saves, deferred init, surface prewarm
-- [x] Terminal resize flicker fix, async archive operations
-- [x] CommandBuilder for clean shell command composition
-- [x] Poblenou skyline as SwiftUI Shape in help and empty state
-- [x] CLAUDE.md with comprehensive development workflow docs
-- [x] Archive warning: warn if worktree has uncommitted changes before archiving
-- [x] Workstream sorting in project view (by name or recent use toggle)
-- [x] Sidebar shows branch name per workstream (refreshed periodically)
-- [x] Sidebar toggle animation flicker fix
-- [x] Git worktree list and prune in project overview
-- [x] Fix auto-rename branch (--append-system-prompt instead of --system-prompt-file)
-- [x] Extract env var injection logic to WorkstreamEnvironment module
-- [x] Tmux mode limited to Coding Agent only (Terminal tab uses plain shell)
-- [x] Tmux aggressive-resize and window-size latest to prevent size revert
-- [x] Script config: .factoryfloor.json with fallback to emdash/conductor/superset formats
-- [x] Setup tab (Cmd+5): auto-runs setup script on workstream creation
-- [x] Run tab (Cmd+6): on-demand dev server via run script
-- [x] Teardown script runs before worktree removal on archive
-- [x] .env symlink guarded by setting (default on)
-- [x] Script info displayed in workstream Info tab
-- [x] App icon (factory floor + Poblenou skyline)
-- [x] Landing page website with Tailwind CSS build
-- [x] Rename to Factory Floor (bundle ID, URL scheme, config dir, all references)
-- [x] Hugo website with asset versioning (MD5 query params)
-- [x] GitHub Pages deploy workflow
-- [x] Release-please for automated versioning
-- [x] CLI launcher script (ff --install)
-- [x] Distribution guide (Homebrew, notarization, Sparkle)
-- [x] Umami analytics integration
-- [x] GitHub repo at alltuner/factoryfloor
-- [x] CommandBuilder withFallback quoting fixed with 25 tests
-- [x] All app strings translated (en, ca, es, sv)
-- [x] Dynamic workspace tabs (terminal/browser on demand, closeable)
+- [x] Dynamic workspace tabs (Info + Agent always, Terminal/Browser on demand)
 - [x] Terminal tabs auto-close on shell exit, agent respawns
 - [x] Multi-terminal support with proper Ghostty focus management
-- [x] PR badge in workspace toolbar
-- [x] Browser loading indicator, Cmd+L address bar
-- [x] Workstream name syncs from branch rename
-- [x] Sidebar state persisted across restarts
-- [x] Install CLI (ff) from Settings
-- [x] Sponsor page with contribution options
-- [x] Website: Hugo i18n (en/ca/es/sv), language switcher, open source section
-- [x] Sidebar visual polish (hover effects, branch names, credit line)
-
-## Probably not needed
-- [ ] Claude Agent SDK integration (TypeScript): CLI + tmux + session-id covers our needs
+- [x] Embedded WKWebView browser with nav bar, loading indicator
+- [x] Cmd+L address bar focus, auto-focus on new browser
+- [x] PR badge in workspace toolbar (links to GitHub PR)
+- [x] Info tab with README.md, CLAUDE.md, AGENTS.md (pinned header, scrollable docs)
+- [x] GitHub integration: repo info, open PRs, branch PR status (via gh CLI)
+- [x] Keyboard shortcuts: Cmd+Return (agent), Cmd+I (info), Cmd+T (terminal), Cmd+B (browser), Cmd+W (close tab), Cmd+1-9 (switch), Cmd+Shift+[/] (cycle), Cmd+/ (help)
+- [x] Cmd+Shift+O external browser, Cmd+Shift+E external terminal
+- [x] Ctrl+Cmd+S sidebar toggle, Esc closes settings/help
+- [x] Cmd+W closes tab (overrides macOS window close)
+- [x] Help view with app icon, skyline, shortcuts, credits, sponsor link
+- [x] Settings: environment, CLI install, tmux, bypass, teams, auto-rename, appearance, language, base dir, branch prefix, external apps (with icons), bleeding edge, danger zone
+- [x] Project overview with editable name, centered header, directory with copy/terminal icons, git info, GitHub info, worktree list with prune
+- [x] Workstream info with pinned header (project name, workstream name, branch, directory), PR status, scripts, scrollable docs
+- [x] Drag-and-drop directories to sidebar
+- [x] factoryfloor:// URL scheme for single-instance behavior
+- [x] CLI launcher (ff) with install from Settings
+- [x] Auto-generated workstream names (operation-adjective-component)
+- [x] Workstream name syncs from branch rename (every 15s)
+- [x] Sidebar state persisted across restarts (selection + expanded)
+- [x] Async git repo info, path validity, branch names with periodic refresh
+- [x] Auto-remove projects with missing directories
+- [x] Worktree path validation with visual feedback
+- [x] Archive warning for uncommitted changes
+- [x] Workstream sorting in project view (recent / A-Z)
+- [x] Sidebar branch names per workstream
+- [x] Sidebar credit line with sponsor link
+- [x] Localization: en, ca, es, sv (all strings translated)
+- [x] Script config: .factoryfloor.json with fallback to emdash/conductor/superset
+- [x] Setup script runs in background on workstream creation
+- [x] Teardown script runs before worktree removal on archive
+- [x] CommandBuilder with proper shell quoting (25 tests)
+- [x] App icon with Poblenou skyline
+- [x] Rename to Factory Floor (bundle ID, URL scheme, config, all references)
+- [x] Ghostty submodule pinned to v1.3.1
+- [x] Bridging header moved to Resources/
+- [x] Code signing and notarization (scripts/release.sh)
+- [x] Release-please for automated versioning
+- [x] MIT license
+- [x] README with marketing-first layout
+- [x] Website: Hugo + Tailwind, i18n (4 languages), language switcher, skyline, sponsor page, open source section, Umami analytics, canonical/hreflang SEO
+- [x] GitHub Pages deploy workflow
+- [x] GitHub repo (alltuner/factoryfloor, public, topics, description)
+- [x] Distribution guide (docs/distribution.md)
