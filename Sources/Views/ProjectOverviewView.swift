@@ -15,24 +15,18 @@ struct ProjectOverviewView: View {
     @State private var showingPruneConfirm = false
     @State private var isPruning = false
 
+    @AppStorage("factoryfloor.defaultTerminal") private var defaultTerminal: String = ""
+
     var body: some View {
         Form {
-            // MARK: - Project
+            // MARK: - Project header
             Section {
                 TextField("Name", text: $project.name)
+                    .font(.system(size: 18, weight: .semibold))
+                    .textFieldStyle(.plain)
                     .onChange(of: project.name) { _, _ in onProjectChanged() }
 
-                LabeledContent("Directory") {
-                    Text(project.directory)
-                        .font(.system(.body, design: .monospaced))
-                        .foregroundStyle(.secondary)
-                        .lineLimit(1)
-                        .truncationMode(.middle)
-                }
-            } header: {
-                Text("Project")
-            } footer: {
-                Text("The name is an alias for display only. Changing it does not rename any files or directories.")
+                DirectoryRow(path: project.directory, defaultTerminal: defaultTerminal)
             }
 
             // MARK: - Repository

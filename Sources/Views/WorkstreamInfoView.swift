@@ -11,6 +11,7 @@ struct WorkstreamInfoView: View {
     var scriptConfig: ScriptConfig = .empty
 
     @EnvironmentObject var appEnv: AppEnvironment
+    @AppStorage("factoryfloor.defaultTerminal") private var defaultTerminal: String = ""
     @State private var branchName: String?
     @State private var docFiles: [DocFile] = []
     @State private var selectedDoc: String?
@@ -32,30 +33,20 @@ struct WorkstreamInfoView: View {
                 VStack(spacing: 0) {
                     // Workstream metadata
                     Form {
-                        Section("Workstream") {
-                            LabeledContent("Name") {
-                                Text(workstreamName)
-                                    .font(.system(.body, design: .monospaced))
-                            }
+                        Section {
+                            Text(workstreamName)
+                                .font(.system(size: 18, weight: .semibold, design: .monospaced))
 
                             if let branch = branchName {
-                                LabeledContent("Branch") {
-                                    HStack(spacing: 4) {
-                                        Image(systemName: "arrow.triangle.branch")
-                                            .font(.caption)
-                                        Text(branch)
-                                    }
-                                    .foregroundStyle(.secondary)
+                                HStack(spacing: 4) {
+                                    Image(systemName: "arrow.triangle.branch")
+                                        .font(.caption)
+                                    Text(branch)
                                 }
+                                .foregroundStyle(.secondary)
                             }
 
-                            LabeledContent("Directory") {
-                                Text(abbreviatePath(workingDirectory))
-                                    .font(.system(.body, design: .monospaced))
-                                    .foregroundStyle(.secondary)
-                                    .lineLimit(1)
-                                    .truncationMode(.middle)
-                            }
+                            DirectoryRow(path: workingDirectory, defaultTerminal: defaultTerminal)
 
                             LabeledContent("Project") {
                                 Text(projectName)
@@ -209,12 +200,67 @@ struct WorkstreamInfoView: View {
         }
     }
 
-    private func abbreviatePath(_ path: String) -> String {
-        let home = FileManager.default.homeDirectoryForCurrentUser.path
-        if path.hasPrefix(home) {
-            return "~" + path.dropFirst(home.count)
+}
+
+// MARK: - Directory row with copy and open-in-terminal actions
+
+struct DirectoryRow: View {
+    let path: String
+    var defaultTerminal: String = ""
+
+    var body: some View {
+        HStack(spacing: 6) {
+            Text(abbreviatePath(path))
+                .font(.system(.body, design: .monospaced))
+                .foregroundStyle(.secondary)
+                .lineLimit(1)
+                .truncationMode(.middle)
+
+            Spacer()
+
+            Button(action: copyPath) {
+                Image(systemName: "doc.on.doc")
+                    .font(.system(size: 11))
+                    .foregroundStyle(.secondary)
+            }
+            .buttonStyle(.plain)
+            .help("Copy path")
+
+            Button(action: openInTerminal) {
+                Image(systemName: "terminal")
+                    .font(.system(size: 11))
+                    .foregroundStyle(.secondary)
+            }
+            .buttonStyle(.plain)
+            .help("Open in external terminal")
         }
-        return path
+    }
+
+    private func copyPath() {
+        NSPasteboard.general.clearContents()
+        NSPasteboard.general.setString(path, forType: .string)
+    }
+
+    private func openInTerminal() {
+        if !defaultTerminal.isEmpty,
+           let appURL = NSWorkspace.shared.urlForApplication(withBundleIdentifier: defaultTerminal) {
+            let config = NSWorkspace.OpenConfiguration()
+            NSWorkspace.shared.open([URL(fileURLWithPath: path)], withApplicationAt: appURL, configuration: config)
+        } else {
+            let escaped = path.replacingOccurrences(of: "\"", with: "\\\"")
+            let script = "tell application \"Terminal\" to do script \"cd \(escaped) && clear\""
+            if let appleScript = NSAppleScript(source: script) {
+                appleScript.executeAndReturnError(nil)
+            }
+        }
+    }
+
+    private func abbreviatePath(_ p: String) -> String {
+        let home = FileManager.default.homeDirectoryForCurrentUser.path
+        if p.hasPrefix(home) {
+            return "~" + p.dropFirst(home.count)
+        }
+        return p
     }
 }
 
