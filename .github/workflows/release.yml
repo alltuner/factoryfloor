@@ -41,7 +41,15 @@ jobs:
       - name: Install dependencies
         run: brew install xcodegen zig
 
+      - name: Cache Ghostty xcframework
+        id: ghostty-cache
+        uses: actions/cache@v4
+        with:
+          path: ghostty/macos/GhosttyKit.xcframework
+          key: ghostty-xcframework-${{ hashFiles('ghostty/.git') }}
+
       - name: Build Ghostty xcframework
+        if: steps.ghostty-cache.outputs.cache-hit != 'true'
         run: |
           cd ghostty
           zig build -Demit-xcframework=true -Demit-macos-app=false -Dxcframework-target=universal -Doptimize=ReleaseFast
