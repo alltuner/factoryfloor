@@ -210,7 +210,13 @@ struct EnvironmentTabView: View {
     }
 
     private func envInput(script: String, role: String) -> String {
-        let command = scriptCommand(script: script, role: role)
+        let command: String
+        if role == "run",
+           let launcherPath = RunLauncher.executableURL()?.path {
+            command = runScriptCommand(script: script, workstreamID: workstreamID, launcherPath: launcherPath)
+        } else {
+            command = scriptCommand(script: script, role: role)
+        }
         if useTmux {
             return buildCommand(script: command, role: role) + "\n"
         }

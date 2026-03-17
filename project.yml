@@ -30,7 +30,9 @@ targets:
     type: application
     platform: macOS
     sources:
-      - Sources
+      - path: Sources
+        excludes:
+          - Launcher
       - path: Resources/Assets.xcassets
         buildPhase: resources
       - path: Localization/en.lproj/Localizable.strings
@@ -81,12 +83,41 @@ targets:
           PRODUCT_NAME: Factory Floor
           FF_URL_SCHEME: factoryfloor
     dependencies:
+      - target: FFRun
       - package: swift-cmark
         product: cmark-gfm
       - package: swift-cmark
         product: cmark-gfm-extensions
       - package: Sentry
         product: Sentry
+    postBuildScripts:
+      - script: |
+          set -e
+          mkdir -p "${TARGET_BUILD_DIR}/${CONTENTS_FOLDER_PATH}/Helpers"
+          cp -f "${BUILT_PRODUCTS_DIR}/ff-run" "${TARGET_BUILD_DIR}/${CONTENTS_FOLDER_PATH}/Helpers/ff-run"
+          chmod +x "${TARGET_BUILD_DIR}/${CONTENTS_FOLDER_PATH}/Helpers/ff-run"
+        name: Bundle ff-run
+        outputFiles:
+          - $(TARGET_BUILD_DIR)/$(CONTENTS_FOLDER_PATH)/Helpers/ff-run
+
+  FFRun:
+    type: tool
+    platform: macOS
+    sources:
+      - path: Sources
+        includes:
+          - Launcher/**
+          - Models/AppConstants.swift
+          - Models/FilePersistence.swift
+          - Models/RunState.swift
+    settings:
+      base:
+        PRODUCT_NAME: ff-run
+        OTHER_LDFLAGS:
+          - -lproc
+      configs:
+        Debug:
+          SWIFT_ACTIVE_COMPILATION_CONDITIONS: DEBUG
 
   FactoryFloorTests:
     type: bundle.unit-test

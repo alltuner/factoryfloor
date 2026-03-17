@@ -144,6 +144,17 @@ struct TerminalContainerView: View {
     @State private var terminalTitles: [UUID: String] = [:]
     @State private var cachedClaudeCommand: String?
     @State private var draggedCustomTab: WorkspaceTab?
+    @StateObject private var portDetector: PortDetector
+
+    init(workstreamID: UUID, workingDirectory: String, projectDirectory: String, projectName: String, workstreamName: String, bypassPermissions: Bool) {
+        self.workstreamID = workstreamID
+        self.workingDirectory = workingDirectory
+        self.projectDirectory = projectDirectory
+        self.projectName = projectName
+        self.workstreamName = workstreamName
+        self.bypassPermissions = bypassPermissions
+        _portDetector = StateObject(wrappedValue: PortDetector(workstreamID: workstreamID))
+    }
 
     private var claudeID: UUID { workstreamID }
 
@@ -172,6 +183,11 @@ struct TerminalContainerView: View {
 
     private var workstreamPort: Int {
         PortAllocator.port(for: workingDirectory)
+    }
+
+    private var browserDefaultURL: String {
+        let port = portDetector.selectedPort ?? workstreamPort
+        return "http://localhost:\(port)/"
     }
 
     private var branchPR: GitHubPR? {
@@ -335,7 +351,7 @@ struct TerminalContainerView: View {
                 environmentVars: terminalEnvVars
             )
         case .browser(let id):
-            BrowserView(defaultURL: "http://localhost:\(workstreamPort)/", tabID: id)
+            BrowserView(defaultURL: browserDefaultURL, tabID: id)
                 .id(id)
         }
     }
@@ -416,7 +432,7 @@ struct TerminalContainerView: View {
             terminalTitles[surfaceID] = notification.userInfo?["title"] as? String
         }
         .onReceive(NotificationCenter.default.publisher(for: .openExternalBrowser)) { _ in
-            guard let url = URL(string: "http://localhost:\(workstreamPort)/") else { return }
+            guard let url = URL(string: browserDefaultURL) else { return }
             if defaultBrowser.isEmpty {
                 NSWorkspace.shared.open(url)
             } else if let appURL = NSWorkspace.shared.urlForApplication(withBundleIdentifier: defaultBrowser) {

@@ -9,6 +9,35 @@ extension Notification.Name {
     static let browserTitleChanged = Notification.Name("factoryfloor.browserTitleChanged")
 }
 
+func shouldRetargetBrowser(currentURL: String?, displayedURL: String, previousDefaultURL: String, nextDefaultURL: String, connectionError: Bool) -> Bool {
+    guard normalizedBrowserURL(previousDefaultURL) != normalizedBrowserURL(nextDefaultURL) else {
+        return false
+    }
+
+    if connectionError {
+        return normalizedBrowserURL(displayedURL) == normalizedBrowserURL(previousDefaultURL)
+    }
+
+    guard let currentURL else { return false }
+    return normalizedBrowserURL(currentURL) == normalizedBrowserURL(previousDefaultURL)
+}
+
+private func normalizedBrowserURL(_ urlString: String) -> String {
+    var resolved = urlString
+    if !resolved.contains("://") {
+        resolved = "http://\(resolved)"
+    }
+    guard let components = URLComponents(string: resolved) else {
+        return resolved
+    }
+
+    var normalized = components
+    if normalized.path.isEmpty {
+        normalized.path = "/"
+    }
+    return normalized.string ?? resolved
+}
+
 struct BrowserView: View {
     let defaultURL: String
     var tabID: UUID?
@@ -120,6 +149,17 @@ struct BrowserView: View {
         }
         .onReceive(NotificationCenter.default.publisher(for: .focusAddressBar)) { _ in
             urlFieldFocused = true
+        }
+        .onChange(of: defaultURL) { oldURL, newURL in
+            guard shouldRetargetBrowser(
+                currentURL: webView.url?.absoluteString,
+                displayedURL: urlText,
+                previousDefaultURL: oldURL,
+                nextDefaultURL: newURL,
+                connectionError: connectionError
+            ) else { return }
+            urlText = newURL
+            navigateTo(newURL)
         }
         .onChange(of: pageTitle) { _, newTitle in
             guard let tabID else { return }
