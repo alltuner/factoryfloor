@@ -25,7 +25,7 @@ jobs:
   build:
     needs: release-please
     if: ${{ needs.release-please.outputs.release_created }}
-    runs-on: macos-14
+    runs-on: macos-15
     permissions:
       contents: write
     env:
