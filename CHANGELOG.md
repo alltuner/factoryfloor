@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.1.11](https://github.com/alltuner/factoryfloor/compare/v0.1.10...v0.1.11) (2026-03-17)
+
+
+### Performance
+
+* **ci:** replace brew with dedicated setup actions for zig and xcodegen ([#30](https://github.com/alltuner/factoryfloor/issues/30)) ([d438aaf](https://github.com/alltuner/factoryfloor/commit/d438aafae5a83a6b5f74c917abe08781f982e3ea))
+
 ## [0.1.10](https://github.com/alltuner/factoryfloor/compare/v0.1.9...v0.1.10) (2026-03-17)
 
 
