@@ -1,92 +1,92 @@
 [nav_features]
-other = "Funktioner"
+other = "Features"
 [nav_how]
-other = "Så fungerar det"
+other = "Hur det funkar"
 [nav_config]
-other = "Konfiguration"
+other = "Config"
 
 [hero_badge]
-other = "Gratis och öppen · macOS-nativt · Ghostty-terminal"
+other = "Gratis och open source · macOS-native · Ghostty-terminal"
 [hero_title_1]
 other = "Din"
 [hero_title_accent]
 other = "AI-drivna"
 [hero_title_2]
-other = "utvecklarmiljö."
+other = "dev workspace."
 [hero_desc]
-other = "En nativ macOS-app byggd på <a href=\"https://ghostty.org\" class=\"text-wine-light hover:underline\">Ghosttys</a> GPU-renderade terminal. Hanterar git-worktrees, Claude Code-sessioner och utvecklingsservrar från ett enda fönster. Varje arbetsflöde får sin egen gren, terminal och AI-agent — allt körs parallellt, allt i nativ hastighet."
+other = "Nativ macOS-app byggd på <a href=\"https://ghostty.org\" class=\"text-wine-light hover:underline\">Ghosttys</a> GPU-renderade terminal. Hanterar git worktrees, Claude Code-sessions och dev servers i ett fönster. Varje workstream får egen branch, terminal och agent, allt parallellt, allt native."
 [hero_download]
 other = "Ladda ner"
 [hero_source]
-other = "Visa källkod"
+other = "Källkod"
 
 [features_label]
-other = "Funktioner"
+other = "Features"
 [features_title]
 other = "Allt i ett fönster."
 [features_desc]
-other = "Sluta jonglera mellan terminaler, webbläsare och git-klienter. Varje arbetsflöde är en fristående utvecklingsmiljö."
+other = "Sluta jonglera terminaler, browsers och git-klienter. Varje workstream är en komplett dev-miljö."
 [feat_worktrees_title]
-other = "Git-worktrees"
+other = "Git Worktrees"
 [feat_worktrees_desc]
-other = "Varje arbetsflöde får sin egen gren och worktree. Växla mellan uppgifter utan att stasha, med .env-filer automatiskt symlänkade."
+other = "Varje workstream får egen branch och worktree. Byt task utan stash. .env-filer symlänkas automatiskt."
 [feat_claude_title]
 other = "Claude Code"
 [feat_claude_desc]
-other = "Integrerad AI-agent med sessionsbeständighet. Återuppta konversationer efter omstarter med automatiska sessions-ID:n."
+other = "Integrerad agent med session persistence. Återuppta konversationer efter restart med automatiska session IDs."
 [feat_tmux_title]
-other = "Tmux-beständighet"
+other = "Tmux persistence"
 [feat_tmux_desc]
-other = "Agentsessioner överlever omstarter via tmux på en dedikerad socket. Inget mer tappat sammanhang eller avbrutna arbetsflöden."
+other = "Agent sessions överlever restarts via tmux på en dedicerad socket. Ingen tappad kontext, inga avbrutna workflows."
 [feat_scripts_title]
-other = "Setup- och körskript"
+other = "Setup & run scripts"
 [feat_scripts_desc]
-other = "Konfigurera setup-, kör- och nedrivningsskript per projekt. Kompatibelt med emdash-, conductor- och superset-konfigurationer."
+other = "Konfigurera setup, run och teardown scripts per projekt. Kompatibelt med emdash, conductor och superset configs."
 [feat_browser_title]
-other = "Inbäddad webbläsare"
+other = "Inbyggd browser"
 [feat_browser_desc]
-other = "WKWebView-webbläsarflik med deterministisk porttilldelning. Förhandsgranska din app utan att lämna arbetsytan."
+other = "WKWebView browser tab med deterministiska portar. Previewa din app utan att lämna workspace."
 [feat_github_title]
 other = "GitHub-integration"
 [feat_github_desc]
-other = "Se repoinformation, öppna PR:er och grenstatus för PR:er direkt i projektvyn. Drivs av gh CLI."
+other = "Repo-info, öppna PRs och branch PR-status direkt i projektvyn. Via gh CLI."
 
 [how_label]
-other = "Så fungerar det"
+other = "Hur det funkar"
 [how_title]
 other = "Tre steg till parallell utveckling."
 [how_desc]
-other = "Gå från repo till körande arbetsflöde på sekunder. Varje arbetsflöde är isolerat och fristående."
+other = "Från repo till körande workstream på sekunder. Varje workstream isolerad och fristående."
 [step1_title]
 other = "Lägg till ett projekt"
 [step1_desc]
-other = "Dra en katalog till sidofältet, eller skapa en ny. Factory Floor upptäcker git-repon, installerade verktyg och GitHub-anslutningar automatiskt."
+other = "Dra en directory till sidebaren eller skapa en ny. Factory Floor detekterar git repos, installerade tools och GitHub-kopplingar automatiskt."
 [step2_title]
-other = "Skapa ett arbetsflöde"
+other = "Skapa en workstream"
 [step2_desc]
-other = "En ny git-worktree med en färsk gren, en Claude Code-session, en terminal och en webbläsarflik. Allt kopplat och redo att köra."
+other = "En ny worktree med fresh branch, Claude Code session, terminal och browser tab. Allt uppkopplat, redo att köra."
 [step3_title]
 other = "Koda med AI"
 [step3_desc]
-other = "Kodningsagenten döper om din gren för att matcha uppgiften. Setup-skript installerar beroenden. Växla mellan arbetsflöden utan att tappa tillstånd."
+other = "Agenten renamnger din branch efter tasken. Setup scripts installerar dependencies. Byt workstream utan att tappa state."
 
 [config_label]
-other = "Konfiguration"
+other = "Config"
 [config_title]
-other = "Enkel skriptkonfiguration."
+other = "Drop-in script config."
 [config_desc]
-other = "Automatisera ditt arbetsflödes livscykel med setup-, kör- och nedrivningsskript. Installera beroenden när en worktree skapas, starta utvecklingsservrar vid behov och rensa resurser vid arkivering."
+other = "Automatisera workstream-livscykeln med setup, run och teardown scripts. Installera dependencies när en worktree skapas, starta dev servers on demand, städa resurser vid arkivering."
 [config_add]
 other = "Lägg till en"
 [config_or_use]
-other = "i ditt repo, eller använd din befintliga konfiguration från"
+other = "i ditt repo, eller använd din befintliga config från"
 
 [env_label]
-other = "Miljö"
+other = "Environment"
 [env_title]
-other = "Variabler tillgängliga i varje terminal."
+other = "Variabler i varje terminal."
 [env_desc]
-other = "Varje arbetsflödesterminal, setup-skript och körkommando har tillgång till dessa miljövariabler. Använd dem i dina skript och utvecklingsserverkonfigurationer."
+other = "Varje workstream-terminal, setup script och run command har tillgång till dessa environment variables. Använd dem i scripts och dev server configs."
 [env_variable]
 other = "Variabel"
 [env_description]
@@ -96,42 +96,42 @@ other = "Exempel"
 [env_project]
 other = "Projektnamn"
 [env_workstream]
-other = "Arbetsflödesnamn"
+other = "Workstream-namn"
 [env_project_dir]
-other = "Huvudrepots sökväg"
+other = "Path till huvudrepot"
 [env_worktree_dir]
-other = "Worktree-sökväg för detta arbetsflöde"
+other = "Worktree path för denna workstream"
 [env_port]
-other = "Deterministisk port för detta arbetsflöde"
+other = "Deterministisk port för denna workstream"
 
 [shortcuts_label]
-other = "Tangentbordsfokus"
+other = "Keyboard-first"
 [shortcuts_title]
-other = "Navigera utan musen."
+other = "Navigera utan mus."
 [shortcuts_desc]
-other = "Kontextkänsliga genvägar som anpassar sig efter om du är i en projektvy eller ett arbetsflöde."
+other = "Kontextkänsliga shortcuts som anpassas efter om du är i projektvy eller workstream."
 [shortcuts_global]
 other = "Globalt"
 [shortcuts_project]
 other = "Projektvy"
 [shortcuts_workstream]
-other = "Arbetsflödesvy"
+other = "Workstream-vy"
 [sc_new]
-other = "Nytt arbetsflöde eller projekt"
+other = "Ny workstream eller projekt"
 [sc_settings]
 other = "Inställningar"
 [sc_open_ws]
-other = "Öppna arbetsflöde efter position"
+other = "Öppna workstream efter position"
 [sc_back]
 other = "Tillbaka till projektet"
 [sc_tabs]
-other = "Info / Agent / Terminal / Webbläsare"
+other = "Info / Agent / Terminal / Browser"
 [sc_script_tabs]
-other = "Setup / Kör"
+other = "Setup / Run"
 [sc_cycle]
-other = "Växla flikar"
+other = "Växla tabs"
 [sc_ext_browser]
-other = "Extern webbläsare"
+other = "Extern browser"
 [sc_ext_terminal]
 other = "Extern terminal"
 
@@ -144,15 +144,15 @@ other = "Kontakt"
 
 # Open Source
 [oss_label]
-other = "Öppen källkod"
+other = "Open Source"
 [oss_title]
-other = "Gratis och öppen källkod."
+other = "Gratis och open source."
 [oss_desc]
-other = "Factory Floor har MIT-licens och är gratis att använda. Källkoden finns tillgänglig på GitHub. Bidrag, felrapporter och funktionsförslag är välkomna."
+other = "Factory Floor är MIT-licensierad och gratis. Källkoden finns på GitHub. Bidrag, bug reports och feature requests välkomnas."
 [oss_view]
 other = "Visa på GitHub"
 [oss_star]
 other = "Ge en stjärna"
 
 [footer_poblenou]
-other = "Gjord med ❤️ i Poblenou, Barcelona"
+other = "Byggd med ❤️ i Poblenou, Barcelona"

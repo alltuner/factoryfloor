@@ -8,83 +8,83 @@ other = "Configuració"
 
 # Hero
 [hero_badge]
-other = "Gratuït i obert · macOS natiu · Terminal Ghostty"
+other = "Gratuït i open source · macOS natiu · Terminal Ghostty"
 [hero_title_1]
-other = "Desenvolupa"
+other = "El teu"
 [hero_title_accent]
-other = "amb IA."
+other = "espai dev"
 [hero_title_2]
-other = ""
+other = "amb IA."
 [hero_desc]
-other = "Una app nativa de macOS construïda sobre el terminal renderitzat per GPU de <a href=\"https://ghostty.org\" class=\"text-wine-light hover:underline\">Ghostty</a>. Gestiona git worktrees, sessions de Claude Code i servidors de desenvolupament des d'una sola finestra. Cada workstream té la seva pròpia branca, terminal i agent d'IA — tot en paral·lel, tot a velocitat nativa."
+other = "App nativa de macOS sobre el terminal GPU de <a href=\"https://ghostty.org\" class=\"text-wine-light hover:underline\">Ghostty</a>. Gestiona git worktrees, sessions de Claude Code i servidors dev des d'una sola finestra. Cada workstream té branch, terminal i agent propis, tot en paral·lel, tot a velocitat nativa."
 [hero_download]
 other = "Descarrega"
 [hero_source]
-other = "Veure el codi font"
+other = "Codi font"
 
 # Features
 [features_label]
 other = "Funcionalitats"
 [features_title]
-other = "Tot en una sola finestra."
+other = "Tot en una finestra."
 [features_desc]
-other = "Prou de fer malabars amb terminals, navegadors i clients git. Cada workstream és un entorn de desenvolupament autònom."
+other = "Prou de fer malabars amb terminals, browsers i clients git. Cada workstream és un entorn dev complet."
 [feat_worktrees_title]
 other = "Git Worktrees"
 [feat_worktrees_desc]
-other = "Cada workstream té la seva pròpia branca i worktree. Canvia de tasca sense fer stash, amb els fitxers .env enllaçats automàticament."
+other = "Cada workstream té branch i worktree propis. Canvia de tasca sense stash, amb fitxers .env symlinkats automàticament."
 [feat_claude_title]
 other = "Claude Code"
 [feat_claude_desc]
-other = "Agent d'IA integrat amb persistència de sessions. Reprèn converses entre reinicis de l'app amb identificadors de sessió automàtics."
+other = "Agent integrat amb persistència de sessió. Reprèn converses entre reinicis amb session IDs automàtics."
 [feat_tmux_title]
-other = "Persistència amb Tmux"
+other = "Persistència tmux"
 [feat_tmux_desc]
-other = "Les sessions de l'agent sobreviuen als reinicis de l'app via tmux en un socket dedicat. Mai més context perdut ni fluxos de treball interromputs."
+other = "Les sessions d'agent sobreviuen reinicis via tmux en un socket dedicat. Mai més context perdut ni workflows interromputs."
 [feat_scripts_title]
-other = "Scripts de configuració i execució"
+other = "Setup & Run Scripts"
 [feat_scripts_desc]
-other = "Configura scripts de preparació, execució i desmuntatge per projecte. Compatible amb configuracions d'emdash, conductor i superset."
+other = "Configura scripts de setup, run i teardown per projecte. Compatible amb configs d'emdash, conductor i superset."
 [feat_browser_title]
-other = "Navegador integrat"
+other = "Browser integrat"
 [feat_browser_desc]
-other = "Pestanya de navegador WKWebView amb assignació de ports determinista. Previsualitza la teva app sense sortir de l'espai de treball."
+other = "Tab de browser WKWebView amb ports deterministes. Previsualitza l'app sense sortir del workspace."
 [feat_github_title]
-other = "Integració amb GitHub"
+other = "Integració GitHub"
 [feat_github_desc]
-other = "Consulta informació del repositori, PRs obertes i l'estat de PRs per branca directament a la vista del projecte. Funciona amb el CLI de gh."
+other = "Info del repo, PRs obertes i estat de PRs per branch, directament a la vista del projecte. Via gh CLI."
 
 # How it works
 [how_label]
 other = "Com funciona"
 [how_title]
-other = "Tres passos per al desenvolupament en paral·lel."
+other = "Tres passos per desenvolupar en paral·lel."
 [how_desc]
-other = "Del repositori a un workstream en funcionament en segons. Cada workstream és aïllat i autònom."
+other = "Del repo a un workstream actiu en segons. Cada workstream és aïllat i autònom."
 [step1_title]
 other = "Afegeix un projecte"
 [step1_desc]
-other = "Arrossega un directori a la barra lateral, o crea'n un de nou. Factory Floor detecta automàticament repositoris git, eines instal·lades i connexions amb GitHub."
+other = "Arrossega un directori al sidebar o crea'n un de nou. Factory Floor detecta repos git, eines instal·lades i connexions GitHub automàticament."
 [step2_title]
 other = "Crea un workstream"
 [step2_desc]
-other = "Un nou git worktree amb una branca nova, una sessió de Claude Code, un terminal i una pestanya de navegador. Tot connectat i llest per començar."
+other = "Un worktree nou amb branch, sessió de Claude Code, terminal i tab de browser. Tot connectat, llest per començar."
 [step3_title]
 other = "Programa amb IA"
 [step3_desc]
-other = "L'agent de programació reanomena la branca per adaptar-la a la tasca. Els scripts de preparació instal·len les dependències. Canvia entre workstreams sense perdre l'estat."
+other = "L'agent renomena el branch per la tasca. Els setup scripts instal·len dependències. Canvia entre workstreams sense perdre estat."
 
 # Config
 [config_label]
 other = "Configuració"
 [config_title]
-other = "Configuració amb scripts directes."
+other = "Scripts drop-in."
 [config_desc]
-other = "Automatitza el cicle de vida dels teus workstreams amb scripts de preparació, execució i desmuntatge. Instal·la dependències quan es crea un worktree, inicia servidors de desenvolupament sota demanda i allibera recursos en arxivar."
+other = "Automatitza el cicle de vida dels workstreams amb scripts de setup, run i teardown. Instal·la dependències al crear un worktree, arrenca servidors dev sota demanda i allibera recursos en arxivar."
 [config_add]
 other = "Afegeix un"
 [config_or_use]
-other = "al teu repositori, o utilitza la teva configuració existent de"
+other = "al repo, o usa la config existent de"
 
 # Env vars
 [env_label]
@@ -92,7 +92,7 @@ other = "Entorn"
 [env_title]
 other = "Variables disponibles a cada terminal."
 [env_desc]
-other = "Cada terminal de workstream, script de preparació i comanda d'execució té accés a aquestes variables d'entorn. Utilitza-les als teus scripts i configuracions de servidors de desenvolupament."
+other = "Cada terminal, setup script i run command del workstream té accés a aquestes variables d'entorn. Usa-les als scripts i configs de servidors dev."
 [env_variable]
 other = "Variable"
 [env_description]
@@ -104,25 +104,25 @@ other = "Nom del projecte"
 [env_workstream]
 other = "Nom del workstream"
 [env_project_dir]
-other = "Ruta del repositori principal"
+other = "Path del repositori principal"
 [env_worktree_dir]
-other = "Ruta del worktree d'aquest workstream"
+other = "Path del worktree d'aquest workstream"
 [env_port]
-other = "Port determinista per a aquest workstream"
+other = "Port determinista del workstream"
 
 # Shortcuts
 [shortcuts_label]
-other = "Teclat primer"
+other = "Keyboard-first"
 [shortcuts_title]
-other = "Navega sense el ratolí."
+other = "Navega sense ratolí."
 [shortcuts_desc]
-other = "Dreceres sensibles al context que s'adapten segons si ets a la vista del projecte o d'un workstream."
+other = "Dreceres contextuals que s'adapten segons si ets a la vista de projecte o de workstream."
 [shortcuts_global]
 other = "Global"
 [shortcuts_project]
-other = "Vista del projecte"
+other = "Vista de projecte"
 [shortcuts_workstream]
-other = "Vista del workstream"
+other = "Vista de workstream"
 [sc_new]
 other = "Nou workstream o projecte"
 [sc_settings]
@@ -132,13 +132,13 @@ other = "Obre workstream per posició"
 [sc_back]
 other = "Torna al projecte"
 [sc_tabs]
-other = "Info / Agent / Terminal / Navegador"
+other = "Info / Agent / Terminal / Browser"
 [sc_script_tabs]
-other = "Preparació / Execució"
+other = "Setup / Run"
 [sc_cycle]
-other = "Cicla pestanyes"
+other = "Cicla tabs"
 [sc_ext_browser]
-other = "Navegador extern"
+other = "Browser extern"
 [sc_ext_terminal]
 other = "Terminal extern"
 
@@ -152,11 +152,11 @@ other = "Contacte"
 
 # Open Source
 [oss_label]
-other = "Codi obert"
+other = "Open Source"
 [oss_title]
-other = "Gratuït i de codi obert."
+other = "Gratuït i open source."
 [oss_desc]
-other = "Factory Floor té llicència MIT i és gratuït. El codi font està disponible a GitHub. Les contribucions, informes d'errors i sol·licituds de funcionalitats són benvingudes."
+other = "Factory Floor té llicència MIT i és gratuït. Codi font disponible a GitHub. Contribucions, bug reports i feature requests són benvinguts."
 [oss_view]
 other = "Veure a GitHub"
 [oss_star]

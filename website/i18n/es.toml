@@ -7,87 +7,87 @@ other = "Cómo funciona"
 other = "Configuración"
 
 [hero_badge]
-other = "Gratuito y abierto · macOS nativo · Terminal Ghostty"
+other = "Gratis y open source · macOS nativo · Terminal Ghostty"
 [hero_title_1]
-other = "Desarrolla"
+other = "Tu"
 [hero_title_accent]
-other = "con IA."
+other = "espacio dev"
 [hero_title_2]
-other = ""
+other = "con IA."
 [hero_desc]
-other = "Una app nativa de macOS construida sobre la terminal con renderizado GPU de <a href=\"https://ghostty.org\" class=\"text-wine-light hover:underline\">Ghostty</a>. Gestiona worktrees de git, sesiones de Claude Code y servidores de desarrollo desde una sola ventana. Cada workstream tiene su propia rama, terminal y agente de IA — todo en paralelo, todo a velocidad nativa."
+other = "App nativa de macOS sobre el terminal GPU de <a href=\"https://ghostty.org\" class=\"text-wine-light hover:underline\">Ghostty</a>. Gestiona git worktrees, sesiones de Claude Code y servidores dev desde una sola ventana. Cada workstream tiene su branch, terminal y agent, todo en paralelo, todo a velocidad nativa."
 [hero_download]
 other = "Descargar"
 [hero_source]
-other = "Ver código fuente"
+other = "Código fuente"
 
 [features_label]
 other = "Características"
 [features_title]
-other = "Todo en una sola ventana."
+other = "Todo en una ventana."
 [features_desc]
-other = "Se acabó hacer malabares con terminales, navegadores y clientes git. Cada workstream es un entorno de desarrollo autocontenido."
+other = "Basta de hacer malabares con terminales, browsers y clientes git. Cada workstream es un entorno dev completo."
 [feat_worktrees_title]
 other = "Git Worktrees"
 [feat_worktrees_desc]
-other = "Cada workstream tiene su propia rama y worktree. Cambia entre tareas sin stash, con archivos .env enlazados automáticamente."
+other = "Cada workstream tiene su branch y worktree. Cambia de tarea sin stash, con archivos .env enlazados automáticamente."
 [feat_claude_title]
 other = "Claude Code"
 [feat_claude_desc]
-other = "Agente de IA integrado con persistencia de sesión. Retoma conversaciones entre reinicios de la app con IDs de sesión automáticos."
+other = "Agent integrado con persistencia de sesión. Retoma conversaciones entre reinicios con session IDs automáticos."
 [feat_tmux_title]
-other = "Persistencia con Tmux"
+other = "Persistencia tmux"
 [feat_tmux_desc]
-other = "Las sesiones del agente sobreviven a reinicios de la app gracias a tmux en un socket dedicado. Sin perder contexto ni interrumpir flujos de trabajo."
+other = "Las sesiones del agent sobreviven reinicios via tmux en un socket dedicado. Sin contexto perdido ni workflows interrumpidos."
 [feat_scripts_title]
-other = "Scripts de Setup y Run"
+other = "Setup & Run Scripts"
 [feat_scripts_desc]
-other = "Configura scripts de setup, run y teardown por proyecto. Compatible con configuraciones de emdash, conductor y superset."
+other = "Configura scripts de setup, run y teardown por proyecto. Compatible con configs de emdash, conductor y superset."
 [feat_browser_title]
-other = "Navegador integrado"
+other = "Browser integrado"
 [feat_browser_desc]
-other = "Pestaña de navegador con WKWebView y asignación determinista de puertos. Previsualiza tu app sin salir del espacio de trabajo."
+other = "Tab de browser WKWebView con puertos deterministas. Previsualiza tu app sin salir del workspace."
 [feat_github_title]
-other = "Integración con GitHub"
+other = "Integración GitHub"
 [feat_github_desc]
-other = "Consulta información del repositorio, PRs abiertas y el estado de PRs por rama directamente en la vista de proyecto. Funciona con el CLI de gh."
+other = "Info del repo, PRs abiertas y estado de PRs por branch, directo en la vista de proyecto. Via gh CLI."
 
 [how_label]
 other = "Cómo funciona"
 [how_title]
-other = "Tres pasos para desarrollar en paralelo."
+other = "Tres pasos para desarrollo en paralelo."
 [how_desc]
-other = "De repositorio a workstream en segundos. Cada workstream está aislado y es autocontenido."
+other = "De repo a workstream activo en segundos. Cada workstream aislado y autónomo."
 [step1_title]
 other = "Añade un proyecto"
 [step1_desc]
-other = "Arrastra un directorio a la barra lateral o crea uno nuevo. Factory Floor detecta automáticamente repos git, herramientas instaladas y conexiones con GitHub."
+other = "Arrastra un directorio al sidebar o crea uno nuevo. Factory Floor detecta repos git, herramientas instaladas y conexiones GitHub automáticamente."
 [step2_title]
 other = "Crea un workstream"
 [step2_desc]
-other = "Un nuevo worktree de git con una rama limpia, una sesión de Claude Code, una terminal y una pestaña de navegador. Todo conectado y listo para usar."
+other = "Un worktree nuevo con branch, sesión de Claude Code, terminal y tab de browser. Todo conectado, listo para usar."
 [step3_title]
 other = "Programa con IA"
 [step3_desc]
-other = "El agente de código renombra tu rama para que coincida con la tarea. Los scripts de setup instalan dependencias. Cambia entre workstreams sin perder estado."
+other = "El agent renombra tu branch para la tarea. Los setup scripts instalan dependencias. Cambia entre workstreams sin perder estado."
 
 [config_label]
 other = "Configuración"
 [config_title]
-other = "Configuración con scripts."
+other = "Scripts drop-in."
 [config_desc]
-other = "Automatiza el ciclo de vida de tus workstreams con scripts de setup, run y teardown. Instala dependencias al crear un worktree, arranca servidores de desarrollo bajo demanda y libera recursos al archivar."
+other = "Automatiza el ciclo de vida de workstreams con scripts de setup, run y teardown. Instala dependencias al crear un worktree, arranca servidores dev bajo demanda y libera recursos al archivar."
 [config_add]
 other = "Añade un"
 [config_or_use]
-other = "a tu repositorio, o usa tu configuración existente de"
+other = "a tu repo, o usa tu config existente de"
 
 [env_label]
 other = "Entorno"
 [env_title]
 other = "Variables disponibles en cada terminal."
 [env_desc]
-other = "Cada terminal, script de setup y comando run de un workstream tiene acceso a estas variables de entorno. Úsalas en tus scripts y configuraciones de servidores de desarrollo."
+other = "Cada terminal, setup script y run command del workstream tiene acceso a estas variables de entorno. Úsalas en scripts y configs de servidores dev."
 [env_variable]
 other = "Variable"
 [env_description]
@@ -99,18 +99,18 @@ other = "Nombre del proyecto"
 [env_workstream]
 other = "Nombre del workstream"
 [env_project_dir]
-other = "Ruta del repositorio principal"
+other = "Path del repositorio principal"
 [env_worktree_dir]
-other = "Ruta del worktree de este workstream"
+other = "Path del worktree de este workstream"
 [env_port]
-other = "Puerto determinista para este workstream"
+other = "Puerto determinista del workstream"
 
 [shortcuts_label]
-other = "Atajos de teclado"
+other = "Keyboard-first"
 [shortcuts_title]
-other = "Navega sin el ratón."
+other = "Navega sin ratón."
 [shortcuts_desc]
-other = "Atajos sensibles al contexto que se adaptan según estés en la vista de proyecto o de workstream."
+other = "Atajos contextuales que se adaptan según estés en vista de proyecto o de workstream."
 [shortcuts_global]
 other = "Global"
 [shortcuts_project]
@@ -126,13 +126,13 @@ other = "Abrir workstream por posición"
 [sc_back]
 other = "Volver al proyecto"
 [sc_tabs]
-other = "Info / Agente / Terminal / Navegador"
+other = "Info / Agent / Terminal / Browser"
 [sc_script_tabs]
 other = "Setup / Run"
 [sc_cycle]
-other = "Recorrer pestañas"
+other = "Recorrer tabs"
 [sc_ext_browser]
-other = "Navegador externo"
+other = "Browser externo"
 [sc_ext_terminal]
 other = "Terminal externo"
 
@@ -145,11 +145,11 @@ other = "Contacto"
 
 # Open Source
 [oss_label]
-other = "Código abierto"
+other = "Open Source"
 [oss_title]
-other = "Gratuito y de código abierto."
+other = "Gratis y open source."
 [oss_desc]
-other = "Factory Floor tiene licencia MIT y es gratuito. El código fuente está disponible en GitHub. Las contribuciones, informes de errores y solicitudes de funcionalidades son bienvenidas."
+other = "Factory Floor tiene licencia MIT y es gratis. Código fuente en GitHub. Contribuciones, bug reports y feature requests son bienvenidos."
 [oss_view]
 other = "Ver en GitHub"
 [oss_star]
