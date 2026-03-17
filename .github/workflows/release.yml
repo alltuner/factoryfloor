@@ -28,6 +28,7 @@ jobs:
     runs-on: macos-15
     permissions:
       contents: write
+      actions: write
     env:
       SIGNING_IDENTITY: "Developer ID Application: ALL TUNER LABS S.L. (J5TAY75Q3F)"
       APP_NAME: "Factory Floor"
@@ -252,6 +253,7 @@ jobs:
           fi
 
       - name: Trigger website deploy
+        continue-on-error: true
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
