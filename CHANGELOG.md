@@ -1,5 +1,17 @@
 # Changelog
 
+## [0.1.15](https://github.com/alltuner/factoryfloor/compare/v0.1.14...v0.1.15) (2026-03-17)
+
+
+### Bug Fixes
+
+* add comprehensive debug logging for workspace creation ([#43](https://github.com/alltuner/factoryfloor/issues/43)) ([#44](https://github.com/alltuner/factoryfloor/issues/44)) ([9e52aa1](https://github.com/alltuner/factoryfloor/commit/9e52aa1665b7f1da5c7c8a86a2ef091f5df8d749))
+
+
+### Miscellaneous
+
+* update versions.json to v0.1.14 ([b4c06bc](https://github.com/alltuner/factoryfloor/commit/b4c06bc849f1451a0a5507197d128c1f375ae16a))
+
 ## [0.1.14](https://github.com/alltuner/factoryfloor/compare/v0.1.13...v0.1.14) (2026-03-17)
 
 
