@@ -187,9 +187,10 @@
 "Setup" = "Konfiguration";
 "Run" = "Körning";
 "Restart %@ script" = "Starta om %@-skript";
+"Start %@ script" = "Starta %@-skript";
 "No %@ script configured" = "Inget %@-skript konfigurerat";
 "Add a %@ field to .factoryfloor.json:" = "Lägg till ett %@-fält i .factoryfloor.json:";
-"Also picks up scripts from .emdash.json, conductor.json, and .superset/config.json." = "Hittar även skript från .emdash.json, conductor.json och .superset/config.json.";
+"Also supports .factoryfloor/config.json." = "Stöder även .factoryfloor/config.json.";
 
 /* Tab labels */
 "Info" = "Info";

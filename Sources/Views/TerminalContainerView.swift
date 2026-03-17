@@ -398,17 +398,6 @@ struct TerminalContainerView: View {
                 environmentVars: terminalEnvVars
             )
         }
-        if let run = scriptConfig.run {
-            let runID = derivedUUID(from: workstreamID, salt: "env-run-0")
-            let cmd = buildEnvironmentCommand(script: run, role: "run")
-            _ = surfaceCache.surface(
-                for: runID,
-                app: app,
-                workingDirectory: workingDirectory,
-                command: cmd,
-                environmentVars: terminalEnvVars
-            )
-        }
     }
 
     private func buildEnvironmentCommand(script: String, role: String) -> String {

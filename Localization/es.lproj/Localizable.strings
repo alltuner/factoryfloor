@@ -187,9 +187,10 @@
 "Setup" = "Configuración inicial";
 "Run" = "Ejecución";
 "Restart %@ script" = "Reiniciar script de %@";
+"Start %@ script" = "Iniciar script de %@";
 "No %@ script configured" = "No hay ningún script de %@ configurado";
 "Add a %@ field to .factoryfloor.json:" = "Añade un campo %@ a .factoryfloor.json:";
-"Also picks up scripts from .emdash.json, conductor.json, and .superset/config.json." = "También detecta scripts de .emdash.json, conductor.json y .superset/config.json.";
+"Also supports .factoryfloor/config.json." = "También compatible con .factoryfloor/config.json.";
 
 /* Tab labels */
 "Info" = "Información";

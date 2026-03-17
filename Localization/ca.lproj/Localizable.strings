@@ -187,9 +187,10 @@
 "Setup" = "Configuració inicial";
 "Run" = "Execució";
 "Restart %@ script" = "Reinicia l'script de %@";
+"Start %@ script" = "Inicia l'script de %@";
 "No %@ script configured" = "No hi ha cap script de %@ configurat";
 "Add a %@ field to .factoryfloor.json:" = "Afegeix un camp %@ a .factoryfloor.json:";
-"Also picks up scripts from .emdash.json, conductor.json, and .superset/config.json." = "També detecta scripts de .emdash.json, conductor.json i .superset/config.json.";
+"Also supports .factoryfloor/config.json." = "També compatible amb .factoryfloor/config.json.";
 
 /* Tab labels */
 "Info" = "Informació";

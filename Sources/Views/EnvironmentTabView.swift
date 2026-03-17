@@ -16,6 +16,7 @@ struct EnvironmentTabView: View {
     @EnvironmentObject var appEnv: AppEnvironment
     @State private var setupGeneration = 0
     @State private var runGeneration = 0
+    @State private var runStarted = false
 
     private var setupID: UUID {
         derivedUUID(from: workstreamID, salt: "env-setup-\(setupGeneration)")
@@ -36,14 +37,7 @@ struct EnvironmentTabView: View {
                 onRestart: restartSetup
             )
 
-            scriptPane(
-                title: NSLocalizedString("Run", comment: ""),
-                icon: "play",
-                script: scriptConfig.run,
-                surfaceID: runID,
-                tmuxRole: "run",
-                onRestart: restartRun
-            )
+            runPane()
         }
     }
 
@@ -100,6 +94,84 @@ struct EnvironmentTabView: View {
         }
     }
 
+    @ViewBuilder
+    private func runPane() -> some View {
+        let title = NSLocalizedString("Run", comment: "")
+        VStack(spacing: 0) {
+            // Header bar
+            HStack {
+                Image(systemName: "play")
+                    .font(.system(size: 11))
+                    .foregroundStyle(.secondary)
+                Text(title)
+                    .font(.system(size: 12, weight: .semibold))
+
+                if let script = scriptConfig.run {
+                    Text(script)
+                        .font(.system(size: 10, design: .monospaced))
+                        .foregroundStyle(.tertiary)
+                        .lineLimit(1)
+                        .truncationMode(.tail)
+                }
+
+                Spacer()
+
+                if scriptConfig.run != nil {
+                    if runStarted {
+                        Button(action: restartRun) {
+                            Image(systemName: "arrow.counterclockwise")
+                                .font(.system(size: 11))
+                        }
+                        .buttonStyle(.borderless)
+                        .help(String(format: NSLocalizedString("Restart %@ script", comment: ""), title.lowercased()))
+                        .accessibilityLabel(String(format: NSLocalizedString("Restart %@ script", comment: ""), title.lowercased()))
+                    } else {
+                        Button(action: { runStarted = true }) {
+                            Image(systemName: "play.fill")
+                                .font(.system(size: 11))
+                        }
+                        .buttonStyle(.borderless)
+                        .help(String(format: NSLocalizedString("Start %@ script", comment: ""), title.lowercased()))
+                        .accessibilityLabel(String(format: NSLocalizedString("Start %@ script", comment: ""), title.lowercased()))
+                    }
+                }
+            }
+            .padding(.horizontal, 10)
+            .padding(.vertical, 6)
+            .background(.bar)
+
+            Divider()
+
+            // Content
+            if let script = scriptConfig.run {
+                if runStarted {
+                    SingleTerminalView(
+                        surfaceID: runID,
+                        workingDirectory: workingDirectory,
+                        command: buildCommand(script: script, role: "run"),
+                        isFocused: false,
+                        environmentVars: environmentVars
+                    )
+                    .id(runID)
+                } else {
+                    VStack(spacing: 12) {
+                        Button(action: { runStarted = true }) {
+                            Image(systemName: "play.fill")
+                                .font(.system(size: 24))
+                        }
+                        .buttonStyle(.borderless)
+                        Text(script)
+                            .font(.system(size: 11, design: .monospaced))
+                            .foregroundStyle(.tertiary)
+                    }
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+                }
+            } else {
+                scriptInstructions(title: title)
+            }
+        }
+    }
+
     private func scriptInstructions(title: String) -> some View {
         VStack(spacing: 12) {
             Image(systemName: "doc.text")
@@ -118,7 +190,7 @@ struct EnvironmentTabView: View {
                 .background(Color.primary.opacity(0.05))
                 .clipShape(RoundedRectangle(cornerRadius: 4))
                 .foregroundStyle(.secondary)
-            Text("Also picks up scripts from .emdash.json, conductor.json, and .superset/config.json.")
+            Text("Also supports .factoryfloor/config.json.")
                 .font(.system(size: 10))
                 .foregroundStyle(.quaternary)
         }
@@ -140,6 +212,10 @@ struct EnvironmentTabView: View {
 
     private func restartRun() {
         surfaceCache.removeSurface(for: runID)
+        runStarted = false
         runGeneration += 1
+        DispatchQueue.main.async {
+            runStarted = true
+        }
     }
 }

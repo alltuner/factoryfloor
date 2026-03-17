@@ -44,7 +44,7 @@ other = "Agent sessions survive app restarts via tmux on a dedicated socket. No 
 [feat_scripts_title]
 other = "Setup & Run Scripts"
 [feat_scripts_desc]
-other = "Configure setup, run, and teardown scripts per project. Compatible with emdash, conductor, and superset configs."
+other = "Configure setup, run, and teardown scripts per project via .factoryfloor.json."
 [feat_browser_title]
 other = "Embedded Browser"
 [feat_browser_desc]
@@ -168,3 +168,33 @@ other = "Star the project"
 
 [footer_poblenou]
 other = "Made with ❤️ in Poblenou, Barcelona"
+
+# Sponsor
+[sponsor_intro]
+other = "Factory Floor is free and open source. Your support helps fund continued development and new features."
+[sponsor_financial]
+other = "Financial support"
+[sponsor_github]
+other = "GitHub Sponsors"
+[sponsor_github_desc]
+other = "Recurring or one-time sponsorship via GitHub."
+[sponsor_coffee]
+other = "Buy Me a Coffee"
+[sponsor_coffee_desc]
+other = "Quick one-time contribution."
+[sponsor_star]
+other = "Star the project"
+[sponsor_star_desc]
+other = "Stars help others discover Factory Floor."
+[sponsor_issues]
+other = "Report issues"
+[sponsor_issues_desc]
+other = "Bug reports and feature requests help improve the app."
+[sponsor_contribute]
+other = "Contribute code"
+[sponsor_contribute_desc]
+other = "Pull requests for bug fixes, features, and translations are welcome."
+[sponsor_ghostty]
+other = "Support Ghostty"
+[sponsor_ghostty_desc]
+other = "Factory Floor is built on Ghostty's GPU-rendered terminal."

@@ -161,3 +161,33 @@ other = "Dale una estrella"
 
 [footer_poblenou]
 other = "Hecho con ❤️ en Poblenou, Barcelona"
+
+# Sponsor
+[sponsor_intro]
+other = "Factory Floor es gratis y open source. Tu apoyo ayuda a financiar el desarrollo continuado y nuevas funcionalidades."
+[sponsor_financial]
+other = "Apoyo financiero"
+[sponsor_github]
+other = "GitHub Sponsors"
+[sponsor_github_desc]
+other = "Patrocinio recurrente o puntual vía GitHub."
+[sponsor_coffee]
+other = "Buy Me a Coffee"
+[sponsor_coffee_desc]
+other = "Contribución rápida puntual."
+[sponsor_star]
+other = "Dale una estrella"
+[sponsor_star_desc]
+other = "Las estrellas ayudan a otros a descubrir Factory Floor."
+[sponsor_issues]
+other = "Reporta problemas"
+[sponsor_issues_desc]
+other = "Los bug reports y feature requests ayudan a mejorar la app."
+[sponsor_contribute]
+other = "Contribuye código"
+[sponsor_contribute_desc]
+other = "Los pull requests para correcciones, funcionalidades y traducciones son bienvenidos."
+[sponsor_ghostty]
+other = "Apoya a Ghostty"
+[sponsor_ghostty_desc]
+other = "Factory Floor está construido sobre el terminal GPU de Ghostty."

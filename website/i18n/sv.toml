@@ -160,3 +160,33 @@ other = "Ge en stjärna"
 
 [footer_poblenou]
 other = "Byggd med ❤️ i Poblenou, Barcelona"
+
+# Sponsor
+[sponsor_intro]
+other = "Factory Floor är gratis och open source. Ditt stöd hjälper till att finansiera fortsatt utveckling och nya funktioner."
+[sponsor_financial]
+other = "Ekonomiskt stöd"
+[sponsor_github]
+other = "GitHub Sponsors"
+[sponsor_github_desc]
+other = "Återkommande eller engångssponsring via GitHub."
+[sponsor_coffee]
+other = "Buy Me a Coffee"
+[sponsor_coffee_desc]
+other = "Snabb engångsbidrag."
+[sponsor_star]
+other = "Ge en stjärna"
+[sponsor_star_desc]
+other = "Stjärnor hjälper andra att upptäcka Factory Floor."
+[sponsor_issues]
+other = "Rapportera problem"
+[sponsor_issues_desc]
+other = "Buggrapporter och feature requests hjälper till att förbättra appen."
+[sponsor_contribute]
+other = "Bidra med kod"
+[sponsor_contribute_desc]
+other = "Pull requests för buggfixar, funktioner och översättningar är välkomna."
+[sponsor_ghostty]
+other = "Stöd Ghostty"
+[sponsor_ghostty_desc]
+other = "Factory Floor är byggt på Ghosttys GPU-renderade terminal."
