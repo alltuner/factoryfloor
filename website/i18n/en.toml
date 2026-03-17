@@ -204,3 +204,11 @@ other = "Pull requests for bug fixes, features, and translations are welcome."
 other = "Support Ghostty"
 [sponsor_ghostty_desc]
 other = "Factory Floor is built on Ghostty's GPU-rendered terminal."
+
+# Get
+[get_title]
+other = "Get Factory Floor"
+[get_desc]
+other = "Install via Homebrew or download the latest release."
+[get_download]
+other = "Download from GitHub Releases"

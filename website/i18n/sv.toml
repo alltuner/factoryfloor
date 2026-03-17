@@ -196,3 +196,11 @@ other = "Pull requests för buggfixar, funktioner och översättningar är välk
 other = "Stöd Ghostty"
 [sponsor_ghostty_desc]
 other = "Factory Floor är byggt på Ghosttys GPU-renderade terminal."
+
+# Get
+[get_title]
+other = "Skaffa Factory Floor"
+[get_desc]
+other = "Installera via Homebrew eller ladda ner senaste versionen."
+[get_download]
+other = "Ladda ner från GitHub Releases"

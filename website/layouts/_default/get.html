@@ -1,0 +1,26 @@
+{{ define "content" }}
+{{ partial "nav.html" . }}
+
+<section class="min-h-screen flex flex-col justify-center pt-20">
+  <div class="max-w-[600px] mx-auto px-8 text-center">
+    <h1 class="font-mono text-3xl font-bold mb-6">{{ T "get_title" }}</h1>
+    <p class="text-fg-muted leading-relaxed mb-8">{{ T "get_desc" }}</p>
+
+    <div class="max-w-[480px] mx-auto mb-8">
+      <div class="flex items-center rounded-lg border border-fg-faint bg-bg-surface overflow-hidden">
+        <code class="flex-1 px-4 py-3 font-mono text-sm text-fg-dim select-all">brew install --cask alltuner/tap/factoryfloor</code>
+        <button onclick="navigator.clipboard.writeText('brew install --cask alltuner/tap/factoryfloor')" class="px-3 py-3 text-fg-muted hover:text-fg transition-colors border-l border-fg-faint hover:bg-fg-faint cursor-pointer bg-transparent">
+          <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+        </button>
+      </div>
+    </div>
+
+    <a href="{{ .Site.Params.githubURL }}/releases/latest" class="inline-flex items-center gap-2 text-wine-light no-underline hover:text-fg transition-colors font-mono text-sm">
+      <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+      {{ T "get_download" }}
+    </a>
+  </div>
+</section>
+
+{{ partial "footer.html" . }}
+{{ end }}
