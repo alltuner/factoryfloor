@@ -16,6 +16,7 @@ struct WorkstreamInfoView: View {
     @State private var copiedBranch = false
     @State private var docFiles: [DocFile] = []
     @State private var selectedDoc: String?
+    @State private var projectIcon: NSImage?
 
     struct DocFile: Identifiable {
         let name: String
@@ -29,6 +30,13 @@ struct WorkstreamInfoView: View {
         VStack(spacing: 0) {
             // Pinned header
             VStack(spacing: 4) {
+                if let icon = projectIcon {
+                    Image(nsImage: icon)
+                        .resizable()
+                        .interpolation(.high)
+                        .frame(width: 40, height: 40)
+                        .clipShape(RoundedRectangle(cornerRadius: 8))
+                }
                 Text(projectName)
                     .font(.system(size: 13))
                     .foregroundStyle(.secondary)
@@ -141,6 +149,23 @@ struct WorkstreamInfoView: View {
         .onAppear { loadInfo() }
     } // body
 
+    private static let iconPaths = [
+        "icon.svg", "icon.png",
+        ".github/icon.svg", ".github/icon.png",
+        "logo.svg", "logo.png",
+    ]
+
+    private static func findProjectIcon(in directory: String) -> NSImage? {
+        let base = URL(fileURLWithPath: directory)
+        for relative in iconPaths {
+            let path = base.appendingPathComponent(relative).path
+            if let image = NSImage(contentsOfFile: path) {
+                return image
+            }
+        }
+        return nil
+    }
+
     private func loadInfo() {
         Task.detached {
             let branch = GitOperations.repoInfo(at: workingDirectory).branch
@@ -148,6 +173,12 @@ struct WorkstreamInfoView: View {
                 branchName = branch
                 appEnv.refreshGitHubInfo(for: projectDirectory, branch: branch)
             }
+        }
+
+        let projDir = projectDirectory
+        Task.detached {
+            let icon = Self.findProjectIcon(in: projDir)
+            await MainActor.run { projectIcon = icon }
         }
 
         let dir = workingDirectory
