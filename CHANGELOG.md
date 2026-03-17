@@ -1,5 +1,23 @@
 # Changelog
 
+## [0.1.8](https://github.com/alltuner/factoryfloor/compare/v0.1.7...v0.1.8) (2026-03-17)
+
+
+### Features
+
+* **website:** add changelog page with timeline layout ([#20](https://github.com/alltuner/factoryfloor/issues/20)) ([d0b38e5](https://github.com/alltuner/factoryfloor/commit/d0b38e50c5043a5da22c8525b6145c5c1e1c1c9a))
+
+
+### Bug Fixes
+
+* **ci:** remove --deep from app re-signing, add debug logging ([#23](https://github.com/alltuner/factoryfloor/issues/23)) ([d298fb8](https://github.com/alltuner/factoryfloor/commit/d298fb898d6eb081daf244371c0a735208e175c3))
+* let release-please bump version in Info.plist ([#22](https://github.com/alltuner/factoryfloor/issues/22)) ([1624a40](https://github.com/alltuner/factoryfloor/commit/1624a40be203c21b3723994b0fe1d3a2d4096fd4))
+
+
+### Miscellaneous
+
+* update versions.json to v0.1.7 ([7a67bf2](https://github.com/alltuner/factoryfloor/commit/7a67bf2ebb8cea5dc998e788a5c79e17e2f01687))
+
 ## [0.1.7](https://github.com/alltuner/factoryfloor/compare/v0.1.6...v0.1.7) (2026-03-17)
 
 
