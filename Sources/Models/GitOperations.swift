@@ -3,7 +3,7 @@
 
 import Foundation
 
-struct GitRepoInfo {
+struct GitRepoInfo: Sendable {
     let isRepo: Bool
     let branch: String?
     let remoteURL: String?
@@ -11,7 +11,7 @@ struct GitRepoInfo {
     let isDirty: Bool
 }
 
-struct WorktreeInfo: Identifiable {
+struct WorktreeInfo: Identifiable, Sendable {
     let path: String
     let branch: String?
     let isDirty: Bool

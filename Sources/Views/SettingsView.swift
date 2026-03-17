@@ -330,7 +330,7 @@ struct SettingsView: View {
 
 // MARK: - Tool Detection
 
-enum BinaryStatus {
+enum BinaryStatus: Sendable {
     case notFound
     case found(String)
 
@@ -345,7 +345,7 @@ enum BinaryStatus {
     }
 }
 
-struct ToolStatus {
+struct ToolStatus: Sendable {
     var tmux: BinaryStatus = .notFound
     var tmuxVersion: String?
     var claude: BinaryStatus = .notFound
@@ -501,7 +501,7 @@ private struct ToolRow: View {
 
 // MARK: - App Detection
 
-struct AppInfo: Identifiable {
+struct AppInfo: Identifiable, @unchecked Sendable {
     let name: String
     let bundleID: String
     var id: String { bundleID }

@@ -147,7 +147,7 @@ struct WorkstreamInfoView: View {
         "logo.svg", "logo.png",
     ]
 
-    private static func findProjectIcon(in directory: String) -> NSImage? {
+    nonisolated private static func findProjectIcon(in directory: String) -> NSImage? {
         let base = URL(fileURLWithPath: directory)
         for relative in iconPaths {
             let path = base.appendingPathComponent(relative).path
@@ -158,29 +158,57 @@ struct WorkstreamInfoView: View {
         return nil
     }
 
-    private func loadInfo() {
-        Task.detached {
-            let branch = GitOperations.repoInfo(at: workingDirectory).branch
-            await MainActor.run {
-                branchName = branch
-                appEnv.refreshGitHubInfo(for: projectDirectory, branch: branch)
+    nonisolated private static func findProjectIconPath(in directory: String) -> String? {
+        let base = URL(fileURLWithPath: directory)
+        for relative in iconPaths {
+            let path = base.appendingPathComponent(relative).path
+            if FileManager.default.fileExists(atPath: path) {
+                return path
             }
+        }
+        return nil
+    }
+
+    private func loadInfo() {
+        let workingDir = workingDirectory
+        let gitHubProjectDir = projectDirectory
+        Task.detached {
+            let branch = GitOperations.repoInfo(at: workingDir).branch
+            await updateBranchInfo(branch, projectDirectory: gitHubProjectDir)
         }
 
         let projDir = projectDirectory
         Task.detached {
-            let icon = Self.findProjectIcon(in: projDir)
-            await MainActor.run { projectIcon = icon }
+            let iconPath = Self.findProjectIconPath(in: projDir)
+            await updateProjectIcon(iconPath: iconPath)
         }
 
         let dir = workingDirectory
         Task.detached {
             let found = DocFile.loadFrom(directory: dir)
-            await MainActor.run {
-                docFiles = found
-                selectedDoc = found.first?.name
-            }
+            await updateDocFiles(found)
         }
+    }
+
+    @MainActor
+    private func updateBranchInfo(_ branch: String?, projectDirectory: String) {
+        branchName = branch
+        appEnv.refreshGitHubInfo(for: projectDirectory, branch: branch)
+    }
+
+    @MainActor
+    private func updateProjectIcon(iconPath: String?) {
+        if let iconPath {
+            projectIcon = NSImage(contentsOfFile: iconPath)
+        } else {
+            projectIcon = nil
+        }
+    }
+
+    @MainActor
+    private func updateDocFiles(_ docFiles: [DocFile]) {
+        self.docFiles = docFiles
+        selectedDoc = docFiles.first?.name
     }
 
 }

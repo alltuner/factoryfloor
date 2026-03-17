@@ -248,9 +248,7 @@ struct ProjectOverviewView: View {
         let dir = project.directory
         Task.detached {
             let wts = GitOperations.listWorktreesWithInfo(at: dir)
-            await MainActor.run {
-                worktrees = wts
-            }
+            await updateWorktrees(wts)
         }
     }
 
@@ -258,10 +256,7 @@ struct ProjectOverviewView: View {
         let dir = project.directory
         Task.detached {
             let found = DocFile.loadFrom(directory: dir)
-            await MainActor.run {
-                docFiles = found
-                selectedDoc = found.first?.name
-            }
+            await updateDocFiles(found)
         }
     }
 
@@ -271,16 +266,7 @@ struct ProjectOverviewView: View {
         let prunablePaths = Set(worktrees.filter { !$0.isMain && !$0.isDirty }.map(\.path))
         Task.detached {
             GitOperations.pruneCleanWorktrees(at: dir)
-            await MainActor.run {
-                // Remove workstreams whose worktree paths were pruned
-                project.workstreams.removeAll { ws in
-                    guard let path = ws.worktreePath else { return false }
-                    return prunablePaths.contains(path)
-                }
-                onProjectChanged()
-                isPruning = false
-                refreshWorktrees()
-            }
+            await applyPrunedWorktrees(prunablePaths)
         }
     }
 
@@ -291,6 +277,28 @@ struct ProjectOverviewView: View {
         case .alphabetical:
             return workstreams.sorted { $0.name.localizedCaseInsensitiveCompare($1.name) == .orderedAscending }
         }
+    }
+
+    @MainActor
+    private func updateWorktrees(_ worktrees: [WorktreeInfo]) {
+        self.worktrees = worktrees
+    }
+
+    @MainActor
+    private func updateDocFiles(_ docFiles: [DocFile]) {
+        self.docFiles = docFiles
+        selectedDoc = docFiles.first?.name
+    }
+
+    @MainActor
+    private func applyPrunedWorktrees(_ prunablePaths: Set<String>) {
+        project.workstreams.removeAll { ws in
+            guard let path = ws.worktreePath else { return false }
+            return prunablePaths.contains(path)
+        }
+        onProjectChanged()
+        isPruning = false
+        refreshWorktrees()
     }
 
 }

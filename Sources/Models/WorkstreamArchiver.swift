@@ -12,6 +12,7 @@ enum WorkstreamArchiver {
     ///   - project: The project containing the workstream (mutated in place to remove it).
     ///   - surfaceCache: The terminal surface cache to evict surfaces from.
     ///   - tmuxPath: Path to the tmux binary, if available.
+    @MainActor
     static func archive(
         _ workstreamID: UUID,
         in project: inout Project,

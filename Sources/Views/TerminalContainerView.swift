@@ -17,7 +17,7 @@ extension Notification.Name {
 }
 
 /// A tab in the workspace. Info and Agent are permanent; terminals and browsers are closeable.
-enum WorkspaceTab: Hashable {
+enum WorkspaceTab: Hashable, Sendable {
     case info
     case agent
     case environment
@@ -619,6 +619,7 @@ extension Notification.Name {
     static let terminalTabExited = Notification.Name("factoryfloor.terminalTabExited")
 }
 
+@MainActor
 final class TerminalSurfaceCache: ObservableObject {
     private var surfaces: [UUID: TerminalView] = [:]
     private var surfaceParams: [UUID: SurfaceParams] = [:]

@@ -17,6 +17,7 @@ extension Notification.Name {
     static let switchToWorkstream = Notification.Name("factoryfloor.switchToWorkstream")
 }
 
+@MainActor
 final class AppDelegate: NSObject, NSApplicationDelegate {
     func applicationShouldTerminate(_ sender: NSApplication) -> NSApplication.TerminateReply {
         let confirmQuit = UserDefaults.standard.object(forKey: "factoryfloor.confirmQuit") as? Bool ?? true

@@ -6,7 +6,7 @@ import OSLog
 
 private let logger = Logger(subsystem: "factoryfloor", category: "sidebar-selection")
 
-enum SidebarSelection: Hashable, Codable {
+enum SidebarSelection: Hashable, Codable, Sendable {
     case project(UUID)
     case workstream(UUID)
     case settings

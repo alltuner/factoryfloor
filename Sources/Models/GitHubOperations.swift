@@ -3,7 +3,7 @@
 
 import Foundation
 
-struct GitHubRepoInfo {
+struct GitHubRepoInfo: Sendable {
     let name: String
     let url: String
     let description: String?
@@ -12,7 +12,7 @@ struct GitHubRepoInfo {
     let openIssues: Int
 }
 
-struct GitHubPR {
+struct GitHubPR: Sendable {
     let number: Int
     let title: String
     let state: String

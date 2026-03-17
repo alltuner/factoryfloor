@@ -6,6 +6,7 @@ import os
 
 private let logger = Logger(subsystem: "factoryfloor", category: "terminal-app")
 
+@MainActor
 final class TerminalApp {
     static let shared = TerminalApp()
 
@@ -27,54 +28,78 @@ final class TerminalApp {
             wakeup_cb: { userdata in
                 guard let userdata else { return }
                 let app = Unmanaged<TerminalApp>.fromOpaque(userdata).takeUnretainedValue()
-                DispatchQueue.main.async { app.tick() }
+                DispatchQueue.main.async {
+                    MainActor.assumeIsolated {
+                        app.tick()
+                    }
+                }
             },
             action_cb: { _, target, action in
-                guard target.tag == GHOSTTY_TARGET_SURFACE else { return false }
-                switch action.tag {
-                case GHOSTTY_ACTION_SET_TITLE:
-                    guard let cstr = action.action.set_title.title else { return false }
-                    let title = String(cString: cstr)
-                    guard let view = TerminalView.view(for: target.target.surface),
-                          let wsID = view.workstreamID else { return false }
-                    NotificationCenter.default.post(
-                        name: .terminalTitleChanged,
-                        object: wsID,
-                        userInfo: ["title": title]
-                    )
-                    return true
-                default:
-                    return false
+                MainActor.assumeIsolated {
+                    guard target.tag == GHOSTTY_TARGET_SURFACE else { return false }
+                    switch action.tag {
+                    case GHOSTTY_ACTION_SET_TITLE:
+                        guard let cstr = action.action.set_title.title else { return false }
+                        let title = String(cString: cstr)
+                        guard let view = TerminalView.view(for: target.target.surface),
+                              let wsID = view.workstreamID else { return false }
+                        NotificationCenter.default.post(
+                            name: .terminalTitleChanged,
+                            object: wsID,
+                            userInfo: ["title": title]
+                        )
+                        return true
+                    default:
+                        return false
+                    }
                 }
             },
             read_clipboard_cb: { userdata, location, state in
                 guard let userdata else { return false }
                 guard let state else { return false }
 
-                let pasteboard = NSPasteboard.general
-                guard let str = pasteboard.string(forType: .string) else { return false }
+                let performRead = {
+                    let pasteboard = NSPasteboard.general
+                    guard let str = pasteboard.string(forType: .string) else { return false }
 
-                let surfaceView = Unmanaged<TerminalView>.fromOpaque(userdata).takeUnretainedValue()
-                guard let surface = surfaceView.surface else { return false }
-                str.withCString { cstr in
-                    ghostty_surface_complete_clipboard_request(surface, cstr, state, true)
+                    let surfaceView = Unmanaged<TerminalView>.fromOpaque(userdata).takeUnretainedValue()
+                    guard let surface = surfaceView.surface else { return false }
+                    str.withCString { cstr in
+                        ghostty_surface_complete_clipboard_request(surface, cstr, state, true)
+                    }
+                    return true
                 }
-                return true
+                if Thread.isMainThread {
+                    return MainActor.assumeIsolated { performRead() }
+                }
+                return DispatchQueue.main.sync {
+                    MainActor.assumeIsolated { performRead() }
+                }
             },
             confirm_read_clipboard_cb: nil,
             write_clipboard_cb: { userdata, location, content, len, confirm in
                 guard let content, len > 0 else { return }
-                // Find the text/plain entry
-                for i in 0..<len {
-                    let item = content[i]
-                    guard let mime = item.mime, let data = item.data else { continue }
-                    let mimeStr = String(cString: mime)
-                    if mimeStr == "text/plain" {
-                        let str = String(cString: data)
-                        let pasteboard = NSPasteboard.general
-                        pasteboard.clearContents()
-                        pasteboard.setString(str, forType: .string)
-                        break
+
+                let performWrite = {
+                    // Find the text/plain entry
+                    for i in 0..<len {
+                        let item = content[i]
+                        guard let mime = item.mime, let data = item.data else { continue }
+                        let mimeStr = String(cString: mime)
+                        if mimeStr == "text/plain" {
+                            let str = String(cString: data)
+                            let pasteboard = NSPasteboard.general
+                            pasteboard.clearContents()
+                            pasteboard.setString(str, forType: .string)
+                            break
+                        }
+                    }
+                }
+                if Thread.isMainThread {
+                    MainActor.assumeIsolated { performWrite() }
+                } else {
+                    DispatchQueue.main.sync {
+                        MainActor.assumeIsolated { performWrite() }
                     }
                 }
             },
@@ -82,7 +107,9 @@ final class TerminalApp {
                 guard let userdata else { return }
                 let surfaceView = Unmanaged<TerminalView>.fromOpaque(userdata).takeUnretainedValue()
                 DispatchQueue.main.async {
-                    surfaceView.surfaceClosed()
+                    MainActor.assumeIsolated {
+                        surfaceView.surfaceClosed()
+                    }
                 }
             }
         )

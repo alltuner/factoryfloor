@@ -3,7 +3,7 @@
 
 import Foundation
 
-struct ScriptConfig {
+struct ScriptConfig: Sendable {
     let setup: String?
     let run: String?
     let teardown: String?
