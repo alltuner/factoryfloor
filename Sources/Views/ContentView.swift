@@ -27,17 +27,17 @@ struct ContentView: View {
 
     private var activeProject: Project? {
         guard let selection else {
-            NSLog("[FF] activeProject: selection is nil")
+            logger.warning("[FF] activeProject: selection is nil")
             return nil
         }
         switch selection {
         case .project(let id):
             let found = projects.first(where: { $0.id == id })
-            if found == nil { NSLog("[FF] activeProject: project \(id) not found in \(projects.count) projects") }
+            if found == nil { logger.warning("[FF] activeProject: project \(id, privacy: .public) not found in \(projects.count, privacy: .public) projects") }
             return found
         case .workstream(let wsID):
             let found = projects.first(where: { $0.workstreams.contains(where: { $0.id == wsID }) })
-            if found == nil { NSLog("[FF] activeProject: workstream \(wsID) not found in any project") }
+            if found == nil { logger.warning("[FF] activeProject: workstream \(wsID, privacy: .public) not found in any project") }
             return found
         case .settings, .help:
             return nil
@@ -227,9 +227,9 @@ struct ContentView: View {
         }
         .onChange(of: appEnvironment.missingProjectIDs) { _, missing in
             guard !missing.isEmpty else { return }
-            NSLog("[FF] missingProjectIDs changed: \(missing.count) missing, \(projects.count) total projects")
+            logger.warning("[FF] missingProjectIDs changed: \(missing.count, privacy: .public) missing, \(projects.count, privacy: .public) total projects")
             let names = projects.filter { missing.contains($0.id) }.map(\.name)
-            NSLog("[FF] removing projects: \(names)")
+            logger.warning("[FF] removing projects: \(names, privacy: .public)")
             for id in missing {
                 if let project = projects.first(where: { $0.id == id }) {
                     for ws in project.workstreams {
@@ -248,7 +248,7 @@ struct ContentView: View {
             removedProjectNames = names
         }
         .onChange(of: selection) { oldValue, newValue in
-            NSLog("[FF] selection changed: \(String(describing: oldValue)) -> \(String(describing: newValue))")
+            logger.warning("[FF] selection changed: \(String(describing: oldValue), privacy: .public) -> \(String(describing: newValue), privacy: .public)")
             if newValue == .settings || newValue == .help {
                 selectionBeforeSettings = oldValue
             }
