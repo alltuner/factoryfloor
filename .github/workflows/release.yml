@@ -131,8 +131,8 @@ jobs:
           DMG_URL="https://github.com/alltuner/factoryfloor/releases/download/v${VERSION}/FactoryFloor-${VERSION}.dmg"
           SHA256=$(shasum -a 256 "build/release/$DMG_NAME" | awk '{print $1}')
 
-          gh api repos/alltuner/homebrew-tap/contents/Casks/factoryfloor.rb \
-            --method GET -q '.sha' > /tmp/cask_sha.txt
+          CASK_SHA=$(gh api repos/alltuner/homebrew-tap/contents/Casks/factoryfloor.rb \
+            --method GET -q '.sha')
 
           CASK_CONTENT=$(cat <<RUBY
           cask "factoryfloor" do
@@ -147,6 +147,7 @@ jobs:
             depends_on macos: ">= :sonoma"
 
             app "Factory Floor.app"
+            binary "#{appdir}/Factory Floor.app/Contents/Resources/ff", target: "ff"
 
             zap trash: [
               "~/.config/factoryfloor",
@@ -157,13 +158,11 @@ jobs:
           RUBY
           )
 
-          echo "$CASK_CONTENT" | base64 > /tmp/cask_b64.txt
-
           gh api repos/alltuner/homebrew-tap/contents/Casks/factoryfloor.rb \
             --method PUT \
             -f message="chore: update factoryfloor to v${VERSION}" \
             -f content="$(echo "$CASK_CONTENT" | base64)" \
-            -f sha="$(cat /tmp/cask_sha.txt)"
+            -f sha="$CASK_SHA"
 
       - name: Clean up keychain
         if: always()
