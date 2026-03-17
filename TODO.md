@@ -11,8 +11,8 @@
 
 ## Bugs
 
-- [ ] BrowserView: "Press Cmd+Shift+B to retry" hint is wrong (Cmd+Shift+B doesn't retry, retryBrowser notification is never posted)
-- [ ] Settings/Help persisted as selection: app reopens to Settings if quit while in Settings (should restore last project/workstream)
+- [x] BrowserView: "Press Cmd+Shift+B to retry" hint is wrong (removed misleading hint and dead notification)
+- [x] Settings/Help persisted as selection: app reopens to Settings if quit while in Settings (fixed)
 - [ ] Detached HEAD inconsistency: project overview shows "HEAD", worktree list shows "detached"
 - [ ] Path collision: worktree names differing only by `/` vs `-` produce same filesystem path (sanitize converts `/` to `-`)
 - [ ] Surface cleanup in removeWorkstreamSurfaces hard-capped at 20 tabs (orphans surfaces beyond that)
@@ -34,11 +34,11 @@
 
 ## Code Quality
 
-- [ ] Extract duplicated abbreviatePath into a shared String extension (appears in 5 files)
+- [x] Extract duplicated abbreviatePath into a shared String extension (PathUtilities.swift)
 - [ ] Remove duplicated performArchive logic between ContentView and ProjectSidebar
-- [ ] Remove dead bleedingEdge setting (toggle exists but nothing reads it)
-- [ ] Remove dead retryBrowser notification (declared and observed but never posted)
-- [ ] ToolStatus.detect: remove misleading async signature (contains no await)
+- [ ] Remove dead bleedingEdge setting (toggle exists but nothing reads it, keep for future auto-update)
+- [x] Remove dead retryBrowser notification (declared and observed but never posted)
+- [x] ToolStatus.detect: remove misleading async signature (contains no await)
 - [ ] Localization: add missing strings for Settings sections, HelpView, BrowserView error UI, ProjectOverviewView
 - [ ] Remove stale unused keys from Localizable.strings files
 - [ ] surfaceRegistry thread safety: confirm ghostty callback threading contract

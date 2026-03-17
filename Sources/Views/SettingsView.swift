@@ -344,7 +344,7 @@ struct ToolStatus {
     var git: BinaryStatus = .notFound
     var gitVersion: String?
 
-    static func detect() async -> ToolStatus {
+    static func detect() -> ToolStatus {
         var status = ToolStatus()
 
         status.tmux = findBinary("tmux")

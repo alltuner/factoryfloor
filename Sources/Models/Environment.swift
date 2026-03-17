@@ -28,7 +28,7 @@ final class AppEnvironment: ObservableObject {
     func refresh() {
         isDetecting = true
         Task.detached {
-            let tools = await ToolStatus.detect()
+            let tools = ToolStatus.detect()
             let terminals = AppInfo.detectTerminals()
             let browsers = AppInfo.detectBrowsers()
             await MainActor.run {

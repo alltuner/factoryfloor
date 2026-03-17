@@ -310,8 +310,6 @@ struct ProjectSidebar: View {
     @EnvironmentObject private var surfaceCache: TerminalSurfaceCache
     @EnvironmentObject private var appEnv: AppEnvironment
 
-    @AppStorage("factoryfloor.tmuxMode") private var tmuxModeForArchive: Bool = false
-
     private func confirmArchive(_ workstream: Workstream) {
         if let path = workstream.worktreePath, GitOperations.hasUncommittedChanges(at: path) {
             archiveWarningDirty = true
