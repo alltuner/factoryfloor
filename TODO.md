@@ -2,14 +2,7 @@
 
 ## Pre-release
 
-- [ ] Hide CLI install option in Settings when symlink already exists and points correctly
-- [ ] Add `binary` directive to Homebrew cask so `ff` symlink is created on install
-- [ ] Review distribution.md for security hardening opportunities
 - [ ] Take app screenshots for the website (workspace view, sidebar, terminal, environment tab)
-
-## Website
-
-- [ ] Take app screenshots for the website
 
 ## Post-release
 
@@ -48,15 +41,16 @@
 - [x] Cmd+L address bar focus, auto-focus on new browser
 - [x] PR badge in workspace toolbar (links to GitHub PR)
 - [x] Info tab with README.md, CLAUDE.md, AGENTS.md (cmark-gfm WKWebView, skip files < 20 bytes)
+- [x] Doc tabs in project overview (shared DocFile/DocTabButton)
 - [x] GitHub integration: repo info, open PRs, branch PR status (via gh CLI)
-- [x] Keyboard shortcuts: all documented in HelpView and README
-- [x] Help view with app icon, skyline, shortcuts, credits, sponsor link
-- [x] Settings: environment, CLI install, tmux, bypass, teams, auto-rename, appearance, language, base dir, branch prefix, external apps, bleeding edge, danger zone
-- [x] Project overview with editable name, git info, GitHub info, worktree list with prune
+- [x] Keyboard shortcuts: all documented in HelpView, README, CLAUDE.md, and website
+- [x] Help view with app icon, skyline, shortcuts, credits, sponsor/bug/feature links
+- [x] Settings: environment, CLI install (auto-hidden when installed), tmux, bypass, teams, auto-rename, appearance, language, base dir, branch prefix, external apps, bleeding edge, danger zone
+- [x] Project overview with editable name, git info, GitHub info, worktree list with prune, doc tabs
 - [x] Workstream info with project icon, branch copy, directory, PR status, scripts, docs
 - [x] Drag-and-drop directories to sidebar
 - [x] factoryfloor:// URL scheme for single-instance behavior
-- [x] CLI launcher (ff) with install from Settings
+- [x] CLI launcher (ff) installed via Homebrew cask binary directive
 - [x] Auto-generated workstream names (operation-adjective-component)
 - [x] Workstream name syncs from branch rename (every 15s)
 - [x] Sidebar state persisted across restarts (JSON files in ~/.config/factoryfloor/)
@@ -67,19 +61,19 @@
 - [x] Workstream sorting in project view (recent / A-Z)
 - [x] Localization: en, ca, es, sv (all strings translated)
 - [x] Script config: .factoryfloor.json
-- [x] Environment tab: setup (auto) / run (on-demand) with re-execute
+- [x] Environment tab: setup (auto) / run (on-demand) with Rebuild (⌃⇧R) and Start/Rerun (⌃⇧S) shortcuts
 - [x] Preload agent and setup terminals in background
 - [x] Occlude non-visible terminal surfaces (ghostty_surface_set_occlusion)
 - [x] Update notification: versions.json check + sidebar badge + /get page
 - [x] App icon with Poblenou skyline
 - [x] Project icon detection (icon.svg, icon.png, logo.svg, logo.png)
 - [x] Ghostty submodule pinned to v1.3.1, weekly CI compatibility test
-- [x] Code signing, notarization, release-please, CI pipeline
-- [x] Homebrew tap (alltuner/homebrew-tap) and cask formula
-- [x] Website: Hugo + Tailwind, i18n (4 langs), sponsor page, privacy, SEO, OG image
-- [x] Distribution docs: distribution.md (release routine), distribution-strategy.md
+- [x] Code signing, notarization, release-please, CI pipeline (security hardened)
+- [x] Homebrew tap (alltuner/homebrew-tap) with cask and CLI binary
+- [x] Website: Hugo + Tailwind, i18n (4 langs), sponsor page, privacy, SEO, OG image, /get page
+- [x] Distribution docs: distribution.md (release routine), distribution-strategy.md, port-detection.md
 - [x] Onboarding view with prerequisites, getting started, key concepts
-- [x] Security: WKWebView JS disabled, shell-escape tmux, deinit race fix, git flag injection, .env symlink validation
+- [x] Security: WKWebView JS disabled, shell-escape tmux, deinit race fix, git flag injection, .env symlink validation, CI hardening
 - [x] Accessibility: labels, focus rings, keyboard-reachable hover actions
 - [x] Code quality: dedup, parallelized git, cached state, consolidated timers, error propagation
 - [x] Error feedback: worktree creation, non-git dir, ghostty init, project removal, Claude not found

@@ -33,11 +33,12 @@ Factory Floor is a native macOS app built on [Ghostty](https://ghostty.org)'s GP
 - **Git Worktrees** &mdash; Each workstream gets its own branch and worktree. Switch between tasks without stashing.
 - **Claude Code** &mdash; Integrated AI agent with session persistence. Resume conversations across app restarts.
 - **Tmux Persistence** &mdash; Agent sessions survive app restarts via tmux on a dedicated socket.
-- **Setup & Run Scripts** &mdash; Configure setup, run, and teardown scripts per project via `.factoryfloor.json`.
+- **Setup & Run Scripts** &mdash; Configure setup, run, and teardown scripts per project via `.factoryfloor.json`. Environment tab with split-pane terminals, Rebuild (⌃⇧R) and Start/Rerun (⌃⇧S).
 - **Embedded Browser** &mdash; WKWebView tab with deterministic port allocation per workstream.
 - **GitHub Integration** &mdash; Repo info, open PRs, and branch PR status via the `gh` CLI.
 - **Dynamic Tabs** &mdash; Open as many terminals and browsers as you need. Close with Cmd+W or Ctrl+D.
-- **Keyboard-first** &mdash; Every action has a shortcut. Cmd+Return for agent, Cmd+I for info, Cmd+T for terminal, Cmd+B for browser.
+- **Update Notifications** &mdash; Checks for new versions and shows a badge in the sidebar.
+- **Keyboard-first** &mdash; Every action has a shortcut. Cmd+Return for agent, Cmd+I for info, Cmd+E for environment, Cmd+T for terminal, Cmd+B for browser.
 
 ### Script Configuration
 
@@ -91,6 +92,8 @@ Every workstream terminal has access to:
 | `Cmd+Shift+[` / `]` | Cycle tabs |
 | `Cmd+Shift+O` | External browser |
 | `Cmd+Shift+E` | External terminal |
+| `Ctrl+Shift+R` | Rebuild setup |
+| `Ctrl+Shift+S` | Start/Rerun |
 
 ### Supported Languages
 
