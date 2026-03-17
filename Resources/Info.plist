@@ -11,7 +11,9 @@
     <key>CFBundleVersion</key>
     <string>1</string>
     <key>CFBundleShortVersionString</key>
-    <string>0.1.0</string>
+    <!-- x-release-please-start-version -->
+    <string>0.1.7</string>
+    <!-- x-release-please-end -->
     <key>CFBundlePackageType</key>
     <string>APPL</string>
     <key>CFBundleExecutable</key>
