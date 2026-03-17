@@ -9,10 +9,8 @@ enum TmuxSession {
         "\(AppConstants.appID)/\(sanitize(project))/\(sanitize(workstream))/\(role)"
     }
 
-    /// Path to the minimal tmux config that makes tmux invisible.
-    private static var configPath: String {
-        let path = AppConstants.configDirectory.appendingPathComponent("tmux.conf")
-        let config = """
+    static var configContents: String {
+        """
         # Managed by \(AppConstants.appID). Do not edit.
         # Makes tmux act as a transparent session persistence wrapper.
         set -g status off
@@ -28,15 +26,20 @@ enum TmuxSession {
         set -g aggressive-resize on
         set -g window-size latest
         set -g remain-on-exit on
-        set-hook -g pane-died 'respawn-pane'
+        set -g remain-on-exit-format ""
         """
+    }
+
+    /// Path to the minimal tmux config that makes tmux invisible.
+    private static var configPath: String {
+        let path = AppConstants.configDirectory.appendingPathComponent("tmux.conf")
         // Write config if missing or outdated
         let fm = FileManager.default
         try? fm.createDirectory(at: AppConstants.configDirectory, withIntermediateDirectories: true)
-        if let existing = try? String(contentsOfFile: path.path, encoding: .utf8), existing == config {
+        if let existing = try? String(contentsOfFile: path.path, encoding: .utf8), existing == configContents {
             return path.path
         }
-        try? config.write(toFile: path.path, atomically: true, encoding: .utf8)
+        try? configContents.write(toFile: path.path, atomically: true, encoding: .utf8)
         return path.path
     }
 
@@ -52,11 +55,14 @@ enum TmuxSession {
         let conf = shellEscape(configPath)
         // -L uses a dedicated socket, -f uses our minimal config
         let base = "\(tmuxPath) -L \(socketName) -f \(conf) new-session -A -s \(escaped)"
+        let wrappedCommand: String
         if let command {
             let escapedCommand = shellEscape(command)
-            return "\(base) -- sh -c \(escapedCommand)"
+            wrappedCommand = "\(base) -- sh -c \(escapedCommand)"
+        } else {
+            wrappedCommand = base
         }
-        return base
+        return "sh -c \(shellEscape("\(serverSetupCommand(tmuxPath: tmuxPath, configPath: configPath)); exec \(wrappedCommand)"))"
     }
 
     /// Kill a tmux session by name.
@@ -68,6 +74,21 @@ enum TmuxSession {
         process.standardError = FileHandle.nullDevice
         try? process.run()
         process.waitUntilExit()
+    }
+
+    static func sessionExists(tmuxPath: String, sessionName: String) -> Bool {
+        let process = Process()
+        process.executableURL = URL(fileURLWithPath: tmuxPath)
+        process.arguments = ["-L", socketName, "has-session", "-t", sessionName]
+        process.standardOutput = FileHandle.nullDevice
+        process.standardError = FileHandle.nullDevice
+        do {
+            try process.run()
+            process.waitUntilExit()
+            return process.terminationStatus == 0
+        } catch {
+            return false
+        }
     }
 
     /// Kill the agent tmux session for a workstream.
@@ -84,5 +105,14 @@ enum TmuxSession {
 
     private static func shellEscape(_ str: String) -> String {
         "'\(str.replacingOccurrences(of: "'", with: "'\\''"))'"
+    }
+
+    private static func serverSetupCommand(tmuxPath: String, configPath: String) -> String {
+        let socket = shellEscape(socketName)
+        let conf = shellEscape(configPath)
+        let startServer = "\(tmuxPath) -L \(socket) start-server >/dev/null 2>&1 || true"
+        let sourceFile = "\(tmuxPath) -L \(socket) source-file \(conf) >/dev/null 2>&1 || true"
+        let clearPaneDiedHook = "\(tmuxPath) -L \(socket) set-hook -gu pane-died >/dev/null 2>&1 || true"
+        return "\(startServer); \(sourceFile); \(clearPaneDiedHook)"
     }
 }

@@ -32,6 +32,24 @@ enum WorkspaceTab: Hashable {
     }
 }
 
+enum TerminalSessionMode: Equatable {
+    case standard
+    case tmux
+    case waitingForTools
+
+    static func resolve(tmuxModeEnabled: Bool, isDetectingTools: Bool, tmuxInstalled: Bool) -> Self {
+        if tmuxModeEnabled {
+            if isDetectingTools {
+                return .waitingForTools
+            }
+            if tmuxInstalled {
+                return .tmux
+            }
+        }
+        return .standard
+    }
+}
+
 struct TerminalContainerView: View {
     let workstreamID: UUID
     let workingDirectory: String
@@ -68,8 +86,16 @@ struct TerminalContainerView: View {
         }
     }
 
+    private var sessionMode: TerminalSessionMode {
+        TerminalSessionMode.resolve(
+            tmuxModeEnabled: tmuxMode,
+            isDetectingTools: appEnv.isDetecting,
+            tmuxInstalled: appEnv.toolStatus.tmux.isInstalled
+        )
+    }
+
     private var useTmux: Bool {
-        tmuxMode && appEnv.toolStatus.tmux.isInstalled
+        sessionMode == .tmux
     }
 
     private var workstreamPort: Int {
@@ -172,7 +198,9 @@ struct TerminalContainerView: View {
                 scriptConfig: scriptConfig
             )
         case .agent:
-            if appEnv.toolStatus.claude.path == nil {
+            if sessionMode == .waitingForTools {
+                terminalLoadingView(message: "Checking terminal tools...")
+            } else if appEnv.toolStatus.claude.path == nil {
                 VStack(spacing: 16) {
                     Image(systemName: "sparkle")
                         .font(.system(size: 40))
@@ -196,15 +224,19 @@ struct TerminalContainerView: View {
                 )
             }
         case .environment:
-            EnvironmentTabView(
-                workstreamID: workstreamID,
-                workingDirectory: workingDirectory,
-                projectName: projectName,
-                workstreamName: workstreamName,
-                scriptConfig: scriptConfig,
-                useTmux: useTmux,
-                environmentVars: terminalEnvVars
-            )
+            if sessionMode == .waitingForTools {
+                terminalLoadingView(message: "Checking terminal tools...")
+            } else {
+                EnvironmentTabView(
+                    workstreamID: workstreamID,
+                    workingDirectory: workingDirectory,
+                    projectName: projectName,
+                    workstreamName: workstreamName,
+                    scriptConfig: scriptConfig,
+                    useTmux: useTmux,
+                    environmentVars: terminalEnvVars
+                )
+            }
         case .terminal(let id):
             SingleTerminalView(
                 surfaceID: id,
@@ -234,13 +266,17 @@ struct TerminalContainerView: View {
             preloadSurfaces()
             surfaceCache.updateOcclusion(visibleSurfaceIDs: visibleSurfaceIDs)
         }
-        .onChange(of: activeTab) { _ in
+        .onChange(of: activeTab) {
             surfaceCache.updateOcclusion(visibleSurfaceIDs: visibleSurfaceIDs)
         }
-        .onChange(of: tmuxMode) { _ in cachedClaudeCommand = buildClaudeCommand() }
-        .onChange(of: bypassPermissions) { _ in cachedClaudeCommand = buildClaudeCommand() }
-        .onChange(of: autoRenameBranch) { _ in cachedClaudeCommand = buildClaudeCommand() }
-        .onChange(of: workstreamName) { _ in cachedClaudeCommand = buildClaudeCommand() }
+        .onChange(of: tmuxMode) { cachedClaudeCommand = buildClaudeCommand() }
+        .onChange(of: bypassPermissions) { cachedClaudeCommand = buildClaudeCommand() }
+        .onChange(of: autoRenameBranch) { cachedClaudeCommand = buildClaudeCommand() }
+        .onChange(of: workstreamName) { cachedClaudeCommand = buildClaudeCommand() }
+        .onChange(of: appEnv.isDetecting) {
+            cachedClaudeCommand = buildClaudeCommand()
+            preloadSurfaces()
+        }
         .onReceive(NotificationCenter.default.publisher(for: .toggleInfo)) { _ in activeTab = .info }
         .onReceive(NotificationCenter.default.publisher(for: .focusAgent)) { _ in activeTab = .agent }
         .onReceive(NotificationCenter.default.publisher(for: .toggleEnvironment)) { _ in
@@ -373,6 +409,7 @@ struct TerminalContainerView: View {
 
     /// Pre-create terminal surfaces so they start running before their tab is visible.
     private func preloadSurfaces() {
+        guard sessionMode != .waitingForTools else { return }
         guard let app = TerminalApp.shared.app else { return }
 
         // Agent surface
@@ -430,6 +467,17 @@ struct TerminalContainerView: View {
             port: workstreamPort,
             agentTeams: agentTeams
         )
+    }
+
+    private func terminalLoadingView(message: String) -> some View {
+        VStack(spacing: 12) {
+            ProgressView()
+                .controlSize(.regular)
+            Text(message)
+                .font(.system(size: 13))
+                .foregroundStyle(.secondary)
+        }
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
     }
 }
 

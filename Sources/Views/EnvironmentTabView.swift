@@ -3,6 +3,17 @@
 
 import SwiftUI
 
+func shouldRestoreRunSession(useTmux: Bool, hasRunScript: Bool, hasExistingRunSession: Bool) -> Bool {
+    useTmux && hasRunScript && hasExistingRunSession
+}
+
+func scriptCommand(script: String, role: String) -> String {
+    if role == "setup" {
+        return "\(script); printf '\\nSetup completed in this terminal.\\n'"
+    }
+    return script
+}
+
 struct EnvironmentTabView: View {
     let workstreamID: UUID
     let workingDirectory: String
@@ -51,6 +62,9 @@ struct EnvironmentTabView: View {
             if scriptConfig.run != nil {
                 if runStarted { restartRun() } else { runStarted = true }
             }
+        }
+        .onAppear {
+            restoreRunState()
         }
     }
 
@@ -196,10 +210,11 @@ struct EnvironmentTabView: View {
     }
 
     private func envInput(script: String, role: String) -> String {
+        let command = scriptCommand(script: script, role: role)
         if useTmux {
-            return buildCommand(script: script, role: role) + "\n"
+            return buildCommand(script: command, role: role) + "\n"
         }
-        return script + "; exec tail -f /dev/null\n"
+        return command + "; exec tail -f /dev/null\n"
     }
 
     private func buildCommand(script: String, role: String) -> String {
@@ -234,6 +249,18 @@ struct EnvironmentTabView: View {
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
             runGeneration += 1
             runRestarting = false
+            runStarted = true
+        }
+    }
+
+    private func restoreRunState() {
+        guard !runStarted,
+              useTmux,
+              scriptConfig.run != nil,
+              let tmuxPath = appEnv.toolStatus.tmux.path else { return }
+        let session = TmuxSession.sessionName(project: projectName, workstream: workstreamName, role: "run")
+        let hasExistingRunSession = TmuxSession.sessionExists(tmuxPath: tmuxPath, sessionName: session)
+        if shouldRestoreRunSession(useTmux: useTmux, hasRunScript: scriptConfig.run != nil, hasExistingRunSession: hasExistingRunSession) {
             runStarted = true
         }
     }
