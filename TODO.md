@@ -1,5 +1,11 @@
 # TODO
 
+## New stuff
+
+- [ ] Make routines in Coding Agent (launching), and environment (setup and run (run after setup has completed only)) happen in the background when a new workspace is created (while you land in the info view)
+- [x] Footer: single line "Built by David Poblador i Garcia · All Tuner Labs"
+- [x] Sponsor link in website footer (♥ Sponsor)
+
 ## Security
 
 - [x] Pin third-party CI actions to commit SHAs (supply chain protection)
@@ -28,8 +34,8 @@
 - [x] Show error dialog when ghostty_init fails (NSAlert instead of fatalError)
 - [x] ToolRow: text already shown alongside color dot (no change needed)
 - [x] Add copy-branch-name button alongside copy-path in workstream info header
-- [ ] the footer "Built by David Poblador i Garcia with the support of All Tuner Labs" should be in one line, but perhaps with a shorter wording
-- [ ] the website needs a prominent link somewhere to the sponsor page to support the development
+- [x] Footer: single line "Built by David Poblador i Garcia · All Tuner Labs"
+- [x] Sponsor link in website footer (♥ Sponsor)
 
 ## Accessibility
 

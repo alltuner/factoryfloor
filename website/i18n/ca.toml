@@ -149,6 +149,8 @@ other = "Fet per"
 other = "amb el suport de"
 [footer_contact]
 other = "Contacte"
+[footer_sponsor]
+other = "Patrocina"
 
 # Open Source
 [oss_label]

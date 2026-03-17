@@ -141,6 +141,8 @@ other = "Byggd av"
 other = "med stöd av"
 [footer_contact]
 other = "Kontakt"
+[footer_sponsor]
+other = "Sponsra"
 
 # Open Source
 [oss_label]

@@ -5,16 +5,15 @@
     <div class="flex flex-col md:flex-row justify-between items-center gap-6">
       <div class="flex flex-col items-center md:items-start gap-1 text-sm text-fg-muted">
         <div>
-          {{ T "footer_built_by" }} <a href="https://davidpoblador.com" class="text-wine-light no-underline hover:text-fg transition-colors">David Poblador i Garcia</a>
-        </div>
-        <div>
-          {{ T "footer_support" }} <a href="https://alltuner.com" class="text-wine-light no-underline hover:text-fg transition-colors">All Tuner Labs</a>
+          {{ T "footer_built_by" }} <a href="https://davidpoblador.com" class="text-wine-light no-underline hover:text-fg transition-colors">David Poblador i Garcia</a> · <a href="https://alltuner.com" class="text-wine-light no-underline hover:text-fg transition-colors">All Tuner Labs</a>
         </div>
         <div class="text-xs text-fg-muted/60">
           {{ T "footer_poblenou" }}
         </div>
       </div>
       <div class="flex items-center gap-4">
+        <a href="/sponsor" class="font-mono text-xs text-wine-light no-underline transition-colors hover:text-fg">♥ {{ T "footer_sponsor" }}</a>
+        <span class="text-fg-faint">|</span>
         <!-- Language switcher -->
         <div class="flex items-center gap-2 text-xs font-mono">
           {{ $currentLang := .Site.Language.Lang }}
