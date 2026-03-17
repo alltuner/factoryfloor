@@ -7,7 +7,6 @@
 ## Post-release
 
 - [ ] Auto-update mechanism (Sparkle): in-app update for direct DMG users
-- [ ] Clean remaining build warnings and flip the project to Swift 6
 - [ ] Port detection: auto-detect when run script opens a listening port, point browser to it (scoped in docs/port-detection.md)
 - [ ] Crash reporting
 
@@ -80,3 +79,4 @@
 - [x] Restore full app state on launch (persist info/agent/environment, return spawned tabs to info)
 - [x] Right-click sidebar menu for copying project path, branch name, and worktree path
 - [x] Drag-and-drop reorder for custom terminal and browser tabs
+- [x] Clean remaining build warnings and flip the project to Swift 6

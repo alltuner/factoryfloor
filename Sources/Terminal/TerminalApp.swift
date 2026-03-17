@@ -10,7 +10,7 @@ private let logger = Logger(subsystem: "factoryfloor", category: "terminal-app")
 final class TerminalApp {
     static let shared = TerminalApp()
 
-    private(set) var app: ghostty_app_t?
+    nonisolated(unsafe) private(set) var app: ghostty_app_t?
 
     private init() {
         // Create config

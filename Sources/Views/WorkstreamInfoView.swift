@@ -141,7 +141,7 @@ struct WorkstreamInfoView: View {
         .onAppear { loadInfo() }
     } // body
 
-    private static let iconPaths = [
+    nonisolated private static let iconPaths = [
         "icon.svg", "icon.png",
         ".github/icon.svg", ".github/icon.png",
         "logo.svg", "logo.png",

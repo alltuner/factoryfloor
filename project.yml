@@ -8,7 +8,7 @@ options:
 
 settings:
   base:
-    SWIFT_VERSION: "5.10"
+    SWIFT_VERSION: "6.0"
     SWIFT_STRICT_CONCURRENCY: complete
     SWIFT_OBJC_BRIDGING_HEADER: Resources/FactoryFloor-Bridging-Header.h
     HEADER_SEARCH_PATHS:

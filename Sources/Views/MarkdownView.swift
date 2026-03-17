@@ -37,7 +37,11 @@ struct MarkdownContentView: NSViewRepresentable {
     final class Coordinator: NSObject, WKNavigationDelegate {
         var lastMarkdown: String?
 
-        func webView(_ webView: WKWebView, decidePolicyFor action: WKNavigationAction, decisionHandler: @escaping (WKNavigationActionPolicy) -> Void) {
+        func webView(
+            _ webView: WKWebView,
+            decidePolicyFor action: WKNavigationAction,
+            decisionHandler: @escaping @MainActor @Sendable (WKNavigationActionPolicy) -> Void
+        ) {
             if action.navigationType == .linkActivated, let url = action.request.url {
                 // Only open absolute HTTP(S) links in the external browser.
                 // Ignore anchor links, relative paths, and other schemes.

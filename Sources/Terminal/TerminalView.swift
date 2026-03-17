@@ -10,15 +10,16 @@ extension Notification.Name {
     static let terminalActivity = Notification.Name("ff2.terminalActivity")
 }
 
-final class TerminalView: NSView, NSTextInputClient {
+@MainActor
+final class TerminalView: NSView {
     /// Maps ghostty surface pointers to their owning views.
-    static var surfaceRegistry: [UnsafeMutableRawPointer: TerminalView] = [:]
+    nonisolated(unsafe) static var surfaceRegistry: [UnsafeMutableRawPointer: TerminalView] = [:]
 
     static func view(for surface: ghostty_surface_t) -> TerminalView? {
         surfaceRegistry[surface]
     }
 
-    private(set) var surface: ghostty_surface_t?
+    nonisolated(unsafe) private(set) var surface: ghostty_surface_t?
     var workstreamID: UUID?
     private var trackingArea: NSTrackingArea?
     private var markedText = NSMutableAttributedString()
@@ -44,8 +45,8 @@ final class TerminalView: NSView, NSTextInputClient {
         config.context = GHOSTTY_SURFACE_CONTEXT_WINDOW
 
         // Build C env vars array. Keep the strings alive until surface is created.
-        var envKeys = environmentVars.map { $0.key.utf8CString }
-        var envValues = environmentVars.map { $0.value.utf8CString }
+        let envKeys = environmentVars.map { $0.key.utf8CString }
+        let envValues = environmentVars.map { $0.value.utf8CString }
         var cEnvVars = (0..<environmentVars.count).map { i in
             envKeys[i].withUnsafeBufferPointer { keyBuf in
                 envValues[i].withUnsafeBufferPointer { valBuf in
@@ -126,12 +127,6 @@ final class TerminalView: NSView, NSTextInputClient {
 
     deinit {
         if let surface {
-            if Thread.isMainThread {
-                Self.surfaceRegistry.removeValue(forKey: surface)
-            } else {
-                let s = surface
-                DispatchQueue.main.async { Self.surfaceRegistry.removeValue(forKey: s) }
-            }
             ghostty_surface_free(surface)
         }
     }
@@ -236,7 +231,7 @@ final class TerminalView: NSView, NSTextInputClient {
     // MARK: - Keyboard
 
     override func keyDown(with event: NSEvent) {
-        guard let surface else {
+        guard self.surface != nil else {
             interpretKeyEvents([event])
             return
         }
@@ -344,8 +339,6 @@ final class TerminalView: NSView, NSTextInputClient {
 
         return characters
     }
-
-    // MARK: - NSTextInputClient
 
     func insertText(_ string: Any, replacementRange: NSRange) {
         guard NSApp.currentEvent != nil else { return }
@@ -497,6 +490,8 @@ final class TerminalView: NSView, NSTextInputClient {
         return ghostty_input_mods_e(rawValue: mods)
     }
 }
+
+extension TerminalView: @MainActor NSTextInputClient {}
 
 // MARK: - NSScreen display ID helper
 

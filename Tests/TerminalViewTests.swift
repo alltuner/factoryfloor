@@ -5,6 +5,7 @@ import Cocoa
 import XCTest
 @testable import FactoryFloor
 
+@MainActor
 final class TerminalViewTests: XCTestCase {
     func testGhosttyMousePointFlipsYAxis() {
         let view = NSView(frame: NSRect(x: 0, y: 0, width: 200, height: 120))
