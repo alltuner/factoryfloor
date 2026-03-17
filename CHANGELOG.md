@@ -1,5 +1,18 @@
 # Changelog
 
+## [0.1.16](https://github.com/alltuner/factoryfloor/compare/v0.1.15...v0.1.16) (2026-03-17)
+
+
+### Bug Fixes
+
+* use os_log Logger with public privacy for debug logging ([#43](https://github.com/alltuner/factoryfloor/issues/43)) ([#49](https://github.com/alltuner/factoryfloor/issues/49)) ([467d749](https://github.com/alltuner/factoryfloor/commit/467d74982622974bccfe8332e2d8a9b1f96d3859))
+* **website:** add brew update to upgrade instructions, trigger deploy after release ([#47](https://github.com/alltuner/factoryfloor/issues/47)) ([385f085](https://github.com/alltuner/factoryfloor/commit/385f085d5f96a711e3feabb456dffbafaa0f088a)), closes [#40](https://github.com/alltuner/factoryfloor/issues/40) [#42](https://github.com/alltuner/factoryfloor/issues/42)
+
+
+### Miscellaneous
+
+* update versions.json to v0.1.15 ([e898537](https://github.com/alltuner/factoryfloor/commit/e898537e0c959c4f36edb346df47e480cc5f4c05))
+
 ## [0.1.15](https://github.com/alltuner/factoryfloor/compare/v0.1.14...v0.1.15) (2026-03-17)
 
 
