@@ -26,12 +26,19 @@ struct ContentView: View {
     }
 
     private var activeProject: Project? {
-        guard let selection else { return nil }
+        guard let selection else {
+            NSLog("[FF] activeProject: selection is nil")
+            return nil
+        }
         switch selection {
         case .project(let id):
-            return projects.first(where: { $0.id == id })
+            let found = projects.first(where: { $0.id == id })
+            if found == nil { NSLog("[FF] activeProject: project \(id) not found in \(projects.count) projects") }
+            return found
         case .workstream(let wsID):
-            return projects.first(where: { $0.workstreams.contains(where: { $0.id == wsID }) })
+            let found = projects.first(where: { $0.workstreams.contains(where: { $0.id == wsID }) })
+            if found == nil { NSLog("[FF] activeProject: workstream \(wsID) not found in any project") }
+            return found
         case .settings, .help:
             return nil
         }
@@ -220,7 +227,9 @@ struct ContentView: View {
         }
         .onChange(of: appEnvironment.missingProjectIDs) { _, missing in
             guard !missing.isEmpty else { return }
+            NSLog("[FF] missingProjectIDs changed: \(missing.count) missing, \(projects.count) total projects")
             let names = projects.filter { missing.contains($0.id) }.map(\.name)
+            NSLog("[FF] removing projects: \(names)")
             for id in missing {
                 if let project = projects.first(where: { $0.id == id }) {
                     for ws in project.workstreams {
@@ -239,6 +248,7 @@ struct ContentView: View {
             removedProjectNames = names
         }
         .onChange(of: selection) { oldValue, newValue in
+            NSLog("[FF] selection changed: \(String(describing: oldValue)) -> \(String(describing: newValue))")
             if newValue == .settings || newValue == .help {
                 selectionBeforeSettings = oldValue
             }

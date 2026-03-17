@@ -113,6 +113,7 @@ final class AppEnvironment: ObservableObject {
                 var isDir: ObjCBool = false
                 let exists = FileManager.default.fileExists(atPath: project.directory, isDirectory: &isDir) && isDir.boolValue
                 if !exists {
+                    NSLog("[FF] refreshPathValidity: project \(project.name) directory MISSING: \(project.directory)")
                     missing.insert(project.id)
                 }
 

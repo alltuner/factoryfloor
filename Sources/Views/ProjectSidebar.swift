@@ -86,7 +86,7 @@ struct ProjectSidebar: View {
                                 }
                             }
                         } : nil,
-                        onAdd: { addWorkstream(for: project.id) },
+                        onAdd: { NSLog("[FF] onAdd button tapped for project \(project.name)"); addWorkstream(for: project.id) },
                         onAddWithPermissions: { addWorkstream(for: project.id, bypassPermissions: true) },
                         onAddWithoutPermissions: { addWorkstream(for: project.id, bypassPermissions: false) },
                         onDelete: { projectToDelete = project.id }
