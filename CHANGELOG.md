@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.1.12](https://github.com/alltuner/factoryfloor/compare/v0.1.11...v0.1.12) (2026-03-17)
+
+
+### Bug Fixes
+
+* **ci:** correct xcodegen setup action name ([#32](https://github.com/alltuner/factoryfloor/issues/32)) ([a70ef8a](https://github.com/alltuner/factoryfloor/commit/a70ef8a0af8672665c46a851870e36257ea6d9db))
+
 ## [0.1.11](https://github.com/alltuner/factoryfloor/compare/v0.1.10...v0.1.11) (2026-03-17)
 
 
