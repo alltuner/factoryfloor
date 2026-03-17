@@ -18,9 +18,11 @@ jobs:
         with:
           submodules: true
 
-      - name: Install dependencies
-        run: |
-          brew install xcodegen zig
+      - uses: xcodegen/setup-xcodegen@v1
+
+      - uses: mlugg/setup-zig@v2
+        with:
+          version: 0.15.2
 
       - name: Update Ghostty submodule
         run: |
