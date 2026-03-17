@@ -38,8 +38,13 @@ jobs:
         with:
           submodules: true
 
-      - name: Install XcodeGen
-        run: brew install xcodegen
+      - name: Install dependencies
+        run: brew install xcodegen zig
+
+      - name: Build Ghostty xcframework
+        run: |
+          cd ghostty
+          zig build -Demit-xcframework=true -Dxcframework-target=universal -Doptimize=ReleaseFast
 
       - name: Generate Xcode project
         run: xcodegen generate
