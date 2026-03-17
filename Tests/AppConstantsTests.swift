@@ -5,18 +5,15 @@ import XCTest
 @testable import FactoryFloor
 
 final class AppConstantsTests: XCTestCase {
-    func testDebugBuildFallsBackToReleaseDirectoryWhenDebugDirectoryIsMissing() {
+    func testDebugBuildUsesReleaseConfigDirectory() {
         let base = URL(fileURLWithPath: "/tmp/factoryfloor-config")
 
         let resolved = resolvedConfigDirectory(
-            appID: "factoryfloor-debug",
+            configDirectoryName: "factoryfloor",
             environment: [:],
             defaultConfigBase: base,
-            isDebugBuild: true,
             isRunningTests: false
-        ) { path in
-            path == base.appendingPathComponent("factoryfloor").path
-        }
+        )
 
         XCTAssertEqual(resolved, base.appendingPathComponent("factoryfloor"))
     }
@@ -25,15 +22,12 @@ final class AppConstantsTests: XCTestCase {
         let base = URL(fileURLWithPath: "/tmp/factoryfloor-config")
 
         let resolved = resolvedConfigDirectory(
-            appID: "factoryfloor-debug",
+            configDirectoryName: "factoryfloor",
             environment: [:],
             defaultConfigBase: base,
-            isDebugBuild: true,
             isRunningTests: true
-        ) { path in
-            path == base.appendingPathComponent("factoryfloor").path
-        }
+        )
 
-        XCTAssertEqual(resolved, base.appendingPathComponent("factoryfloor-debug-tests"))
+        XCTAssertEqual(resolved, base.appendingPathComponent("factoryfloor-tests"))
     }
 }

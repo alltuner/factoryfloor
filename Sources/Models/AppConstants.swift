@@ -4,12 +4,10 @@
 import Foundation
 
 func resolvedConfigDirectory(
-    appID: String,
+    configDirectoryName: String,
     environment: [String: String],
     defaultConfigBase: URL,
-    isDebugBuild: Bool,
-    isRunningTests: Bool,
-    fileExists: (String) -> Bool = { FileManager.default.fileExists(atPath: $0) }
+    isRunningTests: Bool
 ) -> URL {
     let configBase: URL
     if let xdg = environment["XDG_CONFIG_HOME"], !xdg.isEmpty {
@@ -19,18 +17,10 @@ func resolvedConfigDirectory(
     }
 
     if isRunningTests {
-        return configBase.appendingPathComponent("\(appID)-tests")
+        return configBase.appendingPathComponent("\(configDirectoryName)-tests")
     }
 
-    let dir = configBase.appendingPathComponent(appID)
-    if isDebugBuild, !fileExists(dir.path) {
-        let releaseDir = configBase.appendingPathComponent("factoryfloor")
-        if fileExists(releaseDir.path) {
-            return releaseDir
-        }
-    }
-
-    return dir
+    return configBase.appendingPathComponent(configDirectoryName)
 }
 
 enum AppConstants {
@@ -44,20 +34,13 @@ enum AppConstants {
     static let urlScheme = "factoryfloor"
     #endif
 
-    /// Config directory: ~/.config/factoryfloor[-debug]/ (respects XDG_CONFIG_HOME).
-    /// Falls back to the release config directory if the debug one doesn't exist.
+    /// Config directory: ~/.config/factoryfloor/ (respects XDG_CONFIG_HOME).
+    /// XCTest uses ~/.config/factoryfloor-tests/ to keep test data isolated.
     static var configDirectory: URL {
         resolvedConfigDirectory(
-            appID: appID,
+            configDirectoryName: "factoryfloor",
             environment: ProcessInfo.processInfo.environment,
             defaultConfigBase: FileManager.default.homeDirectoryForCurrentUser.appendingPathComponent(".config"),
-            isDebugBuild: {
-                #if DEBUG
-                true
-                #else
-                false
-                #endif
-            }(),
             isRunningTests: ProcessInfo.processInfo.environment["XCTestConfigurationFilePath"] != nil
         )
     }
