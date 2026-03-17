@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.1.3](https://github.com/alltuner/factoryfloor/compare/v0.1.2...v0.1.3) (2026-03-17)
+
+
+### Bug Fixes
+
+* **ci:** build ghostty xcframework before release build ([#10](https://github.com/alltuner/factoryfloor/issues/10)) ([f7be824](https://github.com/alltuner/factoryfloor/commit/f7be824119e04304c3a9c46ae84eadbb1f63489d))
+
 ## [0.1.2](https://github.com/alltuner/factoryfloor/compare/v0.1.1...v0.1.2) (2026-03-17)
 
 
