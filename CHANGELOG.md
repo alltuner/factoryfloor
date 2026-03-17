@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.1.5](https://github.com/alltuner/factoryfloor/compare/v0.1.4...v0.1.5) (2026-03-17)
+
+
+### Bug Fixes
+
+* **ci:** fetch Apple notarization log on failure ([#14](https://github.com/alltuner/factoryfloor/issues/14)) ([7fc381e](https://github.com/alltuner/factoryfloor/commit/7fc381ee029486c13ac6e38248396683570c6087))
+
 ## [0.1.4](https://github.com/alltuner/factoryfloor/compare/v0.1.3...v0.1.4) (2026-03-17)
 
 
