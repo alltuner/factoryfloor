@@ -21,6 +21,10 @@ struct WorktreeInfo: Identifiable, Sendable {
 }
 
 enum GitOperations {
+    private static var gitPath: String? {
+        CommandLineTools.path(for: "git")
+    }
+
     /// Check if a directory is a git repository.
     static func isGitRepo(at path: String) -> Bool {
         let gitDir = URL(fileURLWithPath: path).appendingPathComponent(".git")
@@ -29,7 +33,7 @@ enum GitOperations {
 
     /// Initialize a git repo at the given path.
     static func initRepo(at path: String) -> Bool {
-        return run("git", args: ["init"], in: path) != nil
+        return run(args: ["init"], in: path) != nil
     }
 
     /// Get repo information for display.
@@ -38,19 +42,19 @@ enum GitOperations {
             return GitRepoInfo(isRepo: false, branch: nil, remoteURL: nil, commitCount: nil, isDirty: false)
         }
 
-        let rawBranch = run("git", args: ["rev-parse", "--abbrev-ref", "HEAD"], in: path)?
+        let rawBranch = run(args: ["rev-parse", "--abbrev-ref", "HEAD"], in: path)?
             .trimmingCharacters(in: .whitespacesAndNewlines)
         // rev-parse returns literal "HEAD" when in detached state
         let branch = (rawBranch == "HEAD") ? nil : rawBranch
 
-        let remote = run("git", args: ["remote", "get-url", "origin"], in: path)?
+        let remote = run(args: ["remote", "get-url", "origin"], in: path)?
             .trimmingCharacters(in: .whitespacesAndNewlines)
 
-        let countStr = run("git", args: ["rev-list", "--count", "HEAD"], in: path)?
+        let countStr = run(args: ["rev-list", "--count", "HEAD"], in: path)?
             .trimmingCharacters(in: .whitespacesAndNewlines)
         let commitCount = countStr.flatMap(Int.init)
 
-        let status = run("git", args: ["status", "--porcelain"], in: path)?
+        let status = run(args: ["status", "--porcelain"], in: path)?
             .trimmingCharacters(in: .whitespacesAndNewlines)
         let isDirty = status.map { !$0.isEmpty } ?? false
 
@@ -66,18 +70,18 @@ enum GitOperations {
     /// Detect the default branch (origin/main, origin/master, main, master).
     static func defaultBranch(at path: String) -> String {
         // Try remote HEAD first
-        if let ref = run("git", args: ["symbolic-ref", "refs/remotes/origin/HEAD", "--short"], in: path) {
+        if let ref = run(args: ["symbolic-ref", "refs/remotes/origin/HEAD", "--short"], in: path) {
             return ref.trimmingCharacters(in: .whitespacesAndNewlines)
         }
         // Check if origin/main or origin/master exist
         for branch in ["origin/main", "origin/master"] {
-            if run("git", args: ["rev-parse", "--verify", branch], in: path) != nil {
+            if run(args: ["rev-parse", "--verify", branch], in: path) != nil {
                 return branch
             }
         }
         // Fallback to local main/master
         for branch in ["main", "master"] {
-            if run("git", args: ["rev-parse", "--verify", branch], in: path) != nil {
+            if run(args: ["rev-parse", "--verify", branch], in: path) != nil {
                 return branch
             }
         }
@@ -104,19 +108,11 @@ enum GitOperations {
         )
 
         // Create worktree with new branch based off the default branch
-        let result = run(
-            "git",
-            args: ["worktree", "add", "-b", branchName, worktreeDir.path, baseBranch],
-            in: projectPath
-        )
+        let result = run(args: ["worktree", "add", "-b", branchName, worktreeDir.path, baseBranch], in: projectPath)
 
         if result == nil {
             // Branch might already exist, try without -b
-            let fallback = run(
-                "git",
-                args: ["worktree", "add", worktreeDir.path, branchName],
-                in: projectPath
-            )
+            let fallback = run(args: ["worktree", "add", worktreeDir.path, branchName], in: projectPath)
             guard fallback != nil else { return nil }
         }
 
@@ -152,7 +148,7 @@ enum GitOperations {
             .appendingPathComponent(sanitize(projectName))
             .appendingPathComponent(sanitize(workstreamName))
 
-        _ = run("git", args: ["worktree", "remove", "--force", worktreeDir.path], in: projectPath)
+        _ = run(args: ["worktree", "remove", "--force", worktreeDir.path], in: projectPath)
 
         // Clean up empty directories
         try? FileManager.default.removeItem(at: worktreeDir)
@@ -164,13 +160,13 @@ enum GitOperations {
 
     /// Check if a worktree has uncommitted changes (staged, unstaged, or untracked files).
     static func hasUncommittedChanges(at path: String) -> Bool {
-        guard let status = run("git", args: ["status", "--porcelain"], in: path) else { return false }
+        guard let status = run(args: ["status", "--porcelain"], in: path) else { return false }
         return !status.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
     }
 
     /// List existing worktrees for a project with branch and dirty status.
     static func listWorktreesWithInfo(at projectPath: String) -> [WorktreeInfo] {
-        guard let output = run("git", args: ["worktree", "list", "--porcelain"], in: projectPath) else {
+        guard let output = run(args: ["worktree", "list", "--porcelain"], in: projectPath) else {
             return []
         }
 
@@ -210,13 +206,13 @@ enum GitOperations {
         let worktrees = listWorktreesWithInfo(at: projectPath)
         var pruned = 0
         for wt in worktrees where !wt.isMain && !wt.isDirty {
-            let result = run("git", args: ["worktree", "remove", wt.path], in: projectPath)
+            let result = run(args: ["worktree", "remove", wt.path], in: projectPath)
             if result != nil {
                 pruned += 1
             }
         }
         // Clean up stale entries
-        _ = run("git", args: ["worktree", "prune"], in: projectPath)
+        _ = run(args: ["worktree", "prune"], in: projectPath)
         return pruned
     }
 
@@ -232,11 +228,12 @@ enum GitOperations {
         return result.isEmpty ? "unnamed" : result
     }
 
-    private static func run(_ command: String, args: [String], in directory: String) -> String? {
+    private static func run(args: [String], in directory: String) -> String? {
+        guard let gitPath else { return nil }
         let process = Process()
         let pipe = Pipe()
-        process.executableURL = URL(fileURLWithPath: "/usr/bin/env")
-        process.arguments = [command] + args
+        process.executableURL = URL(fileURLWithPath: gitPath)
+        process.arguments = args
         process.currentDirectoryURL = URL(fileURLWithPath: directory)
         process.standardOutput = pipe
         process.standardError = FileHandle.nullDevice

@@ -21,9 +21,14 @@ struct GitHubPR: Sendable {
 }
 
 enum GitHubOperations {
+    private static var gitPath: String? {
+        CommandLineTools.path(for: "git")
+    }
+
     /// Check if the project has a GitHub remote.
     static func hasGitHubRemote(at path: String) -> Bool {
-        guard let remote = run("git", args: ["remote", "get-url", "origin"], in: path) else { return false }
+        guard let gitPath,
+              let remote = run(gitPath, args: ["remote", "get-url", "origin"], in: path) else { return false }
         return remote.contains("github.com")
     }
 

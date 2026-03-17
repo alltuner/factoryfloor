@@ -384,26 +384,8 @@ struct ToolStatus: Sendable {
     }
 
     private static func findBinary(_ name: String) -> BinaryStatus {
-        let searchPaths = [
-            "/opt/homebrew/bin/\(name)",
-            "/usr/local/bin/\(name)",
-            "/usr/bin/\(name)",
-            "\(NSHomeDirectory())/.local/bin/\(name)",
-        ]
-
-        for path in searchPaths {
-            if FileManager.default.isExecutableFile(atPath: path) {
-                return .found(path)
-            }
-        }
-
-        // Fallback to which
-        if let output = runCommand("/usr/bin/which", args: [name]),
-           !output.isEmpty {
-            return .found(output)
-        }
-
-        return .notFound
+        guard let path = CommandLineTools.path(for: name) else { return .notFound }
+        return .found(path)
     }
 
     private static func runForVersion(_ path: String, args: [String]) -> String? {
