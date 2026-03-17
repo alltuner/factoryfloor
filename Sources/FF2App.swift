@@ -139,6 +139,18 @@ struct FF2App: App {
                 }
                 .keyboardShortcut("e", modifiers: .command)
 
+                Button("Rebuild Setup") {
+                    NotificationCenter.default.post(name: .rebuildSetup, object: nil)
+                }
+                .keyboardShortcut("s", modifiers: [.control, .shift])
+
+                Button("Start/Rerun") {
+                    NotificationCenter.default.post(name: .rerunScript, object: nil)
+                }
+                .keyboardShortcut("r", modifiers: [.control, .shift])
+
+                Divider()
+
                 Button("Toggle Terminal") {
                     NotificationCenter.default.post(name: .toggleTerminal, object: nil)
                 }

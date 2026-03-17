@@ -34,6 +34,7 @@ struct EnvironmentTabView: View {
                 title: NSLocalizedString("Setup", comment: ""),
                 icon: "hammer",
                 restartLabel: NSLocalizedString("Rebuild", comment: ""),
+                shortcut: "⌃⇧S",
                 script: scriptConfig.setup,
                 surfaceID: setupID,
                 tmuxRole: "setup",
@@ -43,12 +44,19 @@ struct EnvironmentTabView: View {
 
             runPane()
         }
+        .onReceive(NotificationCenter.default.publisher(for: .rebuildSetup)) { _ in
+            if scriptConfig.setup != nil { restartSetup() }
+        }
+        .onReceive(NotificationCenter.default.publisher(for: .rerunScript)) { _ in
+            if scriptConfig.run != nil {
+                if runStarted { restartRun() } else { runStarted = true }
+            }
+        }
     }
 
     @ViewBuilder
-    private func scriptPane(title: String, icon: String, restartLabel: String, script: String?, surfaceID: UUID, tmuxRole: String, restarting: Bool, onRestart: @escaping () -> Void) -> some View {
+    private func scriptPane(title: String, icon: String, restartLabel: String, shortcut: String, script: String?, surfaceID: UUID, tmuxRole: String, restarting: Bool, onRestart: @escaping () -> Void) -> some View {
         VStack(spacing: 0) {
-            // Header bar
             HStack {
                 Image(systemName: icon)
                     .font(.system(size: 11))
@@ -67,16 +75,7 @@ struct EnvironmentTabView: View {
                 Spacer()
 
                 if script != nil {
-                    Button(action: onRestart) {
-                        HStack(spacing: 4) {
-                            Image(systemName: "arrow.counterclockwise")
-                                .font(.system(size: 10))
-                            Text(restartLabel)
-                                .font(.system(size: 11))
-                        }
-                    }
-                    .buttonStyle(.borderless)
-                    .accessibilityLabel(restartLabel)
+                    EnvActionButton(label: restartLabel, icon: "arrow.counterclockwise", shortcut: shortcut, action: onRestart)
                 }
             }
             .padding(.horizontal, 10)
@@ -85,7 +84,6 @@ struct EnvironmentTabView: View {
 
             Divider()
 
-            // Content
             if restarting {
                 Color.clear
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
@@ -107,8 +105,8 @@ struct EnvironmentTabView: View {
     @ViewBuilder
     private func runPane() -> some View {
         let title = NSLocalizedString("Run", comment: "")
+        let shortcut = "⌃⇧R"
         VStack(spacing: 0) {
-            // Header bar
             HStack {
                 Image(systemName: "play")
                     .font(.system(size: 11))
@@ -128,28 +126,9 @@ struct EnvironmentTabView: View {
 
                 if scriptConfig.run != nil {
                     if runStarted {
-                        Button(action: restartRun) {
-                            HStack(spacing: 4) {
-                                Image(systemName: "arrow.counterclockwise")
-                                    .font(.system(size: 10))
-                                Text(NSLocalizedString("Rerun", comment: ""))
-                                    .font(.system(size: 11))
-                            }
-                        }
-                        .buttonStyle(.borderless)
-                        .accessibilityLabel(NSLocalizedString("Rerun", comment: ""))
+                        EnvActionButton(label: NSLocalizedString("Rerun", comment: ""), icon: "arrow.counterclockwise", shortcut: shortcut, action: restartRun)
                     } else {
-                        Button(action: { runStarted = true }) {
-                            HStack(spacing: 4) {
-                                Image(systemName: "play.fill")
-                                    .font(.system(size: 10))
-                                Text(NSLocalizedString("Start", comment: ""))
-                                    .font(.system(size: 11))
-                            }
-                        }
-                        .buttonStyle(.borderless)
-                        .help(String(format: NSLocalizedString("Start %@ script", comment: ""), title.lowercased()))
-                        .accessibilityLabel(String(format: NSLocalizedString("Start %@ script", comment: ""), title.lowercased()))
+                        EnvActionButton(label: NSLocalizedString("Start", comment: ""), icon: "play.fill", shortcut: shortcut) { runStarted = true }
                     }
                 }
             }
@@ -159,7 +138,6 @@ struct EnvironmentTabView: View {
 
             Divider()
 
-            // Content
             if let script = scriptConfig.run {
                 if runStarted && !runRestarting {
                     SingleTerminalView(
@@ -170,7 +148,7 @@ struct EnvironmentTabView: View {
                         environmentVars: environmentVars
                     )
                     .id(runID)
-                } else {
+                } else if !runStarted {
                     VStack(spacing: 12) {
                         Button(action: { runStarted = true }) {
                             Image(systemName: "play.fill")
@@ -180,8 +158,14 @@ struct EnvironmentTabView: View {
                         Text(script)
                             .font(.system(size: 11, design: .monospaced))
                             .foregroundStyle(.tertiary)
+                        Text(shortcut)
+                            .font(.system(size: 10, design: .monospaced))
+                            .foregroundStyle(.quaternary)
                     }
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
+                } else {
+                    Color.clear
+                        .frame(maxWidth: .infinity, maxHeight: .infinity)
                 }
             } else {
                 scriptInstructions(title: title)
@@ -211,18 +195,18 @@ struct EnvironmentTabView: View {
         .frame(maxWidth: .infinity, maxHeight: .infinity)
     }
 
-    private func killTmuxSession(role: String) {
-        guard useTmux, let tmuxPath = appEnv.toolStatus.tmux.path else { return }
-        let session = TmuxSession.sessionName(project: projectName, workstream: workstreamName, role: role)
-        TmuxSession.killSession(tmuxPath: tmuxPath, sessionName: session)
-    }
-
     private func buildCommand(script: String, role: String) -> String {
         if useTmux, let tmuxPath = appEnv.toolStatus.tmux.path {
             let session = TmuxSession.sessionName(project: projectName, workstream: workstreamName, role: role)
             return TmuxSession.wrapCommand(tmuxPath: tmuxPath, sessionName: session, command: script)
         }
         return script
+    }
+
+    private func killTmuxSession(role: String) {
+        guard useTmux, let tmuxPath = appEnv.toolStatus.tmux.path else { return }
+        let session = TmuxSession.sessionName(project: projectName, workstream: workstreamName, role: role)
+        TmuxSession.killSession(tmuxPath: tmuxPath, sessionName: session)
     }
 
     private func restartSetup() {
@@ -245,5 +229,39 @@ struct EnvironmentTabView: View {
             runRestarting = false
             runStarted = true
         }
+    }
+}
+
+extension Notification.Name {
+    static let rebuildSetup = Notification.Name("factoryfloor.rebuildSetup")
+    static let rerunScript = Notification.Name("factoryfloor.rerunScript")
+}
+
+private struct EnvActionButton: View {
+    let label: String
+    let icon: String
+    let shortcut: String
+    let action: () -> Void
+    @State private var isHovering = false
+
+    var body: some View {
+        Button(action: action) {
+            HStack(spacing: 4) {
+                Image(systemName: icon)
+                    .font(.system(size: 10))
+                Text(label)
+                    .font(.system(size: 11))
+                Text(shortcut)
+                    .font(.system(size: 9, design: .monospaced))
+                    .foregroundStyle(.tertiary)
+            }
+            .padding(.horizontal, 6)
+            .padding(.vertical, 2)
+            .background(isHovering ? Color.primary.opacity(0.08) : Color.clear)
+            .clipShape(RoundedRectangle(cornerRadius: 4))
+        }
+        .buttonStyle(.borderless)
+        .onHover { isHovering = $0 }
+        .accessibilityLabel(label)
     }
 }
