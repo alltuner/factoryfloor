@@ -42,7 +42,7 @@ jobs:
         run: brew install xcodegen zig
 
       - name: Cache SPM packages
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         with:
           path: |
             build/derived/SourcePackages
@@ -51,7 +51,7 @@ jobs:
 
       - name: Cache Ghostty xcframework
         id: ghostty-cache
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         with:
           path: ghostty/macos/GhosttyKit.xcframework
           key: ghostty-xcframework-${{ hashFiles('ghostty/.git') }}
