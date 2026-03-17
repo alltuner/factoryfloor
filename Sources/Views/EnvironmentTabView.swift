@@ -108,7 +108,7 @@ struct EnvironmentTabView: View {
             Text("No \(title.lowercased()) script configured")
                 .font(.system(size: 13))
                 .foregroundStyle(.secondary)
-            Text("Add a \(title.lowercased()) field to your .factoryfloor.json:")
+            Text("Add a \(title.lowercased()) field to .factoryfloor.json:")
                 .font(.system(size: 11))
                 .foregroundStyle(.tertiary)
             Text("{ \"\(title.lowercased())\": \"your-command\" }")
@@ -118,6 +118,9 @@ struct EnvironmentTabView: View {
                 .background(Color.primary.opacity(0.05))
                 .clipShape(RoundedRectangle(cornerRadius: 4))
                 .foregroundStyle(.secondary)
+            Text("Also picks up scripts from .emdash.json, conductor.json, and .superset/config.json.")
+                .font(.system(size: 10))
+                .foregroundStyle(.quaternary)
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
     }
