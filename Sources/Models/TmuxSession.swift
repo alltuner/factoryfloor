@@ -53,7 +53,8 @@ enum TmuxSession {
         // -L uses a dedicated socket, -f uses our minimal config
         let base = "\(tmuxPath) -L \(socketName) -f \(conf) new-session -A -s \(escaped)"
         if let command {
-            return "\(base) \(command)"
+            let escapedCommand = shellEscape(command)
+            return "\(base) -- sh -c \(escapedCommand)"
         }
         return base
     }
