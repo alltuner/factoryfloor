@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.1.4](https://github.com/alltuner/factoryfloor/compare/v0.1.3...v0.1.4) (2026-03-17)
+
+
+### Bug Fixes
+
+* **ci:** skip ghostty app bundle build, only emit xcframework ([#12](https://github.com/alltuner/factoryfloor/issues/12)) ([c5844b3](https://github.com/alltuner/factoryfloor/commit/c5844b3b9203419281d0f61069b2dcb6307b1d9f))
+
 ## [0.1.3](https://github.com/alltuner/factoryfloor/compare/v0.1.2...v0.1.3) (2026-03-17)
 
 
