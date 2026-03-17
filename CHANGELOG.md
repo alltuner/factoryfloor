@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.1.14](https://github.com/alltuner/factoryfloor/compare/v0.1.13...v0.1.14) (2026-03-17)
+
+
+### Bug Fixes
+
+* **ci:** use correct xcodegen-action version tag (1.2.4, no v prefix) ([#36](https://github.com/alltuner/factoryfloor/issues/36)) ([70e79a6](https://github.com/alltuner/factoryfloor/commit/70e79a624e090429cb2e1e97a35ff67421dd76ed))
+
 ## [0.1.13](https://github.com/alltuner/factoryfloor/compare/v0.1.12...v0.1.13) (2026-03-17)
 
 
