@@ -137,6 +137,7 @@ When adding, removing, or changing keyboard shortcuts:
 Current shortcuts:
 - **Cmd+Return**: Focus Coding Agent
 - **Cmd+I**: Info panel
+- **Cmd+E**: Environment
 - **Cmd+T**: New Terminal
 - **Cmd+B**: New Browser
 - **Cmd+W**: Close tab

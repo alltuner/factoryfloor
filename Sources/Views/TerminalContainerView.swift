@@ -190,7 +190,7 @@ struct TerminalContainerView: View {
                         .foregroundStyle(.secondary)
                     Text("Install Claude Code to use the Coding Agent.")
                         .foregroundStyle(.tertiary)
-                    Link("Install Claude Code", destination: URL(string: "https://claude.ai/claude-code")!)
+                    Link("Install Claude Code", destination: URL(string: "https://docs.anthropic.com/en/docs/claude-code/overview")!)
                         .buttonStyle(.bordered)
                 }
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
@@ -571,13 +571,6 @@ final class TerminalSurfaceCache: ObservableObject {
     func removeSurface(for id: UUID) {
         surfaces.removeValue(forKey: id)
         surfaceParams.removeValue(forKey: id)
-    }
-
-    /// Unfocus all surfaces except the given one.
-    func focusExclusively(_ id: UUID) {
-        for (surfaceID, view) in surfaces {
-            view.setFocused(surfaceID == id)
-        }
     }
 
     func removeWorkstreamSurfaces(for workstreamID: UUID) {

@@ -82,6 +82,7 @@ Every workstream terminal has access to:
 |---|---|
 | `Cmd+Return` | Focus Coding Agent |
 | `Cmd+I` | Info panel |
+| `Cmd+E` | Environment |
 | `Cmd+T` | New Terminal |
 | `Cmd+B` | New Browser |
 | `Cmd+W` | Close tab |
@@ -171,7 +172,7 @@ All strings are localized. To add a language:
 Factory Floor is built on the shoulders of these projects:
 
 - **[Ghostty](https://ghostty.org)** — GPU-accelerated terminal engine (Metal-rendered via libghostty)
-- **[Claude Code](https://claude.ai/claude-code)** — AI coding agent by Anthropic
+- **[Claude Code](https://docs.anthropic.com/en/docs/claude-code/overview)** — AI coding agent by Anthropic
 - **[XcodeGen](https://github.com/yonaskolb/XcodeGen)** — Xcode project generation from `project.yml`
 - **[cmark-gfm](https://github.com/github/cmark-gfm)** — GitHub Flavored Markdown rendering (via [swift-cmark](https://github.com/swiftlang/swift-cmark))
 - **[Hugo](https://gohugo.io)** + **[Tailwind CSS](https://tailwindcss.com)** — Website
