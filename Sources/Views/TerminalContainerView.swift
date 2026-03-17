@@ -220,6 +220,7 @@ struct TerminalContainerView: View {
             if scriptConfig.hasAnyScript && !tabs.contains(.environment) {
                 tabs.insert(.environment, at: 2)
             }
+            preloadSurfaces()
         }
         .onChange(of: tmuxMode) { _ in cachedClaudeCommand = buildClaudeCommand() }
         .onChange(of: bypassPermissions) { _ in cachedClaudeCommand = buildClaudeCommand() }
@@ -287,9 +288,9 @@ struct TerminalContainerView: View {
 
     private func tabLabel(_ tab: WorkspaceTab) -> String? {
         switch tab {
-        case .info: return "Info"
-        case .agent: return "Agent"
-        case .environment: return "Environment"
+        case .info: return NSLocalizedString("Info", comment: "")
+        case .agent: return NSLocalizedString("Agent", comment: "")
+        case .environment: return NSLocalizedString("Environment", comment: "")
         case .terminal(let id):
             guard let title = terminalTitles[id], !title.isEmpty else { return nil }
             return title.count > 20 ? String(title.prefix(20)) + "..." : title
@@ -353,6 +354,54 @@ struct TerminalContainerView: View {
             let newIndex = min(index, tabs.count - 1)
             activeTab = tabs[newIndex]
         }
+    }
+
+    /// Pre-create terminal surfaces so they start running before their tab is visible.
+    private func preloadSurfaces() {
+        guard let app = TerminalApp.shared.app else { return }
+
+        // Agent surface
+        if let cmd = cachedClaudeCommand {
+            _ = surfaceCache.surface(
+                for: claudeID,
+                app: app,
+                workingDirectory: workingDirectory,
+                command: cmd,
+                environmentVars: envVars
+            )
+        }
+
+        // Environment script surfaces
+        if let setup = scriptConfig.setup {
+            let setupID = derivedUUID(from: workstreamID, salt: "env-setup-0")
+            let cmd = buildEnvironmentCommand(script: setup, role: "setup")
+            _ = surfaceCache.surface(
+                for: setupID,
+                app: app,
+                workingDirectory: workingDirectory,
+                command: cmd,
+                environmentVars: terminalEnvVars
+            )
+        }
+        if let run = scriptConfig.run {
+            let runID = derivedUUID(from: workstreamID, salt: "env-run-0")
+            let cmd = buildEnvironmentCommand(script: run, role: "run")
+            _ = surfaceCache.surface(
+                for: runID,
+                app: app,
+                workingDirectory: workingDirectory,
+                command: cmd,
+                environmentVars: terminalEnvVars
+            )
+        }
+    }
+
+    private func buildEnvironmentCommand(script: String, role: String) -> String {
+        if useTmux, let tmuxPath = appEnv.toolStatus.tmux.path {
+            let session = TmuxSession.sessionName(project: projectName, workstream: workstreamName, role: role)
+            return TmuxSession.wrapCommand(tmuxPath: tmuxPath, sessionName: session, command: script)
+        }
+        return script
     }
 
     /// Env vars for plain terminal tabs. Clears tmux vars to prevent inheritance.
