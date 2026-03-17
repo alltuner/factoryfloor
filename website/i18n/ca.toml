@@ -76,7 +76,7 @@ other = "Un worktree nou amb branch, sessió de Claude Code, terminal i tab de b
 [step3_title]
 other = "Programa amb IA"
 [step3_desc]
-other = "L'agent renomena el branch per la tasca. Els setup scripts instal·len dependències. Canvia entre workstreams sense perdre estat."
+other = "L'agent adapta el nom de la branca a la tasca. Els setup scripts instal·len dependències. Canvia entre workstreams sense perdre estat."
 
 # Config
 [config_label]
