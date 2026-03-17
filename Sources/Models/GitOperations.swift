@@ -2,6 +2,9 @@
 // ABOUTME: Handles repo detection, init, worktree create/remove, and repo info.
 
 import Foundation
+import OSLog
+
+private let logger = Logger(subsystem: "factoryfloor", category: "git")
 
 struct GitRepoInfo: Sendable {
     let isRepo: Bool
@@ -230,7 +233,7 @@ enum GitOperations {
 
     private static func run(args: [String], in directory: String) -> String? {
         guard let gitPath else {
-            NSLog("[FF] git run: gitPath is nil")
+            logger.warning("[FF] git run: gitPath is nil")
             return nil
         }
         let process = Process()
@@ -247,13 +250,13 @@ enum GitOperations {
             let errData = errPipe.fileHandleForReading.readDataToEndOfFile()
             let errStr = String(data: errData, encoding: .utf8) ?? ""
             guard process.terminationStatus == 0 else {
-                NSLog("[FF] git \(args.joined(separator: " ")) failed (exit \(process.terminationStatus)): \(errStr)")
+                logger.warning("[FF] git \(args.joined(separator: " "), privacy: .public) failed (exit \(process.terminationStatus, privacy: .public)): \(errStr, privacy: .public)")
                 return nil
             }
             let data = pipe.fileHandleForReading.readDataToEndOfFile()
             return String(data: data, encoding: .utf8)
         } catch {
-            NSLog("[FF] git \(args.joined(separator: " ")) threw: \(error)")
+            logger.warning("[FF] git \(args.joined(separator: " "), privacy: .public) threw: \(error, privacy: .public)")
             return nil
         }
     }

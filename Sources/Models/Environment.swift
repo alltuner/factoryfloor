@@ -2,6 +2,9 @@
 // ABOUTME: Shared across the app as an environment object with async background updates.
 
 import SwiftUI
+import OSLog
+
+private let logger = Logger(subsystem: "factoryfloor", category: "environment")
 
 @MainActor
 final class AppEnvironment: ObservableObject {
@@ -113,7 +116,7 @@ final class AppEnvironment: ObservableObject {
                 var isDir: ObjCBool = false
                 let exists = FileManager.default.fileExists(atPath: project.directory, isDirectory: &isDir) && isDir.boolValue
                 if !exists {
-                    NSLog("[FF] refreshPathValidity: project \(project.name) directory MISSING: \(project.directory)")
+                    logger.warning("[FF] refreshPathValidity: project \(project.name, privacy: .public) directory MISSING: \(project.directory, privacy: .public)")
                     missing.insert(project.id)
                 }
 
