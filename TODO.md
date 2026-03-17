@@ -8,6 +8,10 @@
 
 - [ ] Auto-update mechanism (Sparkle): in-app update for direct DMG users
 - [ ] Swift 6 migration (strict concurrency), scoped in docs/swift6-migration.md
+- [ ] Restore full app state on launch (active tab within workstream. if user was on a custom browser or spawned terminal since those are not preserved, return to the info pane)
+- [ ] Right-click context menu on sidebar: workstream (copy branch name, copy worktree path), project (copy project path)
+- [ ] Port detection: auto-detect when run script opens a listening port, point browser to it (scoped in docs/port-detection.md)
+
 - [ ] Crash reporting
 
 ## Future
@@ -17,7 +21,7 @@
 - [ ] Horizontal terminal splits within a tab (ghostty C API supports splits)
 - [ ] Drag-and-drop to reorder tabs
 - [ ] System notifications when agent needs attention (bell/urgency from Ghostty)
-- [ ] Restore full app state on launch (active tab within workstream)
+- [ ] Restore full app state on launch (active tab within workstream. if user was on a custom browser or spawned terminal since those are not preserved, return to the info pane)
 - [ ] Right-click context menu on sidebar: workstream (copy branch name, copy worktree path), project (copy project path)
 - [ ] Port detection: auto-detect when run script opens a listening port, point browser to it (scoped in docs/port-detection.md)
 
