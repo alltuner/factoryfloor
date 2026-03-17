@@ -1,5 +1,18 @@
 # Changelog
 
+## [0.1.10](https://github.com/alltuner/factoryfloor/compare/v0.1.9...v0.1.10) (2026-03-17)
+
+
+### Performance
+
+* **ci:** cache ghostty xcframework between builds ([#26](https://github.com/alltuner/factoryfloor/issues/26)) ([1d51987](https://github.com/alltuner/factoryfloor/commit/1d519873cecf52acf6ffee39c0d47ddd7f52b5a9))
+* **ci:** cache SPM packages between builds ([#29](https://github.com/alltuner/factoryfloor/issues/29)) ([960b037](https://github.com/alltuner/factoryfloor/commit/960b03734755023fa4086987a4dfd15031f843a1))
+
+
+### Miscellaneous
+
+* **deps:** update actions/cache action to v5 ([#27](https://github.com/alltuner/factoryfloor/issues/27)) ([c506297](https://github.com/alltuner/factoryfloor/commit/c50629746d9936178b63399901f82dde0bbb14a2))
+
 ## [0.1.9](https://github.com/alltuner/factoryfloor/compare/v0.1.8...v0.1.9) (2026-03-17)
 
 
