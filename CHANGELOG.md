@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.1.9](https://github.com/alltuner/factoryfloor/compare/v0.1.8...v0.1.9) (2026-03-17)
+
+
+### Bug Fixes
+
+* pass env vars to tmux sessions via -e flags ([#24](https://github.com/alltuner/factoryfloor/issues/24)) ([596f731](https://github.com/alltuner/factoryfloor/commit/596f7313c0a97dfb6ad092b3fb8ea2065d278681))
+
 ## [0.1.8](https://github.com/alltuner/factoryfloor/compare/v0.1.7...v0.1.8) (2026-03-17)
 
 
