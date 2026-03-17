@@ -39,7 +39,7 @@ struct BrowserView: View {
                     Image(systemName: "chevron.right")
                         .font(.system(size: 12, weight: .semibold))
                 }
-                .buttonStyle(.plain)
+                .buttonStyle(.borderless)
                 .disabled(!canGoForward)
                 .foregroundStyle(canGoForward ? .primary : .quaternary)
                 .accessibilityLabel("Forward")
@@ -50,14 +50,14 @@ struct BrowserView: View {
                     Image(systemName: isLoading ? "xmark" : "arrow.clockwise")
                         .font(.system(size: 11))
                 }
-                .buttonStyle(.plain)
+                .buttonStyle(.borderless)
                 .accessibilityLabel(isLoading ? "Stop loading" : "Reload")
 
                 Button(action: { navigateTo(defaultURL) }) {
                     Image(systemName: "house")
                         .font(.system(size: 11))
                 }
-                .buttonStyle(.plain)
+                .buttonStyle(.borderless)
                 .accessibilityLabel("Home")
 
                 TextField("URL", text: $urlText)
