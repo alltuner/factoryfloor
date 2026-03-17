@@ -96,7 +96,7 @@ targets:
           mkdir -p "${TARGET_BUILD_DIR}/${CONTENTS_FOLDER_PATH}/Helpers"
           cp -f "${BUILT_PRODUCTS_DIR}/ff-run" "${TARGET_BUILD_DIR}/${CONTENTS_FOLDER_PATH}/Helpers/ff-run"
           chmod +x "${TARGET_BUILD_DIR}/${CONTENTS_FOLDER_PATH}/Helpers/ff-run"
-          codesign --force --sign "${EXPANDED_CODE_SIGN_IDENTITY}" --timestamp --generate-entitlement-der "${TARGET_BUILD_DIR}/${CONTENTS_FOLDER_PATH}/Helpers/ff-run"
+          codesign --force --sign "${EXPANDED_CODE_SIGN_IDENTITY}" --timestamp --options=runtime --generate-entitlement-der "${TARGET_BUILD_DIR}/${CONTENTS_FOLDER_PATH}/Helpers/ff-run"
         name: Bundle ff-run
         outputFiles:
           - $(TARGET_BUILD_DIR)/$(CONTENTS_FOLDER_PATH)/Helpers/ff-run

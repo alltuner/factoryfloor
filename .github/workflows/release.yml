@@ -74,6 +74,9 @@ jobs:
             DEVELOPMENT_TEAM=J5TAY75Q3F \
             CODE_SIGN_IDENTITY="$SIGNING_IDENTITY" \
             CODE_SIGN_STYLE=Manual \
+            ENABLE_HARDENED_RUNTIME=YES \
+            CODE_SIGN_INJECT_BASE_ENTITLEMENTS=NO \
+            OTHER_CODE_SIGN_FLAGS="--timestamp --options=runtime" \
             build
 
       - name: Package and sign
@@ -88,14 +91,31 @@ jobs:
 
           mkdir -p build/release
           cp -R "$APP_BUILT" "build/release/${APP_NAME}.app"
+          APP="build/release/${APP_NAME}.app"
+
+          # Re-sign embedded frameworks with secure timestamp
+          find "$APP/Contents/Frameworks" -type f -perm +111 -o -name "*.dylib" | while read -r bin; do
+            codesign --force --sign "$SIGNING_IDENTITY" --timestamp "$bin"
+          done
+
+          # Re-sign helpers with hardened runtime and secure timestamp
+          find "$APP/Contents/Helpers" -type f -perm +111 | while read -r bin; do
+            codesign --force --sign "$SIGNING_IDENTITY" --timestamp --options=runtime "$bin"
+          done
+
+          # Re-sign the main app bundle (deep sign to catch anything missed)
+          codesign --force --sign "$SIGNING_IDENTITY" --timestamp --options=runtime \
+            --entitlements Resources/ff2.entitlements --deep "$APP"
+
+          codesign --verify --verbose=2 --deep --strict "$APP"
 
           DMG_NAME="FactoryFloor-${VERSION}.dmg"
           hdiutil create -volname "$APP_NAME" \
-            -srcfolder "build/release/${APP_NAME}.app" \
+            -srcfolder "$APP" \
             -ov -format UDZO \
             "build/release/$DMG_NAME"
 
-          codesign --sign "$SIGNING_IDENTITY" "build/release/$DMG_NAME"
+          codesign --sign "$SIGNING_IDENTITY" --timestamp "build/release/$DMG_NAME"
 
           echo "DMG_NAME=$DMG_NAME" >> "$GITHUB_ENV"
 
