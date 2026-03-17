@@ -38,7 +38,7 @@ jobs:
         with:
           submodules: true
 
-      - uses: xavierLowmiller/xcodegen-action@v1
+      - uses: xavierLowmiller/xcodegen-action@1.2.4
         with:
           install: true
           run: false
