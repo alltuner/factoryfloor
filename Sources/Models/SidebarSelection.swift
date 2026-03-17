@@ -46,7 +46,9 @@ enum SidebarSelection: Hashable, Codable {
     }
 
     func save() {
-        guard let data = try? JSONEncoder().encode(self) else { return }
+        let encoder = JSONEncoder()
+        encoder.outputFormatting = [.prettyPrinted, .sortedKeys]
+        guard let data = try? encoder.encode(self) else { return }
         do {
             try FilePersistence.writeAtomically(data, to: Self.fileURL)
         } catch {
@@ -79,7 +81,9 @@ enum SidebarState {
     }
 
     static func saveExpanded(_ ids: Set<UUID>) {
-        guard let data = try? JSONEncoder().encode(ids) else { return }
+        let encoder = JSONEncoder()
+        encoder.outputFormatting = [.prettyPrinted, .sortedKeys]
+        guard let data = try? encoder.encode(ids) else { return }
         do {
             try FilePersistence.writeAtomically(data, to: fileURL)
         } catch {

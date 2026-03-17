@@ -369,7 +369,9 @@ enum ProjectStore {
     }
 
     static func save(_ projects: [Project]) {
-        guard let data = try? JSONEncoder().encode(projects) else { return }
+        let encoder = JSONEncoder()
+        encoder.outputFormatting = [.prettyPrinted, .sortedKeys]
+        guard let data = try? encoder.encode(projects) else { return }
         do {
             try FilePersistence.writeAtomically(data, to: fileURL)
         } catch {
