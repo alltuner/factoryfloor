@@ -15,12 +15,12 @@ final class TerminalView: NSView {
     /// Maps ghostty surface pointers to their owning views.
     nonisolated(unsafe) static var surfaceRegistry: [UnsafeMutableRawPointer: TerminalView] = [:]
 
-    static func view(for surface: ghostty_surface_t) -> TerminalView? {
+    nonisolated static func view(for surface: ghostty_surface_t) -> TerminalView? {
         surfaceRegistry[surface]
     }
 
     nonisolated(unsafe) private(set) var surface: ghostty_surface_t?
-    var workstreamID: UUID?
+    nonisolated(unsafe) var workstreamID: UUID?
     private var trackingArea: NSTrackingArea?
     private var markedText = NSMutableAttributedString()
     private var keyTextAccumulator: [String]?

@@ -6,6 +6,118 @@ import os
 
 private let logger = Logger(subsystem: "factoryfloor", category: "terminal-app")
 
+private func handleTerminalWakeup(_ userdata: UnsafeMutableRawPointer?) {
+    guard let userdata else { return }
+    let userdataBits = UInt(bitPattern: userdata)
+    DispatchQueue.main.async {
+        let userdata = UnsafeMutableRawPointer(bitPattern: userdataBits)!
+        let app = Unmanaged<TerminalApp>.fromOpaque(userdata).takeUnretainedValue()
+        app.tick()
+    }
+}
+
+private func handleTerminalAction(
+    _ userdata: UnsafeMutableRawPointer?,
+    _ target: ghostty_target_s,
+    _ action: ghostty_action_s
+) -> Bool {
+    guard target.tag == GHOSTTY_TARGET_SURFACE else { return false }
+    switch action.tag {
+    case GHOSTTY_ACTION_SET_TITLE:
+        guard let cstr = action.action.set_title.title else { return false }
+        let title = String(cString: cstr)
+        guard let view = TerminalView.view(for: target.target.surface),
+              let wsID = view.workstreamID else { return false }
+        DispatchQueue.main.async {
+            NotificationCenter.default.post(
+                name: .terminalTitleChanged,
+                object: wsID,
+                userInfo: ["title": title]
+            )
+        }
+        return true
+    default:
+        return false
+    }
+}
+
+private func readTerminalClipboard(
+    _ userdata: UnsafeMutableRawPointer?,
+    _ location: ghostty_clipboard_e,
+    _ state: UnsafeMutableRawPointer?
+) -> Bool {
+    guard let userdata else { return false }
+    guard let state else { return false }
+    let userdataBits = UInt(bitPattern: userdata)
+    let stateBits = UInt(bitPattern: state)
+
+    if Thread.isMainThread {
+        return completeClipboardRead(userdataBits: userdataBits, stateBits: stateBits)
+    }
+    return DispatchQueue.main.sync {
+        completeClipboardRead(userdataBits: userdataBits, stateBits: stateBits)
+    }
+}
+
+private func writeTerminalClipboard(
+    _ userdata: UnsafeMutableRawPointer?,
+    _ location: ghostty_clipboard_e,
+    _ content: UnsafePointer<ghostty_clipboard_content_s>?,
+    _ len: Int,
+    _ confirm: Bool
+) {
+    guard let content, len > 0 else { return }
+    let entries = (0..<len).compactMap { index -> String? in
+        let item = content[index]
+        guard let mime = item.mime, let data = item.data else { return nil }
+        let mimeStr = String(cString: mime)
+        guard mimeStr == "text/plain" else { return nil }
+        return String(cString: data)
+    }
+    guard let plainText = entries.first else { return }
+
+    if Thread.isMainThread {
+        writeClipboardText(plainText)
+    } else {
+        DispatchQueue.main.sync {
+            writeClipboardText(plainText)
+        }
+    }
+}
+
+private func closeTerminalSurface(
+    _ userdata: UnsafeMutableRawPointer?,
+    _ processAlive: Bool
+) {
+    guard let userdata else { return }
+    let userdataBits = UInt(bitPattern: userdata)
+    DispatchQueue.main.async {
+        let userdata = UnsafeMutableRawPointer(bitPattern: userdataBits)!
+        let surfaceView = Unmanaged<TerminalView>.fromOpaque(userdata).takeUnretainedValue()
+        surfaceView.surfaceClosed()
+    }
+}
+
+private func completeClipboardRead(userdataBits: UInt, stateBits: UInt) -> Bool {
+    let pasteboard = NSPasteboard.general
+    guard let str = pasteboard.string(forType: .string) else { return false }
+
+    let userdata = UnsafeMutableRawPointer(bitPattern: userdataBits)!
+    let state = UnsafeMutableRawPointer(bitPattern: stateBits)!
+    let surfaceView = Unmanaged<TerminalView>.fromOpaque(userdata).takeUnretainedValue()
+    guard let surface = surfaceView.surface else { return false }
+    str.withCString { cstr in
+        ghostty_surface_complete_clipboard_request(surface, cstr, state, true)
+    }
+    return true
+}
+
+private func writeClipboardText(_ plainText: String) {
+    let pasteboard = NSPasteboard.general
+    pasteboard.clearContents()
+    pasteboard.setString(plainText, forType: .string)
+}
+
 @MainActor
 final class TerminalApp {
     static let shared = TerminalApp()
@@ -25,93 +137,12 @@ final class TerminalApp {
         var runtimeConfig = ghostty_runtime_config_s(
             userdata: Unmanaged.passUnretained(self).toOpaque(),
             supports_selection_clipboard: false,
-            wakeup_cb: { userdata in
-                guard let userdata else { return }
-                let app = Unmanaged<TerminalApp>.fromOpaque(userdata).takeUnretainedValue()
-                DispatchQueue.main.async {
-                    MainActor.assumeIsolated {
-                        app.tick()
-                    }
-                }
-            },
-            action_cb: { _, target, action in
-                MainActor.assumeIsolated {
-                    guard target.tag == GHOSTTY_TARGET_SURFACE else { return false }
-                    switch action.tag {
-                    case GHOSTTY_ACTION_SET_TITLE:
-                        guard let cstr = action.action.set_title.title else { return false }
-                        let title = String(cString: cstr)
-                        guard let view = TerminalView.view(for: target.target.surface),
-                              let wsID = view.workstreamID else { return false }
-                        NotificationCenter.default.post(
-                            name: .terminalTitleChanged,
-                            object: wsID,
-                            userInfo: ["title": title]
-                        )
-                        return true
-                    default:
-                        return false
-                    }
-                }
-            },
-            read_clipboard_cb: { userdata, location, state in
-                guard let userdata else { return false }
-                guard let state else { return false }
-
-                let performRead = {
-                    let pasteboard = NSPasteboard.general
-                    guard let str = pasteboard.string(forType: .string) else { return false }
-
-                    let surfaceView = Unmanaged<TerminalView>.fromOpaque(userdata).takeUnretainedValue()
-                    guard let surface = surfaceView.surface else { return false }
-                    str.withCString { cstr in
-                        ghostty_surface_complete_clipboard_request(surface, cstr, state, true)
-                    }
-                    return true
-                }
-                if Thread.isMainThread {
-                    return MainActor.assumeIsolated { performRead() }
-                }
-                return DispatchQueue.main.sync {
-                    MainActor.assumeIsolated { performRead() }
-                }
-            },
+            wakeup_cb: handleTerminalWakeup,
+            action_cb: handleTerminalAction,
+            read_clipboard_cb: readTerminalClipboard,
             confirm_read_clipboard_cb: nil,
-            write_clipboard_cb: { userdata, location, content, len, confirm in
-                guard let content, len > 0 else { return }
-
-                let performWrite = {
-                    // Find the text/plain entry
-                    for i in 0..<len {
-                        let item = content[i]
-                        guard let mime = item.mime, let data = item.data else { continue }
-                        let mimeStr = String(cString: mime)
-                        if mimeStr == "text/plain" {
-                            let str = String(cString: data)
-                            let pasteboard = NSPasteboard.general
-                            pasteboard.clearContents()
-                            pasteboard.setString(str, forType: .string)
-                            break
-                        }
-                    }
-                }
-                if Thread.isMainThread {
-                    MainActor.assumeIsolated { performWrite() }
-                } else {
-                    DispatchQueue.main.sync {
-                        MainActor.assumeIsolated { performWrite() }
-                    }
-                }
-            },
-            close_surface_cb: { userdata, processAlive in
-                guard let userdata else { return }
-                let surfaceView = Unmanaged<TerminalView>.fromOpaque(userdata).takeUnretainedValue()
-                DispatchQueue.main.async {
-                    MainActor.assumeIsolated {
-                        surfaceView.surfaceClosed()
-                    }
-                }
-            }
+            write_clipboard_cb: writeTerminalClipboard,
+            close_surface_cb: closeTerminalSurface
         )
 
         guard let app = ghostty_app_new(&runtimeConfig, config) else {
@@ -148,7 +179,7 @@ final class TerminalApp {
         }
     }
 
-    private func tick() {
+    fileprivate func tick() {
         guard let app else { return }
         ghostty_app_tick(app)
     }
