@@ -25,6 +25,9 @@
 - [ ] Notify user when a project directory is removed from disk (currently silently removes from sidebar)
 - [ ] Onboarding: explain prerequisites (claude, gh), what a workstream is, Cmd+N contextual behavior
 - [ ] Execute the `run` script from .factoryfloor.json (currently loaded and displayed but never run)
+- [ ] Show error dialog when ghostty_init or ghostty_app_new fails (currently crashes or shows blank)
+- [ ] ToolRow: add shape/text indicator alongside color dot for authentication status (color-only info)
+- [ ] Add copy-branch-name button alongside copy-path in workstream info header
 
 ## Accessibility
 
@@ -42,6 +45,10 @@
 - [ ] Localization: add missing strings for Settings sections, HelpView, BrowserView error UI, ProjectOverviewView
 - [ ] Remove stale unused keys from Localizable.strings files
 - [ ] surfaceRegistry thread safety: confirm ghostty callback threading contract
+- [ ] Fix derivedUUID misleading comment (says SHA-256 but uses simple byte folding)
+- [ ] Cache claudeCommand computed property (builds CommandBuilder on every render)
+- [ ] Consolidate polling timers (15s in ContentView + 30s in TerminalContainerView per workstream)
+- [ ] Parallelize refreshPathValidity git calls (currently 4N sequential subprocesses)
 
 ## Future
 
