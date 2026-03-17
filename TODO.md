@@ -31,9 +31,9 @@
 
 ## Accessibility
 
-- [ ] Add accessibilityLabel/accessibilityHint to all interactive elements
-- [ ] Make hover-only actions (archive, delete, add) reachable via keyboard
-- [ ] Restore focus rings on .buttonStyle(.plain) buttons for keyboard navigation
+- [x] Add accessibilityLabel/accessibilityHint to all interactive elements
+- [x] Make hover-only actions (archive, delete, add) visible via opacity when not hovered
+- [x] Restore focus rings on .buttonStyle(.plain) buttons (.borderless) for keyboard navigation
 
 ## Code Quality
 
@@ -42,13 +42,13 @@
 - [ ] Remove dead bleedingEdge setting (toggle exists but nothing reads it, keep for future auto-update)
 - [x] Remove dead retryBrowser notification (declared and observed but never posted)
 - [x] ToolStatus.detect: remove misleading async signature (contains no await)
-- [ ] Localization: add missing strings for Settings sections, HelpView, BrowserView error UI, ProjectOverviewView
+- [x] Localization: add missing strings for Settings sections, HelpView, BrowserView error UI, ProjectOverviewView
 - [ ] Remove stale unused keys from Localizable.strings files
 - [ ] surfaceRegistry thread safety: confirm ghostty callback threading contract
 - [x] Fix derivedUUID misleading comment (says SHA-256 but uses simple byte folding)
-- [ ] Cache claudeCommand computed property (builds CommandBuilder on every render)
+- [x] Cache claudeCommand computed property (builds CommandBuilder on every render)
 - [ ] Consolidate polling timers (15s in ContentView + 30s in TerminalContainerView per workstream)
-- [ ] Parallelize refreshPathValidity git calls (currently 4N sequential subprocesses)
+- [x] Parallelize refreshPathValidity git calls (TaskGroup)
 
 ## Future
 
