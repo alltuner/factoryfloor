@@ -84,7 +84,7 @@ other = "Automate your workstream lifecycle with setup, run, and teardown script
 [config_add]
 other = "Add a"
 [config_or_use]
-other = "to your repo, or use your existing config from"
+other = "to your project root."
 
 # Env vars
 [env_label]

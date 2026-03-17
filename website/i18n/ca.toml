@@ -44,7 +44,7 @@ other = "Les sessions d'agent sobreviuen reinicis via tmux en un socket dedicat.
 [feat_scripts_title]
 other = "Setup & Run Scripts"
 [feat_scripts_desc]
-other = "Configura scripts de setup, run i teardown per projecte. Compatible amb configs d'emdash, conductor i superset."
+other = "Configura scripts de setup, run i teardown per projecte via .factoryfloor.json."
 [feat_browser_title]
 other = "Browser integrat"
 [feat_browser_desc]
@@ -84,7 +84,7 @@ other = "Automatitza el cicle de vida dels workstreams amb scripts de setup, run
 [config_add]
 other = "Afegeix un"
 [config_or_use]
-other = "al repo, o usa la config existent de"
+other = "a l'arrel del projecte."
 
 # Env vars
 [env_label]

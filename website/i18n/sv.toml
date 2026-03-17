@@ -41,7 +41,7 @@ other = "Agent sessions överlever restarts via tmux på en dedicerad socket. In
 [feat_scripts_title]
 other = "Setup & run scripts"
 [feat_scripts_desc]
-other = "Konfigurera setup, run och teardown scripts per projekt. Kompatibelt med emdash, conductor och superset configs."
+other = "Konfigurera setup, run och teardown scripts per projekt via .factoryfloor.json."
 [feat_browser_title]
 other = "Inbyggd browser"
 [feat_browser_desc]
@@ -79,7 +79,7 @@ other = "Automatisera workstream-livscykeln med setup, run och teardown scripts.
 [config_add]
 other = "Lägg till en"
 [config_or_use]
-other = "i ditt repo, eller använd din befintliga config från"
+other = "i din projektrot."
 
 [env_label]
 other = "Environment"

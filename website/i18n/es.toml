@@ -42,7 +42,7 @@ other = "Las sesiones del agent sobreviven reinicios via tmux en un socket dedic
 [feat_scripts_title]
 other = "Setup & Run Scripts"
 [feat_scripts_desc]
-other = "Configura scripts de setup, run y teardown por proyecto. Compatible con configs de emdash, conductor y superset."
+other = "Configura scripts de setup, run y teardown por proyecto via .factoryfloor.json."
 [feat_browser_title]
 other = "Browser integrado"
 [feat_browser_desc]
@@ -80,7 +80,7 @@ other = "Automatiza el ciclo de vida de workstreams con scripts de setup, run y 
 [config_add]
 other = "Añade un"
 [config_or_use]
-other = "a tu repo, o usa tu config existente de"
+other = "a la raíz de tu proyecto."
 
 [env_label]
 other = "Entorno"
