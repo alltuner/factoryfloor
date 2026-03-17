@@ -20,8 +20,8 @@
     <div class="max-w-[480px] mx-auto mb-8">
       <p class="text-xs text-fg-muted font-mono mb-2">{{ T "get_upgrade" }}</p>
       <div class="flex items-center rounded-lg border border-fg-faint bg-bg-surface overflow-hidden">
-        <code class="flex-1 px-4 py-3 font-mono text-sm text-fg-dim select-all">brew upgrade --cask factoryfloor</code>
-        <button onclick="navigator.clipboard.writeText('brew upgrade --cask factoryfloor');this.querySelector('.icon-copy').classList.add('hidden');this.querySelector('.icon-check').classList.remove('hidden');setTimeout(()=>{this.querySelector('.icon-copy').classList.remove('hidden');this.querySelector('.icon-check').classList.add('hidden')},2000)" class="px-3 py-3 text-fg-muted hover:text-fg transition-colors border-l border-fg-faint hover:bg-fg-faint cursor-pointer bg-transparent" aria-label="Copy">
+        <code class="flex-1 px-4 py-3 font-mono text-sm text-fg-dim select-all">brew update && brew upgrade --cask factoryfloor</code>
+        <button onclick="navigator.clipboard.writeText('brew update && brew upgrade --cask factoryfloor');this.querySelector('.icon-copy').classList.add('hidden');this.querySelector('.icon-check').classList.remove('hidden');setTimeout(()=>{this.querySelector('.icon-copy').classList.remove('hidden');this.querySelector('.icon-check').classList.add('hidden')},2000)" class="px-3 py-3 text-fg-muted hover:text-fg transition-colors border-l border-fg-faint hover:bg-fg-faint cursor-pointer bg-transparent" aria-label="Copy">
           <svg class="icon-copy w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
           <svg class="icon-check w-4 h-4 hidden text-code-str" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
         </button>
