@@ -118,8 +118,9 @@ When a port is selected:
    watch the specific file for writes.
 
 3. **What happens if ff-run crashes?**
-   State file has `startedAt` timestamp. App ignores entries with
-   stale PIDs (check `kill(pid, 0)` before trusting the file).
+   The terminal shows the error, the shell stays alive (initialInput),
+   and the user hits Rerun. State file goes stale; app validates PID
+   with `kill(pid, 0)` before trusting it. No special recovery needed.
 
 4. **Should the user be able to disable port detection?**
    Not in v1. The feature is passive (only retargets default URLs).
