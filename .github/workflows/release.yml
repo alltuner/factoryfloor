@@ -38,7 +38,10 @@ jobs:
         with:
           submodules: true
 
-      - uses: irgendwie/setup-xcodegen@v1
+      - uses: xavierLowmiller/xcodegen-action@v1
+        with:
+          install: true
+          run: false
 
       - uses: mlugg/setup-zig@v2
         with:
