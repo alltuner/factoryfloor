@@ -65,7 +65,7 @@
 - [ ] Pin ghostty submodule update to CI (auto-test against new Ghostty releases)
 - [ ] Occlude non-visible terminal surfaces to save GPU (needs careful timing)
 - [ ] System notifications when agent needs attention (bell/urgency from Ghostty)
-- [ ] OG image: proper 1200x630 banner with app name and tagline for social sharing
+- [x] OG image: branded banner with app name, logo, and Poblenou skyline
 - [ ] Restore full app state on launch (active tab within workstream; sidebar selection and expanded state already persisted)
 
 ## Done
