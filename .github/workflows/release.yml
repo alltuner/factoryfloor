@@ -44,7 +44,7 @@ jobs:
       - name: Build Ghostty xcframework
         run: |
           cd ghostty
-          zig build -Demit-xcframework=true -Dxcframework-target=universal -Doptimize=ReleaseFast
+          zig build -Demit-xcframework=true -Demit-macos-app=false -Dxcframework-target=universal -Doptimize=ReleaseFast
 
       - name: Generate Xcode project
         run: xcodegen generate
