@@ -10,7 +10,7 @@
 <section class="min-h-screen flex flex-col pt-20 pb-16">
   <div class="max-w-[700px] mx-auto px-8 w-full">
     <h1 class="font-mono text-3xl font-bold mb-2">{{ .Title }}</h1>
-    <p class="text-fg-muted text-sm mb-10">Release history for Factory Floor</p>
+    <p class="text-fg-muted text-sm mb-10">{{ T "changelog_subtitle" }}</p>
 
     <div class="space-y-0">
       {{ range $i, $section := $sections }}

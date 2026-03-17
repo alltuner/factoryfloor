@@ -216,3 +216,7 @@ other = "Install"
 other = "Upgrade"
 [get_download]
 other = "Download from GitHub Releases"
+
+# Changelog
+[changelog_subtitle]
+other = "Release history for Factory Floor"

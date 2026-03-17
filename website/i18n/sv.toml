@@ -208,3 +208,7 @@ other = "Installera"
 other = "Uppgradera"
 [get_download]
 other = "Ladda ner från GitHub Releases"
+
+# Changelog
+[changelog_subtitle]
+other = "Versionshistorik för Factory Floor"

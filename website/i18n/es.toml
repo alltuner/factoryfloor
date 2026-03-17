@@ -209,3 +209,7 @@ other = "Instalar"
 other = "Actualizar"
 [get_download]
 other = "Descargar desde GitHub Releases"
+
+# Changelog
+[changelog_subtitle]
+other = "Historial de versiones de Factory Floor"
