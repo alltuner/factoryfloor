@@ -100,15 +100,6 @@ struct BrowserView: View {
                         Text(urlText)
                             .font(.system(.body, design: .monospaced))
                             .foregroundStyle(.tertiary)
-                        HStack(spacing: 4) {
-                            Text("Press")
-                            Text(Image(systemName: "command"))
-                            Text(Image(systemName: "shift"))
-                            Text("B to retry")
-                        }
-                        .font(.caption)
-                        .foregroundStyle(.secondary)
-
                         Button("Retry") { retry() }
                             .buttonStyle(.bordered)
                     }
@@ -122,9 +113,6 @@ struct BrowserView: View {
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
                 urlFieldFocused = true
             }
-        }
-        .onReceive(NotificationCenter.default.publisher(for: .retryBrowser)) { _ in
-            retry()
         }
         .onReceive(NotificationCenter.default.publisher(for: .focusAddressBar)) { _ in
             urlFieldFocused = true

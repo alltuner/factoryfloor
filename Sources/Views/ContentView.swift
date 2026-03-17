@@ -229,10 +229,13 @@ struct ContentView: View {
             ProjectStore.save(projects)
         }
         .onChange(of: selection) { oldValue, newValue in
-            if newValue == .settings {
+            if newValue == .settings || newValue == .help {
                 selectionBeforeSettings = oldValue
             }
-            newValue?.save()
+            // Don't persist settings/help as saved selection
+            if newValue != .settings && newValue != .help {
+                newValue?.save()
+            }
         }
         .onKeyPress(.escape) {
             if selection == .settings || selection == .help {

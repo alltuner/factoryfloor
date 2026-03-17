@@ -7,7 +7,6 @@ extension Notification.Name {
     static let openDirectory = Notification.Name("factoryfloor.openDirectory")
     static let openSettings = Notification.Name("factoryfloor.openSettings")
     static let openHelp = Notification.Name("factoryfloor.openHelp")
-    static let retryBrowser = Notification.Name("factoryfloor.retryBrowser")
     static let switchToProject = Notification.Name("factoryfloor.switchToProject")
     static let toggleSidebar = Notification.Name("factoryfloor.toggleSidebar")
     static let switchByNumber = Notification.Name("factoryfloor.switchByNumber") // object: Int (1-9)
