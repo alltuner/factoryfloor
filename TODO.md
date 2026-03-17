@@ -2,34 +2,23 @@
 
 ## Pre-release
 
-- [x] Homebrew tap (alltuner/homebrew-tap) and cask formula
-- [x] CI: automate build, sign, notarize, DMG, and release upload via GitHub Actions (secrets need configuring, see docs/distribution.md)
-- [x] Confirm before quit (Cmd+Q) when workstreams are active
-- [x] Browser tab: show page title in tab label
-- [x] Change workstream navigation shortcuts from Cmd+1-9 to Cmd+Shift+1-9 (Cmd+1-9 collides with terminal tab switching); make it work from within any workspace tab
-- [x] Website: legal/privacy policy page
-- [x] CONTRIBUTING.md guide
-- [x] CODE_OF_CONDUCT.md
-- [x] Funding: add Buy Me a Coffee and GitHub Sponsors options (website + FUNDING.yml)
 - [ ] Website: favicon, OG image, SEO meta tags
 
 ## Future
 
+- [ ] Swift 6 migration (strict concurrency)
 - [ ] External Chrome integration: launch with --remote-debugging-port for WebMCP/CDP
 - [ ] PR management: create and manage PRs from workstreams (currently view-only)
 - [ ] Auto-update mechanism (Sparkle or similar)
 - [ ] Crash reporting
 - [ ] Move persistence from UserDefaults to a proper file (for larger state)
-- [ ] Horizontal terminal splits within a tab (ghostty C API supports splits via action_cb, but surface lifecycle needs investigation; Cmd+D/Cmd+Shift+D keybinds conflict with ghostty's own keybind processing)
+- [ ] Horizontal terminal splits within a tab (ghostty C API supports splits via action_cb, but surface lifecycle needs investigation)
 - [ ] Preload Coding Agent terminal in background so it's ready when the user switches from Info tab
 - [ ] Drag-and-drop to reorder tabs
-- [ ] Website: favicon, OG image, SEO meta tags
 - [ ] Show project icon in info pages if found in a well-known location (e.g., icon.png, .github/icon.png)
 - [ ] Pin ghostty submodule update to CI (auto-test against new Ghostty releases)
 - [ ] Occlude non-visible terminal surfaces to save GPU (needs careful timing)
-- [ ] Swift 6 migration (strict concurrency)
 - [ ] System notifications when agent needs attention (bell/urgency from Ghostty)
-- [x] Terminal tab: show running command in tab label (via ghostty SET_TITLE action)
 - [ ] Restore full app state on launch (active tab within workstream; sidebar selection and expanded state already persisted)
 
 ## Done
@@ -53,7 +42,7 @@
 - [x] PR badge in workspace toolbar (links to GitHub PR)
 - [x] Info tab with README.md, CLAUDE.md, AGENTS.md (pinned header, scrollable docs)
 - [x] GitHub integration: repo info, open PRs, branch PR status (via gh CLI)
-- [x] Keyboard shortcuts: Cmd+Return (agent), Cmd+I (info), Cmd+T (terminal), Cmd+B (browser), Cmd+W (close tab), Cmd+1-9 (switch), Cmd+Shift+[/] (cycle), Cmd+/ (help)
+- [x] Keyboard shortcuts: Cmd+Return (agent), Cmd+I (info), Cmd+T (terminal), Cmd+B (browser), Cmd+W (close tab), Cmd+1-9 (switch tabs), Ctrl+1-9 (switch workstreams), Cmd+Shift+[/] (cycle), Cmd+/ (help)
 - [x] Cmd+Shift+O external browser, Cmd+Shift+E external terminal
 - [x] Ctrl+Cmd+S sidebar toggle, Esc closes settings/help
 - [x] Cmd+W closes tab (overrides macOS window close)
@@ -93,3 +82,12 @@
 - [x] Distribution guide (docs/distribution.md)
 - [x] Debug builds: different icon and bundle ID so debug/release can run in parallel
 - [x] Markdown info view: cmark-gfm WKWebView renderer with full HTML support
+- [x] Confirm before quit (Cmd+Q) when workstreams are active
+- [x] Browser tab: show page title in tab label
+- [x] Terminal tab: show running command in tab label (via ghostty SET_TITLE action)
+- [x] Homebrew tap (alltuner/homebrew-tap) and cask formula
+- [x] CI: automate build, sign, notarize, DMG, and release upload via GitHub Actions
+- [x] CONTRIBUTING.md, CODE_OF_CONDUCT.md
+- [x] Funding: Buy Me a Coffee, GitHub Sponsors (website + FUNDING.yml + CLI message)
+- [x] Website: legal/privacy policy page (4 languages)
+- [x] Workstream navigation shortcuts (Ctrl+1-9, Cmd+Shift+[/] cycling)
