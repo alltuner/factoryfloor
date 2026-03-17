@@ -193,4 +193,58 @@ final class AppEnvironment: ObservableObject {
             }
         }
     }
+
+    // MARK: - Branch PR Refresh
+
+    private var lastBranchPRRefresh: Date = .distantPast
+
+    /// Refresh PRs for all workstream branches. Throttled to run at most every 30 seconds.
+    func refreshAllBranchPRs(projects: [Project]) {
+        let now = Date()
+        guard now.timeIntervalSince(lastBranchPRRefresh) >= 30 else { return }
+        lastBranchPRRefresh = now
+
+        guard ghAvailable, let ghPath = toolStatus.gh.path else { return }
+
+        // Collect (projectDir, branch) pairs from cached branch names
+        var lookups: [(projectDir: String, branch: String)] = []
+        for project in projects {
+            for ws in project.workstreams {
+                guard let path = ws.worktreePath,
+                      let branch = branchNameCache[path] else { continue }
+                lookups.append((project.directory, branch))
+            }
+        }
+
+        guard !lookups.isEmpty else { return }
+
+        // Deduplicate by key to avoid redundant gh calls
+        var seen: Set<String> = []
+        let unique = lookups.filter { seen.insert("\($0.projectDir)|\($0.branch)").inserted }
+
+        Task.detached {
+            await withTaskGroup(of: (String, GitHubPR?).self) { group in
+                for lookup in unique {
+                    let dir = lookup.projectDir
+                    let branch = lookup.branch
+                    let key = "\(dir)|\(branch)"
+                    group.addTask {
+                        let pr = GitHubOperations.prForBranch(ghPath: ghPath, at: dir, branch: branch)
+                        return (key, pr)
+                    }
+                }
+                for await (key, pr) in group {
+                    let capturedKey = key
+                    let capturedPR = pr
+                    await MainActor.run {
+                        if let pr = capturedPR {
+                            self.githubBranchPRCache[capturedKey] = pr
+                        } else {
+                            self.githubBranchPRCache.removeValue(forKey: capturedKey)
+                        }
+                    }
+                }
+            }
+        }
+    }
 }

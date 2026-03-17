@@ -82,6 +82,11 @@ struct TerminalContainerView: View {
         PortAllocator.port(for: workingDirectory)
     }
 
+    private var branchPR: GitHubPR? {
+        guard let branch = appEnv.branchName(for: workingDirectory) else { return nil }
+        return appEnv.githubPR(for: projectDirectory, branch: branch)
+    }
+
     private func buildClaudeCommand() -> String? {
         guard let basePath = appEnv.toolStatus.claude.path else { return nil }
         let sessionID = workstreamID.uuidString.lowercased()
@@ -217,15 +222,11 @@ struct TerminalContainerView: View {
             scriptConfig = ScriptConfig.load(from: projectDirectory)
             surfaceCache.respawnableIDs.insert(claudeID)
             runSetupIfNeeded()
-            refreshBranchPR()
         }
         .onChange(of: tmuxMode) { _ in cachedClaudeCommand = buildClaudeCommand() }
         .onChange(of: bypassPermissions) { _ in cachedClaudeCommand = buildClaudeCommand() }
         .onChange(of: autoRenameBranch) { _ in cachedClaudeCommand = buildClaudeCommand() }
         .onReceive(appEnv.objectWillChange) { _ in cachedClaudeCommand = buildClaudeCommand() }
-        .onReceive(Timer.publish(every: 30, on: .main, in: .common).autoconnect()) { _ in
-            refreshBranchPR()
-        }
         .onReceive(NotificationCenter.default.publisher(for: .toggleInfo)) { _ in
             activeTab = .info
         }
@@ -363,20 +364,6 @@ struct TerminalContainerView: View {
             process.standardError = FileHandle.nullDevice
             try? process.run()
             process.waitUntilExit()
-        }
-    }
-
-    private func refreshBranchPR() {
-        guard appEnv.ghAvailable, let ghPath = appEnv.toolStatus.gh.path else { return }
-        let dir = projectDirectory
-        let workDir = workingDirectory
-        Task.detached {
-            let branch = GitOperations.repoInfo(at: workDir).branch
-            guard let branch else { return }
-            let pr = GitHubOperations.prForBranch(ghPath: ghPath, at: dir, branch: branch)
-            await MainActor.run {
-                self.branchPR = pr
-            }
         }
     }
 

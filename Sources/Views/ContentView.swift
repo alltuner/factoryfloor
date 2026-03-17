@@ -208,6 +208,7 @@ struct ContentView: View {
         .onReceive(Timer.publish(every: 15, on: .main, in: .common).autoconnect()) { _ in
             appEnvironment.refreshAllRepoInfo(projects: projects)
             appEnvironment.refreshPathValidity(projects: projects)
+            appEnvironment.refreshAllBranchPRs(projects: projects)
             syncWorkstreamNamesFromBranches()
         }
         .onChange(of: appEnvironment.missingProjectIDs) { _, missing in
