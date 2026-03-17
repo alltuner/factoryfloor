@@ -36,5 +36,13 @@ defaultContentLanguage = "en"
   analyticsID = "81a482e5-52a9-467e-87f8-28c38f2d7e9e"
   analyticsSrc = "https://meta.factory-floor.com/meta.js"
 
+[module]
+  [[module.mounts]]
+    source = "assets"
+    target = "assets"
+  [[module.mounts]]
+    source = "../CHANGELOG.md"
+    target = "assets/CHANGELOG.md"
+
 [markup.goldmark.renderer]
   unsafe = true

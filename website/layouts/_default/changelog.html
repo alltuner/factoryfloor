@@ -1,0 +1,79 @@
+{{ define "content" }}
+{{ partial "nav.html" . }}
+
+{{ $raw := (resources.Get "CHANGELOG.md").Content }}
+{{/* Strip the "# Changelog" title since we render our own */}}
+{{ $body := replaceRE `(?s)^#\s+Changelog\s*\n*` "" $raw }}
+{{/* Parse version sections */}}
+{{ $sections := split $body "\n## " }}
+
+<section class="min-h-screen flex flex-col pt-20 pb-16">
+  <div class="max-w-[700px] mx-auto px-8 w-full">
+    <h1 class="font-mono text-3xl font-bold mb-2">{{ .Title }}</h1>
+    <p class="text-fg-muted text-sm mb-10">Release history for Factory Floor</p>
+
+    <div class="space-y-0">
+      {{ range $i, $section := $sections }}
+        {{ if gt (len (strings.TrimSpace $section)) 0 }}
+          {{/* Re-add the ## prefix that split removed (except first empty chunk) */}}
+          {{ $md := printf "## %s" $section }}
+          {{ if eq $i 0 }}{{ $md = $section }}{{ end }}
+
+          {{/* Extract version and date from the heading */}}
+          {{ $heading := index (split $section "\n") 0 }}
+          {{ $version := "" }}
+          {{ $date := "" }}
+          {{ $url := "" }}
+          {{ with findRE `\[([0-9]+\.[0-9]+\.[0-9]+)\]` $heading }}
+            {{ $version = replaceRE `[\[\]]` "" (index . 0) }}
+          {{ end }}
+          {{ with findRE `\((\d{4}-\d{2}-\d{2})\)` $heading }}
+            {{ $date = replaceRE `[()]` "" (index . 0) }}
+          {{ end }}
+          {{ with findRE `\(https://[^)]+\)` $heading }}
+            {{ $url = replaceRE `[()]` "" (index . 0) }}
+          {{ end }}
+
+          {{ if $version }}
+          <div class="border-l-2 border-fg-faint pl-6 pb-8 relative
+            {{ if eq $i 1 }}border-l-wine/40{{ end }}">
+            {{/* Timeline dot */}}
+            <div class="absolute -left-[7px] top-0 w-3 h-3 rounded-full border-2
+              {{ if eq $i 1 }}border-wine bg-wine/20{{ else }}border-fg-faint bg-bg{{ end }}"></div>
+
+            <div class="flex items-baseline gap-3 mb-4">
+              {{ if $url }}
+              <a href="{{ $url }}" class="font-mono text-xl font-bold text-fg no-underline hover:text-wine-light transition-colors">v{{ $version }}</a>
+              {{ else }}
+              <span class="font-mono text-xl font-bold">v{{ $version }}</span>
+              {{ end }}
+              {{ if $date }}
+              <span class="font-mono text-xs text-fg-muted">{{ $date }}</span>
+              {{ end }}
+            </div>
+
+            {{/* Render the body without the heading */}}
+            {{ $lines := split $section "\n" }}
+            {{ $bodyLines := after 1 $lines }}
+            {{ $content := delimit $bodyLines "\n" }}
+
+            <div class="text-sm
+              [&_h3]:font-mono [&_h3]:text-xs [&_h3]:font-semibold [&_h3]:uppercase [&_h3]:tracking-wider [&_h3]:text-fg-muted [&_h3]:mt-4 [&_h3]:mb-2
+              [&_ul]:mb-3 [&_ul]:pl-4 [&_ul]:list-none
+              [&_li]:relative [&_li]:pl-4 [&_li]:mb-1.5 [&_li]:text-fg-muted [&_li]:leading-relaxed
+              [&_li]:before:content-['›'] [&_li]:before:absolute [&_li]:before:left-0 [&_li]:before:text-wine-light [&_li]:before:font-mono
+              [&_a]:text-wine-light [&_a]:no-underline [&_a]:hover:underline
+              [&_strong]:text-fg [&_strong]:font-medium
+              [&_code]:font-mono [&_code]:text-xs [&_code]:text-fg-dim [&_code]:bg-bg-surface [&_code]:px-1 [&_code]:py-0.5 [&_code]:rounded">
+              {{ $content | markdownify }}
+            </div>
+          </div>
+          {{ end }}
+        {{ end }}
+      {{ end }}
+    </div>
+  </div>
+</section>
+
+{{ partial "footer.html" . }}
+{{ end }}
