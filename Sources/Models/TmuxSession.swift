@@ -50,11 +50,12 @@ enum TmuxSession {
     /// Dedicated socket name so we don't interfere with the user's tmux.
     private static let socketName = AppConstants.appID
 
-    static func wrapCommand(tmuxPath: String, sessionName: String, command: String?) -> String {
+    static func wrapCommand(tmuxPath: String, sessionName: String, command: String?, environmentVars: [String: String] = [:]) -> String {
         let escaped = shellEscape(sessionName)
         let conf = shellEscape(configPath)
         // -L uses a dedicated socket, -f uses our minimal config
-        let base = "\(tmuxPath) -L \(socketName) -f \(conf) new-session -A -s \(escaped)"
+        let envFlags = environmentVars.map { "-e \(shellEscape("\($0.key)=\($0.value)"))" }.joined(separator: " ")
+        let base = "\(tmuxPath) -L \(socketName) -f \(conf) new-session -A -s \(escaped) \(envFlags)"
         let wrappedCommand: String
         if let command {
             let escapedCommand = shellEscape(command)

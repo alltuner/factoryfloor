@@ -225,7 +225,7 @@ struct TerminalContainerView: View {
 
         if useTmux, let tmuxPath = appEnv.toolStatus.tmux.path {
             let session = TmuxSession.sessionName(project: projectName, workstream: workstreamName, role: "agent")
-            return TmuxSession.wrapCommand(tmuxPath: tmuxPath, sessionName: session, command: cmd)
+            return TmuxSession.wrapCommand(tmuxPath: tmuxPath, sessionName: session, command: cmd, environmentVars: envVars)
         }
         return cmd
     }
@@ -580,7 +580,7 @@ struct TerminalContainerView: View {
     private func buildEnvironmentCommand(script: String, role: String) -> String {
         if useTmux, let tmuxPath = appEnv.toolStatus.tmux.path {
             let session = TmuxSession.sessionName(project: projectName, workstream: workstreamName, role: role)
-            return TmuxSession.wrapCommand(tmuxPath: tmuxPath, sessionName: session, command: script)
+            return TmuxSession.wrapCommand(tmuxPath: tmuxPath, sessionName: session, command: script, environmentVars: envVars)
         }
         return script
     }

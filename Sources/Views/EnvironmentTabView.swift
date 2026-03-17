@@ -239,7 +239,7 @@ struct EnvironmentTabView: View {
     private func buildCommand(script: String, role: String) -> String {
         if useTmux, let tmuxPath = appEnv.toolStatus.tmux.path {
             let session = TmuxSession.sessionName(project: projectName, workstream: workstreamName, role: role)
-            return TmuxSession.wrapCommand(tmuxPath: tmuxPath, sessionName: session, command: script)
+            return TmuxSession.wrapCommand(tmuxPath: tmuxPath, sessionName: session, command: script, environmentVars: environmentVars)
         }
         return script
     }
