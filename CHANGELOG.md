@@ -1,5 +1,17 @@
 # Changelog
 
+## [0.1.7](https://github.com/alltuner/factoryfloor/compare/v0.1.6...v0.1.7) (2026-03-17)
+
+
+### Bug Fixes
+
+* resolve workspace creation failure in production builds ([#18](https://github.com/alltuner/factoryfloor/issues/18)) ([ece00ab](https://github.com/alltuner/factoryfloor/commit/ece00ab0c20b17f4e169c16e1a748804a1ea8222))
+
+
+### Miscellaneous
+
+* update versions.json to v0.1.6 ([b0acea2](https://github.com/alltuner/factoryfloor/commit/b0acea2441e1fd2dc70ff7035b8b8afa12554fbc))
+
 ## [0.1.6](https://github.com/alltuner/factoryfloor/compare/v0.1.5...v0.1.6) (2026-03-17)
 
 
