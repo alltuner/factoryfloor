@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.1.13](https://github.com/alltuner/factoryfloor/compare/v0.1.12...v0.1.13) (2026-03-17)
+
+
+### Bug Fixes
+
+* **ci:** use correct xcodegen action (xavierLowmiller/xcodegen-action) ([#34](https://github.com/alltuner/factoryfloor/issues/34)) ([abfcac3](https://github.com/alltuner/factoryfloor/commit/abfcac320332011b7cd50421a2b02e35fc53928c))
+
 ## [0.1.12](https://github.com/alltuner/factoryfloor/compare/v0.1.11...v0.1.12) (2026-03-17)
 
 
