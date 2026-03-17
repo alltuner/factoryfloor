@@ -41,6 +41,14 @@ jobs:
       - name: Install dependencies
         run: brew install xcodegen zig
 
+      - name: Cache SPM packages
+        uses: actions/cache@v4
+        with:
+          path: |
+            build/derived/SourcePackages
+          key: spm-${{ hashFiles('FactoryFloor.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved', 'project.yml') }}
+          restore-keys: spm-
+
       - name: Cache Ghostty xcframework
         id: ghostty-cache
         uses: actions/cache@v4
