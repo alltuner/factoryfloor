@@ -24,6 +24,7 @@ struct ProjectSidebar: View {
     @State private var archiveWarningDirty = false
     @State private var expandedProjects: Set<UUID> = SidebarState.loadExpanded()
     @State private var cachedSortedIDs: [UUID] = []
+    @State private var showWorktreeError = false
     @AppStorage("factoryfloor.sortOrder") private var sortOrder: ProjectSortOrder = .recent
 
     /// Index from UUID to project array index for O(1) lookups.
@@ -278,6 +279,14 @@ struct ProjectSidebar: View {
                 Text("The worktree and its branch will be removed.")
             }
         }
+        .alert(
+            "Worktree Creation Failed",
+            isPresented: $showWorktreeError
+        ) {
+            Button("OK", role: .cancel) {}
+        } message: {
+            Text("Could not create a git worktree. Check that the repository is in a clean state and try again.")
+        }
     }
 
     // MARK: - Workstream management
@@ -294,13 +303,16 @@ struct ProjectSidebar: View {
         let existingNames = Set(project.workstreams.map(\.name))
         let name = NameGenerator.generate(avoiding: existingNames)
 
-        let worktreePath = GitOperations.createWorktree(
+        guard let worktreePath = GitOperations.createWorktree(
             projectPath: project.directory,
             projectName: project.name,
             workstreamName: name,
             branchPrefix: branchPrefix,
             symlinkEnv: symlinkEnv
-        )
+        ) else {
+            showWorktreeError = true
+            return
+        }
 
         let bypass = bypassPermissions ?? defaultBypass
         let workstream = Workstream(name: name, worktreePath: worktreePath, bypassPermissions: bypass)
