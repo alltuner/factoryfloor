@@ -491,7 +491,7 @@ final class TerminalView: NSView {
     }
 }
 
-extension TerminalView: @MainActor NSTextInputClient {}
+extension TerminalView: @preconcurrency NSTextInputClient {}
 
 // MARK: - NSScreen display ID helper
 
