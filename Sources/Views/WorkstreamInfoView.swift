@@ -13,6 +13,7 @@ struct WorkstreamInfoView: View {
     @EnvironmentObject var appEnv: AppEnvironment
     @AppStorage("factoryfloor.defaultTerminal") private var defaultTerminal: String = ""
     @State private var branchName: String?
+    @State private var copiedBranch = false
     @State private var docFiles: [DocFile] = []
     @State private var selectedDoc: String?
 
@@ -38,6 +39,16 @@ struct WorkstreamInfoView: View {
                         Image(systemName: "arrow.triangle.branch")
                             .font(.caption)
                         Text(branch)
+                        DirectoryActionButton(
+                            icon: copiedBranch ? "checkmark" : "doc.on.doc",
+                            color: copiedBranch ? .green : nil,
+                            tooltip: "Copy branch name"
+                        ) {
+                            NSPasteboard.general.clearContents()
+                            NSPasteboard.general.setString(branch, forType: .string)
+                            copiedBranch = true
+                            DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) { copiedBranch = false }
+                        }
                     }
                     .foregroundStyle(.secondary)
                 }
