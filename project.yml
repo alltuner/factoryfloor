@@ -37,6 +37,8 @@ targets:
         buildPhase: resources
       - path: Localization/sv.lproj/Localizable.strings
         buildPhase: resources
+      - path: Resources/Scripts/ff
+        buildPhase: resources
     settings:
       base:
         PRODUCT_MODULE_NAME: FactoryFloor
