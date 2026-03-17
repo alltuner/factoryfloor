@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.1.2](https://github.com/alltuner/factoryfloor/compare/v0.1.1...v0.1.2) (2026-03-17)
+
+
+### Bug Fixes
+
+* resolve CI build failure and ff-run notarization ([#8](https://github.com/alltuner/factoryfloor/issues/8)) ([4e74409](https://github.com/alltuner/factoryfloor/commit/4e74409db010682053161d9f1c9bcffe263f1f3b))
+
 ## [0.1.1](https://github.com/alltuner/factoryfloor/compare/v0.1.0...v0.1.1) (2026-03-17)
 
 
