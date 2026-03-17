@@ -35,7 +35,7 @@
 "Cancel" = "Cancelar";
 "Remove" = "Eliminar";
 "Worktree Creation Failed" = "Error al crear el árbol de trabajo";
-"Could not create a git worktree. This can happen if the branch already exists or if there is an ongoing merge or rebase." = "No se pudo crear un árbol de trabajo git. Esto puede ocurrir si la rama ya existe o si hay una fusión o un rebase en curso.";
+"Could not create the git worktree. The branch may already exist, or there may be an ongoing merge or rebase." = "No se pudo crear el árbol de trabajo git. La rama puede ya existir, o puede haber una fusión o un rebase en curso.";
 "OK" = "Aceptar";
 "Not a Git Repository" = "No es un repositorio Git";
 "Workstreams require a git repository. Initialize one with git init or select a different directory." = "Los flujos de trabajo requieren un repositorio git. Inicializa uno con git init o selecciona un directorio diferente.";

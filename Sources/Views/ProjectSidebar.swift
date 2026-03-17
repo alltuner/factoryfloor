@@ -286,7 +286,7 @@ struct ProjectSidebar: View {
         ) {
             Button("OK", role: .cancel) {}
         } message: {
-            Text("Could not create a git worktree. This can happen if the branch already exists or if there is an ongoing merge or rebase.")
+            Text("Could not create the git worktree. The branch may already exist, or there may be an ongoing merge or rebase.")
         }
         .alert(
             "Not a Git Repository",
