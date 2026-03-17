@@ -18,7 +18,7 @@
       <div class="p-8 bg-bg transition-colors hover:bg-bg-surface">
         <div class="w-10 h-10 flex items-center justify-center rounded-[10px] border border-wine/30 bg-wine-glow mb-5 text-lg">{{ .icon | safeHTML }}</div>
         <h3 class="font-mono text-sm font-semibold mb-2">{{ .title }}</h3>
-        <p class="text-sm text-fg-muted leading-relaxed">{{ .desc }}</p>
+        <p class="text-sm text-fg-muted leading-relaxed">{{ .desc | safeHTML }}</p>
       </div>
       {{ end }}
     </div>

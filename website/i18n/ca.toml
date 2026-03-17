@@ -40,7 +40,7 @@ other = "Cada workstream té branch i worktree propis. Canvia de tasca sense sta
 [feat_claude_title]
 other = "Claude Code"
 [feat_claude_desc]
-other = "Agent integrat amb persistència de sessió. Reprèn converses entre reinicis amb session IDs automàtics."
+other = "Agent <a href='https://docs.anthropic.com/en/docs/claude-code/overview' class='text-wine-light no-underline hover:underline'>Claude Code</a> integrat amb persistència de sessió. Reprèn converses entre reinicis amb session IDs automàtics."
 [feat_tmux_title]
 other = "Persistència tmux"
 [feat_tmux_desc]

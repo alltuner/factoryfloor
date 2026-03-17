@@ -38,7 +38,7 @@ other = "Cada workstream tiene su branch y worktree. Cambia de tarea sin stash, 
 [feat_claude_title]
 other = "Claude Code"
 [feat_claude_desc]
-other = "Agent integrado con persistencia de sesión. Retoma conversaciones entre reinicios con session IDs automáticos."
+other = "Agent <a href='https://docs.anthropic.com/en/docs/claude-code/overview' class='text-wine-light no-underline hover:underline'>Claude Code</a> integrado con persistencia de sesión. Retoma conversaciones entre reinicios con session IDs automáticos."
 [feat_tmux_title]
 other = "Persistencia tmux"
 [feat_tmux_desc]

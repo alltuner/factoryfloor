@@ -37,7 +37,7 @@ other = "Varje workstream får egen branch och worktree. Byt task utan stash. .e
 [feat_claude_title]
 other = "Claude Code"
 [feat_claude_desc]
-other = "Integrerad agent med session persistence. Återuppta konversationer efter restart med automatiska session IDs."
+other = "Integrerad <a href='https://docs.anthropic.com/en/docs/claude-code/overview' class='text-wine-light no-underline hover:underline'>Claude Code</a>-agent med session persistence. Återuppta konversationer efter restart med automatiska session IDs."
 [feat_tmux_title]
 other = "Tmux persistence"
 [feat_tmux_desc]

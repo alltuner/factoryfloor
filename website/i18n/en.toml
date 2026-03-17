@@ -40,7 +40,7 @@ other = "Each workstream gets its own branch and worktree. Switch between tasks 
 [feat_claude_title]
 other = "Claude Code"
 [feat_claude_desc]
-other = "Integrated AI agent with session persistence. Resume conversations across app restarts with automatic session IDs."
+other = "Integrated <a href='https://docs.anthropic.com/en/docs/claude-code/overview' class='text-wine-light no-underline hover:underline'>Claude Code</a> agent with session persistence. Resume conversations across app restarts with automatic session IDs."
 [feat_tmux_title]
 other = "Tmux Persistence"
 [feat_tmux_desc]
