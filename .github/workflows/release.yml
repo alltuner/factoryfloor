@@ -103,9 +103,9 @@ jobs:
             codesign --force --sign "$SIGNING_IDENTITY" --timestamp --options=runtime "$bin"
           done
 
-          # Re-sign the main app bundle (deep sign to catch anything missed)
+          # Sign the main app binary (not --deep, nested code is already signed above)
           codesign --force --sign "$SIGNING_IDENTITY" --timestamp --options=runtime \
-            --entitlements Resources/ff2.entitlements --deep "$APP"
+            --entitlements Resources/ff2.entitlements "$APP"
 
           codesign --verify --verbose=2 --deep --strict "$APP"
 

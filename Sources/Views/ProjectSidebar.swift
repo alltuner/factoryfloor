@@ -312,16 +312,24 @@ struct ProjectSidebar: View {
     @AppStorage("factoryfloor.symlinkEnv") private var symlinkEnv: Bool = true
 
     private func addWorkstream(for projectID: UUID, bypassPermissions: Bool? = nil) {
-        guard let index = projects.firstIndex(where: { $0.id == projectID }) else { return }
+        NSLog("[FF] addWorkstream called for projectID=\(projectID)")
+        guard let index = projects.firstIndex(where: { $0.id == projectID }) else {
+            NSLog("[FF] addWorkstream: project not found")
+            return
+        }
         let project = projects[index]
+        NSLog("[FF] addWorkstream: project=\(project.name) dir=\(project.directory)")
 
         guard GitOperations.isGitRepo(at: project.directory) else {
+            NSLog("[FF] addWorkstream: not a git repo")
             showNotGitRepoError = true
             return
         }
+        NSLog("[FF] addWorkstream: is git repo")
 
         let existingNames = Set(project.workstreams.map(\.name))
         let name = NameGenerator.generate(avoiding: existingNames)
+        NSLog("[FF] addWorkstream: generated name=\(name)")
 
         guard let worktreePath = GitOperations.createWorktree(
             projectPath: project.directory,
@@ -330,9 +338,11 @@ struct ProjectSidebar: View {
             branchPrefix: branchPrefix,
             symlinkEnv: symlinkEnv
         ) else {
+            NSLog("[FF] addWorkstream: createWorktree FAILED")
             showWorktreeError = true
             return
         }
+        NSLog("[FF] addWorkstream: worktree created at \(worktreePath)")
 
         let bypass = bypassPermissions ?? defaultBypass
         let workstream = Workstream(name: name, worktreePath: worktreePath, bypassPermissions: bypass)
@@ -341,6 +351,7 @@ struct ProjectSidebar: View {
         expandedProjects.insert(projectID)
         selection = .workstream(workstream.id)
         onProjectsChanged()
+        NSLog("[FF] addWorkstream: done")
     }
 
     @EnvironmentObject private var surfaceCache: TerminalSurfaceCache

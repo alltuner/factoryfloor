@@ -229,21 +229,31 @@ enum GitOperations {
     }
 
     private static func run(args: [String], in directory: String) -> String? {
-        guard let gitPath else { return nil }
+        guard let gitPath else {
+            NSLog("[FF] git run: gitPath is nil")
+            return nil
+        }
         let process = Process()
         let pipe = Pipe()
+        let errPipe = Pipe()
         process.executableURL = URL(fileURLWithPath: gitPath)
         process.arguments = args
         process.currentDirectoryURL = URL(fileURLWithPath: directory)
         process.standardOutput = pipe
-        process.standardError = FileHandle.nullDevice
+        process.standardError = errPipe
         do {
             try process.run()
             process.waitUntilExit()
-            guard process.terminationStatus == 0 else { return nil }
+            let errData = errPipe.fileHandleForReading.readDataToEndOfFile()
+            let errStr = String(data: errData, encoding: .utf8) ?? ""
+            guard process.terminationStatus == 0 else {
+                NSLog("[FF] git \(args.joined(separator: " ")) failed (exit \(process.terminationStatus)): \(errStr)")
+                return nil
+            }
             let data = pipe.fileHandleForReading.readDataToEndOfFile()
             return String(data: data, encoding: .utf8)
         } catch {
+            NSLog("[FF] git \(args.joined(separator: " ")) threw: \(error)")
             return nil
         }
     }
