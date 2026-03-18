@@ -301,12 +301,31 @@ Adopt SwiftGitX if any of these become true:
 4. **SwiftGitX reaches 1.0** and adds worktree support natively, removing the
    need for us to contribute it.
 
-### If we do adopt it
+### Hybrid approach: SwiftGitX for reads, Process for writes
+
+The most pragmatic adoption path doesn't require worktree support at all.
+Use SwiftGitX for the frequent read-only operations and keep `Process("git")`
+for worktree management:
+
+**SwiftGitX (in-process, fast):**
+- `repoInfo()` - runs every 15s per project, benefits most from no fork+exec
+- `hasUncommittedChanges()` - called on every worktree list render
+- `defaultBranch()` - reference resolution
+- `isGitRepo()` - directory check
+- `rev-parse`, `symbolic-ref`, `remote get-url`
+
+**Keep Process("git") (needs CLI):**
+- `worktree add/remove/list/prune` - not in SwiftGitX
+- `init` - rare, not performance-sensitive
+
+This gives the performance and type-safety benefits without waiting for
+worktree support. Cost: one SPM dependency, ~500 lines of adapter code.
+
+### If we do a full adoption
 
 1. Fork SwiftGitX, add worktree bindings following the Collection pattern.
 2. Open PR upstream. If merged, depend on upstream. If not, depend on our fork.
 3. Add `SwiftGitX` to `project.yml` packages.
 4. Rewrite `GitOperations.swift` to use SwiftGitX's Repository API.
-5. Keep the `run()` helper as a fallback for any operations SwiftGitX doesn't
-   cover.
+5. Keep the `run()` helper as a fallback for worktree operations.
 6. Estimated total effort: 3-5 days including testing.
