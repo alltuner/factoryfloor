@@ -1,5 +1,28 @@
 # Changelog
 
+## [0.1.29](https://github.com/alltuner/factoryfloor/compare/v0.1.28...v0.1.29) (2026-03-18)
+
+
+### Features
+
+* show port indicator in sidebar and title bar ([#119](https://github.com/alltuner/factoryfloor/issues/119)) ([#123](https://github.com/alltuner/factoryfloor/issues/123)) ([cdb1731](https://github.com/alltuner/factoryfloor/commit/cdb1731c8c7b00a231c081a637a314421e540ff4))
+
+
+### Bug Fixes
+
+* set run-state files to 0600 and directories to 0700 ([#97](https://github.com/alltuner/factoryfloor/issues/97)) ([#121](https://github.com/alltuner/factoryfloor/issues/121)) ([8009d0d](https://github.com/alltuner/factoryfloor/commit/8009d0db9fe1a479c6a2246450514e37ac3b80c4))
+* show spinner when environment pane is restarting ([#89](https://github.com/alltuner/factoryfloor/issues/89)) ([#120](https://github.com/alltuner/factoryfloor/issues/120)) ([7bc3fc3](https://github.com/alltuner/factoryfloor/commit/7bc3fc398e506e88b09062f59a5ba2a810d5cffa))
+
+
+### Refactoring
+
+* remove legacy JSON file migration code ([#93](https://github.com/alltuner/factoryfloor/issues/93)) ([#122](https://github.com/alltuner/factoryfloor/issues/122)) ([3b5041c](https://github.com/alltuner/factoryfloor/commit/3b5041ca4f6bca93aa09ef722c3544be1904298d))
+
+
+### Miscellaneous
+
+* update versions.json to v0.1.28 ([1507e37](https://github.com/alltuner/factoryfloor/commit/1507e37d77a4e65753793b8e23abe2215a90bddc))
+
 ## [0.1.28](https://github.com/alltuner/factoryfloor/compare/v0.1.27...v0.1.28) (2026-03-18)
 
 
