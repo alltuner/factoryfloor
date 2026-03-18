@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.1.25](https://github.com/alltuner/factoryfloor/compare/v0.1.24...v0.1.25) (2026-03-18)
+
+
+### Bug Fixes
+
+* remove stale baseDirectory argument from MarkdownContentView call ([#106](https://github.com/alltuner/factoryfloor/issues/106)) ([1758aba](https://github.com/alltuner/factoryfloor/commit/1758aba868bd81b884a445f59162f641b0db3e2e))
+
 ## [0.1.24](https://github.com/alltuner/factoryfloor/compare/v0.1.23...v0.1.24) (2026-03-18)
 
 
