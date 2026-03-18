@@ -1,17 +1,17 @@
-<div class="mt-16 animate-fade-up-4">
+<div class="mt-8 md:mt-16 animate-fade-up-4">
   <div class="relative">
     <!-- Screenshot tabs -->
-    <div class="flex justify-center gap-2 mb-4">
-      <button onclick="showScreenshot('agent')" class="ss-tab ss-tab-active font-mono text-xs px-3 py-1.5 rounded-md border border-fg-faint transition-all" data-tab="agent">Agent</button>
-      <button onclick="showScreenshot('environment')" class="ss-tab font-mono text-xs px-3 py-1.5 rounded-md border border-fg-faint transition-all" data-tab="environment">Environment</button>
-      <button onclick="showScreenshot('info')" class="ss-tab font-mono text-xs px-3 py-1.5 rounded-md border border-fg-faint transition-all" data-tab="info">Info</button>
-      <button onclick="showScreenshot('terminal')" class="ss-tab font-mono text-xs px-3 py-1.5 rounded-md border border-fg-faint transition-all" data-tab="terminal">Terminal</button>
-      <button onclick="showScreenshot('browser')" class="ss-tab font-mono text-xs px-3 py-1.5 rounded-md border border-fg-faint transition-all" data-tab="browser">Browser</button>
-      <button onclick="showScreenshot('project')" class="ss-tab font-mono text-xs px-3 py-1.5 rounded-md border border-fg-faint transition-all" data-tab="project">Project</button>
+    <div class="flex justify-center gap-1.5 md:gap-2 mb-3 md:mb-4 flex-wrap">
+      <button onclick="showScreenshot('agent')" class="ss-tab ss-tab-active font-mono text-xs px-2 md:px-3 py-1 md:py-1.5 rounded-md border border-fg-faint transition-all" data-tab="agent">Agent</button>
+      <button onclick="showScreenshot('environment')" class="ss-tab font-mono text-xs px-2 md:px-3 py-1 md:py-1.5 rounded-md border border-fg-faint transition-all hidden md:inline-flex" data-tab="environment">Environment</button>
+      <button onclick="showScreenshot('info')" class="ss-tab font-mono text-xs px-2 md:px-3 py-1 md:py-1.5 rounded-md border border-fg-faint transition-all" data-tab="info">Info</button>
+      <button onclick="showScreenshot('terminal')" class="ss-tab font-mono text-xs px-2 md:px-3 py-1 md:py-1.5 rounded-md border border-fg-faint transition-all" data-tab="terminal">Terminal</button>
+      <button onclick="showScreenshot('browser')" class="ss-tab font-mono text-xs px-2 md:px-3 py-1 md:py-1.5 rounded-md border border-fg-faint transition-all hidden md:inline-flex" data-tab="browser">Browser</button>
+      <button onclick="showScreenshot('project')" class="ss-tab font-mono text-xs px-2 md:px-3 py-1 md:py-1.5 rounded-md border border-fg-faint transition-all hidden md:inline-flex" data-tab="project">Project</button>
     </div>
 
     <!-- Screenshots -->
-    <div class="rounded-xl overflow-hidden shadow-[0_25px_80px_var(--color-shadow)] border border-fg-faint">
+    <div class="rounded-xl overflow-hidden shadow-[0_25px_80px_var(--color-shadow)] border border-fg-faint cursor-pointer" onclick="openScreenshotModal()">
       <img id="ss-agent" class="ss-img w-full" src="/img/screenshots/agent.png" alt="Claude Code agent running in Factory Floor">
       <img id="ss-environment" class="ss-img w-full hidden" src="/img/screenshots/environment.png" alt="Environment tab with setup and run scripts">
       <img id="ss-info" class="ss-img w-full hidden" src="/img/screenshots/info.png" alt="Workstream info with documentation">
@@ -21,6 +21,19 @@
     </div>
   </div>
 </div>
+
+<!-- Screenshot modal -->
+<dialog id="ss-modal" class="modal">
+  <div class="modal-box max-w-none w-[95vw] md:w-[90vw] p-0 bg-bg border border-fg-faint rounded-xl overflow-hidden">
+    <form method="dialog" class="absolute top-2 right-2 z-10">
+      <button class="btn btn-sm btn-circle bg-bg-surface border-fg-faint text-fg hover:bg-bg-elevated">✕</button>
+    </form>
+    <img id="ss-modal-img" class="w-full" src="" alt="">
+  </div>
+  <form method="dialog" class="modal-backdrop bg-black/70">
+    <button>close</button>
+  </form>
+</dialog>
 
 <script>
 function showScreenshot(name) {
@@ -34,6 +47,15 @@ function showScreenshot(name) {
   activeTab.classList.add('ss-tab-active', 'bg-wine', 'text-[#F7F4F3]', 'border-wine');
   activeTab.classList.remove('text-fg-muted', 'bg-transparent');
 }
+
+function openScreenshotModal() {
+  var visible = document.querySelector('.ss-img:not(.hidden)');
+  if (!visible) return;
+  document.getElementById('ss-modal-img').src = visible.src;
+  document.getElementById('ss-modal-img').alt = visible.alt;
+  document.getElementById('ss-modal').showModal();
+}
+
 // Initialize first tab
 document.addEventListener('DOMContentLoaded', function() { showScreenshot('agent'); });
 </script>
