@@ -63,8 +63,8 @@ enum TmuxSession {
             tmuxCmd += " \(envFlags)"
         }
         if let command {
-            // Pass command directly to tmux new-session (no extra sh -c wrapping)
-            tmuxCmd += " \(shellEscape(command))"
+            // Command is already shell-quoted by the caller (runScriptCommand/scriptCommand)
+            tmuxCmd += " \(command)"
         }
 
         // Single sh -c: server setup then exec tmux
