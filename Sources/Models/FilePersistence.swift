@@ -11,12 +11,17 @@ enum FilePersistence {
     /// Writes to a temporary file first, then renames for crash safety.
     static func writeAtomically(_ data: Data, to url: URL) throws {
         let directory = url.deletingLastPathComponent()
-        try FileManager.default.createDirectory(at: directory, withIntermediateDirectories: true)
+        try FileManager.default.createDirectory(
+            at: directory,
+            withIntermediateDirectories: true,
+            attributes: [.posixPermissions: 0o700]
+        )
 
         let tempURL = directory.appendingPathComponent(".\(url.lastPathComponent).\(UUID().uuidString).tmp")
         do {
             try data.write(to: tempURL)
             _ = try FileManager.default.replaceItemAt(url, withItemAt: tempURL)
+            try FileManager.default.setAttributes([.posixPermissions: 0o600], ofItemAtPath: url.path)
         } catch {
             // Clean up temp file on failure
             try? FileManager.default.removeItem(at: tempURL)
