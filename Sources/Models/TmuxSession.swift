@@ -54,8 +54,7 @@ enum TmuxSession {
         let escaped = shellEscape(sessionName)
         let conf = shellEscape(configPath)
         // -L uses a dedicated socket, -f uses our minimal config
-        // Don't shellEscape env flags here; they'll be escaped by the outer sh -c wrapper
-        let envFlags = environmentVars.map { "-e \($0.key)=\($0.value)" }.joined(separator: " ")
+        let envFlags = environmentVars.map { "-e \"\($0.key)=\(doubleQuoteEscape($0.value))\"" }.joined(separator: " ")
         let base = "\(tmuxPath) -L \(socketName) -f \(conf) new-session -A -s \(escaped) \(envFlags)"
         let wrappedCommand: String
         if let command {
@@ -107,6 +106,14 @@ enum TmuxSession {
 
     private static func shellEscape(_ str: String) -> String {
         "'\(str.replacingOccurrences(of: "'", with: "'\\''"))'"
+    }
+
+    /// Escape a string for safe embedding inside double quotes in a shell command.
+    private static func doubleQuoteEscape(_ str: String) -> String {
+        str.replacingOccurrences(of: "\\", with: "\\\\")
+            .replacingOccurrences(of: "\"", with: "\\\"")
+            .replacingOccurrences(of: "$", with: "\\$")
+            .replacingOccurrences(of: "`", with: "\\`")
     }
 
     private static func serverSetupCommand(tmuxPath: String, configPath: String) -> String {
