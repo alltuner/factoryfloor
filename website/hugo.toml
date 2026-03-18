@@ -40,9 +40,6 @@ defaultContentLanguage = "en"
   [[module.mounts]]
     source = "assets"
     target = "assets"
-  [[module.mounts]]
-    source = "../CHANGELOG.md"
-    target = "assets/CHANGELOG.md"
 
 [markup.goldmark.renderer]
   unsafe = true

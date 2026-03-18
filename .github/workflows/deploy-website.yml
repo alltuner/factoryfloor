@@ -5,6 +5,7 @@ on:
     branches: [main]
     paths:
       - 'website/**'
+      - 'CHANGELOG.md'
   workflow_dispatch:
 
 permissions:
@@ -35,6 +36,19 @@ jobs:
       - run: bun install
 
       - run: bun run assets
+
+      - name: Generate changelog content from CHANGELOG.md
+        working-directory: .
+        run: |
+          {
+            echo '---'
+            echo 'title: Changelog'
+            echo 'layout: changelog'
+            echo 'hideInstall: true'
+            echo 'translationKey: changelog'
+            echo '---'
+            sed '1{/^# Changelog$/d;}' CHANGELOG.md
+          } > website/content/changelog.md
 
       - run: hugo
 
