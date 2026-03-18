@@ -1,9 +1,9 @@
 // ABOUTME: SwiftUI sidebar showing projects as a collapsible tree with workstreams.
 // ABOUTME: Supports adding projects via picker/drag-drop and workstreams inline.
 
+import OSLog
 import SwiftUI
 import UniformTypeIdentifiers
-import OSLog
 
 private let logger = Logger(subsystem: "factoryfloor", category: "sidebar")
 
@@ -29,6 +29,7 @@ struct ProjectSidebar: View {
     @State private var cachedSortedIDs: [UUID] = []
     @State private var cachedProjectIndex: [UUID: Int] = [:]
     @State private var cachedWorkstreamIndex: [UUID: (Int, Int)] = [:]
+    @State private var isCreatingWorkstream = false
     @State private var showWorktreeError = false
     @State private var showNotGitRepoError = false
     @AppStorage("factoryfloor.sortOrder") private var sortOrder: ProjectSortOrder = .recent
@@ -68,122 +69,124 @@ struct ProjectSidebar: View {
     }
 
     var body: some View {
-        GeometryReader { geo in
-        VStack(spacing: 0) {
-            ScrollViewReader { scrollProxy in
-            List(selection: $selection) {
-                ForEach(cachedSortedIDs, id: \.self) { projectID in
-                    let projectBind = projectBinding(for: projectID)
-                    let project = projectBind.wrappedValue
-                    let hasChildren = !project.workstreams.isEmpty
+        GeometryReader { _ in
+            VStack(spacing: 0) {
+                ScrollViewReader { scrollProxy in
+                    List(selection: $selection) {
+                        ForEach(cachedSortedIDs, id: \.self) { projectID in
+                            let projectBind = projectBinding(for: projectID)
+                            let project = projectBind.wrappedValue
+                            let hasChildren = !project.workstreams.isEmpty
 
-                    ProjectHeaderRow(
-                        project: project,
-                        isExpanded: expandedProjects.contains(project.id),
-                        onToggle: hasChildren ? {
-                            withAnimation(.easeInOut(duration: 0.15)) {
-                                if expandedProjects.contains(project.id) {
-                                    expandedProjects.remove(project.id)
-                                } else {
-                                    expandedProjects.insert(project.id)
+                            ProjectHeaderRow(
+                                project: project,
+                                isExpanded: expandedProjects.contains(project.id),
+                                isCreatingWorkstream: isCreatingWorkstream,
+                                onToggle: hasChildren ? {
+                                    withAnimation(.easeInOut(duration: 0.15)) {
+                                        if expandedProjects.contains(project.id) {
+                                            expandedProjects.remove(project.id)
+                                        } else {
+                                            expandedProjects.insert(project.id)
+                                        }
+                                    }
+                                } : nil,
+                                onAdd: { logger.warning("[FF] onAdd button tapped for project \(project.name, privacy: .public)"); addWorkstream(for: project.id) },
+                                onAddWithPermissions: { addWorkstream(for: project.id, bypassPermissions: true) },
+                                onAddWithoutPermissions: { addWorkstream(for: project.id, bypassPermissions: false) },
+                                onDelete: { projectToDelete = project.id }
+                            )
+                            .tag(SidebarSelection.project(project.id))
+
+                            if hasChildren && expandedProjects.contains(project.id) {
+                                let sortedWS = project.workstreams.sorted { $0.lastAccessedAt > $1.lastAccessedAt }
+                                ForEach(sortedWS) { workstream in
+                                    WorkstreamRow(
+                                        name: workstream.name,
+                                        branchName: appEnv.branchName(for: workstream.worktreePath),
+                                        worktreePath: workstream.worktreePath,
+                                        isPathValid: appEnv.isPathValid(workstream.worktreePath),
+                                        onArchive: { confirmArchive(workstream) }
+                                    )
+                                    .tag(SidebarSelection.workstream(workstream.id))
+                                    .padding(.leading, 22)
                                 }
                             }
-                        } : nil,
-                        onAdd: { logger.warning("[FF] onAdd button tapped for project \(project.name, privacy: .public)"); addWorkstream(for: project.id) },
-                        onAddWithPermissions: { addWorkstream(for: project.id, bypassPermissions: true) },
-                        onAddWithoutPermissions: { addWorkstream(for: project.id, bypassPermissions: false) },
-                        onDelete: { projectToDelete = project.id }
-                    )
-                    .tag(SidebarSelection.project(project.id))
-
-                    if hasChildren && expandedProjects.contains(project.id) {
-                        let sortedWS = project.workstreams.sorted { $0.lastAccessedAt > $1.lastAccessedAt }
-                        ForEach(sortedWS) { workstream in
-                            WorkstreamRow(
-                                name: workstream.name,
-                                branchName: appEnv.branchName(for: workstream.worktreePath),
-                                worktreePath: workstream.worktreePath,
-                                isPathValid: appEnv.isPathValid(workstream.worktreePath),
-                                onArchive: { confirmArchive(workstream) }
-                            )
-                            .tag(SidebarSelection.workstream(workstream.id))
-                            .padding(.leading, 22)
                         }
                     }
-                }
-            }
-            .listStyle(.sidebar)
-            .safeAreaInset(edge: .top) {
-                if projects.count > 1 {
-                    Picker("", selection: $sortOrder) {
-                        ForEach(ProjectSortOrder.allCases, id: \.self) { order in
-                            Text(order.rawValue).tag(order)
+                    .listStyle(.sidebar)
+                    .safeAreaInset(edge: .top) {
+                        if projects.count > 1 {
+                            Picker("", selection: $sortOrder) {
+                                ForEach(ProjectSortOrder.allCases, id: \.self) { order in
+                                    Text(order.rawValue).tag(order)
+                                }
+                            }
+                            .pickerStyle(.segmented)
+                            .padding(.horizontal, 12)
+                            .padding(.vertical, 8)
                         }
                     }
-                    .pickerStyle(.segmented)
-                    .padding(.horizontal, 12)
-                    .padding(.vertical, 8)
-                }
-            }
-            .onChange(of: selection) { _, sel in
-                guard let sel else { return }
-                if case .project(let pid) = sel {
-                    expandedProjects.insert(pid)
-                }
-                if case .workstream(let wsID) = sel,
-                   let (pi, _) = cachedWorkstreamIndex[wsID] {
-                    expandedProjects.insert(projects[pi].id)
-                }
-                withAnimation {
-                    scrollProxy.scrollTo(sel, anchor: .center)
-                }
-            }
-            } // ScrollViewReader
+                    .onChange(of: selection) { _, sel in
+                        guard let sel else { return }
+                        if case let .project(pid) = sel {
+                            expandedProjects.insert(pid)
+                        }
+                        if case let .workstream(wsID) = sel,
+                           let (pi, _) = cachedWorkstreamIndex[wsID]
+                        {
+                            expandedProjects.insert(projects[pi].id)
+                        }
+                        withAnimation {
+                            scrollProxy.scrollTo(sel, anchor: .center)
+                        }
+                    }
+                } // ScrollViewReader
 
-            // Bottom bar (always visible)
-            VStack(spacing: 4) {
-                if let version = updateChecker.availableVersion {
-                    UpdateBanner(version: version)
-                }
+                // Bottom bar (always visible)
+                VStack(spacing: 4) {
+                    if let version = updateChecker.availableVersion {
+                        UpdateBanner(version: version)
+                    }
 
-                // Credit
-                VStack(spacing: 2) {
-                    HStack(spacing: 0) {
-                        Text("by ")
-                            .foregroundStyle(.tertiary)
-                        Link("David Poblador i Garcia.", destination: URL(string: "https://davidpoblador.com/")!)
-                            .foregroundStyle(.secondary)
+                    // Credit
+                    VStack(spacing: 2) {
+                        HStack(spacing: 0) {
+                            Text("by ")
+                                .foregroundStyle(.tertiary)
+                            Link("David Poblador i Garcia.", destination: URL(string: "https://davidpoblador.com/")!)
+                                .foregroundStyle(.secondary)
+                        }
+                        HStack(spacing: 0) {
+                            Text("Help ")
+                                .foregroundStyle(.tertiary)
+                            Link("supporting", destination: sponsorURL)
+                                .foregroundStyle(.secondary)
+                            Text(" the development.")
+                                .foregroundStyle(.tertiary)
+                        }
                     }
-                    HStack(spacing: 0) {
-                        Text("Help ")
-                            .foregroundStyle(.tertiary)
-                        Link("supporting", destination: sponsorURL)
-                            .foregroundStyle(.secondary)
-                        Text(" the development.")
-                            .foregroundStyle(.tertiary)
-                    }
-                }
-                .font(.system(size: 10))
+                    .font(.system(size: 10))
 
-                HStack {
-                    SidebarBottomButton(icon: "plus") {
-                        showingAddProjectChoice = true
+                    HStack {
+                        SidebarBottomButton(icon: "plus") {
+                            showingAddProjectChoice = true
+                        }
+                        .accessibilityLabel("Add project")
+                        Spacer()
+                        SidebarBottomButton(icon: "questionmark.circle") {
+                            NotificationCenter.default.post(name: .openHelp, object: nil)
+                        }
+                        .accessibilityLabel("Help")
+                        SidebarBottomButton(icon: "gear") {
+                            NotificationCenter.default.post(name: .openSettings, object: nil)
+                        }
+                        .accessibilityLabel("Settings")
                     }
-                    .accessibilityLabel("Add project")
-                    Spacer()
-                    SidebarBottomButton(icon: "questionmark.circle") {
-                        NotificationCenter.default.post(name: .openHelp, object: nil)
-                    }
-                    .accessibilityLabel("Help")
-                    SidebarBottomButton(icon: "gear") {
-                        NotificationCenter.default.post(name: .openSettings, object: nil)
-                    }
-                    .accessibilityLabel("Settings")
                 }
+                .padding(.horizontal, 4)
+                .padding(.bottom, 4)
             }
-            .padding(.horizontal, 4)
-            .padding(.bottom, 4)
-        }
         }
         .onReceive(NotificationCenter.default.publisher(for: .terminalActivity)) { notification in
             guard let wsID = notification.object as? UUID else { return }
@@ -242,10 +245,11 @@ struct ProjectSidebar: View {
             showingAddProjectChoice = true
         }
         .onReceive(NotificationCenter.default.publisher(for: .addNew)) { _ in
-            if case .workstream(let wsID) = selection,
-               let project = projects.first(where: { $0.workstreams.contains(where: { $0.id == wsID }) }) {
+            if case let .workstream(wsID) = selection,
+               let project = projects.first(where: { $0.workstreams.contains(where: { $0.id == wsID }) })
+            {
                 addWorkstream(for: project.id)
-            } else if case .project(let pid) = selection {
+            } else if case let .project(pid) = selection {
                 addWorkstream(for: pid)
             } else {
                 showingAddProjectChoice = true
@@ -334,29 +338,44 @@ struct ProjectSidebar: View {
         let name = NameGenerator.generate(avoiding: existingNames)
         logger.warning("[FF] addWorkstream: generated name=\(name, privacy: .public)")
 
-        guard let worktreePath = GitOperations.createWorktree(
-            projectPath: project.directory,
-            projectName: project.name,
-            workstreamName: name,
-            branchPrefix: branchPrefix,
-            symlinkEnv: symlinkEnv
-        ) else {
-            logger.warning("[FF] addWorkstream: createWorktree FAILED")
-            showWorktreeError = true
-            return
-        }
-        logger.warning("[FF] addWorkstream: worktree created at \(worktreePath, privacy: .public)")
-
+        let projectPath = project.directory
+        let projectName = project.name
+        let shouldSymlinkEnv = symlinkEnv
+        let prefix = branchPrefix
         let bypass = bypassPermissions ?? defaultBypass
-        let workstream = Workstream(name: name, worktreePath: worktreePath, bypassPermissions: bypass)
-        expandedProjects.insert(projectID)
-        NotificationCenter.default.post(
-            name: .workstreamCreated,
-            object: nil,
-            userInfo: ["projectID": projectID, "workstream": workstream]
-        )
-        rebuildIndices()
-        logger.warning("[FF] addWorkstream: done, posted notification")
+
+        isCreatingWorkstream = true
+
+        Task.detached {
+            let worktreePath = GitOperations.createWorktree(
+                projectPath: projectPath,
+                projectName: projectName,
+                workstreamName: name,
+                branchPrefix: prefix,
+                symlinkEnv: shouldSymlinkEnv
+            )
+
+            await MainActor.run {
+                isCreatingWorkstream = false
+
+                guard let worktreePath else {
+                    logger.warning("[FF] addWorkstream: createWorktree FAILED")
+                    showWorktreeError = true
+                    return
+                }
+                logger.warning("[FF] addWorkstream: worktree created at \(worktreePath, privacy: .public)")
+
+                let workstream = Workstream(name: name, worktreePath: worktreePath, bypassPermissions: bypass)
+                expandedProjects.insert(projectID)
+                NotificationCenter.default.post(
+                    name: .workstreamCreated,
+                    object: nil,
+                    userInfo: ["projectID": projectID, "workstream": workstream]
+                )
+                rebuildIndices()
+                logger.warning("[FF] addWorkstream: done, posted notification")
+            }
+        }
     }
 
     @EnvironmentObject private var surfaceCache: TerminalSurfaceCache
@@ -378,7 +397,7 @@ struct ProjectSidebar: View {
         let projectID = projects[pi].id
         WorkstreamArchiver.archive(wsID, in: &projects[pi], surfaceCache: surfaceCache, tmuxPath: appEnv.toolStatus.tmux.path)
         rebuildIndices()
-        if case .workstream(let id) = selection, id == wsID {
+        if case let .workstream(id) = selection, id == wsID {
             selection = projects[pi].workstreams.first.map { .workstream($0.id) } ?? .project(projectID)
         }
         onProjectsChanged()
@@ -394,9 +413,10 @@ struct ProjectSidebar: View {
             }
         }
         projects.removeAll { $0.id == id }
-        if case .project(let pid) = selection, pid == id { selection = nil }
-        if case .workstream(let wsID) = selection,
-           !projects.contains(where: { $0.workstreams.contains(where: { $0.id == wsID }) }) {
+        if case let .project(pid) = selection, pid == id { selection = nil }
+        if case let .workstream(wsID) = selection,
+           !projects.contains(where: { $0.workstreams.contains(where: { $0.id == wsID }) })
+        {
             selection = nil
         }
         projectToDelete = nil
@@ -494,6 +514,7 @@ private func copyTextToPasteboard(_ text: String) {
 private struct ProjectHeaderRow: View {
     let project: Project
     let isExpanded: Bool
+    let isCreatingWorkstream: Bool
     let onToggle: (() -> Void)?
     let onAdd: () -> Void
     let onAddWithPermissions: () -> Void
@@ -551,20 +572,26 @@ private struct ProjectHeaderRow: View {
             Spacer()
 
             HStack(spacing: 8) {
-                SidebarIconButton(icon: "plus", action: onAdd)
-                    .accessibilityLabel("Add workstream to \(project.name)")
-                    .contextMenu {
-                        Button(action: onAddWithPermissions) {
-                            Label("New workstream (full permissions)", systemImage: "lock.open")
+                if isCreatingWorkstream {
+                    ProgressView()
+                        .controlSize(.small)
+                        .frame(width: 22, height: 22)
+                } else {
+                    SidebarIconButton(icon: "plus", action: onAdd)
+                        .accessibilityLabel("Add workstream to \(project.name)")
+                        .contextMenu {
+                            Button(action: onAddWithPermissions) {
+                                Label("New workstream (full permissions)", systemImage: "lock.open")
+                            }
+                            Button(action: onAddWithoutPermissions) {
+                                Label("New workstream (with prompts)", systemImage: "lock.shield")
+                            }
                         }
-                        Button(action: onAddWithoutPermissions) {
-                            Label("New workstream (with prompts)", systemImage: "lock.shield")
-                        }
-                    }
+                }
                 SidebarIconButton(icon: "trash", action: onDelete)
                     .accessibilityLabel("Remove project")
             }
-            .opacity(isHovering ? 1 : 0)
+            .opacity(isHovering || isCreatingWorkstream ? 1 : 0)
         }
         .frame(maxWidth: .infinity, alignment: .leading)
         .padding(.vertical, 2)
@@ -578,7 +605,6 @@ private struct ProjectHeaderRow: View {
             }
         }
     }
-
 }
 
 private struct WorkstreamRow: View {
@@ -835,5 +861,4 @@ private struct NewProjectSheet: View {
         .padding(20)
         .frame(width: 380)
     }
-
 }
