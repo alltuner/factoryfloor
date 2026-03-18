@@ -1,5 +1,23 @@
 # Changelog
 
+## [0.1.21](https://github.com/alltuner/factoryfloor/compare/v0.1.20...v0.1.21) (2026-03-18)
+
+
+### Bug Fixes
+
+* **ci:** match local and CI build environments ([#59](https://github.com/alltuner/factoryfloor/issues/59)), add SPM cache path ([#38](https://github.com/alltuner/factoryfloor/issues/38)) ([#60](https://github.com/alltuner/factoryfloor/issues/60)) ([771dc21](https://github.com/alltuner/factoryfloor/commit/771dc2117f98cc16b0b60ea78c232418c1ad7863))
+* use ObservableObject for projects to fix Release @State timing ([#43](https://github.com/alltuner/factoryfloor/issues/43)) ([#63](https://github.com/alltuner/factoryfloor/issues/63)) ([c0568c8](https://github.com/alltuner/factoryfloor/commit/c0568c84ccccd8da0761b79b8347921326e4940d))
+
+
+### Miscellaneous
+
+* update versions.json to v0.1.20 ([88939d1](https://github.com/alltuner/factoryfloor/commit/88939d16b69dd24981be021ea4fc8de3bca76052))
+
+
+### Documentation
+
+* add release command to build instructions ([#62](https://github.com/alltuner/factoryfloor/issues/62)) ([4ed8099](https://github.com/alltuner/factoryfloor/commit/4ed80997b166a35a9ba80262c2c4b38dc37715d7))
+
 ## [0.1.20](https://github.com/alltuner/factoryfloor/compare/v0.1.19...v0.1.20) (2026-03-18)
 
 
