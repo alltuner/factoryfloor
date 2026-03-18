@@ -54,7 +54,8 @@ enum TmuxSession {
         let escaped = shellEscape(sessionName)
         let conf = shellEscape(configPath)
         // -L uses a dedicated socket, -f uses our minimal config
-        let envFlags = environmentVars.map { "-e \(shellEscape("\($0.key)=\($0.value)"))" }.joined(separator: " ")
+        // Don't shellEscape env flags here; they'll be escaped by the outer sh -c wrapper
+        let envFlags = environmentVars.map { "-e \($0.key)=\($0.value)" }.joined(separator: " ")
         let base = "\(tmuxPath) -L \(socketName) -f \(conf) new-session -A -s \(escaped) \(envFlags)"
         let wrappedCommand: String
         if let command {
