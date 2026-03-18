@@ -185,6 +185,13 @@ struct TerminalContainerView: View {
         PortAllocator.port(for: workingDirectory)
     }
 
+    private var portSubtitle: String {
+        if let port = portDetector.selectedPort {
+            return "localhost:\(port) · \u{2318}B for browser"
+        }
+        return projectName
+    }
+
     private var browserDefaultURL: String {
         let port = portDetector.selectedPort ?? workstreamPort
         return "http://localhost:\(port)/"
@@ -442,6 +449,7 @@ struct TerminalContainerView: View {
                     NSWorkspace.shared.open(url)
                 }
             }
+            .navigationSubtitle(portSubtitle)
     }
 
     // MARK: - Tab management
