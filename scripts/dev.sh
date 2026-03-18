@@ -35,9 +35,29 @@ case "${1:-build}" in
     xcodegen generate
     xcodebuild -project "$PROJECT" -scheme "$TEST_SCHEME" -configuration Debug test
     ;;
+  release)
+    # Build a Release binary matching CI conditions (hardened runtime, no debug entitlements)
+    BUILD_DIR="build/release-local/derived"
+    xcodegen generate
+    xcodebuild -project "$PROJECT" -scheme "$SCHEME" -configuration Release \
+      -derivedDataPath "$BUILD_DIR" \
+      CODE_SIGN_IDENTITY="-" \
+      CODE_SIGN_STYLE=Manual \
+      ENABLE_HARDENED_RUNTIME=YES \
+      CODE_SIGN_INJECT_BASE_ENTITLEMENTS=NO \
+      OTHER_CODE_SIGN_FLAGS="--options=runtime" \
+      build
+    echo "==> Release build at: $BUILD_DIR/Build/Products/Release/Factory Floor.app"
+    if [ "${2:-}" = "--run" ]; then
+      pkill -f "Factory Floor.app/Contents/MacOS/Factory Floor" 2>/dev/null || true
+      sleep 0.5
+      open "$BUILD_DIR/Build/Products/Release/Factory Floor.app"
+    fi
+    ;;
   clean)
     xcodebuild -project "$PROJECT" -scheme "$SCHEME" -configuration Debug clean 2>/dev/null || true
     rm -rf ~/Library/Developer/Xcode/DerivedData/FactoryFloor-*
+    rm -rf build/release-local
     ;;
   *)
     echo "Usage: ./scripts/dev.sh [command] [directory]"
@@ -46,6 +66,8 @@ case "${1:-build}" in
     echo "  run      Kill and relaunch (optionally with a directory)"
     echo "  br       Build and run"
     echo "  test     Run tests"
+    echo "  release  Build Release matching CI (hardened runtime)"
+    echo "  release --run  Build and run Release"
     echo "  clean    Clean build artifacts"
     ;;
 esac

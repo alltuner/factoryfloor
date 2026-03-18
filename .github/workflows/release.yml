@@ -39,6 +39,11 @@ jobs:
         with:
           submodules: true
 
+      - name: Log build environment
+        run: |
+          xcodebuild -version
+          swift --version
+
       - uses: xavierLowmiller/xcodegen-action@1.2.4
         with:
           install: true
@@ -94,6 +99,7 @@ jobs:
         run: |
           xcodebuild -project "$PROJECT" -scheme "$SCHEME" -configuration Release \
             -derivedDataPath build/derived \
+            -clonedSourcePackagesDirPath build/derived/SourcePackages \
             DEVELOPMENT_TEAM=J5TAY75Q3F \
             CODE_SIGN_IDENTITY="$SIGNING_IDENTITY" \
             CODE_SIGN_STYLE=Manual \
