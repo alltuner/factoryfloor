@@ -225,7 +225,7 @@ struct ProjectOverviewView: View {
                 if let selected = selectedDoc,
                    let doc = docFiles.first(where: { $0.name == selected })
                 {
-                    MarkdownContentView(markdown: doc.content, baseDirectory: project.directory)
+                    MarkdownContentView(markdown: doc.content)
                         .id(selected)
                 }
             }
