@@ -16,8 +16,6 @@ struct ProjectSidebar: View {
     @Binding var projects: [Project]
     @Binding var selection: SidebarSelection?
     let onProjectsChanged: () -> Void
-    var onWorkstreamAdded: ((UUID, Workstream) -> Void)?
-    var onProjectAdded: ((Project) -> Void)?
 
     @State private var showingAddProjectChoice = false
     @State private var showingNewProjectName = false
@@ -352,17 +350,13 @@ struct ProjectSidebar: View {
         let bypass = bypassPermissions ?? defaultBypass
         let workstream = Workstream(name: name, worktreePath: worktreePath, bypassPermissions: bypass)
         expandedProjects.insert(projectID)
-        if let onWorkstreamAdded {
-            // Let ContentView mutate @State and set selection atomically
-            onWorkstreamAdded(projectID, workstream)
-            rebuildIndices()
-        } else {
-            projects[index].workstreams.append(workstream)
-            rebuildIndices()
-            selection = .workstream(workstream.id)
-            onProjectsChanged()
-        }
-        logger.warning("[FF] addWorkstream: done")
+        NotificationCenter.default.post(
+            name: .workstreamCreated,
+            object: nil,
+            userInfo: ["projectID": projectID, "workstream": workstream]
+        )
+        rebuildIndices()
+        logger.warning("[FF] addWorkstream: done, posted notification")
     }
 
     @EnvironmentObject private var surfaceCache: TerminalSurfaceCache
@@ -477,13 +471,11 @@ struct ProjectSidebar: View {
 
         let projectName = name.isEmpty ? URL(fileURLWithPath: directory).lastPathComponent : name
         let project = Project(name: projectName, directory: directory)
-        if let onProjectAdded {
-            onProjectAdded(project)
-        } else {
-            projects.append(project)
-            selection = .project(project.id)
-            onProjectsChanged()
-        }
+        NotificationCenter.default.post(
+            name: .projectCreated,
+            object: nil,
+            userInfo: ["project": project]
+        )
     }
 }
 

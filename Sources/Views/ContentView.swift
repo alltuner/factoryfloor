@@ -6,6 +6,11 @@ import SwiftUI
 
 private let logger = Logger(subsystem: "factoryfloor", category: "content-view")
 
+extension Notification.Name {
+    static let workstreamCreated = Notification.Name("factoryfloor.workstreamCreated")
+    static let projectCreated = Notification.Name("factoryfloor.projectCreated")
+}
+
 struct ContentView: View {
     @State private var projects: [Project] = ProjectStore.load()
     @State private var selection: SidebarSelection? = SidebarSelection.loadSaved() ?? ContentView.initialSelection()
@@ -165,25 +170,7 @@ struct ContentView: View {
             ProjectSidebar(
                 projects: $projects,
                 selection: $selection,
-                onProjectsChanged: { ProjectStore.save(projects) },
-                onWorkstreamAdded: { projectID, workstream in
-                    if let index = projects.firstIndex(where: { $0.id == projectID }) {
-                        projects[index].workstreams.append(workstream)
-                        ProjectStore.save(projects)
-                        let wsID = workstream.id
-                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.05) {
-                            selection = .workstream(wsID)
-                        }
-                    }
-                },
-                onProjectAdded: { project in
-                    projects.append(project)
-                    ProjectStore.save(projects)
-                    let pid = project.id
-                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.05) {
-                        selection = .project(pid)
-                    }
-                }
+                onProjectsChanged: { ProjectStore.save(projects) }
             )
             .navigationSplitViewColumnWidth(min: 160, ideal: 200, max: 350)
         } detail: {
@@ -233,6 +220,23 @@ struct ContentView: View {
         }
         .onReceive(NotificationCenter.default.publisher(for: .prevTab)) { _ in
             cycleWorkstream(direction: -1)
+        }
+        .onReceive(NotificationCenter.default.publisher(for: .workstreamCreated)) { notification in
+            guard let info = notification.userInfo,
+                  let projectID = info["projectID"] as? UUID,
+                  let workstream = info["workstream"] as? Workstream,
+                  let index = projects.firstIndex(where: { $0.id == projectID }) else { return }
+            projects[index].workstreams.append(workstream)
+            selection = .workstream(workstream.id)
+            ProjectStore.save(projects)
+            logger.warning("[FF] workstreamCreated notification handled: \(workstream.name, privacy: .public)")
+        }
+        .onReceive(NotificationCenter.default.publisher(for: .projectCreated)) { notification in
+            guard let project = notification.userInfo?["project"] as? Project else { return }
+            projects.append(project)
+            selection = .project(project.id)
+            ProjectStore.save(projects)
+            logger.warning("[FF] projectCreated notification handled: \(project.name, privacy: .public)")
         }
         .onReceive(Timer.publish(every: 15, on: .main, in: .common).autoconnect()) { _ in
             appEnvironment.refreshAllRepoInfo(projects: projects)
