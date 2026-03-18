@@ -82,6 +82,11 @@
 "Symlink .env files" = "Enllaçar fitxers .env";
 "Symlink .env and .env.local from the main repository into new worktrees." = "Crea enllaços simbòlics de .env i .env.local del repositori principal als nous arbres de treball.";
 
+/* URL scheme confirmation */
+"Open Directory" = "Obre directori";
+"An external application wants to open %@ in %@." = "Una aplicació externa vol obrir %@ a %@.";
+"Allow" = "Permet";
+
 /* Quit confirmation */
 "Quit Factory Floor?" = "Sortir de Factory Floor?";
 "Active workstreams will be stopped." = "Els fluxos de treball actius s'aturaran.";

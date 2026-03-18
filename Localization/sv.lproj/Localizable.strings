@@ -82,6 +82,11 @@
 "Symlink .env files" = "Länka .env-filer";
 "Symlink .env and .env.local from the main repository into new worktrees." = "Skapa symboliska länkar för .env och .env.local från huvudrepositoriet till nya arbetsträd.";
 
+/* URL scheme confirmation */
+"Open Directory" = "Öppna katalog";
+"An external application wants to open %@ in %@." = "En extern applikation vill öppna %@ i %@.";
+"Allow" = "Tillåt";
+
 /* Quit confirmation */
 "Quit Factory Floor?" = "Avsluta Factory Floor?";
 "Active workstreams will be stopped." = "Aktiva arbetsflöden kommer att stoppas.";

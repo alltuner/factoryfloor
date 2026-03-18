@@ -1,9 +1,9 @@
 // ABOUTME: Main application entry point.
 // ABOUTME: Initializes the ghostty terminal engine and presents the main window.
 
-import SwiftUI
-import Sparkle
 import Sentry
+import Sparkle
+import SwiftUI
 
 extension Notification.Name {
     static let openDirectory = Notification.Name("factoryfloor.openDirectory")
@@ -21,7 +21,7 @@ extension Notification.Name {
 
 @MainActor
 final class AppDelegate: NSObject, NSApplicationDelegate {
-    func applicationShouldTerminate(_ sender: NSApplication) -> NSApplication.TerminateReply {
+    func applicationShouldTerminate(_: NSApplication) -> NSApplication.TerminateReply {
         let confirmQuit = UserDefaults.standard.object(forKey: "factoryfloor.confirmQuit") as? Bool ?? true
         guard confirmQuit else { return .terminateNow }
         let projects = ProjectStore.load()
@@ -43,6 +43,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 struct FF2App: App {
     @NSApplicationDelegateAdaptor(AppDelegate.self) var appDelegate
     @StateObject private var updater = Updater()
+    @State private var pendingURLDirectory: String?
 
     init() {
         SentrySDK.start { options in
@@ -53,9 +54,9 @@ struct FF2App: App {
             options.sendDefaultPii = false
             options.releaseName = "\(AppConstants.appID)@\(Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "0.0.0")"
             #if DEBUG
-            options.environment = "development"
+                options.environment = "development"
             #else
-            options.environment = "production"
+                options.environment = "production"
             #endif
         }
 
@@ -103,7 +104,26 @@ struct FF2App: App {
                     guard !path.isEmpty else { return }
                     var isDir: ObjCBool = false
                     guard FileManager.default.fileExists(atPath: path, isDirectory: &isDir), isDir.boolValue else { return }
-                    NotificationCenter.default.post(name: .openDirectory, object: path)
+                    pendingURLDirectory = path
+                }
+                .alert(
+                    Text("Open Directory"),
+                    isPresented: Binding(
+                        get: { pendingURLDirectory != nil },
+                        set: { if !$0 { pendingURLDirectory = nil } }
+                    )
+                ) {
+                    Button("Allow") {
+                        if let path = pendingURLDirectory {
+                            NotificationCenter.default.post(name: .openDirectory, object: path)
+                        }
+                        pendingURLDirectory = nil
+                    }
+                    Button("Cancel", role: .cancel) {
+                        pendingURLDirectory = nil
+                    }
+                } message: {
+                    Text("An external application wants to open \(pendingURLDirectory ?? "") in \(AppConstants.appName).")
                 }
         }
         .defaultSize(width: 1200, height: 800)
@@ -216,11 +236,11 @@ struct FF2App: App {
             CommandGroup(after: .toolbar) {
                 Button("Back to Project") { NotificationCenter.default.post(name: .switchToProject, object: nil) }
                     .keyboardShortcut("0", modifiers: .command)
-                ForEach(1...9, id: \.self) { n in
+                ForEach(1 ... 9, id: \.self) { n in
                     Button("Switch to Tab \(n)") { NotificationCenter.default.post(name: .switchByNumber, object: n) }
                         .keyboardShortcut(KeyEquivalent(Character("\(n)")), modifiers: .command)
                 }
-                ForEach(1...9, id: \.self) { n in
+                ForEach(1 ... 9, id: \.self) { n in
                     Button("Switch to Workstream \(n)") { NotificationCenter.default.post(name: .switchToWorkstream, object: n) }
                         .keyboardShortcut(KeyEquivalent(Character("\(n)")), modifiers: .control)
                 }

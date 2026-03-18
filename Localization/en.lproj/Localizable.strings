@@ -82,6 +82,11 @@
 "Symlink .env files" = "Symlink .env files";
 "Symlink .env and .env.local from the main repository into new worktrees." = "Symlink .env and .env.local from the main repository into new worktrees.";
 
+/* URL scheme confirmation */
+"Open Directory" = "Open Directory";
+"An external application wants to open %@ in %@." = "An external application wants to open %@ in %@.";
+"Allow" = "Allow";
+
 /* Quit confirmation */
 "Quit Factory Floor?" = "Quit Factory Floor?";
 "Active workstreams will be stopped." = "Active workstreams will be stopped.";

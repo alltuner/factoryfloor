@@ -82,6 +82,11 @@
 "Symlink .env files" = "Enlazar archivos .env";
 "Symlink .env and .env.local from the main repository into new worktrees." = "Crea enlaces simbólicos de .env y .env.local del repositorio principal en los nuevos árboles de trabajo.";
 
+/* URL scheme confirmation */
+"Open Directory" = "Abrir directorio";
+"An external application wants to open %@ in %@." = "Una aplicación externa quiere abrir %@ en %@.";
+"Allow" = "Permitir";
+
 /* Quit confirmation */
 "Quit Factory Floor?" = "¿Salir de Factory Floor?";
 "Active workstreams will be stopped." = "Los flujos de trabajo activos se detendrán.";
