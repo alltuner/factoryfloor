@@ -352,8 +352,13 @@ struct ProjectSidebar: View {
         projects[index].workstreams.append(workstream)
         rebuildIndices()
         expandedProjects.insert(projectID)
-        selection = .workstream(workstream.id)
         onProjectsChanged()
+        // Defer selection to next run loop so the @Binding mutation propagates
+        // to ContentView's @State before activeProject is evaluated.
+        let wsID = workstream.id
+        DispatchQueue.main.async {
+            selection = .workstream(wsID)
+        }
         logger.warning("[FF] addWorkstream: done")
     }
 
