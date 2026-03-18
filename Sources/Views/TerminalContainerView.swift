@@ -16,7 +16,7 @@ extension Notification.Name {
     static let terminalTitleChanged = Notification.Name("factoryfloor.terminalTitleChanged")
 }
 
-enum RestorableWorkspaceTab: String, Codable, Sendable {
+enum RestorableWorkspaceTab: String, Codable {
     case info
     case agent
     case environment
@@ -47,29 +47,18 @@ enum RestorableWorkspaceTab: String, Codable, Sendable {
 enum WorkspaceStateStore {
     private static let userDefaultsKey = "factoryfloor.workspaceTabs"
 
-    private static var legacyFileURL: URL {
-        AppConstants.configDirectory.appendingPathComponent("workspace-tabs.json")
-    }
-
     static func load(for workstreamID: UUID) -> RestorableWorkspaceTab? {
-        if let data = UserDefaults.standard.data(forKey: userDefaultsKey),
-           let saved = try? JSONDecoder().decode([String: RestorableWorkspaceTab].self, from: data) {
-            return saved[workstreamID.uuidString]
-        }
-        // Migrate from JSON file if UserDefaults is empty
-        if let data = try? Data(contentsOf: legacyFileURL),
-           let saved = try? JSONDecoder().decode([String: RestorableWorkspaceTab].self, from: data) {
-            UserDefaults.standard.set(data, forKey: userDefaultsKey)
-            try? FileManager.default.removeItem(at: legacyFileURL)
-            return saved[workstreamID.uuidString]
-        }
-        return nil
+        guard let data = UserDefaults.standard.data(forKey: userDefaultsKey),
+              let saved = try? JSONDecoder().decode([String: RestorableWorkspaceTab].self, from: data)
+        else { return nil }
+        return saved[workstreamID.uuidString]
     }
 
     static func save(_ tab: RestorableWorkspaceTab, for workstreamID: UUID) {
         var saved: [String: RestorableWorkspaceTab] = [:]
         if let data = UserDefaults.standard.data(forKey: userDefaultsKey),
-           let existing = try? JSONDecoder().decode([String: RestorableWorkspaceTab].self, from: data) {
+           let existing = try? JSONDecoder().decode([String: RestorableWorkspaceTab].self, from: data)
+        {
             saved = existing
         }
         saved[workstreamID.uuidString] = tab
@@ -83,7 +72,8 @@ func reorderedCustomTabs(_ tabs: [WorkspaceTab], dragging draggedTab: WorkspaceT
           draggedTab.isCloseable,
           targetTab.isCloseable,
           let sourceIndex = tabs.firstIndex(of: draggedTab),
-          let targetIndex = tabs.firstIndex(of: targetTab) else {
+          let targetIndex = tabs.firstIndex(of: targetTab)
+    else {
         return tabs
     }
 
@@ -95,7 +85,7 @@ func reorderedCustomTabs(_ tabs: [WorkspaceTab], dragging draggedTab: WorkspaceT
 }
 
 /// A tab in the workspace. Info and Agent are permanent; terminals and browsers are closeable.
-enum WorkspaceTab: Hashable, Sendable {
+enum WorkspaceTab: Hashable {
     case info
     case agent
     case environment
@@ -164,14 +154,16 @@ struct TerminalContainerView: View {
         _portDetector = StateObject(wrappedValue: PortDetector(workstreamID: workstreamID))
     }
 
-    private var claudeID: UUID { workstreamID }
+    private var claudeID: UUID {
+        workstreamID
+    }
 
     /// Surface IDs that should be rendering for the active tab.
     /// Returns nil for the environment tab (env surface IDs are managed internally).
     private var visibleSurfaceIDs: Set<UUID>? {
         switch activeTab {
         case .agent: return [claudeID]
-        case .terminal(let id): return [id]
+        case let .terminal(id): return [id]
         case .info, .browser: return []
         case .environment: return nil
         }
@@ -352,14 +344,14 @@ struct TerminalContainerView: View {
                     runStoppedManually: $runStoppedManually
                 )
             }
-        case .terminal(let id):
+        case let .terminal(id):
             SingleTerminalView(
                 surfaceID: id,
                 workingDirectory: workingDirectory,
                 isFocused: true,
                 environmentVars: terminalEnvVars
             )
-        case .browser(let id):
+        case let .browser(id):
             BrowserView(defaultURL: browserDefaultURL, tabID: id)
                 .id(id)
         }
@@ -409,47 +401,47 @@ struct TerminalContainerView: View {
     var body: some View {
         mainContent
             .onReceive(NotificationCenter.default.publisher(for: .switchByNumber)) { notification in
-            guard let n = notification.object as? Int, n >= 1 else { return }
-            // Cmd+1-9 maps to closeable tabs (terminals and browsers)
-            let customTabs = tabs.filter(\.isCloseable)
-            guard n <= customTabs.count else { return }
-            activeTab = customTabs[n - 1]
-        }
-        .onReceive(NotificationCenter.default.publisher(for: .nextTab)) { _ in
-            guard let idx = tabs.firstIndex(of: activeTab) else { return }
-            activeTab = tabs[(idx + 1) % tabs.count]
-        }
-        .onReceive(NotificationCenter.default.publisher(for: .prevTab)) { _ in
-            guard let idx = tabs.firstIndex(of: activeTab) else { return }
-            activeTab = tabs[(idx - 1 + tabs.count) % tabs.count]
-        }
-        .onReceive(NotificationCenter.default.publisher(for: .terminalTabExited)) { notification in
-            guard let surfaceID = notification.object as? UUID else { return }
-            if let tab = tabs.first(where: {
-                if case .terminal(let id) = $0 { return id == surfaceID }
-                return false
-            }) {
-                closeTab(tab)
+                guard let n = notification.object as? Int, n >= 1 else { return }
+                // Cmd+1-9 maps to closeable tabs (terminals and browsers)
+                let customTabs = tabs.filter(\.isCloseable)
+                guard n <= customTabs.count else { return }
+                activeTab = customTabs[n - 1]
             }
-        }
-        .onReceive(NotificationCenter.default.publisher(for: .browserTitleChanged)) { notification in
-            guard let tabID = notification.object as? UUID else { return }
-            browserTitles[tabID] = notification.userInfo?["title"] as? String
-        }
-        .onReceive(NotificationCenter.default.publisher(for: .terminalTitleChanged)) { notification in
-            guard let surfaceID = notification.object as? UUID else { return }
-            terminalTitles[surfaceID] = notification.userInfo?["title"] as? String
-        }
-        .onReceive(NotificationCenter.default.publisher(for: .openExternalBrowser)) { _ in
-            guard let url = URL(string: browserDefaultURL) else { return }
-            if defaultBrowser.isEmpty {
-                NSWorkspace.shared.open(url)
-            } else if let appURL = NSWorkspace.shared.urlForApplication(withBundleIdentifier: defaultBrowser) {
-                NSWorkspace.shared.open([url], withApplicationAt: appURL, configuration: NSWorkspace.OpenConfiguration())
-            } else {
-                NSWorkspace.shared.open(url)
+            .onReceive(NotificationCenter.default.publisher(for: .nextTab)) { _ in
+                guard let idx = tabs.firstIndex(of: activeTab) else { return }
+                activeTab = tabs[(idx + 1) % tabs.count]
             }
-        }
+            .onReceive(NotificationCenter.default.publisher(for: .prevTab)) { _ in
+                guard let idx = tabs.firstIndex(of: activeTab) else { return }
+                activeTab = tabs[(idx - 1 + tabs.count) % tabs.count]
+            }
+            .onReceive(NotificationCenter.default.publisher(for: .terminalTabExited)) { notification in
+                guard let surfaceID = notification.object as? UUID else { return }
+                if let tab = tabs.first(where: {
+                    if case let .terminal(id) = $0 { return id == surfaceID }
+                    return false
+                }) {
+                    closeTab(tab)
+                }
+            }
+            .onReceive(NotificationCenter.default.publisher(for: .browserTitleChanged)) { notification in
+                guard let tabID = notification.object as? UUID else { return }
+                browserTitles[tabID] = notification.userInfo?["title"] as? String
+            }
+            .onReceive(NotificationCenter.default.publisher(for: .terminalTitleChanged)) { notification in
+                guard let surfaceID = notification.object as? UUID else { return }
+                terminalTitles[surfaceID] = notification.userInfo?["title"] as? String
+            }
+            .onReceive(NotificationCenter.default.publisher(for: .openExternalBrowser)) { _ in
+                guard let url = URL(string: browserDefaultURL) else { return }
+                if defaultBrowser.isEmpty {
+                    NSWorkspace.shared.open(url)
+                } else if let appURL = NSWorkspace.shared.urlForApplication(withBundleIdentifier: defaultBrowser) {
+                    NSWorkspace.shared.open([url], withApplicationAt: appURL, configuration: NSWorkspace.OpenConfiguration())
+                } else {
+                    NSWorkspace.shared.open(url)
+                }
+            }
     }
 
     // MARK: - Tab management
@@ -459,10 +451,10 @@ struct TerminalContainerView: View {
         case .info: return NSLocalizedString("Info", comment: "")
         case .agent: return NSLocalizedString("Agent", comment: "")
         case .environment: return NSLocalizedString("Environment", comment: "")
-        case .terminal(let id):
+        case let .terminal(id):
             guard let title = terminalTitles[id], !title.isEmpty else { return nil }
             return title.count > 20 ? String(title.prefix(20)) + "..." : title
-        case .browser(let id):
+        case let .browser(id):
             guard let title = browserTitles[id], !title.isEmpty else { return nil }
             return title.count > 20 ? String(title.prefix(20)) + "..." : title
         }
@@ -496,7 +488,7 @@ struct TerminalContainerView: View {
 
     private func tabDragIdentifier(_ tab: WorkspaceTab) -> String {
         switch tab {
-        case .terminal(let id), .browser(let id):
+        case let .terminal(id), let .browser(id):
             return id.uuidString
         case .info:
             return "info"
@@ -527,7 +519,7 @@ struct TerminalContainerView: View {
         guard let index = tabs.firstIndex(of: tab) else { return }
         tabs.remove(at: index)
         // Clean up terminal surface
-        if case .terminal(let id) = tab {
+        if case let .terminal(id) = tab {
             surfaceCache.removeSurface(for: id)
         }
         // Switch to previous tab or agent
@@ -677,11 +669,11 @@ private struct WorkspaceTabButton: View {
 private struct WorkspaceTabDropDelegate: DropDelegate {
     let onDropTab: () -> Void
 
-    func validateDrop(info: DropInfo) -> Bool {
+    func validateDrop(info _: DropInfo) -> Bool {
         true
     }
 
-    func performDrop(info: DropInfo) -> Bool {
+    func performDrop(info _: DropInfo) -> Bool {
         onDropTab()
         return true
     }
@@ -729,13 +721,13 @@ struct SingleTerminalView: NSViewRepresentable {
 
     @EnvironmentObject var surfaceCache: TerminalSurfaceCache
 
-    func makeNSView(context: Context) -> NSView {
+    func makeNSView(context _: Context) -> NSView {
         let container = NSView()
         container.wantsLayer = true
         return container
     }
 
-    func updateNSView(_ container: NSView, context: Context) {
+    func updateNSView(_ container: NSView, context _: Context) {
         guard let app = TerminalApp.shared.app else { return }
 
         let terminalView = surfaceCache.surface(
@@ -835,7 +827,7 @@ final class TerminalSurfaceCache: ObservableObject {
         // Build a set of all possible derived IDs and remove matches
         var derivedIDs = Set<UUID>()
         for prefix in ["terminal", "browser", "env-setup", "env-run"] {
-            for i in 0...99 {
+            for i in 0 ... 99 {
                 derivedIDs.insert(derivedUUID(from: workstreamID, salt: "\(prefix)-\(i)"))
             }
         }

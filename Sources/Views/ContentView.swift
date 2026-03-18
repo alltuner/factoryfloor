@@ -399,25 +399,11 @@ struct ContentView: View {
 enum ProjectStore {
     private static let userDefaultsKey = "factoryfloor.projects"
 
-    private static var legacyFileURL: URL {
-        AppConstants.configDirectory.appendingPathComponent("projects.json")
-    }
-
     static func load() -> [Project] {
-        if let data = UserDefaults.standard.data(forKey: userDefaultsKey),
-           let projects = try? JSONDecoder().decode([Project].self, from: data)
-        {
-            return projects
-        }
-        // Migrate from JSON file if UserDefaults is empty
-        if let data = try? Data(contentsOf: legacyFileURL),
-           let projects = try? JSONDecoder().decode([Project].self, from: data)
-        {
-            save(projects)
-            try? FileManager.default.removeItem(at: legacyFileURL)
-            return projects
-        }
-        return []
+        guard let data = UserDefaults.standard.data(forKey: userDefaultsKey),
+              let projects = try? JSONDecoder().decode([Project].self, from: data)
+        else { return [] }
+        return projects
     }
 
     static func save(_ projects: [Project]) {

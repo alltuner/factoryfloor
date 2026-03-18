@@ -6,19 +6,19 @@ import OSLog
 
 private let logger = Logger(subsystem: "factoryfloor", category: "sidebar-selection")
 
-enum SidebarSelection: Hashable, Codable, Sendable {
+enum SidebarSelection: Hashable, Codable {
     case project(UUID)
     case workstream(UUID)
     case settings
     case help
 
     var projectID: UUID? {
-        if case .project(let id) = self { return id }
+        if case let .project(id) = self { return id }
         return nil
     }
 
     var workstreamID: UUID? {
-        if case .workstream(let id) = self { return id }
+        if case let .workstream(id) = self { return id }
         return nil
     }
 
@@ -26,23 +26,11 @@ enum SidebarSelection: Hashable, Codable, Sendable {
 
     private static let userDefaultsKey = "factoryfloor.selection"
 
-    private static var legacyFileURL: URL {
-        AppConstants.configDirectory.appendingPathComponent("sidebar-selection.json")
-    }
-
     static func loadSaved() -> SidebarSelection? {
-        if let data = UserDefaults.standard.data(forKey: userDefaultsKey),
-           let selection = try? JSONDecoder().decode(SidebarSelection.self, from: data) {
-            return selection
-        }
-        // Migrate from JSON file if UserDefaults is empty
-        if let data = try? Data(contentsOf: legacyFileURL),
-           let selection = try? JSONDecoder().decode(SidebarSelection.self, from: data) {
-            selection.save()
-            try? FileManager.default.removeItem(at: legacyFileURL)
-            return selection
-        }
-        return nil
+        guard let data = UserDefaults.standard.data(forKey: userDefaultsKey),
+              let selection = try? JSONDecoder().decode(SidebarSelection.self, from: data)
+        else { return nil }
+        return selection
     }
 
     func save() {
@@ -54,23 +42,11 @@ enum SidebarSelection: Hashable, Codable, Sendable {
 enum SidebarState {
     private static let userDefaultsKey = "factoryfloor.expandedProjects"
 
-    private static var legacyFileURL: URL {
-        AppConstants.configDirectory.appendingPathComponent("sidebar-state.json")
-    }
-
     static func loadExpanded() -> Set<UUID> {
-        if let data = UserDefaults.standard.data(forKey: userDefaultsKey),
-           let ids = try? JSONDecoder().decode(Set<UUID>.self, from: data) {
-            return ids
-        }
-        // Migrate from JSON file if UserDefaults is empty
-        if let data = try? Data(contentsOf: legacyFileURL),
-           let ids = try? JSONDecoder().decode(Set<UUID>.self, from: data) {
-            saveExpanded(ids)
-            try? FileManager.default.removeItem(at: legacyFileURL)
-            return ids
-        }
-        return []
+        guard let data = UserDefaults.standard.data(forKey: userDefaultsKey),
+              let ids = try? JSONDecoder().decode(Set<UUID>.self, from: data)
+        else { return [] }
+        return ids
     }
 
     static func saveExpanded(_ ids: Set<UUID>) {
