@@ -169,14 +169,20 @@ struct ContentView: View {
                 onWorkstreamAdded: { projectID, workstream in
                     if let index = projects.firstIndex(where: { $0.id == projectID }) {
                         projects[index].workstreams.append(workstream)
-                        selection = .workstream(workstream.id)
                         ProjectStore.save(projects)
+                        let wsID = workstream.id
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.05) {
+                            selection = .workstream(wsID)
+                        }
                     }
                 },
                 onProjectAdded: { project in
                     projects.append(project)
-                    selection = .project(project.id)
                     ProjectStore.save(projects)
+                    let pid = project.id
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.05) {
+                        selection = .project(pid)
+                    }
                 }
             )
             .navigationSplitViewColumnWidth(min: 160, ideal: 200, max: 350)
