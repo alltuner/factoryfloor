@@ -1,5 +1,18 @@
 # Changelog
 
+## [0.1.17](https://github.com/alltuner/factoryfloor/compare/v0.1.16...v0.1.17) (2026-03-18)
+
+
+### Bug Fixes
+
+* **ci:** add actions:write permission for website deploy trigger ([#50](https://github.com/alltuner/factoryfloor/issues/50)) ([272903b](https://github.com/alltuner/factoryfloor/commit/272903b156793a96a8182143fe77adaa6ebef1d9))
+* defer workstream selection to let @Binding propagate ([#43](https://github.com/alltuner/factoryfloor/issues/43)) ([#52](https://github.com/alltuner/factoryfloor/issues/52)) ([d687430](https://github.com/alltuner/factoryfloor/commit/d687430d81728eb84fcd2ba224cf2f665ac0721b))
+
+
+### Miscellaneous
+
+* update versions.json to v0.1.16 ([ff602af](https://github.com/alltuner/factoryfloor/commit/ff602af9f8b7c59e551478d25382429b9e25eed4))
+
 ## [0.1.16](https://github.com/alltuner/factoryfloor/compare/v0.1.15...v0.1.16) (2026-03-17)
 
 
