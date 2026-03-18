@@ -1,5 +1,17 @@
 # Changelog
 
+## [0.1.20](https://github.com/alltuner/factoryfloor/compare/v0.1.19...v0.1.20) (2026-03-18)
+
+
+### Bug Fixes
+
+* use notifications for project/workstream creation ([#43](https://github.com/alltuner/factoryfloor/issues/43)) ([#57](https://github.com/alltuner/factoryfloor/issues/57)) ([75ed058](https://github.com/alltuner/factoryfloor/commit/75ed058599bf263a43af98b5750f9457a1e21f5a))
+
+
+### Miscellaneous
+
+* update versions.json to v0.1.19 ([0aed24f](https://github.com/alltuner/factoryfloor/commit/0aed24f1b5ff5a656f803d819cdf22b35f988cf8))
+
 ## [0.1.19](https://github.com/alltuner/factoryfloor/compare/v0.1.18...v0.1.19) (2026-03-18)
 
 
