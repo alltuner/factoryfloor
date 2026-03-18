@@ -11,10 +11,23 @@ extension Notification.Name {
     static let projectCreated = Notification.Name("factoryfloor.projectCreated")
 }
 
+final class ProjectList: ObservableObject {
+    @Published var items: [Project]
+
+    init() {
+        items = ProjectStore.load()
+    }
+}
+
 struct ContentView: View {
-    @State private var projects: [Project] = ProjectStore.load()
+    @StateObject private var projectList = ProjectList()
     @State private var selection: SidebarSelection? = SidebarSelection.loadSaved() ?? ContentView.initialSelection()
     @State private var selectionBeforeSettings: SidebarSelection?
+
+    private var projects: [Project] {
+        get { projectList.items }
+        nonmutating set { projectList.items = newValue }
+    }
     @StateObject private var surfaceCache = TerminalSurfaceCache()
     @StateObject private var appEnvironment = AppEnvironment()
     @StateObject private var updateChecker = UpdateChecker()
@@ -80,7 +93,7 @@ struct ContentView: View {
         } else if let project = activeProject,
                   let projectIndex = projects.firstIndex(where: { $0.id == project.id }) {
             ProjectOverviewView(
-                project: $projects[projectIndex],
+                project: $projectList.items[projectIndex],
                 onSelectWorkstream: { wsID in selection = .workstream(wsID) },
                 onArchiveWorkstream: { wsID in confirmArchive(wsID) },
                 onProjectChanged: { ProjectStore.save(projects) }
@@ -127,7 +140,7 @@ struct ContentView: View {
             .onReceive(NotificationCenter.default.publisher(for: .openExternalTerminal)) { _ in
                 openExternalTerminal()
             }
-            .onChange(of: projects) { _, newValue in
+            .onChange(of: projectList.items) { _, newValue in
                 // Debounce saves to avoid rapid I/O from activity updates
                 saveWork?.cancel()
                 let work = DispatchWorkItem { ProjectStore.save(newValue) }
@@ -168,7 +181,7 @@ struct ContentView: View {
     private var navigationView: some View {
         NavigationSplitView {
             ProjectSidebar(
-                projects: $projects,
+                projects: $projectList.items,
                 selection: $selection,
                 onProjectsChanged: { ProjectStore.save(projects) }
             )
