@@ -1,5 +1,17 @@
 # Changelog
 
+## [0.1.18](https://github.com/alltuner/factoryfloor/compare/v0.1.17...v0.1.18) (2026-03-18)
+
+
+### Bug Fixes
+
+* use atomic callbacks for project and workstream creation ([#43](https://github.com/alltuner/factoryfloor/issues/43)) ([#53](https://github.com/alltuner/factoryfloor/issues/53)) ([080bcb2](https://github.com/alltuner/factoryfloor/commit/080bcb2b9612934b6328aa7432e04d4d32e845c2))
+
+
+### Miscellaneous
+
+* update versions.json to v0.1.17 ([65042c2](https://github.com/alltuner/factoryfloor/commit/65042c20894d7c95ef70519009ab287f785a4556))
+
 ## [0.1.17](https://github.com/alltuner/factoryfloor/compare/v0.1.16...v0.1.17) (2026-03-18)
 
 
