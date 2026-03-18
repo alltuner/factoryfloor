@@ -1,5 +1,17 @@
 # Changelog
 
+## [0.1.22](https://github.com/alltuner/factoryfloor/compare/v0.1.21...v0.1.22) (2026-03-18)
+
+
+### Bug Fixes
+
+* remove double shell-escaping of tmux -e env flags ([#64](https://github.com/alltuner/factoryfloor/issues/64)) ([be08aa4](https://github.com/alltuner/factoryfloor/commit/be08aa45420f6b380dfce87298f866cb47060258))
+
+
+### Miscellaneous
+
+* update versions.json to v0.1.21 ([db0a820](https://github.com/alltuner/factoryfloor/commit/db0a820ee71fa496a9999e63b851079556862769))
+
 ## [0.1.21](https://github.com/alltuner/factoryfloor/compare/v0.1.20...v0.1.21) (2026-03-18)
 
 
