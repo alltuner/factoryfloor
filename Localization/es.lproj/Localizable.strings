@@ -239,3 +239,5 @@
 "Rerun" = "Reejecutar";
 "Start" = "Iniciar";
 "Stop" = "Detener";
+
+"Restarting..." = "Reiniciando...";

@@ -74,7 +74,6 @@ struct EnvironmentTabView: View {
         }
     }
 
-    @ViewBuilder
     private func scriptPane(title: String, icon: String, restartLabel: String, shortcut: String, script: String?, surfaceID: UUID, tmuxRole: String, restarting: Bool, onRestart: @escaping () -> Void) -> some View {
         VStack(spacing: 0) {
             HStack {
@@ -105,8 +104,13 @@ struct EnvironmentTabView: View {
             Divider()
 
             if restarting {
-                Color.clear
-                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+                VStack(spacing: 12) {
+                    ProgressView()
+                    Text("Restarting...")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                }
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
             } else if let script {
                 SingleTerminalView(
                     surfaceID: surfaceID,
@@ -225,7 +229,8 @@ struct EnvironmentTabView: View {
     private func envInput(script: String, role: String) -> String {
         let command: String
         if role == "run",
-           let launcherPath = RunLauncher.executableURL()?.path {
+           let launcherPath = RunLauncher.executableURL()?.path
+        {
             command = runScriptCommand(script: script, workstreamID: workstreamID, launcherPath: launcherPath)
         } else {
             command = scriptCommand(script: script, role: role)
