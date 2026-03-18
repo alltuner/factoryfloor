@@ -11,6 +11,11 @@ extension Notification.Name {
     static let projectCreated = Notification.Name("factoryfloor.projectCreated")
 }
 
+/// Heap-allocated project storage using reference semantics. All child views that
+/// mutate projects via @Binding write to this shared instance, avoiding the stale
+/// @State snapshot problem that caused #43 in Release builds. Audited in #91:
+/// every @Binding mutation site (archive, delete, prune, rename, activity timestamps)
+/// is safe because they all write through to this ObservableObject.
 final class ProjectList: ObservableObject {
     @Published var items: [Project]
 
@@ -28,6 +33,7 @@ struct ContentView: View {
         get { projectList.items }
         nonmutating set { projectList.items = newValue }
     }
+
     @StateObject private var surfaceCache = TerminalSurfaceCache()
     @StateObject private var appEnvironment = AppEnvironment()
     @StateObject private var updateChecker = UpdateChecker()
@@ -49,11 +55,11 @@ struct ContentView: View {
             return nil
         }
         switch selection {
-        case .project(let id):
+        case let .project(id):
             let found = projects.first(where: { $0.id == id })
             if found == nil { logger.warning("[FF] activeProject: project \(id, privacy: .public) not found in \(projects.count, privacy: .public) projects") }
             return found
-        case .workstream(let wsID):
+        case let .workstream(wsID):
             let found = projects.first(where: { $0.workstreams.contains(where: { $0.id == wsID }) })
             if found == nil { logger.warning("[FF] activeProject: workstream \(wsID, privacy: .public) not found in any project") }
             return found
@@ -91,7 +97,8 @@ struct ContentView: View {
             .navigationTitle(workstream.name)
             .navigationSubtitle(project.name)
         } else if let project = activeProject,
-                  let projectIndex = projects.firstIndex(where: { $0.id == project.id }) {
+                  let projectIndex = projects.firstIndex(where: { $0.id == project.id })
+        {
             ProjectOverviewView(
                 project: $projectList.items[projectIndex],
                 onSelectWorkstream: { wsID in selection = .workstream(wsID) },
@@ -208,7 +215,7 @@ struct ContentView: View {
             guard let n = notification.object as? Int else { return }
             // Find the active project (from project view or workstream view)
             let project: Project?
-            if case .project(let pid) = selection {
+            if case let .project(pid) = selection {
                 project = projects.first(where: { $0.id == pid })
             } else if let wsID = selection?.workstreamID {
                 project = projects.first(where: { $0.workstreams.contains(where: { $0.id == wsID }) })
@@ -224,7 +231,8 @@ struct ContentView: View {
         .onReceive(NotificationCenter.default.publisher(for: .switchToProject)) { _ in
             // Go back to project view from any workstream
             if let wsID = selection?.workstreamID,
-               let project = projects.first(where: { $0.workstreams.contains(where: { $0.id == wsID }) }) {
+               let project = projects.first(where: { $0.workstreams.contains(where: { $0.id == wsID }) })
+            {
                 selection = .project(project.id)
             }
         }
@@ -273,10 +281,10 @@ struct ContentView: View {
                 }
             }
             projects.removeAll { missing.contains($0.id) }
-            if let sel = selection, case .project(let pid) = sel, missing.contains(pid) {
+            if let sel = selection, case let .project(pid) = sel, missing.contains(pid) {
                 selection = nil
             }
-            if let sel = selection, case .workstream(_) = sel, activeProject == nil {
+            if let sel = selection, case .workstream = sel, activeProject == nil {
                 selection = nil
             }
             ProjectStore.save(projects)
@@ -325,7 +333,8 @@ struct ContentView: View {
         guard let dir else { return }
         let terminalBundleID = UserDefaults.standard.string(forKey: "factoryfloor.defaultTerminal") ?? ""
         if !terminalBundleID.isEmpty,
-           let appURL = NSWorkspace.shared.urlForApplication(withBundleIdentifier: terminalBundleID) {
+           let appURL = NSWorkspace.shared.urlForApplication(withBundleIdentifier: terminalBundleID)
+        {
             let config = NSWorkspace.OpenConfiguration()
             NSWorkspace.shared.open([URL(fileURLWithPath: dir)], withApplicationAt: appURL, configuration: config)
         } else if let terminalURL = NSWorkspace.shared.urlForApplication(withBundleIdentifier: "com.apple.Terminal") {
@@ -363,7 +372,8 @@ struct ContentView: View {
         guard !sorted.isEmpty else { return }
 
         if let wsID = selection?.workstreamID,
-           let currentIndex = sorted.firstIndex(where: { $0.id == wsID }) {
+           let currentIndex = sorted.firstIndex(where: { $0.id == wsID })
+        {
             let next = (currentIndex + direction + sorted.count) % sorted.count
             selection = .workstream(sorted[next].id)
         } else if case .project = selection {
@@ -400,12 +410,14 @@ enum ProjectStore {
 
     static func load() -> [Project] {
         if let data = UserDefaults.standard.data(forKey: userDefaultsKey),
-           let projects = try? JSONDecoder().decode([Project].self, from: data) {
+           let projects = try? JSONDecoder().decode([Project].self, from: data)
+        {
             return projects
         }
         // Migrate from JSON file if UserDefaults is empty
         if let data = try? Data(contentsOf: legacyFileURL),
-           let projects = try? JSONDecoder().decode([Project].self, from: data) {
+           let projects = try? JSONDecoder().decode([Project].self, from: data)
+        {
             save(projects)
             try? FileManager.default.removeItem(at: legacyFileURL)
             return projects
