@@ -1,5 +1,23 @@
 # Changelog
 
+## [0.1.27](https://github.com/alltuner/factoryfloor/compare/v0.1.26...v0.1.27) (2026-03-18)
+
+
+### Bug Fixes
+
+* flatten tmux command to single sh -c level, eliminate nested escaping ([#114](https://github.com/alltuner/factoryfloor/issues/114)) ([c42631f](https://github.com/alltuner/factoryfloor/commit/c42631f113abf10e71498088391b011705b1cbb6))
+
+
+### Miscellaneous
+
+* update versions.json to v0.1.26 ([0776e67](https://github.com/alltuner/factoryfloor/commit/0776e678857a34597729058bd7b25a49ffced837))
+
+
+### Documentation
+
+* add hybrid adoption strategy to SwiftGitX analysis ([#112](https://github.com/alltuner/factoryfloor/issues/112)) ([668b3cd](https://github.com/alltuner/factoryfloor/commit/668b3cdae7502609409d795ec692474d85460312))
+* add SwiftGitX feasibility analysis ([#110](https://github.com/alltuner/factoryfloor/issues/110)) ([2970473](https://github.com/alltuner/factoryfloor/commit/297047352b56e656ae618829dcfb2463ea3add61))
+
 ## [0.1.26](https://github.com/alltuner/factoryfloor/compare/v0.1.25...v0.1.26) (2026-03-18)
 
 
