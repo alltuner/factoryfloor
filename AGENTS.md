@@ -8,6 +8,8 @@
 ./scripts/dev.sh br                 # build and run
 ./scripts/dev.sh run [dir]          # kill and relaunch (optionally with a directory)
 ./scripts/dev.sh test               # run XCTest suite
+./scripts/dev.sh release            # release build matching CI (hardened runtime)
+./scripts/dev.sh release --run      # release build and run
 ./scripts/dev.sh clean              # clean build artifacts
 ./scripts/release.sh [version]      # release build: sign, notarize, create DMG
 ```
