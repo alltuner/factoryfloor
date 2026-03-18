@@ -28,6 +28,12 @@ Run `xcodegen generate` when:
 
 Do NOT edit `FactoryFloor.xcodeproj` directly. It is generated from `project.yml`.
 
+### Developer setup
+```bash
+uvx prek install                    # install pre-commit hooks
+uvx prek run --all-files            # run hooks on all files (optional)
+```
+
 ### Release build
 ```bash
 ./scripts/release.sh [version]   # builds, signs, notarizes, creates DMG
@@ -76,7 +82,9 @@ Breaking changes: add `!` after the type or include `BREAKING CHANGE:` in the fo
 - **Bridging header** at `Resources/FactoryFloor-Bridging-Header.h`
 - **Single-window** app via `Window` (not `WindowGroup`)
 - **`factoryfloor://`** URL scheme for single-instance behavior
-- **AppConstants** (`appID`, `appName`, `configDirectory`, `dataDirectory`)
+- **AppConstants** (`appID`, `appName`, `configDirectory`, `cacheDirectory`)
+- **Sparkle** for auto-updates (DMG users), `UpdateChecker` for Homebrew users
+- **prek** pre-commit hooks (`prek.toml`)
 
 ### Key directories
 - `Sources/Models/` - Data models, git operations, tmux, name generator, app constants
@@ -90,12 +98,12 @@ Breaking changes: add `!` after the type or include `BREAKING CHANGE:` in the fo
 - `docs/` - Distribution guide and reference docs
 
 ### Data flow
-- **Projects/workstreams** stored as JSON files in `~/.config/factoryfloor/`, accessed via `ProjectStore`
+- **Projects/workstreams** stored in UserDefaults (`factoryfloor.projects`), accessed via `ProjectStore`. Wrapped in `ProjectList: ObservableObject` for reference-type semantics.
 - **Settings** use `@AppStorage` (UserDefaults), keyed as `factoryfloor.*`
 - **Terminal surfaces** cached in `TerminalSurfaceCache` (keyed by UUID)
 - **Git repo info** cached in `AppEnvironment`, refreshed async every 15s
 - **Tool detection** runs at startup in `AppEnvironment.refresh()`
-- **Sidebar state** (selection, expanded sections) persisted as JSON via `SidebarSelection` / `SidebarState`
+- **Sidebar state** (selection, expanded sections) stored in UserDefaults (`factoryfloor.selection`, `factoryfloor.expandedProjects`)
 
 ### Workstream lifecycle
 1. Creating a workstream: generates name, runs `git worktree add`, symlinks .env (if enabled)
@@ -117,9 +125,9 @@ state to `~/Library/Caches/factoryfloor/run-state/<workstream-id>.json`. The app
 via FSEvents and retargets the embedded browser when a port is detected.
 
 ### Paths
-- Config: `~/.config/factoryfloor/` (respects `XDG_CONFIG_HOME`)
+- Persistent data: UserDefaults (projects, sidebar state, workspace tabs)
 - Cache: `~/Library/Caches/factoryfloor/` (run-state, tmux.conf)
-- Data/worktrees: `~/.factoryfloor/`
+- Worktrees: `~/.factoryfloor/worktrees/`
 - URL scheme: `factoryfloor://`
 - Bundle ID: `com.alltuner.factoryfloor`
 
