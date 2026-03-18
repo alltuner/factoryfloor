@@ -165,7 +165,19 @@ struct ContentView: View {
             ProjectSidebar(
                 projects: $projects,
                 selection: $selection,
-                onProjectsChanged: { ProjectStore.save(projects) }
+                onProjectsChanged: { ProjectStore.save(projects) },
+                onWorkstreamAdded: { projectID, workstream in
+                    if let index = projects.firstIndex(where: { $0.id == projectID }) {
+                        projects[index].workstreams.append(workstream)
+                        selection = .workstream(workstream.id)
+                        ProjectStore.save(projects)
+                    }
+                },
+                onProjectAdded: { project in
+                    projects.append(project)
+                    selection = .project(project.id)
+                    ProjectStore.save(projects)
+                }
             )
             .navigationSplitViewColumnWidth(min: 160, ideal: 200, max: 350)
         } detail: {
