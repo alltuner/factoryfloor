@@ -45,29 +45,36 @@ enum RestorableWorkspaceTab: String, Codable, Sendable {
 }
 
 enum WorkspaceStateStore {
-    private static var fileURL: URL {
+    private static let userDefaultsKey = "factoryfloor.workspaceTabs"
+
+    private static var legacyFileURL: URL {
         AppConstants.configDirectory.appendingPathComponent("workspace-tabs.json")
     }
 
     static func load(for workstreamID: UUID) -> RestorableWorkspaceTab? {
-        guard let data = try? Data(contentsOf: fileURL),
-              let saved = try? JSONDecoder().decode([String: RestorableWorkspaceTab].self, from: data) else {
-            return nil
+        if let data = UserDefaults.standard.data(forKey: userDefaultsKey),
+           let saved = try? JSONDecoder().decode([String: RestorableWorkspaceTab].self, from: data) {
+            return saved[workstreamID.uuidString]
         }
-        return saved[workstreamID.uuidString]
+        // Migrate from JSON file if UserDefaults is empty
+        if let data = try? Data(contentsOf: legacyFileURL),
+           let saved = try? JSONDecoder().decode([String: RestorableWorkspaceTab].self, from: data) {
+            UserDefaults.standard.set(data, forKey: userDefaultsKey)
+            try? FileManager.default.removeItem(at: legacyFileURL)
+            return saved[workstreamID.uuidString]
+        }
+        return nil
     }
 
     static func save(_ tab: RestorableWorkspaceTab, for workstreamID: UUID) {
         var saved: [String: RestorableWorkspaceTab] = [:]
-        if let data = try? Data(contentsOf: fileURL),
+        if let data = UserDefaults.standard.data(forKey: userDefaultsKey),
            let existing = try? JSONDecoder().decode([String: RestorableWorkspaceTab].self, from: data) {
             saved = existing
         }
         saved[workstreamID.uuidString] = tab
-        let encoder = JSONEncoder()
-        encoder.outputFormatting = [.prettyPrinted, .sortedKeys]
-        guard let data = try? encoder.encode(saved) else { return }
-        try? FilePersistence.writeAtomically(data, to: fileURL)
+        guard let data = try? JSONEncoder().encode(saved) else { return }
+        UserDefaults.standard.set(data, forKey: userDefaultsKey)
     }
 }
 

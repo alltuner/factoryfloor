@@ -394,33 +394,27 @@ struct ContentView: View {
 enum ProjectStore {
     private static let userDefaultsKey = "factoryfloor.projects"
 
-    private static var fileURL: URL {
+    private static var legacyFileURL: URL {
         AppConstants.configDirectory.appendingPathComponent("projects.json")
     }
 
     static func load() -> [Project] {
-        // Try loading from JSON file first
-        if let data = try? Data(contentsOf: fileURL) {
-            return (try? JSONDecoder().decode([Project].self, from: data)) ?? []
-        }
-        // Migrate from UserDefaults if file doesn't exist
         if let data = UserDefaults.standard.data(forKey: userDefaultsKey),
            let projects = try? JSONDecoder().decode([Project].self, from: data) {
+            return projects
+        }
+        // Migrate from JSON file if UserDefaults is empty
+        if let data = try? Data(contentsOf: legacyFileURL),
+           let projects = try? JSONDecoder().decode([Project].self, from: data) {
             save(projects)
-            UserDefaults.standard.removeObject(forKey: userDefaultsKey)
+            try? FileManager.default.removeItem(at: legacyFileURL)
             return projects
         }
         return []
     }
 
     static func save(_ projects: [Project]) {
-        let encoder = JSONEncoder()
-        encoder.outputFormatting = [.prettyPrinted, .sortedKeys]
-        guard let data = try? encoder.encode(projects) else { return }
-        do {
-            try FilePersistence.writeAtomically(data, to: fileURL)
-        } catch {
-            logger.warning("Failed to save projects: \(error.localizedDescription)")
-        }
+        guard let data = try? JSONEncoder().encode(projects) else { return }
+        UserDefaults.standard.set(data, forKey: userDefaultsKey)
     }
 }

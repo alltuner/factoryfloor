@@ -26,68 +26,55 @@ enum SidebarSelection: Hashable, Codable, Sendable {
 
     private static let userDefaultsKey = "factoryfloor.selection"
 
-    private static var fileURL: URL {
+    private static var legacyFileURL: URL {
         AppConstants.configDirectory.appendingPathComponent("sidebar-selection.json")
     }
 
     static func loadSaved() -> SidebarSelection? {
-        // Try loading from JSON file first
-        if let data = try? Data(contentsOf: fileURL) {
-            return try? JSONDecoder().decode(SidebarSelection.self, from: data)
-        }
-        // Migrate from UserDefaults if file doesn't exist
         if let data = UserDefaults.standard.data(forKey: userDefaultsKey),
            let selection = try? JSONDecoder().decode(SidebarSelection.self, from: data) {
+            return selection
+        }
+        // Migrate from JSON file if UserDefaults is empty
+        if let data = try? Data(contentsOf: legacyFileURL),
+           let selection = try? JSONDecoder().decode(SidebarSelection.self, from: data) {
             selection.save()
-            UserDefaults.standard.removeObject(forKey: userDefaultsKey)
+            try? FileManager.default.removeItem(at: legacyFileURL)
             return selection
         }
         return nil
     }
 
     func save() {
-        let encoder = JSONEncoder()
-        encoder.outputFormatting = [.prettyPrinted, .sortedKeys]
-        guard let data = try? encoder.encode(self) else { return }
-        do {
-            try FilePersistence.writeAtomically(data, to: Self.fileURL)
-        } catch {
-            logger.warning("Failed to save sidebar selection: \(error.localizedDescription)")
-        }
+        guard let data = try? JSONEncoder().encode(self) else { return }
+        UserDefaults.standard.set(data, forKey: Self.userDefaultsKey)
     }
 }
 
 enum SidebarState {
     private static let userDefaultsKey = "factoryfloor.expandedProjects"
 
-    private static var fileURL: URL {
+    private static var legacyFileURL: URL {
         AppConstants.configDirectory.appendingPathComponent("sidebar-state.json")
     }
 
     static func loadExpanded() -> Set<UUID> {
-        // Try loading from JSON file first
-        if let data = try? Data(contentsOf: fileURL),
+        if let data = UserDefaults.standard.data(forKey: userDefaultsKey),
            let ids = try? JSONDecoder().decode(Set<UUID>.self, from: data) {
             return ids
         }
-        // Migrate from UserDefaults if file doesn't exist
-        if let data = UserDefaults.standard.data(forKey: userDefaultsKey),
+        // Migrate from JSON file if UserDefaults is empty
+        if let data = try? Data(contentsOf: legacyFileURL),
            let ids = try? JSONDecoder().decode(Set<UUID>.self, from: data) {
             saveExpanded(ids)
-            UserDefaults.standard.removeObject(forKey: userDefaultsKey)
+            try? FileManager.default.removeItem(at: legacyFileURL)
             return ids
         }
         return []
     }
 
     static func saveExpanded(_ ids: Set<UUID>) {
-        let encoder = JSONEncoder()
-        encoder.outputFormatting = [.prettyPrinted, .sortedKeys]
-        guard let data = try? encoder.encode(ids) else { return }
-        do {
-            try FilePersistence.writeAtomically(data, to: fileURL)
-        } catch {
-            logger.warning("Failed to save sidebar state: \(error.localizedDescription)")
-        }
+        guard let data = try? JSONEncoder().encode(ids) else { return }
+        UserDefaults.standard.set(data, forKey: userDefaultsKey)
     }
 }
