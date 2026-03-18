@@ -1,5 +1,40 @@
 # Changelog
 
+## [0.1.24](https://github.com/alltuner/factoryfloor/compare/v0.1.23...v0.1.24) (2026-03-18)
+
+
+### Features
+
+* add Sparkle auto-update ([#39](https://github.com/alltuner/factoryfloor/issues/39)) ([#80](https://github.com/alltuner/factoryfloor/issues/80)) ([83acde7](https://github.com/alltuner/factoryfloor/commit/83acde778dce1d4963c1f06c7f83087ba303ecb1))
+* **website:** mobile screenshot layout and modal viewer ([#74](https://github.com/alltuner/factoryfloor/issues/74)) ([#78](https://github.com/alltuner/factoryfloor/issues/78)) ([7cf81e5](https://github.com/alltuner/factoryfloor/commit/7cf81e55ed7729cf7aa9f707861f75b5fda547cb))
+
+
+### Bug Fixes
+
+* async worktree creation with loading spinner ([#92](https://github.com/alltuner/factoryfloor/issues/92), [#87](https://github.com/alltuner/factoryfloor/issues/87)) ([#101](https://github.com/alltuner/factoryfloor/issues/101)) ([a0d8580](https://github.com/alltuner/factoryfloor/commit/a0d858063b742cb2721dfcbefb3f54d7c66842f1))
+* double-quote tmux -e values to handle spaces and special chars ([#94](https://github.com/alltuner/factoryfloor/issues/94)) ([#104](https://github.com/alltuner/factoryfloor/issues/104)) ([a31a676](https://github.com/alltuner/factoryfloor/commit/a31a67668552fa27eba169f3c88a216c466d7b88))
+* localize all user-facing strings in alerts and prune UI ([#88](https://github.com/alltuner/factoryfloor/issues/88)) ([#103](https://github.com/alltuner/factoryfloor/issues/103)) ([4fabdb0](https://github.com/alltuner/factoryfloor/commit/4fabdb0c913eb9d6a31f9e1383cd6a6c12cde95c))
+* require user consent for factoryfloor:// URL scheme ([#98](https://github.com/alltuner/factoryfloor/issues/98)) ([#102](https://github.com/alltuner/factoryfloor/issues/102)) ([cfb2e77](https://github.com/alltuner/factoryfloor/commit/cfb2e775d3bdb3385af633317c6876aa7d6adb92))
+* strip raw HTML from markdown rendering, remove file:// base URL ([#95](https://github.com/alltuner/factoryfloor/issues/95)) ([#99](https://github.com/alltuner/factoryfloor/issues/99)) ([5c4dce5](https://github.com/alltuner/factoryfloor/commit/5c4dce584ddaddcd8ef0a58e04f0d8ab6e946b1b))
+
+
+### Refactoring
+
+* move run-state and tmux.conf to ~/Library/Caches/factoryfloor/ ([#75](https://github.com/alltuner/factoryfloor/issues/75)) ([#76](https://github.com/alltuner/factoryfloor/issues/76)) ([a1de232](https://github.com/alltuner/factoryfloor/commit/a1de232cf57d9eb2754ebcf9c29a1abb05e3149a))
+
+
+### Miscellaneous
+
+* add prek pre-commit hooks ([#82](https://github.com/alltuner/factoryfloor/issues/82)) ([#83](https://github.com/alltuner/factoryfloor/issues/83)) ([19f08f3](https://github.com/alltuner/factoryfloor/commit/19f08f3218f56b875e0734a53b53a51c735c8637))
+* add SwiftFormat hook and update AGENTS.md ([#84](https://github.com/alltuner/factoryfloor/issues/84), [#85](https://github.com/alltuner/factoryfloor/issues/85)) ([#86](https://github.com/alltuner/factoryfloor/issues/86)) ([8656ea8](https://github.com/alltuner/factoryfloor/commit/8656ea81659f318906874885a011c83cb7055841))
+* update versions.json to v0.1.23 ([1f0ef5d](https://github.com/alltuner/factoryfloor/commit/1f0ef5d489abaa737bbd1255db2aedb84dce33be))
+
+
+### Documentation
+
+* add SwiftGit2 feasibility analysis (recommendation: don't adopt) ([#105](https://github.com/alltuner/factoryfloor/issues/105)) ([38fce35](https://github.com/alltuner/factoryfloor/commit/38fce358fc98c59d66e401726e6b2dc69348d47c))
+* document ProjectList ObservableObject audit results ([#91](https://github.com/alltuner/factoryfloor/issues/91)) ([#100](https://github.com/alltuner/factoryfloor/issues/100)) ([b38e2b7](https://github.com/alltuner/factoryfloor/commit/b38e2b77b55f42f33822ce4be24f1c84d9a9b70d))
+
 ## [0.1.23](https://github.com/alltuner/factoryfloor/compare/v0.1.22...v0.1.23) (2026-03-18)
 
 
