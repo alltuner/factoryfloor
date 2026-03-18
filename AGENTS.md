@@ -18,7 +18,7 @@
 1. If you added/removed files or changed `project.yml`: run `xcodegen generate` first
 2. Build and run: `./scripts/dev.sh br`
 3. If tmux mode was on: `tmux -L factoryfloor kill-server`
-4. If you changed the tmux config: `rm -f ~/.factoryfloor/tmux.conf`
+4. If you changed the tmux config: `rm -f ~/Library/Caches/factoryfloor/tmux.conf`
 
 ### When to regenerate the Xcode project
 Run `xcodegen generate` when:
@@ -113,11 +113,12 @@ Scripts are loaded from `.factoryfloor.json` in the project directory:
 ### Port detection
 Run scripts are wrapped in the `ff-run` launcher binary (bundled at `Contents/Helpers/ff-run`).
 The launcher monitors the child process tree for listening TCP ports using `libproc` and writes
-state to `~/.config/factoryfloor/run-state/<workstream-id>.json`. The app watches these files
+state to `~/Library/Caches/factoryfloor/run-state/<workstream-id>.json`. The app watches these files
 via FSEvents and retargets the embedded browser when a port is detected.
 
 ### Paths
 - Config: `~/.config/factoryfloor/` (respects `XDG_CONFIG_HOME`)
+- Cache: `~/Library/Caches/factoryfloor/` (run-state, tmux.conf)
 - Data/worktrees: `~/.factoryfloor/`
 - URL scheme: `factoryfloor://`
 - Bundle ID: `com.alltuner.factoryfloor`

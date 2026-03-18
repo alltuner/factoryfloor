@@ -91,7 +91,7 @@ struct PortSelectionTracker: Sendable {
 
 enum RunStateStore {
     static var directoryURL: URL {
-        AppConstants.configDirectory.appendingPathComponent("run-state", isDirectory: true)
+        AppConstants.cacheDirectory.appendingPathComponent("run-state", isDirectory: true)
     }
 
     static func fileURL(for workstreamID: UUID) -> URL {

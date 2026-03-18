@@ -43,6 +43,8 @@ struct FF2App: App {
     @NSApplicationDelegateAdaptor(AppDelegate.self) var appDelegate
 
     init() {
+        CacheMigration.migrateIfNeeded()
+
         SentrySDK.start { options in
             options.dsn = "https://45310bb703b438b38aee17e84e10d32e@o4511060356956160.ingest.de.sentry.io/4511060370391120"
             options.enableCrashHandler = true

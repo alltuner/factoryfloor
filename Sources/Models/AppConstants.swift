@@ -45,6 +45,16 @@ enum AppConstants {
         )
     }
 
+    /// Cache directory: ~/Library/Caches/factoryfloor/.
+    /// Used for transient files like run-state and tmux config.
+    static var cacheDirectory: URL {
+        let base = FileManager.default.urls(for: .cachesDirectory, in: .userDomainMask).first!
+        let dirName = ProcessInfo.processInfo.environment["XCTestConfigurationFilePath"] != nil
+            ? "factoryfloor-tests"
+            : "factoryfloor"
+        return base.appendingPathComponent(dirName)
+    }
+
     /// Worktrees are always shared between debug and release builds.
     static var worktreesDirectory: URL {
         FileManager.default.homeDirectoryForCurrentUser
