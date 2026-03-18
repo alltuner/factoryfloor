@@ -29,7 +29,6 @@ struct ProjectSidebar: View {
     @State private var cachedSortedIDs: [UUID] = []
     @State private var cachedProjectIndex: [UUID: Int] = [:]
     @State private var cachedWorkstreamIndex: [UUID: (Int, Int)] = [:]
-    @State private var isCreatingWorkstream = false
     @State private var showWorktreeError = false
     @State private var showNotGitRepoError = false
     @AppStorage("factoryfloor.sortOrder") private var sortOrder: ProjectSortOrder = .recent
@@ -81,7 +80,6 @@ struct ProjectSidebar: View {
                             ProjectHeaderRow(
                                 project: project,
                                 isExpanded: expandedProjects.contains(project.id),
-                                isCreatingWorkstream: isCreatingWorkstream,
                                 onToggle: hasChildren ? {
                                     withAnimation(.easeInOut(duration: 0.15)) {
                                         if expandedProjects.contains(project.id) {
@@ -274,7 +272,7 @@ struct ProjectSidebar: View {
             }
         } message: {
             if let id = projectToDelete, let project = projects.first(where: { $0.id == id }) {
-                Text("Remove \"\(project.name)\" from the list? Files in \(project.directory) will not be deleted.")
+                Text(String(format: NSLocalizedString("Remove \"%@\" from the list? Files in %@ will not be deleted.", comment: ""), project.name, project.directory))
             }
         }
         .alert(
@@ -338,44 +336,29 @@ struct ProjectSidebar: View {
         let name = NameGenerator.generate(avoiding: existingNames)
         logger.warning("[FF] addWorkstream: generated name=\(name, privacy: .public)")
 
-        let projectPath = project.directory
-        let projectName = project.name
-        let shouldSymlinkEnv = symlinkEnv
-        let prefix = branchPrefix
-        let bypass = bypassPermissions ?? defaultBypass
-
-        isCreatingWorkstream = true
-
-        Task.detached {
-            let worktreePath = GitOperations.createWorktree(
-                projectPath: projectPath,
-                projectName: projectName,
-                workstreamName: name,
-                branchPrefix: prefix,
-                symlinkEnv: shouldSymlinkEnv
-            )
-
-            await MainActor.run {
-                isCreatingWorkstream = false
-
-                guard let worktreePath else {
-                    logger.warning("[FF] addWorkstream: createWorktree FAILED")
-                    showWorktreeError = true
-                    return
-                }
-                logger.warning("[FF] addWorkstream: worktree created at \(worktreePath, privacy: .public)")
-
-                let workstream = Workstream(name: name, worktreePath: worktreePath, bypassPermissions: bypass)
-                expandedProjects.insert(projectID)
-                NotificationCenter.default.post(
-                    name: .workstreamCreated,
-                    object: nil,
-                    userInfo: ["projectID": projectID, "workstream": workstream]
-                )
-                rebuildIndices()
-                logger.warning("[FF] addWorkstream: done, posted notification")
-            }
+        guard let worktreePath = GitOperations.createWorktree(
+            projectPath: project.directory,
+            projectName: project.name,
+            workstreamName: name,
+            branchPrefix: branchPrefix,
+            symlinkEnv: symlinkEnv
+        ) else {
+            logger.warning("[FF] addWorkstream: createWorktree FAILED")
+            showWorktreeError = true
+            return
         }
+        logger.warning("[FF] addWorkstream: worktree created at \(worktreePath, privacy: .public)")
+
+        let bypass = bypassPermissions ?? defaultBypass
+        let workstream = Workstream(name: name, worktreePath: worktreePath, bypassPermissions: bypass)
+        expandedProjects.insert(projectID)
+        NotificationCenter.default.post(
+            name: .workstreamCreated,
+            object: nil,
+            userInfo: ["projectID": projectID, "workstream": workstream]
+        )
+        rebuildIndices()
+        logger.warning("[FF] addWorkstream: done, posted notification")
     }
 
     @EnvironmentObject private var surfaceCache: TerminalSurfaceCache
@@ -514,7 +497,6 @@ private func copyTextToPasteboard(_ text: String) {
 private struct ProjectHeaderRow: View {
     let project: Project
     let isExpanded: Bool
-    let isCreatingWorkstream: Bool
     let onToggle: (() -> Void)?
     let onAdd: () -> Void
     let onAddWithPermissions: () -> Void
@@ -572,26 +554,20 @@ private struct ProjectHeaderRow: View {
             Spacer()
 
             HStack(spacing: 8) {
-                if isCreatingWorkstream {
-                    ProgressView()
-                        .controlSize(.small)
-                        .frame(width: 22, height: 22)
-                } else {
-                    SidebarIconButton(icon: "plus", action: onAdd)
-                        .accessibilityLabel("Add workstream to \(project.name)")
-                        .contextMenu {
-                            Button(action: onAddWithPermissions) {
-                                Label("New workstream (full permissions)", systemImage: "lock.open")
-                            }
-                            Button(action: onAddWithoutPermissions) {
-                                Label("New workstream (with prompts)", systemImage: "lock.shield")
-                            }
+                SidebarIconButton(icon: "plus", action: onAdd)
+                    .accessibilityLabel("Add workstream to \(project.name)")
+                    .contextMenu {
+                        Button(action: onAddWithPermissions) {
+                            Label("New workstream (full permissions)", systemImage: "lock.open")
                         }
-                }
+                        Button(action: onAddWithoutPermissions) {
+                            Label("New workstream (with prompts)", systemImage: "lock.shield")
+                        }
+                    }
                 SidebarIconButton(icon: "trash", action: onDelete)
                     .accessibilityLabel("Remove project")
             }
-            .opacity(isHovering || isCreatingWorkstream ? 1 : 0)
+            .opacity(isHovering ? 1 : 0)
         }
         .frame(maxWidth: .infinity, alignment: .leading)
         .padding(.vertical, 2)

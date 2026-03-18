@@ -11,11 +11,6 @@ extension Notification.Name {
     static let projectCreated = Notification.Name("factoryfloor.projectCreated")
 }
 
-/// Heap-allocated project storage using reference semantics. All child views that
-/// mutate projects via @Binding write to this shared instance, avoiding the stale
-/// @State snapshot problem that caused #43 in Release builds. Audited in #91:
-/// every @Binding mutation site (archive, delete, prune, rename, activity timestamps)
-/// is safe because they all write through to this ObservableObject.
 final class ProjectList: ObservableObject {
     @Published var items: [Project]
 
@@ -181,7 +176,7 @@ struct ContentView: View {
             ) {
                 Button("OK") { removedProjectNames = [] }
             } message: {
-                Text("The following projects were removed because their directories no longer exist on disk: \(removedProjectNames.joined(separator: ", "))")
+                Text(String(format: NSLocalizedString("The following projects were removed because their directories no longer exist on disk: %@", comment: ""), removedProjectNames.joined(separator: ", ")))
             }
     }
 

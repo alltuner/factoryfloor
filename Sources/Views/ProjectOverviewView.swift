@@ -183,7 +183,7 @@ struct ProjectOverviewView: View {
                                 HStack {
                                     Image(systemName: "trash")
                                         .font(.system(size: 12))
-                                    Text("Prune \(prunableCount) clean worktree\(prunableCount == 1 ? "" : "s")")
+                                    Text(String(format: NSLocalizedString(prunableCount == 1 ? "Prune %d clean worktree" : "Prune %d clean worktrees", comment: ""), prunableCount))
                                 }
                                 .foregroundStyle(.red)
                             }
@@ -225,7 +225,7 @@ struct ProjectOverviewView: View {
                 if let selected = selectedDoc,
                    let doc = docFiles.first(where: { $0.name == selected })
                 {
-                    MarkdownContentView(markdown: doc.content)
+                    MarkdownContentView(markdown: doc.content, baseDirectory: project.directory)
                         .id(selected)
                 }
             }
@@ -241,7 +241,7 @@ struct ProjectOverviewView: View {
             Button("Cancel", role: .cancel) {}
             Button("Prune", role: .destructive) { pruneWorktrees() }
         } message: {
-            Text("Remove \(prunableCount) worktree\(prunableCount == 1 ? "" : "s") with no uncommitted changes? Associated workstreams will also be removed from the sidebar.")
+            Text(String(format: NSLocalizedString(prunableCount == 1 ? "Remove %d worktree with no uncommitted changes? Associated workstreams will also be removed from the sidebar." : "Remove %d worktrees with no uncommitted changes? Associated workstreams will also be removed from the sidebar.", comment: ""), prunableCount))
         }
     }
 
