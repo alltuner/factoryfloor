@@ -36,170 +36,174 @@ struct ProjectOverviewView: View {
             .padding(.top, 20)
             .padding(.bottom, 8)
 
-        Form {
-            // MARK: - Repository
-            if let info = appEnv.repoInfo(for: project.directory) {
-                Section("Repository") {
-                    if info.isRepo {
-                        LabeledContent("Branch") {
-                            HStack(spacing: 4) {
-                                Image(systemName: "arrow.triangle.branch")
-                                    .font(.caption)
-                                Text(info.branch ?? "unknown")
+            Form {
+                // MARK: - Repository
+
+                if let info = appEnv.repoInfo(for: project.directory) {
+                    Section("Repository") {
+                        if info.isRepo {
+                            LabeledContent("Branch") {
+                                HStack(spacing: 4) {
+                                    Image(systemName: "arrow.triangle.branch")
+                                        .font(.caption)
+                                    Text(info.branch ?? "unknown")
+                                }
+                                .foregroundStyle(.secondary)
                             }
-                            .foregroundStyle(.secondary)
+
+                            if let count = info.commitCount {
+                                LabeledContent("Commits") {
+                                    Text("\(count)")
+                                        .foregroundStyle(.secondary)
+                                }
+                            }
+
+                            if let remote = info.remoteURL {
+                                LabeledContent("Remote") {
+                                    Text(remote)
+                                        .font(.system(.body, design: .monospaced))
+                                        .foregroundStyle(.secondary)
+                                        .lineLimit(1)
+                                        .truncationMode(.middle)
+                                }
+                            }
+
+                            LabeledContent("Status") {
+                                Text(info.isDirty ? "Uncommitted changes" : "Clean")
+                                    .foregroundStyle(info.isDirty ? .orange : .green)
+                            }
+                        } else {
+                            LabeledContent("Status") {
+                                Text("Not a git repository")
+                                    .foregroundStyle(.secondary)
+                            }
+                        }
+                    }
+                }
+
+                // MARK: - GitHub
+
+                if appEnv.ghAvailable, let ghInfo = appEnv.githubRepo(for: project.directory) {
+                    Section("GitHub") {
+                        LabeledContent("Repository") {
+                            Text(ghInfo.name)
+                                .foregroundStyle(.secondary)
                         }
 
-                        if let count = info.commitCount {
-                            LabeledContent("Commits") {
-                                Text("\(count)")
+                        if let desc = ghInfo.description, !desc.isEmpty {
+                            LabeledContent("Description") {
+                                Text(desc)
                                     .foregroundStyle(.secondary)
                             }
                         }
 
-                        if let remote = info.remoteURL {
-                            LabeledContent("Remote") {
-                                Text(remote)
-                                    .font(.system(.body, design: .monospaced))
+                        LabeledContent("Stars") {
+                            Text("\(ghInfo.stars)")
+                                .foregroundStyle(.secondary)
+                        }
+
+                        LabeledContent("Open Issues") {
+                            Text("\(ghInfo.openIssues)")
+                                .foregroundStyle(.secondary)
+                        }
+
+                        let prs = appEnv.githubPRs(for: project.directory)
+                        if !prs.isEmpty {
+                            LabeledContent("Open PRs") {
+                                Text("\(prs.count)")
                                     .foregroundStyle(.secondary)
-                                    .lineLimit(1)
-                                    .truncationMode(.middle)
                             }
-                        }
-
-                        LabeledContent("Status") {
-                            Text(info.isDirty ? "Uncommitted changes" : "Clean")
-                                .foregroundStyle(info.isDirty ? .orange : .green)
-                        }
-                    } else {
-                        LabeledContent("Status") {
-                            Text("Not a git repository")
-                                .foregroundStyle(.secondary)
-                        }
-                    }
-                }
-            }
-
-            // MARK: - GitHub
-            if appEnv.ghAvailable, let ghInfo = appEnv.githubRepo(for: project.directory) {
-                Section("GitHub") {
-                    LabeledContent("Repository") {
-                        Text(ghInfo.name)
-                            .foregroundStyle(.secondary)
-                    }
-
-                    if let desc = ghInfo.description, !desc.isEmpty {
-                        LabeledContent("Description") {
-                            Text(desc)
-                                .foregroundStyle(.secondary)
-                        }
-                    }
-
-                    LabeledContent("Stars") {
-                        Text("\(ghInfo.stars)")
-                            .foregroundStyle(.secondary)
-                    }
-
-                    LabeledContent("Open Issues") {
-                        Text("\(ghInfo.openIssues)")
-                            .foregroundStyle(.secondary)
-                    }
-
-                    let prs = appEnv.githubPRs(for: project.directory)
-                    if !prs.isEmpty {
-                        LabeledContent("Open PRs") {
-                            Text("\(prs.count)")
-                                .foregroundStyle(.secondary)
-                        }
-                        ForEach(prs, id: \.number) { pr in
-                            LabeledContent("#\(pr.number)") {
-                                Text(pr.title)
-                                    .foregroundStyle(.secondary)
-                                    .lineLimit(1)
+                            ForEach(prs, id: \.number) { pr in
+                                LabeledContent("#\(pr.number)") {
+                                    Text(pr.title)
+                                        .foregroundStyle(.secondary)
+                                        .lineLimit(1)
+                                }
                             }
                         }
                     }
                 }
-            }
 
-            // MARK: - Workstreams
-            Section {
-                if project.workstreams.isEmpty {
-                    HStack {
-                        Spacer()
-                        VStack(spacing: 8) {
-                            Text("No workstreams yet")
-                                .foregroundStyle(.secondary)
-                            (Text("Press ") + Text(Image(systemName: "command")) + Text(" N ") + Text("to create one."))
-                                .font(.caption)
-                                .foregroundStyle(.tertiary)
-                        }
-                        Spacer()
-                    }
-                    .padding(.vertical, 8)
-                } else {
-                    let sorted = sortedWorkstreams(project.workstreams)
-                    ForEach(Array(sorted.enumerated()), id: \.element.id) { index, workstream in
-                        WorkstreamRow(
-                            workstream: workstream,
-                            shortcutNumber: index < 9 ? index + 1 : nil,
-                            onSelect: { onSelectWorkstream(workstream.id) },
-                            onArchive: { onArchiveWorkstream(workstream.id) }
-                        )
-                    }
-                }
-            } header: {
-                HStack {
-                    Text("Workstreams")
-                    Spacer()
-                    if project.workstreams.count > 1 {
-                        Picker("", selection: $workstreamSortOrder) {
-                            ForEach(ProjectSortOrder.allCases, id: \.self) { order in
-                                Text(order.rawValue).tag(order)
-                            }
-                        }
-                        .pickerStyle(.segmented)
-                        .frame(width: 120)
-                    }
-                    Text("\(project.workstreams.count)")
-                        .font(.caption)
-                        .foregroundStyle(.secondary)
-                }
-            }
+                // MARK: - Workstreams
 
-            // MARK: - Worktrees
-            if !worktrees.isEmpty {
                 Section {
-                    ForEach(worktrees) { wt in
-                        WorktreeInfoRow(worktree: wt)
-                    }
-
-                    if prunableCount > 0 {
-                        Button(action: { showingPruneConfirm = true }) {
-                            HStack {
-                                Image(systemName: "trash")
-                                    .font(.system(size: 12))
-                                Text("Prune \(prunableCount) clean worktree\(prunableCount == 1 ? "" : "s")")
+                    if project.workstreams.isEmpty {
+                        HStack {
+                            Spacer()
+                            VStack(spacing: 8) {
+                                Text("No workstreams yet")
+                                    .foregroundStyle(.secondary)
+                                (Text("Press ") + Text(Image(systemName: "command")) + Text(" N ") + Text("to create one."))
+                                    .font(.caption)
+                                    .foregroundStyle(.tertiary)
                             }
-                            .foregroundStyle(.red)
+                            Spacer()
                         }
-                        .buttonStyle(.borderless)
-                        .disabled(isPruning)
+                        .padding(.vertical, 8)
+                    } else {
+                        let sorted = sortedWorkstreams(project.workstreams)
+                        ForEach(Array(sorted.enumerated()), id: \.element.id) { index, workstream in
+                            WorkstreamRow(
+                                workstream: workstream,
+                                shortcutNumber: index < 9 ? index + 1 : nil,
+                                onSelect: { onSelectWorkstream(workstream.id) },
+                                onArchive: { onArchiveWorkstream(workstream.id) }
+                            )
+                        }
                     }
                 } header: {
                     HStack {
-                        Text("Git Worktrees")
+                        Text("Workstreams")
                         Spacer()
-                        Text("\(worktrees.count)")
+                        if project.workstreams.count > 1 {
+                            Picker("", selection: $workstreamSortOrder) {
+                                ForEach(ProjectSortOrder.allCases, id: \.self) { order in
+                                    Text(order.rawValue).tag(order)
+                                }
+                            }
+                            .pickerStyle(.segmented)
+                            .frame(width: 120)
+                        }
+                        Text("\(project.workstreams.count)")
                             .font(.caption)
                             .foregroundStyle(.secondary)
                     }
-                } footer: {
-                    Text("Worktrees on disk for this repository. Pruning removes clean worktrees and their associated workstreams.")
+                }
+
+                // MARK: - Worktrees
+
+                if !worktrees.isEmpty {
+                    Section {
+                        ForEach(worktrees) { wt in
+                            WorktreeInfoRow(worktree: wt)
+                        }
+
+                        if prunableCount > 0 {
+                            Button(action: { showingPruneConfirm = true }) {
+                                HStack {
+                                    Image(systemName: "trash")
+                                        .font(.system(size: 12))
+                                    Text("Prune \(prunableCount) clean worktree\(prunableCount == 1 ? "" : "s")")
+                                }
+                                .foregroundStyle(.red)
+                            }
+                            .buttonStyle(.borderless)
+                            .disabled(isPruning)
+                        }
+                    } header: {
+                        HStack {
+                            Text("Git Worktrees")
+                            Spacer()
+                            Text("\(worktrees.count)")
+                                .font(.caption)
+                                .foregroundStyle(.secondary)
+                        }
+                    } footer: {
+                        Text("Worktrees on disk for this repository. Pruning removes clean worktrees and their associated workstreams.")
+                    }
                 }
             }
-        }
-        .formStyle(.grouped)
+            .formStyle(.grouped)
 
             // Doc tabs
             if !docFiles.isEmpty {
@@ -219,8 +223,9 @@ struct ProjectOverviewView: View {
                 Divider()
 
                 if let selected = selectedDoc,
-                   let doc = docFiles.first(where: { $0.name == selected }) {
-                    MarkdownContentView(markdown: doc.content, baseDirectory: project.directory)
+                   let doc = docFiles.first(where: { $0.name == selected })
+                {
+                    MarkdownContentView(markdown: doc.content)
                         .id(selected)
                 }
             }
@@ -300,7 +305,6 @@ struct ProjectOverviewView: View {
         isPruning = false
         refreshWorktrees()
     }
-
 }
 
 private struct WorktreeInfoRow: View {

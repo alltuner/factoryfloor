@@ -1,14 +1,13 @@
 // ABOUTME: Renders markdown to HTML using cmark-gfm and displays it in a WKWebView.
-// ABOUTME: Supports raw HTML in markdown for full GitHub README fidelity.
+// ABOUTME: Strips raw HTML from markdown for safe rendering.
 
-import SwiftUI
-import WebKit
 import cmark_gfm
 import cmark_gfm_extensions
+import SwiftUI
+import WebKit
 
 struct MarkdownContentView: NSViewRepresentable {
     let markdown: String
-    var baseDirectory: String?
 
     func makeNSView(context: Context) -> WKWebView {
         let config = WKWebViewConfiguration()
@@ -26,8 +25,7 @@ struct MarkdownContentView: NSViewRepresentable {
         context.coordinator.lastMarkdown = markdown
         let html = renderMarkdownToHTML(markdown)
         let page = wrapInHTMLPage(html)
-        let base = baseDirectory.map { URL(fileURLWithPath: $0, isDirectory: true) }
-        webView.loadHTMLString(page, baseURL: base)
+        webView.loadHTMLString(page, baseURL: nil)
     }
 
     func makeCoordinator() -> Coordinator {
@@ -38,7 +36,7 @@ struct MarkdownContentView: NSViewRepresentable {
         var lastMarkdown: String?
 
         func webView(
-            _ webView: WKWebView,
+            _: WKWebView,
             decidePolicyFor action: WKNavigationAction,
             decisionHandler: @escaping @MainActor @Sendable (WKNavigationActionPolicy) -> Void
         ) {
@@ -75,7 +73,7 @@ private func renderMarkdownToHTML(_ markdown: String) -> String {
     guard let doc = cmark_parser_finish(parser) else { return escapeHTML(markdown) }
     defer { cmark_node_free(doc) }
 
-    let options = CMARK_OPT_DEFAULT | CMARK_OPT_UNSAFE
+    let options = CMARK_OPT_DEFAULT
     let extensions = cmark_parser_get_syntax_extensions(parser)
     guard let cString = cmark_render_html(doc, options, extensions) else { return escapeHTML(markdown) }
     defer { free(cString) }

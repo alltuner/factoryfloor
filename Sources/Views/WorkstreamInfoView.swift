@@ -62,7 +62,8 @@ struct WorkstreamInfoView: View {
 
             // Pinned metadata (PR, scripts)
             if appEnv.ghAvailable, let branch = branchName,
-               let pr = appEnv.githubPR(for: projectDirectory, branch: branch) {
+               let pr = appEnv.githubPR(for: projectDirectory, branch: branch)
+            {
                 Divider()
                 HStack(spacing: 8) {
                     Image(systemName: "arrow.triangle.pull")
@@ -130,8 +131,9 @@ struct WorkstreamInfoView: View {
 
             // Scrollable: only the markdown content
             if let selected = selectedDoc,
-               let doc = docFiles.first(where: { $0.name == selected }) {
-                MarkdownContentView(markdown: doc.content, baseDirectory: workingDirectory)
+               let doc = docFiles.first(where: { $0.name == selected })
+            {
+                MarkdownContentView(markdown: doc.content)
                     .id(selected)
             } else if docFiles.isEmpty {
                 Spacer()
@@ -141,13 +143,13 @@ struct WorkstreamInfoView: View {
         .onAppear { loadInfo() }
     } // body
 
-    nonisolated private static let iconPaths = [
+    private nonisolated static let iconPaths = [
         "icon.svg", "icon.png",
         ".github/icon.svg", ".github/icon.png",
         "logo.svg", "logo.png",
     ]
 
-    nonisolated private static func findProjectIcon(in directory: String) -> NSImage? {
+    private nonisolated static func findProjectIcon(in directory: String) -> NSImage? {
         let base = URL(fileURLWithPath: directory)
         for relative in iconPaths {
             let path = base.appendingPathComponent(relative).path
@@ -158,7 +160,7 @@ struct WorkstreamInfoView: View {
         return nil
     }
 
-    nonisolated private static func findProjectIconPath(in directory: String) -> String? {
+    private nonisolated static func findProjectIconPath(in directory: String) -> String? {
         let base = URL(fileURLWithPath: directory)
         for relative in iconPaths {
             let path = base.appendingPathComponent(relative).path
@@ -210,7 +212,6 @@ struct WorkstreamInfoView: View {
         self.docFiles = docFiles
         selectedDoc = docFiles.first?.name
     }
-
 }
 
 // MARK: - Directory row with copy and open-in-terminal actions
@@ -251,7 +252,8 @@ struct DirectoryRow: View {
 
     private func openInTerminal() {
         if !defaultTerminal.isEmpty,
-           let appURL = NSWorkspace.shared.urlForApplication(withBundleIdentifier: defaultTerminal) {
+           let appURL = NSWorkspace.shared.urlForApplication(withBundleIdentifier: defaultTerminal)
+        {
             let config = NSWorkspace.OpenConfiguration()
             NSWorkspace.shared.open([URL(fileURLWithPath: path)], withApplicationAt: appURL, configuration: config)
         } else if let terminalURL = NSWorkspace.shared.urlForApplication(withBundleIdentifier: "com.apple.Terminal") {
@@ -259,7 +261,6 @@ struct DirectoryRow: View {
             NSWorkspace.shared.open([URL(fileURLWithPath: path)], withApplicationAt: terminalURL, configuration: config)
         }
     }
-
 }
 
 private struct DirectoryActionButton: View {
@@ -289,7 +290,9 @@ private struct DirectoryActionButton: View {
 struct DocFile: Identifiable {
     let name: String
     let content: String
-    var id: String { name }
+    var id: String {
+        name
+    }
 
     static let standardNames = ["README.md", "CLAUDE.md", "AGENTS.md"]
 
@@ -299,7 +302,8 @@ struct DocFile: Identifiable {
             let path = URL(fileURLWithPath: directory).appendingPathComponent(name).path
             if let data = FileManager.default.contents(atPath: path),
                data.count >= 20,
-               let content = String(data: data, encoding: .utf8) {
+               let content = String(data: data, encoding: .utf8)
+            {
                 found.append(DocFile(name: name, content: content))
             }
         }
