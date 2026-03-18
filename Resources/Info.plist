@@ -12,7 +12,7 @@
     <string>1</string>
     <key>CFBundleShortVersionString</key>
     <!-- x-release-please-start-version -->
-    <string>0.1.27</string>
+    <string>0.1.28</string>
     <!-- x-release-please-end -->
     <key>CFBundlePackageType</key>
     <string>APPL</string>

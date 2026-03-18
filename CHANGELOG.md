@@ -1,5 +1,17 @@
 # Changelog
 
+## [0.1.28](https://github.com/alltuner/factoryfloor/compare/v0.1.27...v0.1.28) (2026-03-18)
+
+
+### Bug Fixes
+
+* don't double-escape tmux command argument ([#115](https://github.com/alltuner/factoryfloor/issues/115)) ([91aad5e](https://github.com/alltuner/factoryfloor/commit/91aad5eca06148d9739f41438fd5ea19e0ab77a5))
+
+
+### Miscellaneous
+
+* update versions.json to v0.1.27 ([2daee40](https://github.com/alltuner/factoryfloor/commit/2daee401eed245da006fe552f3ce64b8eecb7842))
+
 ## [0.1.27](https://github.com/alltuner/factoryfloor/compare/v0.1.26...v0.1.27) (2026-03-18)
 
 
