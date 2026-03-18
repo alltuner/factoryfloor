@@ -51,19 +51,25 @@ enum TmuxSession {
     private static let socketName = AppConstants.appID
 
     static func wrapCommand(tmuxPath: String, sessionName: String, command: String?, environmentVars: [String: String] = [:]) -> String {
-        let escaped = shellEscape(sessionName)
+        let socket = shellEscape(socketName)
         let conf = shellEscape(configPath)
-        // -L uses a dedicated socket, -f uses our minimal config
+        let escaped = shellEscape(sessionName)
+
         let envFlags = environmentVars.map { "-e \"\($0.key)=\(doubleQuoteEscape($0.value))\"" }.joined(separator: " ")
-        let base = "\(tmuxPath) -L \(socketName) -f \(conf) new-session -A -s \(escaped) \(envFlags)"
-        let wrappedCommand: String
-        if let command {
-            let escapedCommand = shellEscape(command)
-            wrappedCommand = "\(base) -- sh -c \(escapedCommand)"
-        } else {
-            wrappedCommand = base
+
+        // Build the tmux new-session command
+        var tmuxCmd = "\(tmuxPath) -L \(socket) -f \(conf) new-session -A -s \(escaped)"
+        if !envFlags.isEmpty {
+            tmuxCmd += " \(envFlags)"
         }
-        return "sh -c \(shellEscape("\(serverSetupCommand(tmuxPath: tmuxPath, configPath: configPath)); exec \(wrappedCommand)"))"
+        if let command {
+            // Pass command directly to tmux new-session (no extra sh -c wrapping)
+            tmuxCmd += " \(shellEscape(command))"
+        }
+
+        // Single sh -c: server setup then exec tmux
+        let setup = serverSetupCommand(tmuxPath: tmuxPath, configPath: configPath)
+        return "sh -c \(shellEscape("\(setup); exec \(tmuxCmd)"))"
     }
 
     /// Kill a tmux session by name.
