@@ -1,5 +1,17 @@
 # Changelog
 
+## [0.1.19](https://github.com/alltuner/factoryfloor/compare/v0.1.18...v0.1.19) (2026-03-18)
+
+
+### Bug Fixes
+
+* delay selection after projects mutation to ensure SwiftUI commits ([#43](https://github.com/alltuner/factoryfloor/issues/43)) ([#55](https://github.com/alltuner/factoryfloor/issues/55)) ([ef451ff](https://github.com/alltuner/factoryfloor/commit/ef451ff0536d632744185b48e7b91657f9418714))
+
+
+### Miscellaneous
+
+* update versions.json to v0.1.18 ([5297fc7](https://github.com/alltuner/factoryfloor/commit/5297fc7a83ef28c566f86a84c898415bfa387899))
+
 ## [0.1.18](https://github.com/alltuner/factoryfloor/compare/v0.1.17...v0.1.18) (2026-03-18)
 
 
