@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.1.26](https://github.com/alltuner/factoryfloor/compare/v0.1.25...v0.1.26) (2026-03-18)
+
+
+### Bug Fixes
+
+* **ci:** add --options=runtime to framework re-signing step ([#108](https://github.com/alltuner/factoryfloor/issues/108)) ([5dcb866](https://github.com/alltuner/factoryfloor/commit/5dcb8668426582d6d0c6bc19d085daafc3666dd5))
+
 ## [0.1.25](https://github.com/alltuner/factoryfloor/compare/v0.1.24...v0.1.25) (2026-03-18)
 
 
