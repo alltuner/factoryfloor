@@ -151,9 +151,9 @@ jobs:
           codesign --force --sign "$SIGNING_IDENTITY" --timestamp --options=runtime \
             "$APP/Contents/Frameworks/Sparkle.framework"
 
-          # Re-sign embedded frameworks with secure timestamp
+          # Re-sign embedded frameworks with secure timestamp and hardened runtime
           find "$APP/Contents/Frameworks" -type f -perm +111 -o -name "*.dylib" | while read -r bin; do
-            codesign --force --sign "$SIGNING_IDENTITY" --timestamp "$bin"
+            codesign --force --sign "$SIGNING_IDENTITY" --timestamp --options=runtime "$bin"
           done
 
           # Re-sign helpers with hardened runtime and secure timestamp
