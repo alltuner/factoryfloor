@@ -24,6 +24,9 @@ packages:
   Sentry:
     url: https://github.com/getsentry/sentry-cocoa
     from: "9.7.0"
+  Sparkle:
+    url: https://github.com/sparkle-project/Sparkle
+    from: "2.9.0"
 
 targets:
   FactoryFloor:
@@ -90,6 +93,8 @@ targets:
         product: cmark-gfm-extensions
       - package: Sentry
         product: Sentry
+      - package: Sparkle
+        product: Sparkle
     postBuildScripts:
       - script: |
           set -e

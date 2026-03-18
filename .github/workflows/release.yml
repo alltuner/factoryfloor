@@ -74,6 +74,16 @@ jobs:
           cd ghostty
           zig build -Demit-xcframework=true -Demit-macos-app=false -Dxcframework-target=universal -Doptimize=ReleaseFast
 
+      - name: Setup Sparkle
+        env:
+          SPARKLE_VERSION: "2.9.0"
+        run: |
+          mkdir -p .action/sparkle
+          cd .action/sparkle
+          curl -L "https://github.com/sparkle-project/Sparkle/releases/download/${SPARKLE_VERSION}/Sparkle-for-Swift-Package-Manager.zip" -o sparkle.zip
+          unzip -q sparkle.zip
+          echo "$(pwd)/bin" >> "$GITHUB_PATH"
+
       - name: Generate Xcode project
         run: xcodegen generate
 
@@ -108,6 +118,13 @@ jobs:
             OTHER_CODE_SIGN_FLAGS="--timestamp --options=runtime" \
             build
 
+      - name: Inject Sparkle public key
+        env:
+          SPARKLE_PUBLIC_KEY: ${{ secrets.SPARKLE_PUBLIC_KEY }}
+        run: |
+          APP_BUILT=$(find build/derived -name "${APP_NAME}.app" -type d | head -1)
+          /usr/libexec/PlistBuddy -c "Set :SUPublicEDKey $SPARKLE_PUBLIC_KEY" "$APP_BUILT/Contents/Info.plist"
+
       - name: Package and sign
         env:
           VERSION: ${{ needs.release-please.outputs.version }}
@@ -121,6 +138,18 @@ jobs:
           mkdir -p build/release
           cp -R "$APP_BUILT" "build/release/${APP_NAME}.app"
           APP="build/release/${APP_NAME}.app"
+
+          # Codesign Sparkle framework components (XPC services, helpers, then framework)
+          codesign --force --sign "$SIGNING_IDENTITY" --timestamp --options=runtime \
+            "$APP/Contents/Frameworks/Sparkle.framework/Versions/B/XPCServices/Downloader.xpc"
+          codesign --force --sign "$SIGNING_IDENTITY" --timestamp --options=runtime \
+            "$APP/Contents/Frameworks/Sparkle.framework/Versions/B/XPCServices/Installer.xpc"
+          codesign --force --sign "$SIGNING_IDENTITY" --timestamp --options=runtime \
+            "$APP/Contents/Frameworks/Sparkle.framework/Versions/B/Autoupdate"
+          codesign --force --sign "$SIGNING_IDENTITY" --timestamp --options=runtime \
+            "$APP/Contents/Frameworks/Sparkle.framework/Versions/B/Updater.app"
+          codesign --force --sign "$SIGNING_IDENTITY" --timestamp --options=runtime \
+            "$APP/Contents/Frameworks/Sparkle.framework"
 
           # Re-sign embedded frameworks with secure timestamp
           find "$APP/Contents/Frameworks" -type f -perm +111 -o -name "*.dylib" | while read -r bin; do
@@ -180,13 +209,38 @@ jobs:
 
           xcrun stapler staple "build/release/$DMG_NAME"
 
+      - name: Generate appcast
+        env:
+          SPARKLE_PRIVATE_KEY: ${{ secrets.SPARKLE_PRIVATE_KEY }}
+          VERSION: ${{ needs.release-please.outputs.version }}
+        run: |
+          echo "$SPARKLE_PRIVATE_KEY" > /tmp/sparkle_key
+          SIGN_OUTPUT=$(sign_update -f /tmp/sparkle_key "build/release/$DMG_NAME")
+          rm -f /tmp/sparkle_key
+
+          # sign_update outputs: sparkle:edSignature="<sig>" length="<len>"
+          SIGNATURE=$(echo "$SIGN_OUTPUT" | sed -n 's/.*sparkle:edSignature="\([^"]*\)".*/\1/p')
+          if [ -z "$SIGNATURE" ]; then
+            echo "::error::Failed to extract Ed25519 signature from sign_update output"
+            echo "sign_update output: $SIGN_OUTPUT"
+            exit 1
+          fi
+
+          DMG_URL="https://github.com/alltuner/factoryfloor/releases/download/v${VERSION}/${DMG_NAME}"
+          python3 scripts/generate_appcast.py \
+            --version "$VERSION" \
+            --signature "$SIGNATURE" \
+            --dmg-path "build/release/$DMG_NAME" \
+            --dmg-url "$DMG_URL" \
+            --output appcast.xml
+
       - name: Upload to release
         env:
           GH_TOKEN: ${{ github.token }}
           VERSION: ${{ needs.release-please.outputs.version }}
           TAG_NAME: ${{ needs.release-please.outputs.tag_name }}
         run: |
-          gh release upload "$TAG_NAME" "build/release/$DMG_NAME"
+          gh release upload "$TAG_NAME" "build/release/$DMG_NAME" appcast.xml
 
       - name: Update Homebrew cask
         env:

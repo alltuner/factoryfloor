@@ -2,6 +2,7 @@
 // ABOUTME: Initializes the ghostty terminal engine and presents the main window.
 
 import SwiftUI
+import Sparkle
 import Sentry
 
 extension Notification.Name {
@@ -41,10 +42,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 @main
 struct FF2App: App {
     @NSApplicationDelegateAdaptor(AppDelegate.self) var appDelegate
+    @StateObject private var updater = Updater()
 
     init() {
-        CacheMigration.migrateIfNeeded()
-
         SentrySDK.start { options in
             options.dsn = "https://45310bb703b438b38aee17e84e10d32e@o4511060356956160.ingest.de.sentry.io/4511060370391120"
             options.enableCrashHandler = true
@@ -126,6 +126,11 @@ struct FF2App: App {
             }
             // Cmd+,: toggle settings
             CommandGroup(after: .appSettings) {
+                Button("Check for Updates...") {
+                    updater.checkForUpdates()
+                }
+                .disabled(!updater.canCheckForUpdates)
+
                 Button("Settings") {
                     NotificationCenter.default.post(name: .openSettings, object: nil)
                 }

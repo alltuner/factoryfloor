@@ -26,6 +26,12 @@
     <string>NSApplication</string>
     <key>LSUIElement</key>
     <false/>
+    <key>SUPublicEDKey</key>
+    <string></string>
+    <key>SUFeedURL</key>
+    <string>https://github.com/alltuner/factoryfloor/releases/latest/download/appcast.xml</string>
+    <key>SUEnableAutomaticChecks</key>
+    <false/>
     <key>CFBundleURLTypes</key>
     <array>
         <dict>

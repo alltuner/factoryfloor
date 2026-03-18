@@ -1,5 +1,5 @@
 // ABOUTME: Checks factory-floor.com/versions.json for available updates.
-// ABOUTME: Publishes update availability for display in the sidebar.
+// ABOUTME: Sidebar badge fallback for Homebrew users; Sparkle handles DMG auto-updates.
 
 import Foundation
 import os
