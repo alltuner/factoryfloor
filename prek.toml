@@ -1,0 +1,19 @@
+# ABOUTME: Pre-commit hook configuration for prek.
+# ABOUTME: Run `prek install` to set up hooks, `prek run --all-files` to check everything.
+
+#:schema https://www.schemastore.org/prek.json
+
+[[repos]]
+repo = "builtin"
+hooks = [
+    { id = "no-commit-to-branch", args = ["--branch", "main"] },
+    { id = "check-added-large-files", args = ["--maxkb", "500"] },
+    { id = "check-merge-conflict" },
+    { id = "detect-private-key" },
+    { id = "trailing-whitespace", exclude = '\.md$' },
+    { id = "end-of-file-fixer", exclude = '\.md$' },
+    { id = "check-json" },
+    { id = "check-toml" },
+    { id = "check-xml" },
+    { id = "check-yaml" },
+]
