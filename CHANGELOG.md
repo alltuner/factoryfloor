@@ -1,5 +1,23 @@
 # Changelog
 
+## [0.1.23](https://github.com/alltuner/factoryfloor/compare/v0.1.22...v0.1.23) (2026-03-18)
+
+
+### Bug Fixes
+
+* migrate project storage from JSON files to UserDefaults ([#70](https://github.com/alltuner/factoryfloor/issues/70)) ([9a86fa5](https://github.com/alltuner/factoryfloor/commit/9a86fa5c14adacbfdaf111b58f31663a27924a59)), closes [#46](https://github.com/alltuner/factoryfloor/issues/46)
+* migrate project storage from JSON files to UserDefaults ([#72](https://github.com/alltuner/factoryfloor/issues/72)) ([4a88ebe](https://github.com/alltuner/factoryfloor/commit/4a88ebe497b782bbd02ad4ffd6f1a4195f3f9551)), closes [#46](https://github.com/alltuner/factoryfloor/issues/46)
+
+
+### Miscellaneous
+
+* update versions.json to v0.1.22 ([51075bb](https://github.com/alltuner/factoryfloor/commit/51075bb96d8fb9430239461201d092385e4e4de5))
+
+
+### Documentation
+
+* add Sparkle scoping doc; fix(website): native changelog rendering ([#41](https://github.com/alltuner/factoryfloor/issues/41)) ([#73](https://github.com/alltuner/factoryfloor/issues/73)) ([ee9805b](https://github.com/alltuner/factoryfloor/commit/ee9805b6ba1d6400d5ddf45bf76748bcccf5421c))
+
 ## [0.1.22](https://github.com/alltuner/factoryfloor/compare/v0.1.21...v0.1.22) (2026-03-18)
 
 
