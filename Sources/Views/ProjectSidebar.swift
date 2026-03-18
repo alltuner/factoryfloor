@@ -104,6 +104,7 @@ struct ProjectSidebar: View {
                                         branchName: appEnv.branchName(for: workstream.worktreePath),
                                         worktreePath: workstream.worktreePath,
                                         isPathValid: appEnv.isPathValid(workstream.worktreePath),
+                                        hasActivePort: Self.hasPort(workstream.id),
                                         onArchive: { confirmArchive(workstream) }
                                     )
                                     .tag(SidebarSelection.workstream(workstream.id))
@@ -315,6 +316,10 @@ struct ProjectSidebar: View {
 
     @AppStorage("factoryfloor.bypassPermissions") private var defaultBypass: Bool = false
     @AppStorage("factoryfloor.symlinkEnv") private var symlinkEnv: Bool = true
+
+    private static func hasPort(_ workstreamID: UUID) -> Bool {
+        RunStateStore.loadValidated(for: workstreamID)?.detectedPorts.isEmpty == false
+    }
 
     private func addWorkstream(for projectID: UUID, bypassPermissions: Bool? = nil) {
         logger.warning("[FF] addWorkstream called for projectID=\(projectID, privacy: .public)")
@@ -588,6 +593,7 @@ private struct WorkstreamRow: View {
     var branchName: String?
     var worktreePath: String?
     let isPathValid: Bool
+    var hasActivePort: Bool = false
     let onArchive: () -> Void
 
     @State private var isHovering = false
@@ -596,10 +602,17 @@ private struct WorkstreamRow: View {
         HStack {
             Label {
                 VStack(alignment: .leading, spacing: 1) {
-                    Text(name)
-                        .font(.system(.body))
-                        .strikethrough(!isPathValid)
-                        .foregroundStyle(isPathValid ? .primary : .secondary)
+                    HStack(spacing: 4) {
+                        Text(name)
+                            .font(.system(.body))
+                            .strikethrough(!isPathValid)
+                            .foregroundStyle(isPathValid ? .primary : .secondary)
+                        if hasActivePort {
+                            Image(systemName: "circle.fill")
+                                .font(.system(size: 6))
+                                .foregroundStyle(.green)
+                        }
+                    }
                     if let branchName, isPathValid {
                         HStack(spacing: 3) {
                             Image(systemName: "arrow.triangle.branch")
