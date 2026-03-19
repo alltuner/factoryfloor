@@ -1,5 +1,17 @@
 # Changelog
 
+## [0.1.36](https://github.com/alltuner/factoryfloor/compare/v0.1.35...v0.1.36) (2026-03-19)
+
+
+### Refactoring
+
+* generate Info.plist via XcodeGen and versions.json at deploy time ([#141](https://github.com/alltuner/factoryfloor/issues/141)) ([c1d624b](https://github.com/alltuner/factoryfloor/commit/c1d624b9f5f3192b20213917bdfd33b8c936a153))
+
+
+### Miscellaneous
+
+* update versions.json to v0.1.35 ([4e0a3ac](https://github.com/alltuner/factoryfloor/commit/4e0a3ac0b8411d4380660ebcce7564ef243df083))
+
 ## [0.1.35](https://github.com/alltuner/factoryfloor/compare/v0.1.34...v0.1.35) (2026-03-19)
 
 
