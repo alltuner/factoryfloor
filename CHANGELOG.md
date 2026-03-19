@@ -1,5 +1,20 @@
 # Changelog
 
+## [0.1.38](https://github.com/alltuner/factoryfloor/compare/v0.1.37...v0.1.38) (2026-03-19)
+
+
+### Bug Fixes
+
+* **ci:** prevent premature website deploy during releases ([#145](https://github.com/alltuner/factoryfloor/issues/145)) ([dd2967c](https://github.com/alltuner/factoryfloor/commit/dd2967c4a3b87a0eb225eaf1ae4797c95761e732))
+* host appcast on website to avoid Sparkle update race condition ([#149](https://github.com/alltuner/factoryfloor/issues/149)) ([5984c50](https://github.com/alltuner/factoryfloor/commit/5984c5012a7632df4d59e55bad03309cd5070d5a))
+* replace blocking runModal calls with async alternatives ([#148](https://github.com/alltuner/factoryfloor/issues/148)) ([a0d7e73](https://github.com/alltuner/factoryfloor/commit/a0d7e734bcf22de1f4a1d81ffc71b16d0457639d))
+
+
+### Refactoring
+
+* **ci:** embed Sparkle public key in project.yml ([#147](https://github.com/alltuner/factoryfloor/issues/147)) ([6465fb7](https://github.com/alltuner/factoryfloor/commit/6465fb7258e490a1f663432f8938e3b0c3c82278))
+* **ci:** embed Sparkle public key in project.yml ([#147](https://github.com/alltuner/factoryfloor/issues/147)) ([f7870fa](https://github.com/alltuner/factoryfloor/commit/f7870fabe94d26be60d52bcb054822743fefbe86))
+
 ## [0.1.37](https://github.com/alltuner/factoryfloor/compare/v0.1.36...v0.1.37) (2026-03-19)
 
 
