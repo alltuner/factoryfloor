@@ -8,56 +8,66 @@ PROJECT="FactoryFloor.xcodeproj"
 SCHEME="FactoryFloor"
 TEST_SCHEME="FactoryFloorTests"
 APP_NAME="Factory Floor Debug"
-URL_SCHEME="factoryfloor-debug"
+BUILD_DIR="build/debug/derived"
+APP_PATH="$BUILD_DIR/Build/Products/Debug/$APP_NAME.app"
 
 case "${1:-build}" in
   build)
     xcodegen generate
-    xcodebuild -project "$PROJECT" -scheme "$SCHEME" -configuration Debug build
+    xcodebuild -project "$PROJECT" -scheme "$SCHEME" -configuration Debug \
+      -derivedDataPath "$BUILD_DIR" build
     ;;
   run)
     shift 2>/dev/null || true
-    DIR=$(cd "${1:-.}" 2>/dev/null && pwd)
-    pkill -f "$APP_NAME.app/Contents/MacOS" 2>/dev/null || true
+    pkill -xf ".*/Contents/MacOS/$APP_NAME" 2>/dev/null || true
     sleep 0.5
-    open "$URL_SCHEME://$DIR"
+    if [ -n "${1:-}" ]; then
+      DIR=$(cd "$1" && pwd)
+      open "$APP_PATH" --args "$DIR"
+    else
+      open "$APP_PATH"
+    fi
     ;;
   br)
     shift 2>/dev/null || true
-    DIR=$(cd "${1:-.}" 2>/dev/null && pwd)
     xcodegen generate
-    xcodebuild -project "$PROJECT" -scheme "$SCHEME" -configuration Debug build
-    pkill -f "$APP_NAME.app/Contents/MacOS" 2>/dev/null || true
+    xcodebuild -project "$PROJECT" -scheme "$SCHEME" -configuration Debug \
+      -derivedDataPath "$BUILD_DIR" build
+    pkill -xf ".*/Contents/MacOS/$APP_NAME" 2>/dev/null || true
     sleep 0.5
-    open "$URL_SCHEME://$DIR"
+    if [ -n "${1:-}" ]; then
+      DIR=$(cd "$1" && pwd)
+      open "$APP_PATH" --args "$DIR"
+    else
+      open "$APP_PATH"
+    fi
     ;;
   test)
     xcodegen generate
-    xcodebuild -project "$PROJECT" -scheme "$TEST_SCHEME" -configuration Debug test
+    xcodebuild -project "$PROJECT" -scheme "$TEST_SCHEME" -configuration Debug \
+      -derivedDataPath "$BUILD_DIR" test
     ;;
   release)
-    # Build a Release binary matching CI conditions (hardened runtime, no debug entitlements)
-    BUILD_DIR="build/release-local/derived"
+    RELEASE_DIR="build/release-local/derived"
     xcodegen generate
     xcodebuild -project "$PROJECT" -scheme "$SCHEME" -configuration Release \
-      -derivedDataPath "$BUILD_DIR" \
+      -derivedDataPath "$RELEASE_DIR" \
       CODE_SIGN_IDENTITY="-" \
       CODE_SIGN_STYLE=Manual \
       ENABLE_HARDENED_RUNTIME=YES \
       CODE_SIGN_INJECT_BASE_ENTITLEMENTS=NO \
       OTHER_CODE_SIGN_FLAGS="--options=runtime" \
       build
-    echo "==> Release build at: $BUILD_DIR/Build/Products/Release/Factory Floor.app"
+    echo "==> Release build at: $RELEASE_DIR/Build/Products/Release/Factory Floor.app"
     if [ "${2:-}" = "--run" ]; then
-      pkill -f "Factory Floor.app/Contents/MacOS/Factory Floor" 2>/dev/null || true
+      pkill -xf ".*/Contents/MacOS/Factory Floor" 2>/dev/null || true
       sleep 0.5
-      open "$BUILD_DIR/Build/Products/Release/Factory Floor.app"
+      open "$RELEASE_DIR/Build/Products/Release/Factory Floor.app"
     fi
     ;;
   clean)
     xcodebuild -project "$PROJECT" -scheme "$SCHEME" -configuration Debug clean 2>/dev/null || true
-    rm -rf ~/Library/Developer/Xcode/DerivedData/FactoryFloor-*
-    rm -rf build/release-local
+    rm -rf build/debug build/release-local
     ;;
   *)
     echo "Usage: ./scripts/dev.sh [command] [directory]"
