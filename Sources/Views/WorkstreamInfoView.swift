@@ -297,10 +297,14 @@ struct DocFile: Identifiable {
     static let standardNames = ["README.md", "CLAUDE.md", "AGENTS.md"]
 
     static func loadFrom(directory: String) -> [DocFile] {
+        let fm = FileManager.default
         var found: [DocFile] = []
         for name in standardNames {
             let path = URL(fileURLWithPath: directory).appendingPathComponent(name).path
-            if let data = FileManager.default.contents(atPath: path),
+            guard let attrs = try? fm.attributesOfItem(atPath: path),
+                  attrs[.type] as? FileAttributeType == .typeRegular
+            else { continue }
+            if let data = fm.contents(atPath: path),
                data.count >= 20,
                let content = String(data: data, encoding: .utf8)
             {
