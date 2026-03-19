@@ -1,5 +1,5 @@
-// ABOUTME: Checks factory-floor.com/versions.json for available updates.
-// ABOUTME: Sidebar badge fallback for Homebrew users; Sparkle handles DMG auto-updates.
+// ABOUTME: Checks factory-floor.com/appcast.xml for available updates.
+// ABOUTME: Sidebar badge for Homebrew users; Sparkle handles DMG auto-updates.
 
 import Foundation
 import os
@@ -10,7 +10,7 @@ class UpdateChecker: ObservableObject {
 
     private let currentVersion: String
     private let logger = Logger(subsystem: AppConstants.appID, category: "UpdateChecker")
-    private static let versionsURL = URL(string: "https://factory-floor.com/versions.json")!
+    private static let appcastURL = URL(string: "https://factory-floor.com/appcast.xml")!
 
     init() {
         currentVersion = AppConstants.version
@@ -19,18 +19,26 @@ class UpdateChecker: ObservableObject {
     func check() {
         Task.detached { [currentVersion, logger] in
             do {
-                let (data, _) = try await URLSession.shared.data(from: Self.versionsURL)
-                guard let json = try JSONSerialization.jsonObject(with: data) as? [String: String],
-                      let stable = json["stable"] else { return }
-                if Self.isNewer(stable, than: currentVersion) {
+                let (data, _) = try await URLSession.shared.data(from: Self.appcastURL)
+                guard let version = Self.parseVersion(from: data) else { return }
+                if Self.isNewer(version, than: currentVersion) {
                     await MainActor.run { [weak self] in
-                        self?.availableVersion = stable
+                        self?.availableVersion = version
                     }
                 }
             } catch {
                 logger.debug("Update check failed: \(error.localizedDescription)")
             }
         }
+    }
+
+    /// Extracts the sparkle:shortVersionString from the first enclosure in an appcast feed.
+    nonisolated static func parseVersion(from data: Data) -> String? {
+        let parser = AppcastParser()
+        let xmlParser = XMLParser(data: data)
+        xmlParser.delegate = parser
+        guard xmlParser.parse() else { return nil }
+        return parser.version
     }
 
     /// Simple semver comparison: returns true if `remote` is newer than `local`.
@@ -44,5 +52,21 @@ class UpdateChecker: ObservableObject {
             if rv < lv { return false }
         }
         return false
+    }
+}
+
+private class AppcastParser: NSObject, XMLParserDelegate {
+    var version: String?
+
+    func parser(
+        _: XMLParser,
+        didStartElement elementName: String,
+        namespaceURI _: String?,
+        qualifiedName _: String?,
+        attributes attributeDict: [String: String] = [:]
+    ) {
+        if elementName == "enclosure", version == nil {
+            version = attributeDict["sparkle:shortVersionString"]
+        }
     }
 }

@@ -44,7 +44,7 @@ targets:
         NSPrincipalClass: NSApplication
         LSUIElement: false
         SUPublicEDKey: "grC1rloxT0gFZ2mQVIuDTZlkNFXwXLZhn9+xs4YGuXo="
-        SUFeedURL: https://github.com/alltuner/factoryfloor/releases/latest/download/appcast.xml
+        SUFeedURL: https://factory-floor.com/appcast.xml
         SUEnableAutomaticChecks: true
         CFBundleURLTypes:
           - CFBundleURLName: com.alltuner.factoryfloor.open

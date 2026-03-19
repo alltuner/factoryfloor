@@ -2,4 +2,4 @@ node_modules/
 public/
 resources/
 content/changelog.md
-static/versions.json
+static/appcast.xml

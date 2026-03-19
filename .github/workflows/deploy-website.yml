@@ -49,11 +49,12 @@ jobs:
             sed '1{/^# Changelog$/d;}' CHANGELOG.md
           } > website/content/changelog.md
 
-      - name: Generate versions.json from release manifest
+      - name: Download appcast.xml from latest release
         working-directory: .
+        env:
+          GH_TOKEN: ${{ github.token }}
         run: |
-          VERSION=$(jq -r '."."' .release-please-manifest.json)
-          jq -n --arg v "$VERSION" '{"stable":$v,"latest":$v}' > website/static/versions.json
+          gh release download --repo "$GITHUB_REPOSITORY" --pattern "appcast.xml" --output website/static/appcast.xml
 
       - run: hugo
 

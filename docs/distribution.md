@@ -12,11 +12,11 @@ Factory Floor ships via two channels:
 
 ## Update notification
 
-The app checks `https://factory-floor.com/versions.json` on launch
-and every 6 hours. If a newer stable version exists, a badge appears
-in the sidebar linking to `factory-floor.com/get`.
+DMG users get automatic updates via Sparkle, which reads the appcast
+feed at `https://factory-floor.com/appcast.xml`.
 
-`versions.json` is updated automatically by the release workflow.
+Homebrew users see a sidebar badge when a newer version is available.
+The app parses the version from the same appcast feed.
 
 ## Release flow
 
@@ -31,7 +31,7 @@ in the sidebar linking to `factory-floor.com/get`.
    - Create and sign DMG
    - Upload DMG to GitHub release
    - Update Homebrew cask in `alltuner/homebrew-tap`
-   - Update `versions.json` and trigger website deploy
+   - Trigger website deploy (deploys appcast.xml from the release)
 5. Website deploys automatically (GitHub Pages)
 6. Users see update badge on next app launch
 
@@ -45,18 +45,6 @@ in the sidebar linking to `factory-floor.com/get`.
 | `APPLE_TEAM_ID` | Team identifier |
 | `APPLE_APP_PASSWORD` | App-specific password for notarization |
 | `HOMEBREW_TAP_TOKEN` | PAT with `public_repo` scope for tap updates |
-
-## versions.json
-
-```json
-{
-  "stable": "1.0.0",
-  "latest": "1.0.0"
-}
-```
-
-- `stable`: current release version
-- `latest`: same as stable for now; reserved for future beta channel
 
 ## Local release (manual)
 
@@ -79,6 +67,6 @@ After a release, verify:
 
 1. GitHub release exists with notarized DMG attached
 2. Homebrew cask points to the new DMG
-3. `factory-floor.com/versions.json` reports the new version
+3. `factory-floor.com/appcast.xml` reports the new version
 4. `/get` page shows correct install/upgrade commands
 5. App shows update badge when running an older version

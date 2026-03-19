@@ -4,12 +4,10 @@ GitHub issue: #39
 
 ## Background
 
-Factory Floor currently notifies users about new versions by polling
-`factory-floor.com/versions.json` and showing a badge in the sidebar
-(see `UpdateChecker.swift`). Users must then manually download the DMG
-from GitHub Releases or run `brew upgrade`. Sparkle replaces this with
-true in-app auto-updates: check, download, verify, and install, all
-without leaving the app.
+Factory Floor notifies Homebrew users about new versions by parsing the
+appcast feed at `factory-floor.com/appcast.xml` and showing a badge in
+the sidebar (see `UpdateChecker.swift`). DMG users get automatic
+updates via Sparkle, which reads the same appcast feed.
 
 [Sparkle](https://sparkle-project.org/) is the standard auto-update
 framework for macOS apps. Both
@@ -74,11 +72,13 @@ pattern ghostty and cmux use).
 | Key | Value | Notes |
 |-----|-------|-------|
 | `SUPublicEDKey` | (empty or placeholder) | Overwritten by CI with real public key |
-| `SUFeedURL` | `https://github.com/alltuner/factoryfloor/releases/latest/download/appcast.xml` | Points to the appcast hosted as a GitHub release asset |
+| `SUFeedURL` | `https://factory-floor.com/appcast.xml` | Points to the appcast hosted on the website |
 | `SUEnableAutomaticChecks` | `false` | Let users opt in via Settings |
 
-Using `releases/latest/download/` means GitHub always redirects to the
-most recent release's `appcast.xml`, so we don't need a separate CDN.
+The appcast is hosted on the website and updated by the deploy workflow
+after each release. This avoids a race condition where the GitHub
+`releases/latest/` redirect points to a new release before assets are
+uploaded.
 
 ### 4. App Code Changes
 
@@ -129,14 +129,11 @@ simplest integration path.
 - Optionally add an "Automatically check for updates" toggle bound to
   `controller.updater.automaticallyChecksForUpdates`.
 
-**Remove or repurpose: `UpdateChecker.swift`**
+**Keep: `UpdateChecker.swift`**
 
-The current `UpdateChecker` that polls `versions.json` becomes
-redundant once Sparkle handles update detection. It can be removed, or
-kept temporarily as a fallback for Homebrew users who won't get Sparkle
-updates (Homebrew replaces the app bundle, so Sparkle's in-app updater
-doesn't apply to them). The sidebar badge could remain for Homebrew
-users, driven by the existing `versions.json` check.
+`UpdateChecker` parses the version from the same `appcast.xml` feed on
+the website. It drives the sidebar badge for Homebrew users who don't
+get Sparkle auto-updates.
 
 ### 5. Codesign Sparkle Frameworks
 
@@ -227,32 +224,11 @@ simplified: we only need one channel and one item (the latest release).
 
 ### 7. Appcast Hosting
 
-**Recommended: GitHub release asset** (same as cmux)
-
-Set `SUFeedURL` to:
-```
-https://github.com/alltuner/factoryfloor/releases/latest/download/appcast.xml
-```
-
-GitHub's `latest/download/` path always redirects to the most recent
-release's assets. This means:
-- No separate hosting infrastructure needed.
-- The appcast is versioned alongside the DMG.
-- Each release gets its own `appcast.xml` with the current version's
-  entry.
-
-**Alternative: CDN (like ghostty)**
-
-Ghostty hosts appcast on `release.files.ghostty.org` (Cloudflare R2)
-and maintains a cumulative appcast with version history. This is more
-complex but supports features like delta updates and version-specific
-minimum OS requirements. Not needed for our scale.
-
-**Alternative: `factory-floor.com/appcast.xml`**
-
-Host on our existing website. Simpler than R2 but requires the website
-deploy workflow to also update the appcast. Adds a coupling between
-release and website deploy that doesn't exist today.
+The appcast is hosted on the website at `factory-floor.com/appcast.xml`.
+The deploy-website workflow downloads the appcast from the latest GitHub
+release and includes it in the static site. This ensures the feed URL
+only updates after assets are fully uploaded, avoiding a race condition
+with the GitHub `releases/latest/` redirect.
 
 ### 8. Appcast Generation Script
 
@@ -320,7 +296,7 @@ and replace the running copy.
 | `Sources/Views/SettingsView.swift` | Add auto-update toggle |
 | `.github/workflows/release.yml` | Setup Sparkle, inject keys, sign frameworks, generate appcast, upload |
 | `scripts/generate_appcast.py` | New: builds appcast.xml from release metadata |
-| `Sources/Models/UpdateChecker.swift` | Remove or keep for Homebrew-only fallback |
+| `Sources/Models/UpdateChecker.swift` | Parse version from appcast.xml instead of versions.json |
 
 ## New GitHub Secrets
 
