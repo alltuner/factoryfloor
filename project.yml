@@ -16,7 +16,7 @@ settings:
     MACOSX_DEPLOYMENT_TARGET: "14.0"
     CODE_SIGN_IDENTITY: "-"
     CODE_SIGNING_REQUIRED: "NO"
-    CURRENT_PROJECT_VERSION: "1"
+
 
 packages:
   swift-cmark:

@@ -32,6 +32,7 @@ struct ContentView: View {
     @StateObject private var surfaceCache = TerminalSurfaceCache()
     @StateObject private var appEnvironment = AppEnvironment()
     @StateObject private var updateChecker = UpdateChecker()
+    @EnvironmentObject private var updater: Updater
     @State private var saveWork: DispatchWorkItem?
     @State private var workstreamToArchive: UUID?
     @State private var archiveWarningDirty = false
@@ -194,6 +195,7 @@ struct ContentView: View {
         .environmentObject(surfaceCache)
         .environmentObject(appEnvironment)
         .environmentObject(updateChecker)
+        .environmentObject(updater)
         .onAppear {
             appEnvironment.refresh()
             appEnvironment.refreshAllRepoInfo(projects: projects)

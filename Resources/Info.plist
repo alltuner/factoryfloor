@@ -9,7 +9,9 @@
     <key>CFBundleIdentifier</key>
     <string>$(PRODUCT_BUNDLE_IDENTIFIER)</string>
     <key>CFBundleVersion</key>
-    <string>$(CURRENT_PROJECT_VERSION)</string>
+    <!-- x-release-please-start-version -->
+    <string>0.1.30</string>
+    <!-- x-release-please-end -->
     <key>CFBundleShortVersionString</key>
     <!-- x-release-please-start-version -->
     <string>0.1.30</string>
@@ -31,7 +33,7 @@
     <key>SUFeedURL</key>
     <string>https://github.com/alltuner/factoryfloor/releases/latest/download/appcast.xml</string>
     <key>SUEnableAutomaticChecks</key>
-    <false/>
+    <true/>
     <key>CFBundleURLTypes</key>
     <array>
         <dict>

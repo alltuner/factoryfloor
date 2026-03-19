@@ -91,6 +91,7 @@ struct FF2App: App {
     var body: some Scene {
         Window(AppConstants.appName, id: "main") {
             ContentView()
+                .environmentObject(updater)
                 .onAppear {
                     if let dir = Self.launchDirectory {
                         DispatchQueue.main.async {

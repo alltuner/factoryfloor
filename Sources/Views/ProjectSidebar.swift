@@ -145,7 +145,7 @@ struct ProjectSidebar: View {
                 // Bottom bar (always visible)
                 VStack(spacing: 4) {
                     if let version = updateChecker.availableVersion {
-                        UpdateBanner(version: version)
+                        UpdateBanner(version: version, updater: updater)
                     }
 
                     // Credit
@@ -369,6 +369,7 @@ struct ProjectSidebar: View {
     @EnvironmentObject private var surfaceCache: TerminalSurfaceCache
     @EnvironmentObject private var appEnv: AppEnvironment
     @EnvironmentObject private var updateChecker: UpdateChecker
+    @EnvironmentObject private var updater: Updater
 
     private func confirmArchive(_ workstream: Workstream) {
         if let path = workstream.worktreePath, GitOperations.hasUncommittedChanges(at: path) {
@@ -717,6 +718,7 @@ private struct SidebarBottomButton: View {
 
 private struct UpdateBanner: View {
     let version: String
+    @ObservedObject var updater: Updater
 
     @State private var isHovering = false
 
@@ -728,7 +730,11 @@ private struct UpdateBanner: View {
 
     var body: some View {
         Button {
-            NSWorkspace.shared.open(getURL)
+            if updater.canCheckForUpdates {
+                updater.checkForUpdates()
+            } else {
+                NSWorkspace.shared.open(getURL)
+            }
         } label: {
             HStack(spacing: 6) {
                 Image(systemName: "arrow.up.circle.fill")
