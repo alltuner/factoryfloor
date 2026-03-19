@@ -1,5 +1,22 @@
 # Changelog
 
+## [0.1.40](https://github.com/alltuner/factoryfloor/compare/v0.1.39...v0.1.40) (2026-03-19)
+
+
+### Features
+
+* **website:** add llms.txt for AI crawler discovery ([#156](https://github.com/alltuner/factoryfloor/issues/156)) ([1e4fcc2](https://github.com/alltuner/factoryfloor/commit/1e4fcc2d7fb9c3c2f13eaefd113ce0460c7d000e))
+
+
+### Bug Fixes
+
+* use heap-allocated C strings for ghostty env vars ([#159](https://github.com/alltuner/factoryfloor/issues/159)) ([3c66311](https://github.com/alltuner/factoryfloor/commit/3c6631153e95322e78baa490f5618564fb7889bc))
+
+
+### Performance
+
+* share SPM package cache across worktrees ([#158](https://github.com/alltuner/factoryfloor/issues/158)) ([e531a5a](https://github.com/alltuner/factoryfloor/commit/e531a5a5aeb5f66db72b8c29141d00d5b4ed80bb))
+
 ## [0.1.39](https://github.com/alltuner/factoryfloor/compare/v0.1.38...v0.1.39) (2026-03-19)
 
 
