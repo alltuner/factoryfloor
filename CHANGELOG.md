@@ -1,5 +1,17 @@
 # Changelog
 
+## [0.1.31](https://github.com/alltuner/factoryfloor/compare/v0.1.30...v0.1.31) (2026-03-19)
+
+
+### Bug Fixes
+
+* align CFBundleVersion with semver so Sparkle detects updates ([#129](https://github.com/alltuner/factoryfloor/issues/129)) ([0bcb0aa](https://github.com/alltuner/factoryfloor/commit/0bcb0aa42c968725bb0efdc76b6f8c0b5b3bf9fd))
+
+
+### Miscellaneous
+
+* update versions.json to v0.1.30 ([a319936](https://github.com/alltuner/factoryfloor/commit/a31993680a3a5f5ed6abb9b8f2bd7064ccb2a696))
+
 ## [0.1.30](https://github.com/alltuner/factoryfloor/compare/v0.1.29...v0.1.30) (2026-03-19)
 
 
