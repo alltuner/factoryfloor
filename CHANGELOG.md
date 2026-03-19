@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.1.37](https://github.com/alltuner/factoryfloor/compare/v0.1.36...v0.1.37) (2026-03-19)
+
+
+### Bug Fixes
+
+* wrap preloaded setup script in login shell ([#143](https://github.com/alltuner/factoryfloor/issues/143)) ([a263d35](https://github.com/alltuner/factoryfloor/commit/a263d35f94a7befdaa19e6922bd88b57ddb5e2a7))
+
 ## [0.1.36](https://github.com/alltuner/factoryfloor/compare/v0.1.35...v0.1.36) (2026-03-19)
 
 
