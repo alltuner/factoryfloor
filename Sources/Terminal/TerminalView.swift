@@ -19,7 +19,7 @@ final class TerminalView: NSView {
         surfaceRegistry[surface]
     }
 
-    nonisolated(unsafe) private(set) var surface: ghostty_surface_t?
+    private(set) nonisolated(unsafe) var surface: ghostty_surface_t?
     nonisolated(unsafe) var workstreamID: UUID?
     private var trackingArea: NSTrackingArea?
     private var markedText = NSMutableAttributedString()
@@ -44,15 +44,15 @@ final class TerminalView: NSView {
         config.font_size = 0 // inherit from ghostty config
         config.context = GHOSTTY_SURFACE_CONTEXT_WINDOW
 
-        // Build C env vars array. Keep the strings alive until surface is created.
-        let envKeys = environmentVars.map { $0.key.utf8CString }
-        let envValues = environmentVars.map { $0.value.utf8CString }
-        var cEnvVars = (0..<environmentVars.count).map { i in
-            envKeys[i].withUnsafeBufferPointer { keyBuf in
-                envValues[i].withUnsafeBufferPointer { valBuf in
-                    ghostty_env_var_s(key: keyBuf.baseAddress, value: valBuf.baseAddress)
-                }
-            }
+        // Heap-allocate C strings for env vars so pointers remain valid until surface creation.
+        var cStringPool: [UnsafeMutablePointer<CChar>] = []
+        defer { cStringPool.forEach { free($0) } }
+        var cEnvVars = environmentVars.map { key, value -> ghostty_env_var_s in
+            let cKey = strdup(key)!
+            let cValue = strdup(value)!
+            cStringPool.append(cKey)
+            cStringPool.append(cValue)
+            return ghostty_env_var_s(key: UnsafePointer(cKey), value: UnsafePointer(cValue))
         }
 
         // Use nested withCString to keep all C strings alive during surface creation
@@ -112,7 +112,7 @@ final class TerminalView: NSView {
     }
 
     @available(*, unavailable)
-    required init?(coder: NSCoder) {
+    required init?(coder _: NSCoder) {
         fatalError("init(coder:) is not supported")
     }
 
@@ -133,7 +133,9 @@ final class TerminalView: NSView {
 
     // MARK: - View lifecycle
 
-    override var acceptsFirstResponder: Bool { true }
+    override var acceptsFirstResponder: Bool {
+        true
+    }
 
     override func becomeFirstResponder() -> Bool {
         let result = super.becomeFirstResponder()
@@ -171,7 +173,7 @@ final class TerminalView: NSView {
             let size = self.bounds.size
             let w = UInt32(size.width * currentScale)
             let h = UInt32(size.height * currentScale)
-            if w > 0 && h > 0 {
+            if w > 0, h > 0 {
                 ghostty_surface_set_size(surface, w, h)
             }
         }
@@ -190,11 +192,9 @@ final class TerminalView: NSView {
         let scale = window?.backingScaleFactor ?? NSScreen.main?.backingScaleFactor ?? 2.0
         let w = UInt32(newSize.width * scale)
         let h = UInt32(newSize.height * scale)
-        guard w > 0 && h > 0 else { return }
+        guard w > 0, h > 0 else { return }
         ghostty_surface_set_size(surface, w, h)
     }
-
-
 
     override func updateTrackingAreas() {
         if let trackingArea {
@@ -231,7 +231,7 @@ final class TerminalView: NSView {
     // MARK: - Keyboard
 
     override func keyDown(with event: NSEvent) {
-        guard self.surface != nil else {
+        guard surface != nil else {
             interpretKeyEvents([event])
             return
         }
@@ -300,7 +300,8 @@ final class TerminalView: NSView {
         keyEv.unshifted_codepoint = 0
         if event.type == .keyDown || event.type == .keyUp {
             if let chars = event.characters(byApplyingModifiers: []),
-               let codepoint = chars.unicodeScalars.first {
+               let codepoint = chars.unicodeScalars.first
+            {
                 keyEv.unshifted_codepoint = codepoint.value
             }
         }
@@ -311,7 +312,8 @@ final class TerminalView: NSView {
         // For text, only pass it if it's not a control character (>= 0x20).
         // Ghostty's KeyEncoder handles ctrl character mapping internally.
         if let text, !text.isEmpty,
-           let firstByte = text.utf8.first, firstByte >= 0x20 {
+           let firstByte = text.utf8.first, firstByte >= 0x20
+        {
             return text.withCString { ptr in
                 keyEv.text = ptr
                 return ghostty_surface_key(surface, keyEv)
@@ -332,7 +334,7 @@ final class TerminalView: NSView {
                 return event.characters(byApplyingModifiers: event.modifierFlags.subtracting(.control))
             }
             // Private Use Area: function keys, no text
-            if scalar.value >= 0xF700 && scalar.value <= 0xF8FF {
+            if scalar.value >= 0xF700, scalar.value <= 0xF8FF {
                 return nil
             }
         }
@@ -340,7 +342,7 @@ final class TerminalView: NSView {
         return characters
     }
 
-    func insertText(_ string: Any, replacementRange: NSRange) {
+    func insertText(_ string: Any, replacementRange _: NSRange) {
         guard NSApp.currentEvent != nil else { return }
 
         let chars: String
@@ -363,7 +365,7 @@ final class TerminalView: NSView {
         }
     }
 
-    func setMarkedText(_ string: Any, selectedRange: NSRange, replacementRange: NSRange) {
+    func setMarkedText(_ string: Any, selectedRange _: NSRange, replacementRange _: NSRange) {
         switch string {
         case let v as NSAttributedString: markedText = NSMutableAttributedString(attributedString: v)
         case let v as String: markedText = NSMutableAttributedString(string: v)
@@ -390,7 +392,7 @@ final class TerminalView: NSView {
         markedText.length > 0
     }
 
-    func attributedSubstring(forProposedRange range: NSRange, actualRange: NSRangePointer?) -> NSAttributedString? {
+    func attributedSubstring(forProposedRange _: NSRange, actualRange _: NSRangePointer?) -> NSAttributedString? {
         nil
     }
 
@@ -398,7 +400,7 @@ final class TerminalView: NSView {
         []
     }
 
-    func firstRect(forCharacterRange range: NSRange, actualRange: NSRangePointer?) -> NSRect {
+    func firstRect(forCharacterRange _: NSRange, actualRange _: NSRangePointer?) -> NSRect {
         guard let surface else { return .zero }
         var x: Double = 0, y: Double = 0, w: Double = 0, h: Double = 0
         ghostty_surface_ime_point(surface, &x, &y, &w, &h)
@@ -406,11 +408,11 @@ final class TerminalView: NSView {
         return NSRect(x: point.x, y: point.y, width: w, height: h)
     }
 
-    func characterIndex(for point: NSPoint) -> Int {
+    func characterIndex(for _: NSPoint) -> Int {
         0
     }
 
-    override func doCommand(by selector: Selector) {
+    override func doCommand(by _: Selector) {
         // Let the input system handle commands we don't care about
     }
 
