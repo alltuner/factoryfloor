@@ -298,35 +298,6 @@ jobs:
             -f content="$(echo "$CASK_CONTENT" | base64)" \
             -f sha="$CASK_SHA"
 
-      - name: Update versions.json
-        env:
-          GH_TOKEN: ${{ github.token }}
-          VERSION: ${{ needs.release-please.outputs.version }}
-        run: |
-          VERSIONS_JSON=$(cat <<JSON
-          {
-            "stable": "${VERSION}",
-            "latest": "${VERSION}"
-          }
-          JSON
-          )
-
-          VERSIONS_SHA=$(gh api repos/alltuner/factoryfloor/contents/website/static/versions.json \
-            --method GET -q '.sha' 2>/dev/null || echo "")
-
-          if [ -n "$VERSIONS_SHA" ]; then
-            gh api repos/alltuner/factoryfloor/contents/website/static/versions.json \
-              --method PUT \
-              -f message="chore: update versions.json to v${VERSION}" \
-              -f content="$(echo "$VERSIONS_JSON" | base64)" \
-              -f sha="$VERSIONS_SHA"
-          else
-            gh api repos/alltuner/factoryfloor/contents/website/static/versions.json \
-              --method PUT \
-              -f message="chore: update versions.json to v${VERSION}" \
-              -f content="$(echo "$VERSIONS_JSON" | base64)"
-          fi
-
       - name: Trigger website deploy
         continue-on-error: true
         env:

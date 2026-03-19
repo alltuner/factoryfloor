@@ -9,7 +9,7 @@
       "extra-files": [
         {
           "type": "generic",
-          "path": "Resources/Info.plist"
+          "path": "project.yml"
         }
       ],
       "changelog-sections": [

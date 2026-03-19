@@ -28,7 +28,7 @@ Do **not** edit `FactoryFloor.xcodeproj` directly. It is generated from `project
 - `Sources/Terminal/` - Ghostty integration (TerminalApp singleton, TerminalView)
 - `Sources/Views/` - SwiftUI views (sidebar, settings, workspace, browser)
 - `Localization/` - Localized strings (en, ca, es, sv)
-- `Resources/` - Info.plist, entitlements, assets, bridging header
+- `Resources/` - Entitlements, assets, bridging header
 - `website/` - Hugo + Tailwind CSS site for factory-floor.com
 
 ## How to contribute

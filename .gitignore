@@ -1,6 +1,7 @@
-# Generated Xcode project (regenerate with `xcodegen`)
+# Generated Xcode project and Info.plist (regenerate with `xcodegen`)
 *.xcodeproj
 *.xcworkspace
+FactoryFloor/Info.plist
 
 # Xcode build artifacts
 build/

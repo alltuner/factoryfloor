@@ -65,7 +65,7 @@ in the sidebar linking to `factory-floor.com/get`.
 ```
 
 Builds, signs, notarizes, and creates a DMG locally. Version defaults
-to the value in Info.plist if not provided.
+to the value in `.release-please-manifest.json` if not provided.
 
 ## Auto-update (future)
 

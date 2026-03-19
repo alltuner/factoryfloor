@@ -50,6 +50,12 @@ jobs:
             sed '1{/^# Changelog$/d;}' CHANGELOG.md
           } > website/content/changelog.md
 
+      - name: Generate versions.json from release manifest
+        working-directory: .
+        run: |
+          VERSION=$(jq -r '."."' .release-please-manifest.json)
+          jq -n --arg v "$VERSION" '{"stable":$v,"latest":$v}' > website/static/versions.json
+
       - run: hugo
 
       - uses: actions/upload-pages-artifact@v4

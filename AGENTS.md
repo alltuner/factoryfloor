@@ -91,7 +91,7 @@ Breaking changes: add `!` after the type or include `BREAKING CHANGE:` in the fo
 - `Sources/Terminal/` - Ghostty integration (TerminalApp singleton, TerminalView NSView)
 - `Sources/Views/` - SwiftUI views (sidebar, settings, project overview, workspace, browser)
 - `Localization/` - lproj directories with Localizable.strings
-- `Resources/` - Info.plist, entitlements, bridging header, Assets.xcassets, CLI script
+- `Resources/` - Entitlements, bridging header, Assets.xcassets, CLI script
 - `ghostty/` - Git submodule (do not modify, pinned to stable release tag)
 - `website/` - Hugo + Tailwind CSS site for factory-floor.com
 - `scripts/` - Release and build automation
