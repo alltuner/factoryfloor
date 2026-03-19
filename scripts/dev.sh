@@ -10,12 +10,13 @@ TEST_SCHEME="FactoryFloorTests"
 APP_NAME="Factory Floor Debug"
 BUILD_DIR="build/debug/derived"
 APP_PATH="$BUILD_DIR/Build/Products/Debug/$APP_NAME.app"
+BRANCH=$(git branch --show-current 2>/dev/null || echo "unknown")
 
 case "${1:-build}" in
   build)
     xcodegen generate
     xcodebuild -project "$PROJECT" -scheme "$SCHEME" -configuration Debug \
-      -derivedDataPath "$BUILD_DIR" build
+      -derivedDataPath "$BUILD_DIR" CURRENT_PROJECT_VERSION="$BRANCH" build
     ;;
   run)
     shift 2>/dev/null || true
@@ -32,7 +33,7 @@ case "${1:-build}" in
     shift 2>/dev/null || true
     xcodegen generate
     xcodebuild -project "$PROJECT" -scheme "$SCHEME" -configuration Debug \
-      -derivedDataPath "$BUILD_DIR" build
+      -derivedDataPath "$BUILD_DIR" CURRENT_PROJECT_VERSION="$BRANCH" build
     pkill -xf ".*/Contents/MacOS/$APP_NAME" 2>/dev/null || true
     sleep 0.5
     if [ -n "${1:-}" ]; then
