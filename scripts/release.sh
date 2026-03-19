@@ -33,6 +33,17 @@ rm -rf "$APP_PATH"
 mkdir -p "$BUILD_DIR"
 cp -R "$APP_BUILT" "$APP_PATH"
 
+echo "==> Uploading debug symbols to Sentry..."
+if command -v sentry-cli &>/dev/null; then
+  sentry-cli --url https://de.sentry.io debug-files upload \
+    --org all-tuner-labs \
+    --project factory-floor \
+    "$BUILD_DIR/derived/Build/Products/Release/"
+else
+  echo "Warning: sentry-cli not found, skipping dSYM upload"
+  echo "Install with: brew install getsentry/tools/sentry-cli"
+fi
+
 echo "==> Verifying signature..."
 codesign --verify --verbose=2 "$APP_PATH"
 spctl --assess --type execute --verbose=2 "$APP_PATH" 2>&1

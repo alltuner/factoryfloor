@@ -118,6 +118,16 @@ jobs:
             OTHER_CODE_SIGN_FLAGS="--timestamp --options=runtime" \
             build
 
+      - name: Upload debug symbols to Sentry
+        env:
+          SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
+        run: |
+          curl -sL https://sentry.io/get-cli/ | sh
+          sentry-cli --url https://de.sentry.io debug-files upload \
+            --org all-tuner-labs \
+            --project factory-floor \
+            build/derived/Build/Products/Release/
+
       - name: Inject Sparkle public key
         env:
           SPARKLE_PUBLIC_KEY: ${{ secrets.SPARKLE_PUBLIC_KEY }}

@@ -86,6 +86,7 @@ targets:
           PRODUCT_BUNDLE_IDENTIFIER: com.alltuner.factoryfloor
           PRODUCT_NAME: Factory Floor
           FF_URL_SCHEME: factoryfloor
+          DEBUG_INFORMATION_FORMAT: dwarf-with-dsym
     dependencies:
       - target: FFRun
       - package: swift-cmark
