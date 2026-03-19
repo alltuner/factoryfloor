@@ -1,22 +1,23 @@
 // ABOUTME: Tests for run-script port detection and browser retargeting behavior.
 // ABOUTME: Covers launcher command building, port selection stabilization, and browser navigation policy.
 
-import XCTest
 @testable import FactoryFloor
+import XCTest
 
 final class PortDetectionTests: XCTestCase {
-    func testRunLauncherWrapsRunScriptInShell() {
-        let workstreamID = UUID(uuidString: "12345678-1234-1234-1234-123456789ABC")!
+    func testRunLauncherWrapsRunScriptInLoginShell() throws {
+        let workstreamID = try XCTUnwrap(UUID(uuidString: "12345678-1234-1234-1234-123456789ABC"))
 
         let command = runScriptCommand(
             script: "just dev",
             workstreamID: workstreamID,
-            launcherPath: "/Applications/Factory Floor.app/Contents/Helpers/ff-run"
+            launcherPath: "/Applications/Factory Floor.app/Contents/Helpers/ff-run",
+            shell: "/bin/zsh"
         )
 
         XCTAssertEqual(
             command,
-            "'/Applications/Factory Floor.app/Contents/Helpers/ff-run' --workstream-id 12345678-1234-1234-1234-123456789abc -- /bin/sh -lc 'just dev'"
+            "'/Applications/Factory Floor.app/Contents/Helpers/ff-run' --workstream-id 12345678-1234-1234-1234-123456789abc -- /bin/zsh -lic 'just dev'"
         )
     }
 

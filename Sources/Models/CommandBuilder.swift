@@ -39,9 +39,13 @@ struct CommandBuilder {
         return "sh -c \(shellQuote("\(primary) 2>/dev/null || \(fallbackCmd)"))"
     }
 
+    static var userShell: String {
+        ProcessInfo.processInfo.environment["SHELL"] ?? "/bin/zsh"
+    }
+
     static func shellQuote(_ s: String) -> String {
         let simple = !s.isEmpty && s.allSatisfy {
-            $0.isLetter || $0.isNumber || $0 == "-" || $0 == "_" || $0 == "." || $0 == "/" || $0 == ":" || $0 == "~" || $0 == "@" || $0 == "+"  || $0 == "="
+            $0.isLetter || $0.isNumber || $0 == "-" || $0 == "_" || $0 == "." || $0 == "/" || $0 == ":" || $0 == "~" || $0 == "@" || $0 == "+" || $0 == "="
         }
         if simple { return s }
         return "'\(s.replacingOccurrences(of: "'", with: "'\\''"))'"
