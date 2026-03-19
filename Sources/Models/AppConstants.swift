@@ -25,14 +25,26 @@ func resolvedConfigDirectory(
 
 enum AppConstants {
     #if DEBUG
-    static let appID = "factoryfloor-debug"
-    static let appName = "Factory Floor Debug"
-    static let urlScheme = "factoryfloor-debug"
+        static let appID = "factoryfloor-debug"
+        static let appName = "Factory Floor Debug"
+        static let urlScheme = "factoryfloor-debug"
     #else
-    static let appID = "factoryfloor"
-    static let appName = "Factory Floor"
-    static let urlScheme = "factoryfloor"
+        static let appID = "factoryfloor"
+        static let appName = "Factory Floor"
+        static let urlScheme = "factoryfloor"
     #endif
+
+    static var version: String {
+        Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "0.0.0"
+    }
+
+    static var displayVersion: String {
+        #if DEBUG
+            return "\(version) (Debug)"
+        #else
+            return version
+        #endif
+    }
 
     /// Config directory: ~/.config/factoryfloor/ (respects XDG_CONFIG_HOME).
     /// XCTest uses ~/.config/factoryfloor-tests/ to keep test data isolated.

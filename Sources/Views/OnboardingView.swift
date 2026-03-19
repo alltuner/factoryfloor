@@ -20,6 +20,9 @@ struct OnboardingView: View {
                     Text("AI-powered workspaces for your codebase.")
                         .font(.subheadline)
                         .foregroundStyle(.secondary)
+                    Text("Version \(AppConstants.displayVersion)")
+                        .font(.caption)
+                        .foregroundStyle(.tertiary)
                 }
                 .padding(.top, 24)
 

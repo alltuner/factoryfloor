@@ -13,7 +13,7 @@ class UpdateChecker: ObservableObject {
     private static let versionsURL = URL(string: "https://factory-floor.com/versions.json")!
 
     init() {
-        currentVersion = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "0.0.0"
+        currentVersion = AppConstants.version
     }
 
     func check() {
@@ -37,7 +37,7 @@ class UpdateChecker: ObservableObject {
     nonisolated static func isNewer(_ remote: String, than local: String) -> Bool {
         let r = remote.split(separator: ".").compactMap { Int($0) }
         let l = local.split(separator: ".").compactMap { Int($0) }
-        for i in 0..<max(r.count, l.count) {
+        for i in 0 ..< max(r.count, l.count) {
             let rv = i < r.count ? r[i] : 0
             let lv = i < l.count ? l[i] : 0
             if rv > lv { return true }

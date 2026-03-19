@@ -52,7 +52,7 @@ struct FF2App: App {
             options.enableAppHangTracking = true
             options.appHangTimeoutInterval = 5
             options.sendDefaultPii = false
-            options.releaseName = "\(AppConstants.appID)@\(Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "0.0.0")"
+            options.releaseName = "\(AppConstants.appID)@\(AppConstants.version)"
             #if DEBUG
                 options.environment = "development"
             #else

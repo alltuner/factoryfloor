@@ -20,7 +20,7 @@ struct HelpView: View {
                         .frame(width: 128, height: 128)
                     Text(AppConstants.appName)
                         .font(.system(size: 28, weight: .bold))
-                    Text("Version \(Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "0.1.0")")
+                    Text("Version \(AppConstants.displayVersion)")
                         .font(.caption)
                         .foregroundStyle(.secondary)
                     (Text("Made with ") + Text("\u{2764}\u{FE0F}") + Text(" in Poblenou, Barcelona"))
