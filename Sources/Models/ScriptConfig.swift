@@ -3,7 +3,7 @@
 
 import Foundation
 
-struct ScriptConfig: Sendable {
+struct ScriptConfig {
     let setup: String?
     let run: String?
     let teardown: String?
@@ -27,8 +27,8 @@ struct ScriptConfig: Sendable {
         let config = load(from: projectDirectory)
         guard let teardown = config.teardown else { return }
         let process = Process()
-        process.executableURL = URL(fileURLWithPath: "/bin/sh")
-        process.arguments = ["-c", teardown]
+        process.executableURL = URL(fileURLWithPath: CommandBuilder.userShell)
+        process.arguments = ["-lc", teardown]
         process.currentDirectoryURL = URL(fileURLWithPath: directory)
         process.standardOutput = FileHandle.nullDevice
         process.standardError = FileHandle.nullDevice
@@ -52,7 +52,8 @@ struct ScriptConfig: Sendable {
 
     private static func loadJSON(_ path: String) -> [String: Any]? {
         guard let data = FileManager.default.contents(atPath: path),
-              let json = try? JSONSerialization.jsonObject(with: data) as? [String: Any] else {
+              let json = try? JSONSerialization.jsonObject(with: data) as? [String: Any]
+        else {
             return nil
         }
         return json

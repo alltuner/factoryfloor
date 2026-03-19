@@ -7,11 +7,14 @@ func shouldRestoreRunSession(useTmux: Bool, hasRunScript: Bool, hasExistingRunSe
     useTmux && hasRunScript && hasExistingRunSession && !wasStoppedManually
 }
 
-func scriptCommand(script: String, role: String) -> String {
+func scriptCommand(script: String, role: String, shell: String = CommandBuilder.userShell) -> String {
+    let inner: String
     if role == "setup" {
-        return "\(script); printf '\\nSetup completed in this terminal.\\n'"
+        inner = "\(script); printf '\\nSetup completed in this terminal.\\n'"
+    } else {
+        inner = script
     }
-    return script
+    return "\(shell) -lic \(CommandBuilder.shellQuote(inner))"
 }
 
 struct EnvironmentTabView: View {
