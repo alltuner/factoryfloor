@@ -21,15 +21,16 @@ struct SettingsView: View {
     @EnvironmentObject private var appEnv: AppEnvironment
     @State private var showingClearConfirm = false
     #if DEBUG
-    private static let cliName = "ff-debug"
+        private static let cliName = "ff-debug"
     #else
-    private static let cliName = "ff"
+        private static let cliName = "ff"
     #endif
     @State private var cliInstalled = Self.isCliCorrectlyInstalled()
 
     var body: some View {
         Form {
             // MARK: - Environment
+
             Section {
                 ToolRow(
                     name: "claude",
@@ -78,6 +79,7 @@ struct SettingsView: View {
             }
 
             // MARK: - Projects
+
             Section("Projects") {
                 HStack {
                     Text("Base directory")
@@ -93,8 +95,10 @@ struct SettingsView: View {
                         panel.allowsMultipleSelection = false
                         panel.directoryURL = URL(fileURLWithPath: baseDirectory)
                         panel.message = NSLocalizedString("Choose base directory for projects", comment: "")
-                        if panel.runModal() == .OK, let url = panel.url {
-                            baseDirectory = url.path
+                        panel.begin { response in
+                            if response == .OK, let url = panel.url {
+                                baseDirectory = url.path
+                            }
                         }
                     }
                 }
@@ -132,6 +136,7 @@ struct SettingsView: View {
             }
 
             // MARK: - Terminal & Browser
+
             Section("Terminal & Browser") {
                 Toggle("Tmux Mode", isOn: $tmuxMode)
                     .disabled(!appEnv.toolStatus.tmux.isInstalled)
@@ -183,6 +188,7 @@ struct SettingsView: View {
             }
 
             // MARK: - Coding Agent
+
             Section("Coding Agent") {
                 Toggle("Bypass permission prompts", isOn: $bypassPermissions)
                 Text("When enabled, the coding agent will not ask for confirmation before making changes. Use with caution: the agent will be able to edit files, run commands, and make git commits without asking.")
@@ -201,6 +207,7 @@ struct SettingsView: View {
             }
 
             // MARK: - Appearance
+
             Section("Appearance") {
                 Picker("Theme", selection: $appearance) {
                     Text("System").tag("system")
@@ -228,6 +235,7 @@ struct SettingsView: View {
             }
 
             // MARK: - Danger
+
             Section("Danger Zone") {
                 Toggle("Bleeding edge", isOn: $bleedingEdge)
                 Text("Receive pre-release builds with the latest features. These may be less stable.")
@@ -294,7 +302,8 @@ struct SettingsView: View {
         let fm = FileManager.default
         guard fm.fileExists(atPath: path),
               fm.isExecutableFile(atPath: path),
-              let contents = try? String(contentsOfFile: path, encoding: .utf8) else {
+              let contents = try? String(contentsOfFile: path, encoding: .utf8)
+        else {
             return false
         }
         return contents.contains(AppConstants.urlScheme)
@@ -330,7 +339,7 @@ struct SettingsView: View {
 
 // MARK: - Tool Detection
 
-enum BinaryStatus: Sendable {
+enum BinaryStatus {
     case notFound
     case found(String)
 
@@ -340,12 +349,12 @@ enum BinaryStatus: Sendable {
     }
 
     var path: String? {
-        if case .found(let p) = self { return p }
+        if case let .found(p) = self { return p }
         return nil
     }
 }
 
-struct ToolStatus: Sendable {
+struct ToolStatus {
     var tmux: BinaryStatus = .notFound
     var tmuxVersion: String?
     var claude: BinaryStatus = .notFound
@@ -486,7 +495,9 @@ private struct ToolRow: View {
 struct AppInfo: Identifiable, @unchecked Sendable {
     let name: String
     let bundleID: String
-    var id: String { bundleID }
+    var id: String {
+        bundleID
+    }
 
     var icon: NSImage? {
         guard let url = NSWorkspace.shared.urlForApplication(withBundleIdentifier: bundleID) else { return nil }
@@ -506,7 +517,7 @@ struct AppInfo: Identifiable, @unchecked Sendable {
             ("Alacritty", "org.alacritty"),
             ("kitty", "net.kovidgoyal.kitty"),
         ]
-        return candidates.compactMap { (name, id) in
+        return candidates.compactMap { name, id in
             isAppInstalled(id) ? AppInfo(name: name, bundleID: id) : nil
         }
     }
@@ -521,7 +532,7 @@ struct AppInfo: Identifiable, @unchecked Sendable {
             ("Microsoft Edge", "com.microsoft.edgemac"),
             ("Opera", "com.operasoftware.Opera"),
         ]
-        return candidates.compactMap { (name, id) in
+        return candidates.compactMap { name, id in
             isAppInstalled(id) ? AppInfo(name: name, bundleID: id) : nil
         }
     }
