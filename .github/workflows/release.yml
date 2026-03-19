@@ -119,9 +119,14 @@ jobs:
             build
 
       - name: Upload debug symbols to Sentry
+        continue-on-error: true
         env:
           SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
         run: |
+          if [ -z "$SENTRY_AUTH_TOKEN" ]; then
+            echo "::warning::SENTRY_AUTH_TOKEN not set, skipping dSYM upload"
+            exit 0
+          fi
           curl -sL https://sentry.io/get-cli/ | sh
           sentry-cli --url https://de.sentry.io debug-files upload \
             --org all-tuner-labs \
