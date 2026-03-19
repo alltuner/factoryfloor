@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.1.33](https://github.com/alltuner/factoryfloor/compare/v0.1.32...v0.1.33) (2026-03-19)
+
+
+### Bug Fixes
+
+* **ci:** make dSYM upload non-blocking for releases ([#133](https://github.com/alltuner/factoryfloor/issues/133)) ([e73b829](https://github.com/alltuner/factoryfloor/commit/e73b8299924c5b0a05b6ee0672d7cc2bd1a17a9e))
+
 ## [0.1.32](https://github.com/alltuner/factoryfloor/compare/v0.1.31...v0.1.32) (2026-03-19)
 
 
