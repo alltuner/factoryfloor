@@ -1,5 +1,17 @@
 # Changelog
 
+## [0.1.34](https://github.com/alltuner/factoryfloor/compare/v0.1.33...v0.1.34) (2026-03-19)
+
+
+### Bug Fixes
+
+* run setup/run/teardown scripts in user's login shell ([#135](https://github.com/alltuner/factoryfloor/issues/135)) ([b9d8340](https://github.com/alltuner/factoryfloor/commit/b9d8340a968ccd53859615d7087f869695dc3b2f))
+
+
+### Miscellaneous
+
+* update versions.json to v0.1.33 ([27ea914](https://github.com/alltuner/factoryfloor/commit/27ea91456cf15ec4d83429e8e0f8e0e15dceb745))
+
 ## [0.1.33](https://github.com/alltuner/factoryfloor/compare/v0.1.32...v0.1.33) (2026-03-19)
 
 
