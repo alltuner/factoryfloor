@@ -444,8 +444,10 @@ struct ProjectSidebar: View {
         panel.directoryURL = URL(fileURLWithPath: baseDirectory)
         panel.message = NSLocalizedString("Choose a project directory", comment: "")
         panel.prompt = NSLocalizedString("Select", comment: "")
-        guard panel.runModal() == .OK, let url = panel.url else { return }
-        addProject(name: url.lastPathComponent, directory: url.path)
+        panel.begin { response in
+            guard response == .OK, let url = panel.url else { return }
+            self.addProject(name: url.lastPathComponent, directory: url.path)
+        }
     }
 
     private func createNewProject() {

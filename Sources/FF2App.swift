@@ -27,6 +27,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         let projects = ProjectStore.load()
         let hasWorkstreams = projects.contains { !$0.workstreams.isEmpty }
         guard hasWorkstreams else { return .terminateNow }
+        guard let window = NSApp.keyWindow ?? NSApp.mainWindow else { return .terminateNow }
 
         let alert = NSAlert()
         alert.messageText = NSLocalizedString("Quit Factory Floor?", comment: "")
@@ -35,7 +36,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         alert.addButton(withTitle: NSLocalizedString("Quit", comment: ""))
         alert.addButton(withTitle: NSLocalizedString("Cancel", comment: ""))
 
-        return alert.runModal() == .alertFirstButtonReturn ? .terminateNow : .terminateCancel
+        alert.beginSheetModal(for: window) { response in
+            NSApp.reply(toApplicationShouldTerminate: response == .alertFirstButtonReturn)
+        }
+        return .terminateLater
     }
 }
 
