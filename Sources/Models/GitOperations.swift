@@ -6,7 +6,7 @@ import OSLog
 
 private let logger = Logger(subsystem: "factoryfloor", category: "git")
 
-struct GitRepoInfo: Sendable {
+struct GitRepoInfo {
     let isRepo: Bool
     let branch: String?
     let remoteURL: String?
@@ -14,13 +14,15 @@ struct GitRepoInfo: Sendable {
     let isDirty: Bool
 }
 
-struct WorktreeInfo: Identifiable, Sendable {
+struct WorktreeInfo: Identifiable {
     let path: String
     let branch: String?
     let isDirty: Bool
     let isMain: Bool
 
-    var id: String { path }
+    var id: String {
+        path
+    }
 }
 
 enum GitOperations {
@@ -137,7 +139,8 @@ enum GitOperations {
             // Skip sources that are themselves symlinks to prevent exposing arbitrary files
             if let attrs = try? fm.attributesOfItem(atPath: source.path),
                let fileType = attrs[.type] as? FileAttributeType,
-               fileType != .typeRegular {
+               fileType != .typeRegular
+            {
                 continue
             }
             guard !fm.fileExists(atPath: destination.path) else { continue }
@@ -217,6 +220,35 @@ enum GitOperations {
         // Clean up stale entries
         _ = run(args: ["worktree", "prune"], in: projectPath)
         return pruned
+    }
+
+    /// If the given path is a git worktree (not the main repository), return the main
+    /// repository path. Returns nil for non-git directories or main repositories.
+    static func mainRepositoryPath(for path: String) -> String? {
+        let gitEntry = URL(fileURLWithPath: path).appendingPathComponent(".git")
+        var isDir: ObjCBool = false
+        guard FileManager.default.fileExists(atPath: gitEntry.path, isDirectory: &isDir) else {
+            return nil
+        }
+        // .git is a directory in main repos, a file in worktrees
+        guard !isDir.boolValue else {
+            return nil
+        }
+
+        guard let commonDir = run(args: ["rev-parse", "--git-common-dir"], in: path)?
+            .trimmingCharacters(in: .whitespacesAndNewlines)
+        else {
+            return nil
+        }
+
+        let commonURL: URL
+        if commonDir.hasPrefix("/") {
+            commonURL = URL(fileURLWithPath: commonDir)
+        } else {
+            commonURL = URL(fileURLWithPath: path).appendingPathComponent(commonDir).standardized
+        }
+
+        return commonURL.deletingLastPathComponent().standardizedFileURL.path
     }
 
     // MARK: - Private

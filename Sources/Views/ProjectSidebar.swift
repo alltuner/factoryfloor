@@ -472,13 +472,24 @@ struct ProjectSidebar: View {
     }
 
     private func addProject(name: String, directory: String) {
-        if let existing = projects.first(where: { $0.directory == directory }) {
+        // Resolve worktree branches to their main repository
+        let resolvedDirectory: String
+        let resolvedName: String
+        if let mainRepoPath = GitOperations.mainRepositoryPath(for: directory) {
+            resolvedDirectory = mainRepoPath
+            resolvedName = URL(fileURLWithPath: mainRepoPath).lastPathComponent
+        } else {
+            resolvedDirectory = directory
+            resolvedName = name
+        }
+
+        if let existing = projects.first(where: { $0.directory == resolvedDirectory }) {
             selection = .project(existing.id)
             return
         }
 
-        let projectName = name.isEmpty ? URL(fileURLWithPath: directory).lastPathComponent : name
-        let project = Project(name: projectName, directory: directory)
+        let projectName = resolvedName.isEmpty ? URL(fileURLWithPath: resolvedDirectory).lastPathComponent : resolvedName
+        let project = Project(name: projectName, directory: resolvedDirectory)
         NotificationCenter.default.post(
             name: .projectCreated,
             object: nil,
