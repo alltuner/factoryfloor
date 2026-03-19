@@ -1,0 +1,91 @@
+# Factory Floor
+
+> Factory Floor is a free, open-source native macOS app for AI-powered software development. It manages multiple parallel development tasks (called workstreams), each in its own git worktree with a dedicated Claude Code agent, terminal, and embedded browser. Built on Ghostty's GPU-rendered terminal engine.
+
+Factory Floor lets developers run several AI coding agents in parallel on the same codebase without branch conflicts. Each workstream gets its own git worktree, Claude Code session, terminals, and a browser that auto-detects the dev server port.
+
+Key capabilities:
+
+- Git worktrees: each workstream operates on its own branch and worktree, no stashing needed
+- Claude Code integration: embedded AI agent with session persistence via tmux
+- Setup/run/teardown scripts: configured per project via `.factoryfloor.json`
+- Embedded browser: WKWebView with automatic port detection from run scripts
+- GitHub integration: repo info, open PRs, and branch PR status via the `gh` CLI
+- Keyboard-first: every action has a shortcut
+- Localized in English, Catalan, Spanish, and Swedish
+
+## Installation
+
+Install via Homebrew:
+
+```
+brew install --cask alltuner/tap/factoryfloor
+```
+
+Or download from GitHub Releases.
+
+The `ff` CLI command is included:
+
+```
+ff                  # open current directory
+ff ~/repos/myapp    # open a specific directory
+```
+
+## Configuration
+
+Add a `.factoryfloor.json` to your project root:
+
+```json
+{
+  "setup": "npm install",
+  "run": "PORT=$FF_PORT npm run dev",
+  "teardown": "docker-compose down"
+}
+```
+
+## Environment Variables
+
+Every workstream terminal has access to:
+
+- `FF_PROJECT` — project name
+- `FF_WORKSTREAM` — workstream name
+- `FF_PROJECT_DIR` — main repository path
+- `FF_WORKTREE_DIR` — worktree path for this workstream
+- `FF_PORT` — deterministic port (40001-49999)
+
+## Keyboard Shortcuts
+
+Global:
+
+- `Cmd+N` — new workstream or project
+- `Cmd+Shift+N` — new project
+- `Cmd+,` — settings
+- `Cmd+/` — help
+
+Workstream:
+
+- `Cmd+Return` — focus Coding Agent
+- `Cmd+I` — info panel
+- `Cmd+E` — environment
+- `Cmd+T` — new terminal
+- `Cmd+B` — new browser
+- `Cmd+W` — close tab
+- `Cmd+L` — address bar (browser)
+- `Cmd+0` — back to project
+- `Cmd+1-9` — switch tab
+- `Ctrl+1-9` — switch workstream
+- `Cmd+Shift+[` / `]` — cycle tabs
+- `Ctrl+Shift+R` — rebuild setup
+- `Ctrl+Shift+S` — start/rerun
+
+## Links
+
+- [Website](https://factory-floor.com): Homepage with features, screenshots, and documentation
+- [GitHub](https://github.com/alltuner/factoryfloor): Source code, README, and issue tracker
+- [Download](https://factory-floor.com/get): Installation instructions and download links
+- [Releases](https://github.com/alltuner/factoryfloor/releases): Release history and changelog
+
+## Optional
+
+- [Sponsor](https://factory-floor.com/sponsor): Support the project's development
+- [Privacy Policy](https://factory-floor.com/legal/privacy): Privacy and data handling
