@@ -1,10 +1,18 @@
 // ABOUTME: Tests for Project and Workstream models.
 // ABOUTME: Validates creation, identity, equality, serialization, and workstream management.
 
-import XCTest
 @testable import FactoryFloor
+import XCTest
 
 final class ProjectTests: XCTestCase {
+    private static let testSuiteName = "factoryfloor.tests"
+    private let testDefaults = UserDefaults(suiteName: testSuiteName)!
+
+    override func tearDown() {
+        testDefaults.removePersistentDomain(forName: Self.testSuiteName)
+        super.tearDown()
+    }
+
     func testCreation() {
         let project = Project(name: "myapp", directory: "/Users/test/myapp")
         XCTAssertEqual(project.name, "myapp")
@@ -66,8 +74,8 @@ final class ProjectTests: XCTestCase {
             Project(name: "one", directory: "/one"),
             Project(name: "two", directory: "/two"),
         ]
-        ProjectStore.save(projects)
-        let loaded = ProjectStore.load()
+        ProjectStore.save(projects, defaults: testDefaults)
+        let loaded = ProjectStore.load(defaults: testDefaults)
         XCTAssertEqual(projects, loaded)
     }
 
@@ -112,8 +120,8 @@ final class ProjectTests: XCTestCase {
                 Workstream(name: "dev"),
             ]),
         ]
-        ProjectStore.save(projects)
-        let loaded = ProjectStore.load()
+        ProjectStore.save(projects, defaults: testDefaults)
+        let loaded = ProjectStore.load(defaults: testDefaults)
         XCTAssertEqual(loaded.first?.workstreams.count, 1)
         XCTAssertEqual(loaded.first?.workstreams.first?.name, "dev")
     }

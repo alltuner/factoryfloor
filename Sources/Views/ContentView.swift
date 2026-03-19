@@ -399,15 +399,15 @@ struct ContentView: View {
 enum ProjectStore {
     private static let userDefaultsKey = "factoryfloor.projects"
 
-    static func load() -> [Project] {
-        guard let data = UserDefaults.standard.data(forKey: userDefaultsKey),
+    static func load(defaults: UserDefaults = .standard) -> [Project] {
+        guard let data = defaults.data(forKey: userDefaultsKey),
               let projects = try? JSONDecoder().decode([Project].self, from: data)
         else { return [] }
         return projects
     }
 
-    static func save(_ projects: [Project]) {
+    static func save(_ projects: [Project], defaults: UserDefaults = .standard) {
         guard let data = try? JSONEncoder().encode(projects) else { return }
-        UserDefaults.standard.set(data, forKey: userDefaultsKey)
+        defaults.set(data, forKey: userDefaultsKey)
     }
 }
