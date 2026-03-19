@@ -10,13 +10,15 @@ TEST_SCHEME="FactoryFloorTests"
 APP_NAME="Factory Floor Debug"
 BUILD_DIR="build/debug/derived"
 APP_PATH="$BUILD_DIR/Build/Products/Debug/$APP_NAME.app"
+SPM_CACHE="$HOME/Library/Caches/factoryfloor/spm"
 BRANCH=$(git branch --show-current 2>/dev/null || echo "unknown")
 
 case "${1:-build}" in
   build)
     xcodegen generate
     xcodebuild -project "$PROJECT" -scheme "$SCHEME" -configuration Debug \
-      -derivedDataPath "$BUILD_DIR" CURRENT_PROJECT_VERSION="$BRANCH" build
+      -derivedDataPath "$BUILD_DIR" -clonedSourcePackagesDirPath "$SPM_CACHE" \
+      CURRENT_PROJECT_VERSION="$BRANCH" build
     ;;
   run)
     shift 2>/dev/null || true
@@ -33,7 +35,8 @@ case "${1:-build}" in
     shift 2>/dev/null || true
     xcodegen generate
     xcodebuild -project "$PROJECT" -scheme "$SCHEME" -configuration Debug \
-      -derivedDataPath "$BUILD_DIR" CURRENT_PROJECT_VERSION="$BRANCH" build
+      -derivedDataPath "$BUILD_DIR" -clonedSourcePackagesDirPath "$SPM_CACHE" \
+      CURRENT_PROJECT_VERSION="$BRANCH" build
     pkill -xf ".*/Contents/MacOS/$APP_NAME" 2>/dev/null || true
     sleep 0.5
     if [ -n "${1:-}" ]; then
@@ -46,13 +49,13 @@ case "${1:-build}" in
   test)
     xcodegen generate
     xcodebuild -project "$PROJECT" -scheme "$TEST_SCHEME" -configuration Debug \
-      -derivedDataPath "$BUILD_DIR" test
+      -derivedDataPath "$BUILD_DIR" -clonedSourcePackagesDirPath "$SPM_CACHE" test
     ;;
   release)
     RELEASE_DIR="build/release-local/derived"
     xcodegen generate
     xcodebuild -project "$PROJECT" -scheme "$SCHEME" -configuration Release \
-      -derivedDataPath "$RELEASE_DIR" \
+      -derivedDataPath "$RELEASE_DIR" -clonedSourcePackagesDirPath "$SPM_CACHE" \
       CODE_SIGN_IDENTITY="-" \
       CODE_SIGN_STYLE=Manual \
       ENABLE_HARDENED_RUNTIME=YES \
@@ -68,7 +71,7 @@ case "${1:-build}" in
     ;;
   clean)
     xcodebuild -project "$PROJECT" -scheme "$SCHEME" -configuration Debug clean 2>/dev/null || true
-    rm -rf build/debug build/release-local
+    rm -rf build/debug build/release-local "$SPM_CACHE"
     ;;
   *)
     echo "Usage: ./scripts/dev.sh [command] [directory]"
