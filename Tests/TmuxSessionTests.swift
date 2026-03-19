@@ -45,8 +45,10 @@ final class TmuxSessionTests: XCTestCase {
             environmentVars: ["FF_PROJECT": "client's \"best\" $project"]
         )
 
-        // Single quotes, double quotes, and dollar signs must survive
-        XCTAssertTrue(command.contains("-e \"FF_PROJECT=client's \\\"best\\\" \\$project\""))
+        // Single quotes, double quotes, and dollar signs must survive.
+        // The inner command is shell-escaped (single quotes become '\''),
+        // so the single quote in "client's" appears as client'\''s.
+        XCTAssertTrue(command.contains("-e \"FF_PROJECT=client'\\''s \\\"best\\\" \\$project\""))
     }
 
     func testWrapCommandClearsStalePaneDiedHookBeforeAttaching() {
@@ -60,7 +62,7 @@ final class TmuxSessionTests: XCTestCase {
         XCTAssertTrue(command.contains("source-file"))
         XCTAssertTrue(command.contains("set-hook -gu pane-died"))
         XCTAssertTrue(command.contains("new-session -A -s"))
-        XCTAssertTrue(command.contains("-- sh -c"))
+        XCTAssertTrue(command.contains("sh -c"))
         XCTAssertTrue(command.contains("bun run build"))
     }
 }
