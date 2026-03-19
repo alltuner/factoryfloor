@@ -34,6 +34,7 @@ jobs:
       APP_NAME: "Factory Floor"
       SCHEME: "FactoryFloor"
       PROJECT: "FactoryFloor.xcodeproj"
+      SPARKLE_VERSION: "2.9.0"
     steps:
       - uses: actions/checkout@v6
         with:
@@ -58,7 +59,7 @@ jobs:
         with:
           path: |
             build/derived/SourcePackages
-          key: spm-${{ hashFiles('FactoryFloor.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved', 'project.yml') }}
+          key: spm-${{ hashFiles('project.yml') }}
           restore-keys: spm-
 
       - name: Cache Ghostty xcframework
@@ -75,14 +76,9 @@ jobs:
           zig build -Demit-xcframework=true -Demit-macos-app=false -Dxcframework-target=universal -Doptimize=ReleaseFast
 
       - name: Setup Sparkle
-        env:
-          SPARKLE_VERSION: "2.9.0"
-        run: |
-          mkdir -p .action/sparkle
-          cd .action/sparkle
-          curl -L "https://github.com/sparkle-project/Sparkle/releases/download/${SPARKLE_VERSION}/Sparkle-for-Swift-Package-Manager.zip" -o sparkle.zip
-          unzip -q sparkle.zip
-          echo "$(pwd)/bin" >> "$GITHUB_PATH"
+        uses: jozefizso/setup-sparkle@v2
+        with:
+          version: ${{ env.SPARKLE_VERSION }}
 
       - name: Generate Xcode project
         run: xcodegen generate
@@ -108,6 +104,7 @@ jobs:
       - name: Build release
         run: |
           xcodebuild -project "$PROJECT" -scheme "$SCHEME" -configuration Release \
+            -destination 'generic/platform=macOS' \
             -derivedDataPath build/derived \
             -clonedSourcePackagesDirPath build/derived/SourcePackages \
             DEVELOPMENT_TEAM=J5TAY75Q3F \
@@ -127,11 +124,11 @@ jobs:
             echo "::warning::SENTRY_AUTH_TOKEN not set, skipping dSYM upload"
             exit 0
           fi
-          curl -sL https://sentry.io/get-cli/ | sh
-          sentry-cli --url https://de.sentry.io debug-files upload \
+          brew install getsentry/tools/sentry-cli
+          sentry-cli debug-files upload \
             --org all-tuner-labs \
             --project factory-floor \
-            build/derived/Build/Products/Release/
+            build/derived/Build/Products/Release/*.dSYM
 
       - name: Package and sign
         env:

@@ -48,11 +48,11 @@ jobs:
       - name: Build Factory Floor
         run: |
           xcodegen generate
-          xcodebuild -project FactoryFloor.xcodeproj -scheme FactoryFloor -configuration Debug build
+          xcodebuild -project FactoryFloor.xcodeproj -scheme FactoryFloor -configuration Debug -destination 'generic/platform=macOS' build
 
       - name: Run tests
         run: |
-          xcodebuild -project FactoryFloor.xcodeproj -scheme FactoryFloorTests -configuration Debug test
+          xcodebuild -project FactoryFloor.xcodeproj -scheme FactoryFloorTests -configuration Debug -destination 'generic/platform=macOS' test
 
       - name: Report
         if: always()
