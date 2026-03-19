@@ -1,5 +1,17 @@
 # Changelog
 
+## [0.1.32](https://github.com/alltuner/factoryfloor/compare/v0.1.31...v0.1.32) (2026-03-19)
+
+
+### Bug Fixes
+
+* upload dSYMs to Sentry so crash reports are symbolicated ([#131](https://github.com/alltuner/factoryfloor/issues/131)) ([7f4f2b9](https://github.com/alltuner/factoryfloor/commit/7f4f2b9cc80efbd7e0e35b1d62da7b5a50aaf9ff))
+
+
+### Miscellaneous
+
+* update versions.json to v0.1.31 ([5b0cbbe](https://github.com/alltuner/factoryfloor/commit/5b0cbbea2197b50b8da6d5f020735c825d49a165))
+
 ## [0.1.31](https://github.com/alltuner/factoryfloor/compare/v0.1.30...v0.1.31) (2026-03-19)
 
 
