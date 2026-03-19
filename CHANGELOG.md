@@ -1,5 +1,18 @@
 # Changelog
 
+## [0.1.30](https://github.com/alltuner/factoryfloor/compare/v0.1.29...v0.1.30) (2026-03-19)
+
+
+### Features
+
+* display app version on welcome screen and centralize version access ([#125](https://github.com/alltuner/factoryfloor/issues/125)) ([85d8856](https://github.com/alltuner/factoryfloor/commit/85d8856429c013bd125e94131496b9045eb355c9))
+* resolve git worktree paths to main repository when adding projects ([#127](https://github.com/alltuner/factoryfloor/issues/127)) ([780f26d](https://github.com/alltuner/factoryfloor/commit/780f26dafed1dc65aaf5fd4f95bca8ad79fb10fc))
+
+
+### Miscellaneous
+
+* update versions.json to v0.1.29 ([4649027](https://github.com/alltuner/factoryfloor/commit/4649027154a37bd29fd256193ad8170ddfd800ed))
+
 ## [0.1.29](https://github.com/alltuner/factoryfloor/compare/v0.1.28...v0.1.29) (2026-03-18)
 
 
