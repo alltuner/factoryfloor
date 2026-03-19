@@ -43,7 +43,7 @@ targets:
         NSMainStoryboardFile: ""
         NSPrincipalClass: NSApplication
         LSUIElement: false
-        SUPublicEDKey: ""
+        SUPublicEDKey: "grC1rloxT0gFZ2mQVIuDTZlkNFXwXLZhn9+xs4YGuXo="
         SUFeedURL: https://github.com/alltuner/factoryfloor/releases/latest/download/appcast.xml
         SUEnableAutomaticChecks: true
         CFBundleURLTypes:

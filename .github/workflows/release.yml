@@ -133,13 +133,6 @@ jobs:
             --project factory-floor \
             build/derived/Build/Products/Release/
 
-      - name: Inject Sparkle public key
-        env:
-          SPARKLE_PUBLIC_KEY: ${{ secrets.SPARKLE_PUBLIC_KEY }}
-        run: |
-          APP_BUILT=$(find build/derived -name "${APP_NAME}.app" -type d | head -1)
-          /usr/libexec/PlistBuddy -c "Set :SUPublicEDKey $SPARKLE_PUBLIC_KEY" "$APP_BUILT/Contents/Info.plist"
-
       - name: Package and sign
         env:
           VERSION: ${{ needs.release-please.outputs.version }}
