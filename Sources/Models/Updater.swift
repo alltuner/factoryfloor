@@ -5,21 +5,23 @@ import Sparkle
 
 @MainActor
 final class Updater: ObservableObject {
-    private let controller: SPUStandardUpdaterController
+    private var controller: SPUStandardUpdaterController?
 
     init() {
-        controller = SPUStandardUpdaterController(
-            startingUpdater: true,
-            updaterDelegate: nil,
-            userDriverDelegate: nil
-        )
+        #if !DEBUG
+            controller = SPUStandardUpdaterController(
+                startingUpdater: true,
+                updaterDelegate: nil,
+                userDriverDelegate: nil
+            )
+        #endif
     }
 
     var canCheckForUpdates: Bool {
-        controller.updater.canCheckForUpdates
+        controller?.updater.canCheckForUpdates ?? false
     }
 
     func checkForUpdates() {
-        controller.checkForUpdates(nil)
+        controller?.checkForUpdates(nil)
     }
 }

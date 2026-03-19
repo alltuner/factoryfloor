@@ -115,7 +115,7 @@ struct EnvironmentTabView: View {
                 SingleTerminalView(
                     surfaceID: surfaceID,
                     workingDirectory: workingDirectory,
-                    initialInput: envInput(script: script, role: tmuxRole),
+                    command: envCommand(script: script, role: tmuxRole),
                     isFocused: false,
                     environmentVars: environmentVars
                 )
@@ -171,7 +171,7 @@ struct EnvironmentTabView: View {
                     SingleTerminalView(
                         surfaceID: runID,
                         workingDirectory: workingDirectory,
-                        initialInput: envInput(script: script, role: "run"),
+                        command: envCommand(script: script, role: "run"),
                         isFocused: false,
                         environmentVars: environmentVars
                     )
@@ -226,7 +226,7 @@ struct EnvironmentTabView: View {
         .frame(maxWidth: .infinity, maxHeight: .infinity)
     }
 
-    private func envInput(script: String, role: String) -> String {
+    private func envCommand(script: String, role: String) -> String {
         let command: String
         if role == "run",
            let launcherPath = RunLauncher.executableURL()?.path
@@ -235,10 +235,7 @@ struct EnvironmentTabView: View {
         } else {
             command = scriptCommand(script: script, role: role)
         }
-        if useTmux {
-            return buildCommand(script: command, role: role) + "\n"
-        }
-        return command + "; exec tail -f /dev/null\n"
+        return buildCommand(script: command, role: role)
     }
 
     private func buildCommand(script: String, role: String) -> String {

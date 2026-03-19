@@ -568,17 +568,12 @@ struct TerminalContainerView: View {
         // Environment script surfaces
         if let setup = scriptConfig.setup {
             let setupID = derivedUUID(from: workstreamID, salt: "env-setup-0")
-            let input: String
-            if useTmux {
-                input = buildEnvironmentCommand(script: setup, role: "setup") + "\n"
-            } else {
-                input = setup + "; exec tail -f /dev/null\n"
-            }
+            let cmd = buildEnvironmentCommand(script: setup, role: "setup")
             _ = surfaceCache.surface(
                 for: setupID,
                 app: app,
                 workingDirectory: workingDirectory,
-                initialInput: input,
+                command: cmd,
                 environmentVars: terminalEnvVars
             )
         }
@@ -723,7 +718,6 @@ struct SingleTerminalView: NSViewRepresentable {
     let surfaceID: UUID
     let workingDirectory: String
     var command: String?
-    var initialInput: String?
     var isFocused: Bool = true
     var environmentVars: [String: String] = [:]
 
@@ -743,7 +737,6 @@ struct SingleTerminalView: NSViewRepresentable {
             app: app,
             workingDirectory: workingDirectory,
             command: command,
-            initialInput: initialInput,
             environmentVars: environmentVars
         )
 
