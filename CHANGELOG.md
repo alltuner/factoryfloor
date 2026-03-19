@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.1.39](https://github.com/alltuner/factoryfloor/compare/v0.1.38...v0.1.39) (2026-03-19)
+
+
+### CI/CD
+
+* fix build warnings and improve CI caching ([#154](https://github.com/alltuner/factoryfloor/issues/154)) ([1c2db0b](https://github.com/alltuner/factoryfloor/commit/1c2db0b6d18e5c059aa72b14e705e4df6f88297c))
+
 ## [0.1.38](https://github.com/alltuner/factoryfloor/compare/v0.1.37...v0.1.38) (2026-03-19)
 
 
