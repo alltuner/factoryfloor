@@ -1,5 +1,17 @@
 # Changelog
 
+## [0.1.35](https://github.com/alltuner/factoryfloor/compare/v0.1.34...v0.1.35) (2026-03-19)
+
+
+### Bug Fixes
+
+* correct TmuxSessionTests assertions to match actual output ([#138](https://github.com/alltuner/factoryfloor/issues/138)) ([76dbb87](https://github.com/alltuner/factoryfloor/commit/76dbb87cae1e2dbb6360dbebf35cf810324a8dae)), closes [#137](https://github.com/alltuner/factoryfloor/issues/137)
+
+
+### Miscellaneous
+
+* update versions.json to v0.1.34 ([4b58179](https://github.com/alltuner/factoryfloor/commit/4b58179dae5c2343039dbe2cc1a907d76df78cdc))
+
 ## [0.1.34](https://github.com/alltuner/factoryfloor/compare/v0.1.33...v0.1.34) (2026-03-19)
 
 
