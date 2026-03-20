@@ -46,7 +46,7 @@ jobs:
             echo 'hideInstall: true'
             echo 'translationKey: changelog'
             echo '---'
-            sed '1{/^# Changelog$/d;}' CHANGELOG.md
+            sed -e '1{/^# Changelog$/d;}' -e 's|compare/v[0-9.]*\.\.\.v\([0-9.]*\)|releases/tag/v\1|g' CHANGELOG.md
           } > website/content/changelog.md
 
       - name: Download appcast.xml from latest release
