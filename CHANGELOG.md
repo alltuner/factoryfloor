@@ -1,5 +1,20 @@
 # Changelog
 
+## [0.1.41](https://github.com/alltuner/factoryfloor/compare/v0.1.40...v0.1.41) (2026-03-23)
+
+
+### Bug Fixes
+
+* rewrite ff-run to exec command directly for ghostty PTY compatibility ([#166](https://github.com/alltuner/factoryfloor/issues/166)) ([90871a9](https://github.com/alltuner/factoryfloor/commit/90871a9f87772ba24ad5400cd8a40e2e74cc9981))
+* run build in worktree-create hook for SourceKit resolution ([#163](https://github.com/alltuner/factoryfloor/issues/163)) ([1184e7b](https://github.com/alltuner/factoryfloor/commit/1184e7bd3070ec75df62db098ee4fdc436e7092d)), closes [#161](https://github.com/alltuner/factoryfloor/issues/161)
+* skip symlinks when loading doc files in info panel ([#160](https://github.com/alltuner/factoryfloor/issues/160)) ([cd97a42](https://github.com/alltuner/factoryfloor/commit/cd97a42ec950d66da2bc04b5414d4b13d4286e23))
+* **website:** link changelog versions to GitHub releases instead of diffs ([#164](https://github.com/alltuner/factoryfloor/issues/164)) ([7f0ccd9](https://github.com/alltuner/factoryfloor/commit/7f0ccd99922f3973943ff18a4ab2c0fa57350a1f))
+
+
+### CI/CD
+
+* make Ghostty compat test manual-only and arm64-only ([#165](https://github.com/alltuner/factoryfloor/issues/165)) ([2e56331](https://github.com/alltuner/factoryfloor/commit/2e56331d3d5648969a5ce0b8794016f4a76d78a1))
+
 ## [0.1.40](https://github.com/alltuner/factoryfloor/compare/v0.1.39...v0.1.40) (2026-03-19)
 
 
