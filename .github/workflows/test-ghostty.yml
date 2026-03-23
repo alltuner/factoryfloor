@@ -1,8 +1,6 @@
 name: Test Ghostty Compatibility
 
 on:
-  schedule:
-    - cron: '0 8 * * 1'  # Weekly on Monday at 8am UTC
   workflow_dispatch:
     inputs:
       ghostty_tag:
@@ -43,7 +41,7 @@ jobs:
       - name: Build Ghostty xcframework
         run: |
           cd ghostty
-          zig build -Demit-xcframework=true -Dxcframework-target=universal -Doptimize=ReleaseFast
+          zig build -Demit-xcframework=true -Dxcframework-target=aarch64-macos -Doptimize=ReleaseFast
 
       - name: Build Factory Floor
         run: |
