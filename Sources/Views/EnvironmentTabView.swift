@@ -26,12 +26,12 @@ struct EnvironmentTabView: View {
     let useTmux: Bool
     let environmentVars: [String: String]
     @Binding var runStoppedManually: Bool
+    @Binding var runStarted: Bool
 
     @EnvironmentObject var surfaceCache: TerminalSurfaceCache
     @EnvironmentObject var appEnv: AppEnvironment
     @State private var setupGeneration = 0
     @State private var runGeneration = 0
-    @State private var runStarted = false
     @State private var setupRestarting = false
     @State private var runRestarting = false
 

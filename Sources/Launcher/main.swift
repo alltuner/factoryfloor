@@ -1,100 +1,125 @@
-// ABOUTME: Runs an interactive command, detects listening TCP ports, and reports run state.
-// ABOUTME: Keeps terminal stdio attached while the app retargets browsers from a state file.
+// ABOUTME: Spawns a port monitor, then execs the user's command to preserve PTY inheritance.
+// ABOUTME: The monitor scans for listening TCP ports and writes run-state files.
 
-import Foundation
 import Darwin
+import Foundation
 
 do {
     let configuration = try Configuration(arguments: CommandLine.arguments)
-    try Launcher(configuration: configuration).run()
+    if configuration.monitorMode {
+        runMonitor(configuration: configuration)
+    } else {
+        try launchCommand(configuration: configuration)
+    }
 } catch let error as LauncherError {
     FileHandle.standardError.write(Data((error.message + "\n").utf8))
     exit(error.exitCode)
 } catch {
-    FileHandle.standardError.write(Data(("ff-run failed: \(error.localizedDescription)\n").utf8))
+    FileHandle.standardError.write(Data("ff-run failed: \(error.localizedDescription)\n".utf8))
     exit(1)
 }
 
-private struct Launcher {
-    let configuration: Configuration
+// MARK: - Launcher (parent mode)
 
-    func run() throws {
-        let process = Process()
-        process.executableURL = URL(fileURLWithPath: configuration.command[0])
-        process.arguments = Array(configuration.command.dropFirst())
-        process.environment = ProcessInfo.processInfo.environment
+/// Spawn a background monitor process, then exec the user's command.
+/// exec preserves the PID and PTY file descriptors, so terminal
+/// emulators like ghostty render output correctly.
+private func launchCommand(configuration: Configuration) throws {
+    let commandPID = getpid()
 
-        try process.run()
-        _ = setpgid(process.processIdentifier, process.processIdentifier)
+    // Spawn a copy of ourselves in monitor mode.
+    var pathBuf = [CChar](repeating: 0, count: Int(MAXPATHLEN))
+    var pathLen = UInt32(pathBuf.count)
+    guard _NSGetExecutablePath(&pathBuf, &pathLen) == 0 else {
+        throw LauncherError(exitCode: 1, message: "cannot determine ff-run path")
+    }
+    let selfPath = String(cString: pathBuf)
 
-        try writeState(
-            pid: process.processIdentifier,
-            status: .starting,
-            detectedPorts: [],
-            selectedPort: nil,
-            startedAt: configuration.startedAt
-        )
+    let monitorArgs = [
+        selfPath,
+        "--monitor",
+        "--pid", "\(commandPID)",
+        "--workstream-id", configuration.workstreamID.uuidString.lowercased(),
+    ]
+    var monitorPID: pid_t = 0
+    let argv = monitorArgs.map { strdup($0) } + [nil]
+    defer { argv.forEach { free($0) } }
 
-        let scanner = PortScanner(pid: process.processIdentifier, expectedPort: configuration.expectedPort)
-        let signals = installSignalForwarders(for: process.processIdentifier)
-        scanner.start(startedAt: configuration.startedAt, workstreamID: configuration.workstreamID)
+    var attrs: posix_spawnattr_t?
+    posix_spawnattr_init(&attrs)
+    defer { posix_spawnattr_destroy(&attrs) }
 
-        process.waitUntilExit()
-
-        scanner.stop()
-        signals.forEach { $0.cancel() }
-
-        let finalStatus: RunStateStatus
-        let exitCode: Int32
-        switch process.terminationReason {
-        case .exit:
-            exitCode = process.terminationStatus
-            finalStatus = exitCode == 0 ? .stopped : .crashed
-        case .uncaughtSignal:
-            exitCode = 128 + process.terminationStatus
-            finalStatus = .crashed
-        @unknown default:
-            exitCode = 1
-            finalStatus = .crashed
-        }
-
-        try? writeState(
-            pid: process.processIdentifier,
-            status: finalStatus,
-            detectedPorts: scanner.detectedPorts,
-            selectedPort: scanner.selectedPort,
-            startedAt: configuration.startedAt
-        )
-        RunStateStore.remove(for: configuration.workstreamID)
-        exit(exitCode)
+    let spawnResult = posix_spawn(&monitorPID, selfPath, nil, &attrs, argv, environ)
+    guard spawnResult == 0 else {
+        throw LauncherError(exitCode: 1, message: "failed to spawn monitor: \(String(cString: strerror(spawnResult)))")
     }
 
-    private func installSignalForwarders(for childPID: Int32) -> [DispatchSourceSignal] {
-        var sources: [DispatchSourceSignal] = []
-        let queue = DispatchQueue(label: "factoryfloor.ff-run.signals")
-        for signalNumber in [SIGINT, SIGTERM] {
-            signal(signalNumber, SIG_IGN)
-            let source = DispatchSource.makeSignalSource(signal: signalNumber, queue: queue)
-            source.setEventHandler {
-                _ = kill(-childPID, signalNumber)
-            }
-            source.resume()
-            sources.append(source)
-        }
-        return sources
-    }
+    // exec the user's command, replacing this process.
+    let cmdArgv = configuration.command.map { strdup($0) } + [nil]
+    execvp(configuration.command[0], cmdArgv)
 
-    private func writeState(pid: Int32, status: RunStateStatus, detectedPorts: [Int], selectedPort: Int?, startedAt: Date) throws {
-        let state = RunStateSnapshot(
-            pid: pid,
-            status: status,
-            detectedPorts: detectedPorts.sorted(),
-            selectedPort: selectedPort,
-            startedAt: startedAt
-        )
-        try RunStateStore.write(state, for: configuration.workstreamID)
-    }
+    // exec only returns on failure
+    let err = String(cString: strerror(errno))
+    FileHandle.standardError.write(Data("ff-run: exec failed: \(err)\n".utf8))
+    kill(monitorPID, SIGTERM)
+    exit(1)
 }
+
+// MARK: - Monitor (child mode)
+
+/// Run as a background port monitor. Scans ports in the process tree of the
+/// given PID and writes state files until the process exits.
+private func runMonitor(configuration: Configuration) -> Never {
+    guard let commandPID = configuration.monitorPID else {
+        exit(1)
+    }
+
+    // Detach from the terminal so signals go to the foreground command.
+    signal(SIGINT, SIG_IGN)
+    signal(SIGTERM, SIG_IGN)
+    signal(SIGHUP, SIG_IGN)
+
+    writeState(
+        configuration: configuration,
+        pid: commandPID,
+        status: .starting,
+        detectedPorts: [],
+        selectedPort: nil
+    )
+
+    let scanner = PortScanner(pid: commandPID, expectedPort: configuration.expectedPort)
+    scanner.start(startedAt: configuration.startedAt, workstreamID: configuration.workstreamID)
+
+    // Poll until the command process exits.
+    while kill(commandPID, 0) == 0 {
+        Thread.sleep(forTimeInterval: 0.5)
+    }
+
+    scanner.stop()
+
+    writeState(
+        configuration: configuration,
+        pid: commandPID,
+        status: .stopped,
+        detectedPorts: scanner.detectedPorts,
+        selectedPort: scanner.selectedPort
+    )
+    RunStateStore.remove(for: configuration.workstreamID)
+    exit(0)
+}
+
+private func writeState(configuration: Configuration, pid: Int32, status: RunStateStatus, detectedPorts: [Int], selectedPort: Int?) {
+    let state = RunStateSnapshot(
+        pid: pid,
+        status: status,
+        detectedPorts: detectedPorts.sorted(),
+        selectedPort: selectedPort,
+        startedAt: configuration.startedAt
+    )
+    try? RunStateStore.write(state, for: configuration.workstreamID)
+}
+
+// MARK: - Port Scanner
 
 private final class PortScanner: @unchecked Sendable {
     private let pid: Int32
@@ -108,7 +133,7 @@ private final class PortScanner: @unchecked Sendable {
 
     init(pid: Int32, expectedPort: Int?) {
         self.pid = pid
-        self.tracker = PortSelectionTracker(expectedPort: expectedPort)
+        tracker = PortSelectionTracker(expectedPort: expectedPort)
     }
 
     func start(startedAt: Date, workstreamID: UUID) {
@@ -144,7 +169,7 @@ private final class PortScanner: @unchecked Sendable {
                 timer.schedule(deadline: .now() + .seconds(60), repeating: .seconds(60))
             }
         }
-        self.active = true
+        active = true
         timer.resume()
     }
 
@@ -227,15 +252,21 @@ private final class PortScanner: @unchecked Sendable {
     }
 }
 
+// MARK: - Configuration
+
 private struct Configuration {
     let workstreamID: UUID
     let command: [String]
     let expectedPort: Int?
     let startedAt: Date
+    let monitorMode: Bool
+    let monitorPID: Int32?
 
     init(arguments: [String]) throws {
         var workstreamID: UUID?
         var commandStartIndex: Int?
+        var monitorMode = false
+        var monitorPID: Int32?
         var index = 1
 
         while index < arguments.count {
@@ -244,10 +275,27 @@ private struct Configuration {
                 commandStartIndex = index + 1
                 break
             }
+            if argument == "--monitor" {
+                monitorMode = true
+                index += 1
+                continue
+            }
+            if argument == "--pid" {
+                let valueIndex = index + 1
+                guard valueIndex < arguments.count,
+                      let pid = Int32(arguments[valueIndex])
+                else {
+                    throw LauncherError(exitCode: 2, message: "ff-run --pid requires a valid PID")
+                }
+                monitorPID = pid
+                index += 2
+                continue
+            }
             if argument == "--workstream-id" {
                 let valueIndex = index + 1
                 guard valueIndex < arguments.count,
-                      let parsedID = UUID(uuidString: arguments[valueIndex]) else {
+                      let parsedID = UUID(uuidString: arguments[valueIndex])
+                else {
                     throw LauncherError(exitCode: 2, message: "ff-run requires a valid --workstream-id")
                 }
                 workstreamID = parsedID
@@ -260,14 +308,21 @@ private struct Configuration {
         guard let workstreamID else {
             throw LauncherError(exitCode: 2, message: "ff-run requires --workstream-id <uuid>")
         }
-        guard let commandStartIndex, commandStartIndex < arguments.count else {
-            throw LauncherError(exitCode: 2, message: "ff-run requires a command after --")
-        }
 
+        self.monitorMode = monitorMode
+        self.monitorPID = monitorPID
         self.workstreamID = workstreamID
-        self.command = Array(arguments[commandStartIndex...])
-        self.expectedPort = ProcessInfo.processInfo.environment["FF_PORT"].flatMap(Int.init)
-        self.startedAt = Date()
+        expectedPort = ProcessInfo.processInfo.environment["FF_PORT"].flatMap(Int.init)
+        startedAt = Date()
+
+        if monitorMode {
+            command = []
+        } else {
+            guard let commandStartIndex, commandStartIndex < arguments.count else {
+                throw LauncherError(exitCode: 2, message: "ff-run requires a command after --")
+            }
+            command = Array(arguments[commandStartIndex...])
+        }
     }
 }
 
