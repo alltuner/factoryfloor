@@ -2,7 +2,8 @@
   <div class="relative">
     <!-- Screenshot tabs -->
     <div class="flex justify-center gap-1.5 md:gap-2 mb-3 md:mb-4 flex-wrap">
-      <button onclick="showScreenshot('agent')" class="ss-tab ss-tab-active font-mono text-xs px-2 md:px-3 py-1 md:py-1.5 rounded-md border border-fg-faint transition-all" data-tab="agent">Agent</button>
+      <button onclick="showScreenshot('demo')" class="ss-tab ss-tab-active font-mono text-xs px-2 md:px-3 py-1 md:py-1.5 rounded-md border border-fg-faint transition-all" data-tab="demo">{{ T "hero_demo_tab" }}</button>
+      <button onclick="showScreenshot('agent')" class="ss-tab font-mono text-xs px-2 md:px-3 py-1 md:py-1.5 rounded-md border border-fg-faint transition-all" data-tab="agent">Agent</button>
       <button onclick="showScreenshot('environment')" class="ss-tab font-mono text-xs px-2 md:px-3 py-1 md:py-1.5 rounded-md border border-fg-faint transition-all hidden md:inline-flex" data-tab="environment">Environment</button>
       <button onclick="showScreenshot('info')" class="ss-tab font-mono text-xs px-2 md:px-3 py-1 md:py-1.5 rounded-md border border-fg-faint transition-all" data-tab="info">Info</button>
       <button onclick="showScreenshot('terminal')" class="ss-tab font-mono text-xs px-2 md:px-3 py-1 md:py-1.5 rounded-md border border-fg-faint transition-all" data-tab="terminal">Terminal</button>
@@ -10,14 +11,19 @@
       <button onclick="showScreenshot('project')" class="ss-tab font-mono text-xs px-2 md:px-3 py-1 md:py-1.5 rounded-md border border-fg-faint transition-all hidden md:inline-flex" data-tab="project">Project</button>
     </div>
 
-    <!-- Screenshots -->
-    <div class="rounded-xl overflow-hidden shadow-[0_25px_80px_var(--color-shadow)] border border-fg-faint cursor-pointer" onclick="openScreenshotModal()">
-      <img id="ss-agent" class="ss-img w-full" src="/img/screenshots/agent.png" alt="Claude Code agent running in Factory Floor">
-      <img id="ss-environment" class="ss-img w-full hidden" src="/img/screenshots/environment.png" alt="Environment tab with setup and run scripts">
-      <img id="ss-info" class="ss-img w-full hidden" src="/img/screenshots/info.png" alt="Workstream info with documentation">
-      <img id="ss-terminal" class="ss-img w-full hidden" src="/img/screenshots/terminal.png" alt="Ghostty terminal with custom shell">
-      <img id="ss-browser" class="ss-img w-full hidden" src="/img/screenshots/browser.png" alt="Embedded browser with auto-port detection">
-      <img id="ss-project" class="ss-img w-full hidden" src="/img/screenshots/project.png" alt="Project overview with git info and docs">
+    <!-- Demo video + Screenshots -->
+    <div class="rounded-xl overflow-hidden shadow-[0_25px_80px_var(--color-shadow)] border border-fg-faint">
+      <div id="ss-demo" class="ss-img aspect-video">
+        <iframe class="w-full h-full" src="https://www.youtube-nocookie.com/embed/uneYTs5z42k?rel=0" title="Factory Floor demo" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+      </div>
+      <div class="cursor-pointer" onclick="openScreenshotModal()">
+        <img id="ss-agent" class="ss-img w-full hidden" src="/img/screenshots/agent.png" alt="Claude Code agent running in Factory Floor">
+        <img id="ss-environment" class="ss-img w-full hidden" src="/img/screenshots/environment.png" alt="Environment tab with setup and run scripts">
+        <img id="ss-info" class="ss-img w-full hidden" src="/img/screenshots/info.png" alt="Workstream info with documentation">
+        <img id="ss-terminal" class="ss-img w-full hidden" src="/img/screenshots/terminal.png" alt="Ghostty terminal with custom shell">
+        <img id="ss-browser" class="ss-img w-full hidden" src="/img/screenshots/browser.png" alt="Embedded browser with auto-port detection">
+        <img id="ss-project" class="ss-img w-full hidden" src="/img/screenshots/project.png" alt="Project overview with git info and docs">
+      </div>
     </div>
   </div>
 </div>
@@ -57,5 +63,5 @@ function openScreenshotModal() {
 }
 
 // Initialize first tab
-document.addEventListener('DOMContentLoaded', function() { showScreenshot('agent'); });
+document.addEventListener('DOMContentLoaded', function() { showScreenshot('demo'); });
 </script>

@@ -19,6 +19,8 @@ other = "AI-drivna"
 other = "dev workspace."
 [hero_desc]
 other = "Nativ macOS-app byggd på <a href=\"https://ghostty.org\" class=\"text-wine-light hover:underline\">Ghosttys</a> GPU-renderade terminal. Hanterar git worktrees, <a href=\"https://docs.anthropic.com/en/docs/claude-code/overview\" class=\"text-wine-light hover:underline\">Claude Code</a>-sessions och dev servers i ett fönster. Varje workstream får egen branch, terminal och agent, allt parallellt, allt native."
+[hero_demo_tab]
+other = "Demo"
 [hero_download]
 other = "Ladda ner"
 [hero_source]
