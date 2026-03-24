@@ -1,11 +1,10 @@
 // ABOUTME: Tests for CommandBuilder shell command composition and quoting.
 // ABOUTME: Validates escaping of special characters, spaces, quotes, and nested commands.
 
-import XCTest
 @testable import FactoryFloor
+import XCTest
 
 final class CommandBuilderTests: XCTestCase {
-
     // MARK: - Basic command building
 
     func testSimpleCommand() {
@@ -98,20 +97,20 @@ final class CommandBuilderTests: XCTestCase {
     // MARK: - withFallback
 
     func testWithFallbackBasic() {
-        let result = CommandBuilder.withFallback("cmd1", "cmd2")
-        XCTAssertEqual(result, "sh -c 'cmd1 2>/dev/null || cmd2'")
+        let result = CommandBuilder.withFallback("cmd1", "cmd2", shell: "/bin/zsh")
+        XCTAssertEqual(result, "/bin/zsh -lc 'exec sh -c '\\''cmd1 2>/dev/null || cmd2'\\'''")
     }
 
     func testWithFallbackMessage() {
-        let result = CommandBuilder.withFallback("cmd1", "cmd2", message: "Retrying...")
-        XCTAssertEqual(result, "sh -c 'cmd1 2>/dev/null || (echo Retrying... && cmd2)'")
+        let result = CommandBuilder.withFallback("cmd1", "cmd2", message: "Retrying...", shell: "/bin/zsh")
+        XCTAssertEqual(result, "/bin/zsh -lc 'exec sh -c '\\''cmd1 2>/dev/null || (echo Retrying... && cmd2)'\\'''")
     }
 
     func testWithFallbackMessageWithSpecialChars() {
-        let result = CommandBuilder.withFallback("cmd1", "cmd2", message: "it's failing")
-        // The message should be properly escaped inside the outer sh -c quote
+        let result = CommandBuilder.withFallback("cmd1", "cmd2", message: "it's failing", shell: "/bin/zsh")
         XCTAssertTrue(result.contains("echo"), "Should contain echo")
-        XCTAssertTrue(result.hasPrefix("sh -c "), "Should start with sh -c")
+        XCTAssertTrue(result.hasPrefix("/bin/zsh -lc "), "Should use login shell")
+        XCTAssertTrue(result.contains("exec sh -c"), "Should use sh for POSIX syntax")
     }
 
     func testWithFallbackNestedQuotes() {
@@ -121,9 +120,9 @@ final class CommandBuilderTests: XCTestCase {
         var cmd2 = CommandBuilder("claude")
         cmd2.option("--session-id", "abc-123")
 
-        let result = CommandBuilder.withFallback(cmd1.command, cmd2.command)
-        // The inner single quotes from option values must survive the outer sh -c quoting
-        XCTAssertTrue(result.hasPrefix("sh -c '"))
+        let result = CommandBuilder.withFallback(cmd1.command, cmd2.command, shell: "/bin/zsh")
+        XCTAssertTrue(result.hasPrefix("/bin/zsh -lc '"))
+        XCTAssertTrue(result.contains("exec sh -c"))
         XCTAssertTrue(result.contains("--name"))
         XCTAssertTrue(result.contains("--session-id"))
     }

@@ -27,8 +27,10 @@ struct CommandBuilder {
         parts.joined(separator: " ")
     }
 
-    /// Wrap two commands in a fallback: `sh -c 'cmd1 2>/dev/null || cmd2'`
-    static func withFallback(_ primary: String, _ fallback: String, message: String? = nil) -> String {
+    /// Wrap two commands in a fallback using the user's login shell for proper PATH.
+    /// Uses two layers: the login shell loads profiles, then exec's sh for POSIX syntax.
+    /// This is shell-agnostic (works with zsh, bash, fish) because only sh sees POSIX operators.
+    static func withFallback(_ primary: String, _ fallback: String, message: String? = nil, shell: String = userShell) -> String {
         let fallbackCmd: String
         if let message {
             let escapedMessage = shellQuote(message)
@@ -36,7 +38,9 @@ struct CommandBuilder {
         } else {
             fallbackCmd = fallback
         }
-        return "sh -c \(shellQuote("\(primary) 2>/dev/null || \(fallbackCmd)"))"
+        let posixCmd = "\(primary) 2>/dev/null || \(fallbackCmd)"
+        let shCmd = "exec sh -c \(shellQuote(posixCmd))"
+        return "\(shell) -lc \(shellQuote(shCmd))"
     }
 
     static var userShell: String {

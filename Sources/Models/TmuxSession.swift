@@ -50,7 +50,7 @@ enum TmuxSession {
     /// Dedicated socket name so we don't interfere with the user's tmux.
     private static let socketName = AppConstants.appID
 
-    static func wrapCommand(tmuxPath: String, sessionName: String, command: String?, environmentVars: [String: String] = [:]) -> String {
+    static func wrapCommand(tmuxPath: String, sessionName: String, command: String?, environmentVars: [String: String] = [:], shell: String = CommandBuilder.userShell) -> String {
         let socket = shellEscape(socketName)
         let conf = shellEscape(configPath)
         let escaped = shellEscape(sessionName)
@@ -67,9 +67,11 @@ enum TmuxSession {
             tmuxCmd += " \(command)"
         }
 
-        // Single sh -c: server setup then exec tmux
+        // Use login shell for proper PATH, with inner sh for POSIX syntax.
         let setup = serverSetupCommand(tmuxPath: tmuxPath, configPath: configPath)
-        return "sh -c \(shellEscape("\(setup); exec \(tmuxCmd)"))"
+        let posixCmd = shellEscape("\(setup); exec \(tmuxCmd)")
+        let shCmd = "exec sh -c \(posixCmd)"
+        return "\(shell) -lc \(shellEscape(shCmd))"
     }
 
     /// Kill a tmux session by name.
