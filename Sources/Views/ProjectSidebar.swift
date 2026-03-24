@@ -67,51 +67,102 @@ struct ProjectSidebar: View {
         )
     }
 
+    @ViewBuilder
+    private func projectRows() -> some View {
+        ForEach(cachedSortedIDs, id: \.self) { projectID in
+            let projectBind = projectBinding(for: projectID)
+            let project = projectBind.wrappedValue
+            let hasChildren = !project.workstreams.isEmpty
+
+            ProjectHeaderRow(
+                project: project,
+                isExpanded: expandedProjects.contains(project.id),
+                onToggle: hasChildren ? {
+                    withAnimation(.easeInOut(duration: 0.15)) {
+                        if expandedProjects.contains(project.id) {
+                            expandedProjects.remove(project.id)
+                        } else {
+                            expandedProjects.insert(project.id)
+                        }
+                    }
+                } : nil,
+                onAdd: { logger.warning("[FF] onAdd button tapped for project \(project.name, privacy: .public)"); addWorkstream(for: project.id) },
+                onAddWithPermissions: { addWorkstream(for: project.id, bypassPermissions: true) },
+                onAddWithoutPermissions: { addWorkstream(for: project.id, bypassPermissions: false) },
+                onDelete: { projectToDelete = project.id }
+            )
+            .tag(SidebarSelection.project(project.id))
+
+            if hasChildren && expandedProjects.contains(project.id) {
+                let sortedWS = project.workstreams.sorted { $0.lastAccessedAt > $1.lastAccessedAt }
+                ForEach(sortedWS) { workstream in
+                    WorkstreamRow(
+                        name: workstream.name,
+                        branchName: appEnv.branchName(for: workstream.worktreePath),
+                        worktreePath: workstream.worktreePath,
+                        isPathValid: appEnv.isPathValid(workstream.worktreePath),
+                        hasActivePort: Self.hasPort(workstream.id),
+                        onArchive: { confirmArchive(workstream) }
+                    )
+                    .tag(SidebarSelection.workstream(workstream.id))
+                    .padding(.leading, 22)
+                }
+            }
+        }
+    }
+
+    @ViewBuilder
+    private var bottomBar: some View {
+        VStack(spacing: 4) {
+            if let version = updateChecker.availableVersion {
+                UpdateBanner(version: version, updater: updater)
+            }
+
+            // Credit
+            VStack(spacing: 2) {
+                HStack(spacing: 0) {
+                    Text("by ")
+                        .foregroundStyle(.tertiary)
+                    Link("David Poblador i Garcia.", destination: URL(string: "https://davidpoblador.com/")!)
+                        .foregroundStyle(.secondary)
+                }
+                HStack(spacing: 0) {
+                    Text("Help ")
+                        .foregroundStyle(.tertiary)
+                    Link("supporting", destination: sponsorURL)
+                        .foregroundStyle(.secondary)
+                    Text(" the development.")
+                        .foregroundStyle(.tertiary)
+                }
+            }
+            .font(.system(size: 10))
+
+            HStack {
+                SidebarBottomButton(icon: "plus") {
+                    showingAddProjectChoice = true
+                }
+                .accessibilityLabel("Add project")
+                Spacer()
+                SidebarBottomButton(icon: "questionmark.circle") {
+                    NotificationCenter.default.post(name: .openHelp, object: nil)
+                }
+                .accessibilityLabel("Help")
+                SidebarBottomButton(icon: "gear") {
+                    NotificationCenter.default.post(name: .openSettings, object: nil)
+                }
+                .accessibilityLabel("Settings")
+            }
+        }
+        .padding(.horizontal, 4)
+        .padding(.bottom, 4)
+    }
+
     var body: some View {
         GeometryReader { _ in
             VStack(spacing: 0) {
                 ScrollViewReader { scrollProxy in
                     List(selection: $selection) {
-                        ForEach(cachedSortedIDs, id: \.self) { projectID in
-                            let projectBind = projectBinding(for: projectID)
-                            let project = projectBind.wrappedValue
-                            let hasChildren = !project.workstreams.isEmpty
-
-                            ProjectHeaderRow(
-                                project: project,
-                                isExpanded: expandedProjects.contains(project.id),
-                                onToggle: hasChildren ? {
-                                    withAnimation(.easeInOut(duration: 0.15)) {
-                                        if expandedProjects.contains(project.id) {
-                                            expandedProjects.remove(project.id)
-                                        } else {
-                                            expandedProjects.insert(project.id)
-                                        }
-                                    }
-                                } : nil,
-                                onAdd: { logger.warning("[FF] onAdd button tapped for project \(project.name, privacy: .public)"); addWorkstream(for: project.id) },
-                                onAddWithPermissions: { addWorkstream(for: project.id, bypassPermissions: true) },
-                                onAddWithoutPermissions: { addWorkstream(for: project.id, bypassPermissions: false) },
-                                onDelete: { projectToDelete = project.id }
-                            )
-                            .tag(SidebarSelection.project(project.id))
-
-                            if hasChildren && expandedProjects.contains(project.id) {
-                                let sortedWS = project.workstreams.sorted { $0.lastAccessedAt > $1.lastAccessedAt }
-                                ForEach(sortedWS) { workstream in
-                                    WorkstreamRow(
-                                        name: workstream.name,
-                                        branchName: appEnv.branchName(for: workstream.worktreePath),
-                                        worktreePath: workstream.worktreePath,
-                                        isPathValid: appEnv.isPathValid(workstream.worktreePath),
-                                        hasActivePort: Self.hasPort(workstream.id),
-                                        onArchive: { confirmArchive(workstream) }
-                                    )
-                                    .tag(SidebarSelection.workstream(workstream.id))
-                                    .padding(.leading, 22)
-                                }
-                            }
-                        }
+                        projectRows()
                     }
                     .listStyle(.sidebar)
                     .safeAreaInset(edge: .top) {
@@ -143,48 +194,7 @@ struct ProjectSidebar: View {
                 } // ScrollViewReader
 
                 // Bottom bar (always visible)
-                VStack(spacing: 4) {
-                    if let version = updateChecker.availableVersion {
-                        UpdateBanner(version: version, updater: updater)
-                    }
-
-                    // Credit
-                    VStack(spacing: 2) {
-                        HStack(spacing: 0) {
-                            Text("by ")
-                                .foregroundStyle(.tertiary)
-                            Link("David Poblador i Garcia.", destination: URL(string: "https://davidpoblador.com/")!)
-                                .foregroundStyle(.secondary)
-                        }
-                        HStack(spacing: 0) {
-                            Text("Help ")
-                                .foregroundStyle(.tertiary)
-                            Link("supporting", destination: sponsorURL)
-                                .foregroundStyle(.secondary)
-                            Text(" the development.")
-                                .foregroundStyle(.tertiary)
-                        }
-                    }
-                    .font(.system(size: 10))
-
-                    HStack {
-                        SidebarBottomButton(icon: "plus") {
-                            showingAddProjectChoice = true
-                        }
-                        .accessibilityLabel("Add project")
-                        Spacer()
-                        SidebarBottomButton(icon: "questionmark.circle") {
-                            NotificationCenter.default.post(name: .openHelp, object: nil)
-                        }
-                        .accessibilityLabel("Help")
-                        SidebarBottomButton(icon: "gear") {
-                            NotificationCenter.default.post(name: .openSettings, object: nil)
-                        }
-                        .accessibilityLabel("Settings")
-                    }
-                }
-                .padding(.horizontal, 4)
-                .padding(.bottom, 4)
+                bottomBar
             }
         }
         .onReceive(NotificationCenter.default.publisher(for: .terminalActivity)) { notification in
