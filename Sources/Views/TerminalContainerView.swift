@@ -100,6 +100,36 @@ enum WorkspaceTab: Hashable {
     }
 }
 
+/// Captured workspace tab state for a workstream, used to survive navigation.
+struct WorkspaceTabSnapshot {
+    var tabs: [WorkspaceTab]
+    var terminalCount: Int
+    var browserCount: Int
+    var activeTab: WorkspaceTab
+    var browserTitles: [UUID: String]
+    var terminalTitles: [UUID: String]
+
+    /// Returns a copy with dead terminal tabs removed.
+    /// Browser tabs are kept regardless (they don't use terminal surfaces).
+    func reconciled(liveSurfaceIDs: Set<UUID>) -> WorkspaceTabSnapshot {
+        let filteredTabs = tabs.filter { tab in
+            if case let .terminal(id) = tab {
+                return liveSurfaceIDs.contains(id)
+            }
+            return true
+        }
+        let resolvedActiveTab = filteredTabs.contains(activeTab) ? activeTab : .agent
+        return WorkspaceTabSnapshot(
+            tabs: filteredTabs,
+            terminalCount: terminalCount,
+            browserCount: browserCount,
+            activeTab: resolvedActiveTab,
+            browserTitles: browserTitles,
+            terminalTitles: terminalTitles
+        )
+    }
+}
+
 enum TerminalSessionMode: Equatable {
     case standard
     case tmux
@@ -376,12 +406,27 @@ struct TerminalContainerView: View {
             cachedClaudeCommand = buildClaudeCommand()
             scriptConfig = ScriptConfig.load(from: projectDirectory)
             surfaceCache.respawnableIDs.insert(claudeID)
-            if scriptConfig.hasAnyScript && !tabs.contains(.environment) {
-                tabs.insert(.environment, at: 2)
+            if let snapshot = surfaceCache.restoreTabSnapshot(for: workstreamID) {
+                tabs = snapshot.tabs
+                terminalCount = snapshot.terminalCount
+                browserCount = snapshot.browserCount
+                activeTab = snapshot.activeTab
+                browserTitles = snapshot.browserTitles
+                terminalTitles = snapshot.terminalTitles
+                if scriptConfig.hasAnyScript && !tabs.contains(.environment) {
+                    tabs.insert(.environment, at: 2)
+                }
+            } else {
+                if scriptConfig.hasAnyScript && !tabs.contains(.environment) {
+                    tabs.insert(.environment, at: 2)
+                }
+                activeTab = restoredActiveTab()
             }
-            activeTab = restoredActiveTab()
             preloadSurfaces()
             surfaceCache.updateOcclusion(visibleSurfaceIDs: visibleSurfaceIDs)
+        }
+        .onDisappear {
+            surfaceCache.saveTabSnapshot(for: workstreamID, snapshot: currentTabSnapshot())
         }
         .onChange(of: activeTab) {
             surfaceCache.updateOcclusion(visibleSurfaceIDs: visibleSurfaceIDs)
@@ -515,6 +560,7 @@ struct TerminalContainerView: View {
         let tab = WorkspaceTab.terminal(id)
         tabs.append(tab)
         activeTab = tab
+        saveTabSnapshot()
     }
 
     private func addBrowser() {
@@ -523,6 +569,7 @@ struct TerminalContainerView: View {
         let tab = WorkspaceTab.browser(id)
         tabs.append(tab)
         activeTab = tab
+        saveTabSnapshot()
     }
 
     private func closeTab(_ tab: WorkspaceTab) {
@@ -537,6 +584,22 @@ struct TerminalContainerView: View {
             let newIndex = min(index, tabs.count - 1)
             activeTab = tabs[newIndex]
         }
+        saveTabSnapshot()
+    }
+
+    private func currentTabSnapshot() -> WorkspaceTabSnapshot {
+        WorkspaceTabSnapshot(
+            tabs: tabs,
+            terminalCount: terminalCount,
+            browserCount: browserCount,
+            activeTab: activeTab,
+            browserTitles: browserTitles,
+            terminalTitles: terminalTitles
+        )
+    }
+
+    private func saveTabSnapshot() {
+        surfaceCache.saveTabSnapshot(for: workstreamID, snapshot: currentTabSnapshot())
     }
 
     private func moveCustomTab(to targetTab: WorkspaceTab) {
@@ -774,6 +837,7 @@ extension Notification.Name {
 final class TerminalSurfaceCache: ObservableObject {
     private var surfaces: [UUID: TerminalView] = [:]
     private var surfaceParams: [UUID: SurfaceParams] = [:]
+    private var tabSnapshots: [UUID: WorkspaceTabSnapshot] = [:]
     /// Surface IDs that should respawn when closed (e.g., the agent).
     var respawnableIDs: Set<UUID> = []
 
@@ -826,6 +890,7 @@ final class TerminalSurfaceCache: ObservableObject {
     }
 
     func removeWorkstreamSurfaces(for workstreamID: UUID) {
+        tabSnapshots.removeValue(forKey: workstreamID)
         // Remove agent surface
         removeSurface(for: workstreamID)
         // Build a set of all possible derived IDs and remove matches
@@ -857,5 +922,21 @@ final class TerminalSurfaceCache: ObservableObject {
             removeSurface(for: id)
             NotificationCenter.default.post(name: .terminalTabExited, object: id)
         }
+    }
+
+    // MARK: - Workspace tab snapshots
+
+    func saveTabSnapshot(for workstreamID: UUID, snapshot: WorkspaceTabSnapshot) {
+        tabSnapshots[workstreamID] = snapshot
+    }
+
+    func restoreTabSnapshot(for workstreamID: UUID) -> WorkspaceTabSnapshot? {
+        guard let snapshot = tabSnapshots[workstreamID] else { return nil }
+        let liveSurfaceIDs = Set(surfaces.keys)
+        return snapshot.reconciled(liveSurfaceIDs: liveSurfaceIDs)
+    }
+
+    func removeTabSnapshot(for workstreamID: UUID) {
+        tabSnapshots.removeValue(forKey: workstreamID)
     }
 }
