@@ -1,5 +1,20 @@
 # Changelog
 
+## [0.1.42](https://github.com/alltuner/factoryfloor/compare/v0.1.41...v0.1.42) (2026-03-24)
+
+
+### Features
+
+* localize NS*UsageDescription privacy strings via InfoPlist.strings ([#173](https://github.com/alltuner/factoryfloor/issues/173)) ([98d4358](https://github.com/alltuner/factoryfloor/commit/98d4358733484b8be59a7a001aa73ce0b206438d)), closes [#172](https://github.com/alltuner/factoryfloor/issues/172)
+
+
+### Bug Fixes
+
+* add privacy entitlements and TCC usage descriptions for embedded terminal ([#171](https://github.com/alltuner/factoryfloor/issues/171)) ([87c4216](https://github.com/alltuner/factoryfloor/commit/87c4216482fe07fe5c4797ab6ddf4829b8c0995f)), closes [#167](https://github.com/alltuner/factoryfloor/issues/167)
+* preserve terminal and browser tabs across workspace navigation ([#168](https://github.com/alltuner/factoryfloor/issues/168)) ([be89532](https://github.com/alltuner/factoryfloor/commit/be89532f3fec4c23715bca40715306c665d5543d))
+* sidebar archive button fails due to stale workstream index cache ([#170](https://github.com/alltuner/factoryfloor/issues/170)) ([3727c40](https://github.com/alltuner/factoryfloor/commit/3727c40af9e3db31ce27018abec071ab382337f7))
+* use login shell for agent and tmux commands to load user PATH ([#174](https://github.com/alltuner/factoryfloor/issues/174)) ([debcaad](https://github.com/alltuner/factoryfloor/commit/debcaad4bb195ff070fcab0507839592c9826459))
+
 ## [0.1.41](https://github.com/alltuner/factoryfloor/compare/v0.1.40...v0.1.41) (2026-03-23)
 
 
