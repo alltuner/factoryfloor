@@ -32,14 +32,11 @@ brew install --cask alltuner/tap/factoryfloor
 
 Or [download the latest release](https://factory-floor.com/get/).
 
-Then open any project:
+Then:
 
-```bash
-ff                  # open current directory
-ff ~/repos/myapp    # open a specific directory
-```
-
-Create a workstream (Cmd+N), and Factory Floor sets up a git worktree, launches a Claude Code agent, and detects your dev server automatically.
+1. **Open Factory Floor** and add a project by clicking the `+` button in the sidebar, then selecting a repository directory.
+2. **Create a workstream** with `Cmd+N`. Factory Floor sets up a git worktree and launches a Claude Code agent automatically.
+3. **Start building.** Add terminals (`Cmd+T`), browsers (`Cmd+B`), or configure [run scripts](#script-configuration) to auto-detect your dev server.
 
 ---
 
