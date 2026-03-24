@@ -2,6 +2,7 @@
 // ABOUTME: Info and Agent are always present; terminals and browsers are added on demand.
 
 import SwiftUI
+import WebKit
 
 extension Notification.Name {
     static let terminalSurfaceClosed = Notification.Name("factoryfloor.terminalSurfaceClosed")
@@ -391,7 +392,7 @@ struct TerminalContainerView: View {
                 environmentVars: terminalEnvVars
             )
         case let .browser(id):
-            BrowserView(defaultURL: browserDefaultURL, tabID: id)
+            BrowserView(defaultURL: browserDefaultURL, tabID: id, webView: surfaceCache.webView(for: id))
                 .id(id)
         }
     }
@@ -575,9 +576,14 @@ struct TerminalContainerView: View {
     private func closeTab(_ tab: WorkspaceTab) {
         guard let index = tabs.firstIndex(of: tab) else { return }
         tabs.remove(at: index)
-        // Clean up terminal surface
-        if case let .terminal(id) = tab {
+        // Clean up cached views
+        switch tab {
+        case let .terminal(id):
             surfaceCache.removeSurface(for: id)
+        case let .browser(id):
+            surfaceCache.removeWebView(for: id)
+        default:
+            break
         }
         // Switch to previous tab or agent
         if activeTab == tab {
@@ -838,6 +844,7 @@ final class TerminalSurfaceCache: ObservableObject {
     private var surfaces: [UUID: TerminalView] = [:]
     private var surfaceParams: [UUID: SurfaceParams] = [:]
     private var tabSnapshots: [UUID: WorkspaceTabSnapshot] = [:]
+    private var webViews: [UUID: WKWebView] = [:]
     /// Surface IDs that should respawn when closed (e.g., the agent).
     var respawnableIDs: Set<UUID> = []
 
@@ -882,6 +889,17 @@ final class TerminalSurfaceCache: ObservableObject {
         return view
     }
 
+    func webView(for id: UUID) -> WKWebView {
+        if let existing = webViews[id] { return existing }
+        let view = WKWebView()
+        webViews[id] = view
+        return view
+    }
+
+    func removeWebView(for id: UUID) {
+        webViews.removeValue(forKey: id)
+    }
+
     func removeSurface(for id: UUID) {
         if let view = surfaces.removeValue(forKey: id) {
             view.destroy()
@@ -900,8 +918,9 @@ final class TerminalSurfaceCache: ObservableObject {
                 derivedIDs.insert(derivedUUID(from: workstreamID, salt: "\(prefix)-\(i)"))
             }
         }
-        for id in derivedIDs where surfaces[id] != nil {
-            removeSurface(for: id)
+        for id in derivedIDs {
+            if surfaces[id] != nil { removeSurface(for: id) }
+            if webViews[id] != nil { removeWebView(for: id) }
         }
     }
 

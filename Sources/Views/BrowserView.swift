@@ -41,9 +41,9 @@ private func normalizedBrowserURL(_ urlString: String) -> String {
 struct BrowserView: View {
     let defaultURL: String
     var tabID: UUID?
+    let webView: WKWebView
 
     @State private var urlText: String = ""
-    @State private var webView = WKWebView()
     @State private var isLoading = false
     @State private var canGoBack = false
     @State private var canGoForward = false
@@ -141,10 +141,18 @@ struct BrowserView: View {
             }
         }
         .onAppear {
-            urlText = defaultURL
-            navigateTo(defaultURL)
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
-                urlFieldFocused = true
+            if webView.url == nil {
+                urlText = defaultURL
+                navigateTo(defaultURL)
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                    urlFieldFocused = true
+                }
+            } else {
+                urlText = webView.url?.absoluteString ?? defaultURL
+                canGoBack = webView.canGoBack
+                canGoForward = webView.canGoForward
+                isLoading = webView.isLoading
+                pageTitle = webView.title
             }
         }
         .onReceive(NotificationCenter.default.publisher(for: .focusAddressBar)) { _ in
@@ -207,7 +215,7 @@ struct WebViewRepresentable: NSViewRepresentable {
         return webView
     }
 
-    func updateNSView(_ nsView: WKWebView, context: Context) {}
+    func updateNSView(_: WKWebView, context _: Context) {}
 
     func makeCoordinator() -> Coordinator {
         Coordinator(self)
@@ -220,31 +228,32 @@ struct WebViewRepresentable: NSViewRepresentable {
             self.parent = parent
         }
 
-        func webView(_ webView: WKWebView, didStartProvisionalNavigation navigation: WKNavigation!) {
+        func webView(_ webView: WKWebView, didStartProvisionalNavigation _: WKNavigation!) {
             parent.isLoading = true
             parent.connectionError = false
             updateState(webView)
         }
 
-        func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
+        func webView(_ webView: WKWebView, didFinish _: WKNavigation!) {
             parent.isLoading = false
             parent.connectionError = false
             updateState(webView)
         }
 
-        func webView(_ webView: WKWebView, didFail navigation: WKNavigation!, withError error: Error) {
+        func webView(_ webView: WKWebView, didFail _: WKNavigation!, withError _: Error) {
             parent.isLoading = false
             updateState(webView)
         }
 
-        func webView(_ webView: WKWebView, didFailProvisionalNavigation navigation: WKNavigation!, withError error: Error) {
+        func webView(_ webView: WKWebView, didFailProvisionalNavigation _: WKNavigation!, withError error: Error) {
             parent.isLoading = false
             let nsError = error as NSError
             // Connection refused, host not found, network issues
-            if nsError.domain == NSURLErrorDomain &&
+            if nsError.domain == NSURLErrorDomain,
                [NSURLErrorCannotConnectToHost, NSURLErrorCannotFindHost,
                 NSURLErrorNetworkConnectionLost, NSURLErrorNotConnectedToInternet,
-                NSURLErrorTimedOut].contains(nsError.code) {
+                NSURLErrorTimedOut].contains(nsError.code)
+            {
                 parent.connectionError = true
             }
             updateState(webView)
