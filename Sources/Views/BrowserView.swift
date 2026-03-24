@@ -212,6 +212,7 @@ struct WebViewRepresentable: NSViewRepresentable {
 
     func makeNSView(context: Context) -> WKWebView {
         webView.navigationDelegate = context.coordinator
+        webView.uiDelegate = context.coordinator
         return webView
     }
 
@@ -221,12 +222,68 @@ struct WebViewRepresentable: NSViewRepresentable {
         Coordinator(self)
     }
 
-    class Coordinator: NSObject, WKNavigationDelegate {
+    class Coordinator: NSObject, WKNavigationDelegate, WKUIDelegate {
         let parent: WebViewRepresentable
 
         init(_ parent: WebViewRepresentable) {
             self.parent = parent
         }
+
+        // MARK: - WKUIDelegate (JavaScript dialogs)
+
+        func webView(_ webView: WKWebView, runJavaScriptAlertPanelWithMessage message: String,
+                     initiatedByFrame _: WKFrameInfo, completionHandler: @escaping () -> Void)
+        {
+            let alert = NSAlert()
+            alert.messageText = message
+            alert.addButton(withTitle: NSLocalizedString("OK", comment: ""))
+            if let window = webView.window {
+                alert.beginSheetModal(for: window) { _ in completionHandler() }
+            } else {
+                alert.runModal()
+                completionHandler()
+            }
+        }
+
+        func webView(_ webView: WKWebView, runJavaScriptConfirmPanelWithMessage message: String,
+                     initiatedByFrame _: WKFrameInfo, completionHandler: @escaping (Bool) -> Void)
+        {
+            let alert = NSAlert()
+            alert.messageText = message
+            alert.addButton(withTitle: NSLocalizedString("OK", comment: ""))
+            alert.addButton(withTitle: NSLocalizedString("Cancel", comment: ""))
+            if let window = webView.window {
+                alert.beginSheetModal(for: window) { response in
+                    completionHandler(response == .alertFirstButtonReturn)
+                }
+            } else {
+                let response = alert.runModal()
+                completionHandler(response == .alertFirstButtonReturn)
+            }
+        }
+
+        func webView(_ webView: WKWebView, runJavaScriptTextInputPanelWithPrompt prompt: String,
+                     defaultText: String?, initiatedByFrame _: WKFrameInfo,
+                     completionHandler: @escaping (String?) -> Void)
+        {
+            let alert = NSAlert()
+            alert.messageText = prompt
+            alert.addButton(withTitle: NSLocalizedString("OK", comment: ""))
+            alert.addButton(withTitle: NSLocalizedString("Cancel", comment: ""))
+            let textField = NSTextField(frame: NSRect(x: 0, y: 0, width: 260, height: 24))
+            textField.stringValue = defaultText ?? ""
+            alert.accessoryView = textField
+            if let window = webView.window {
+                alert.beginSheetModal(for: window) { response in
+                    completionHandler(response == .alertFirstButtonReturn ? textField.stringValue : nil)
+                }
+            } else {
+                let response = alert.runModal()
+                completionHandler(response == .alertFirstButtonReturn ? textField.stringValue : nil)
+            }
+        }
+
+        // MARK: - WKNavigationDelegate
 
         func webView(_ webView: WKWebView, didStartProvisionalNavigation _: WKNavigation!) {
             parent.isLoading = true
