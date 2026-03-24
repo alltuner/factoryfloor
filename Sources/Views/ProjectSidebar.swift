@@ -205,6 +205,9 @@ struct ProjectSidebar: View {
             cachedSortedIDs = recomputeSortedIDs()
             rebuildIndices()
         }
+        .onChange(of: projects.flatMap(\.workstreams).map(\.id)) { _, _ in
+            rebuildIndices()
+        }
         .overlay {
             if isDropTargeted {
                 RoundedRectangle(cornerRadius: 8)
@@ -382,7 +385,7 @@ struct ProjectSidebar: View {
 
     private func performArchive() {
         guard let wsID = workstreamToArchive,
-              let (pi, _) = cachedWorkstreamIndex[wsID] else { return }
+              let pi = projects.firstIndex(where: { $0.workstreams.contains(where: { $0.id == wsID }) }) else { return }
         let projectID = projects[pi].id
         WorkstreamArchiver.archive(wsID, in: &projects[pi], surfaceCache: surfaceCache, tmuxPath: appEnv.toolStatus.tmux.path)
         rebuildIndices()
