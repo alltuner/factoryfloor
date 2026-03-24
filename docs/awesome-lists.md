@@ -211,16 +211,16 @@ The meta-list. Not for individual tools. Worth knowing about if we ever create a
 
 | List | Submitted | PR/Issue | Status |
 |------|-----------|----------|--------|
-| hesreallyhim/awesome-claude-code | | | |
-| Uzaaft/awesome-libghostty | | | |
-| wyattgill9/Awesome-Ghostty | | | |
-| jaywcjlove/awesome-mac | | | |
-| kamranahmedse/developer-roadmap | | | |
-| openalternative.co | | | |
-| eltociear/awesome-AI-driven-development | | | |
-| jiji262/awesome-vibe-coding-tools | | | |
-| jqueryscript/awesome-claude-code | | | |
-| dictcp/awesome-git | | | |
-| ai-for-developers/awesome-ai-coding-tools | | | |
-| rothgar/awesome-tuis | | | |
-| awesomeclaude.ai | | | |
+| hesreallyhim/awesome-claude-code | | | Blocked: (1) CLI submissions auto-closed as CoC violation, must use [web UI](https://github.com/hesreallyhim/awesome-claude-code/issues/new?template=recommend-resource.yml); (2) checklist requires one week since first public commit (2026-03-19), submit on or after 2026-03-26 |
+| Uzaaft/awesome-libghostty | 2026-03-24 | [PR #18](https://github.com/Uzaaft/awesome-libghostty/pull/18) | Pending review |
+| wyattgill9/Awesome-Ghostty | 2026-03-24 | [PR #3](https://github.com/wyattgill9/Awesome-Ghostty/pull/3) | Pending review |
+| jaywcjlove/awesome-mac | | | Deferred: repo star count too low |
+| kamranahmedse/developer-roadmap | 2026-03-24 | [PR #9771](https://github.com/kamranahmedse/developer-roadmap/pull/9771) | Pending review |
+| openalternative.co | | | Requires GitHub OAuth login in browser |
+| eltociear/awesome-AI-driven-development | 2026-03-24 | [PR #31](https://github.com/eltociear/awesome-AI-driven-development/pull/31) | Pending review |
+| jiji262/awesome-vibe-coding-tools | 2026-03-24 | [PR #6](https://github.com/jiji262/awesome-vibe-coding-tools/pull/6) | Pending review |
+| jqueryscript/awesome-claude-code | 2026-03-24 | [PR #126](https://github.com/jqueryscript/awesome-claude-code/pull/126) | Pending review |
+| dictcp/awesome-git | 2026-03-24 | [PR #130](https://github.com/dictcp/awesome-git/pull/130) | Pending review |
+| ai-for-developers/awesome-ai-coding-tools | 2026-03-24 | [PR #161](https://github.com/ai-for-developers/awesome-ai-coding-tools/pull/161) | Pending review |
+| rothgar/awesome-tuis | | | Skipped: GUI app, not TUI |
+| awesomeclaude.ai | | | No clear submission process |
