@@ -11,7 +11,7 @@
 
 <p align="center">
   <a href="https://factory-floor.com">Website</a> &middot;
-  <a href="https://github.com/alltuner/factoryfloor/releases">Download</a> &middot;
+  <a href="https://factory-floor.com/get/">Download</a> &middot;
   <a href="https://factory-floor.com/sponsor">Sponsor</a>
 </p>
 
@@ -19,6 +19,27 @@
   <img src="https://img.shields.io/github/license/alltuner/factoryfloor?color=5B2333" alt="License">
   <img src="https://img.shields.io/github/stars/alltuner/factoryfloor?color=5B2333" alt="Stars">
 </p>
+
+---
+
+## Get Started
+
+Install via Homebrew:
+
+```bash
+brew install --cask alltuner/tap/factoryfloor
+```
+
+Or [download the latest release](https://factory-floor.com/get/).
+
+Then open any project:
+
+```bash
+ff                  # open current directory
+ff ~/repos/myapp    # open a specific directory
+```
+
+Create a workstream (Cmd+N), and Factory Floor sets up a git worktree, launches a Claude Code agent, and detects your dev server automatically.
 
 ---
 
@@ -107,7 +128,7 @@ English, Catalan, Spanish, Swedish.
 brew install --cask alltuner/tap/factoryfloor
 ```
 
-Or download from [GitHub Releases](https://github.com/alltuner/factoryfloor/releases).
+Or [download the latest release](https://factory-floor.com/get/).
 
 ### Upgrade
 
@@ -117,14 +138,7 @@ brew upgrade --cask factoryfloor
 
 ### CLI
 
-Homebrew automatically installs the `ff` command:
-
-```bash
-ff                  # open current directory
-ff ~/repos/myapp    # open a specific directory
-```
-
-If you installed via DMG, you can install the CLI from Settings > Environment.
+Homebrew automatically installs the `ff` command. If you installed via DMG, install the CLI from Settings > Environment.
 
 ---
 

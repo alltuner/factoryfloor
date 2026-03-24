@@ -8,152 +8,168 @@ Where to list Factory Floor and how to get featured.
 
 #### 1. hesreallyhim/awesome-claude-code (31k stars)
 
-The most relevant list. Factory Floor fits squarely in the **"Alternative Clients"** section,
-alongside similar tools like crystal (desktop orchestrator), claude-tmux (tmux-based session
-management with worktree support), and Omnara (command center for AI agents).
+The most relevant list. Factory Floor fits in the **"Alternative Clients"** section,
+alongside crystal (desktop orchestrator), claude-tmux (tmux session manager with worktree
+support), and Omnara (command center for AI agents).
 
 - **Section:** Tooling > Alternative Clients > General
 - **How to submit:** Open an issue using their [recommend-resource template](https://github.com/hesreallyhim/awesome-claude-code/issues/new?template=recommend-resource.yml). Do NOT open a PR; their automated system (Claude-managed) handles all PRs.
-- **Pitch angle:** Native macOS app that combines git worktrees + Claude Code + dev servers in a single GPU-rendered window. Differentiator vs crystal/Omnara: native (not Electron), Ghostty-powered terminals, built-in port detection for dev servers.
 - **Competitors already listed:** crystal, claude-tmux, Omnara, Claudable, claude-esp
-
-#### 2. jaywcjlove/awesome-mac (101k stars)
-
-Massive reach. Factory Floor fits in **Developer Tools > Terminal Apps** or possibly
-**Developer Tools > Developer Utilities**.
-
-- **Section:** Developer Tools > Terminal Apps (best fit)
-- **How to submit:** Open a PR adding Factory Floor to the appropriate section. Read their [contributing guidelines](https://github.com/jaywcjlove/awesome-mac/blob/master/CONTRIBUTING.md) first. Uses badges for open source, freeware, and App Store links.
-- **Format:** Follow their entry format exactly:
+- **Ready-to-submit copy:**
   ```
-  * [Factory Floor](https://factory-floor.com) - Native macOS workspace for parallel development with git worktrees, Claude Code, and embedded dev servers. [![Open Source Software](badge-url)](https://github.com/alltuner/factoryfloor) [![Freeware](badge-url)]
+  - [Factory Floor](https://github.com/alltuner/factoryfloor) by [David Poblador i Garcia](https://github.com/dpoblador) - Native macOS workspace for running multiple Claude Code agents in parallel. Each workstream gets its own git worktree, terminal (GPU-rendered via libghostty), and embedded browser with automatic dev server port detection.
   ```
-- **Notes:** This list is highly curated and well-maintained. Quality bar is high; the app should be polished and have a good README/website.
 
-#### 3. Uzaaft/awesome-libghostty (354 stars)
+#### 2. Uzaaft/awesome-libghostty (354 stars)
 
 Curated list of projects built with libghostty. Has a dedicated **"AI Tools & Agent
-Orchestration"** section that is the perfect home for Factory Floor. Direct competitors
-already listed: cmux, Commander, Mux, Supacode, Aizen.
+Orchestration"** section. Direct competitors already listed: cmux, Commander, Mux, Supacode,
+Aizen. Factory Floor is built on libghostty, so this is a natural home.
 
 - **Section:** AI Tools & Agent Orchestration
-- **How to submit:** Open a PR. See [CONTRIBUTING.md](https://github.com/Uzaaft/awesome-libghostty/blob/master/CONTRIBUTING.md) for guidelines.
-- **Pitch angle:** Native macOS workspace for parallel development with git worktrees, Claude Code, and embedded dev servers, powered by libghostty.
-- **Format:** Match existing entries:
+- **How to submit:** Open a PR. See [CONTRIBUTING.md](https://github.com/Uzaaft/awesome-libghostty/blob/master/CONTRIBUTING.md).
+- **Ready-to-submit copy:**
   ```
-  * [Factory Floor](https://factory-floor.com) - A native macOS workspace for parallel development with git worktrees, Claude Code terminals, and embedded dev servers.
+  * [Factory Floor](https://factory-floor.com) - A native macOS workspace for parallel development with git worktrees, Claude Code agents, and embedded dev servers with automatic port detection.
   ```
-- **Notes:** This is the most natural fit of all lists. Factory Floor is literally built on libghostty, and the section already contains its closest competitors. Should be one of the first submissions.
 
-#### 4. wyattgill9/Awesome-Ghostty (active fork, 252+ stars)
+#### 3. jaywcjlove/awesome-mac (101k stars)
+
+Massive reach. Factory Floor fits in **Developer Tools > Terminal Apps**.
+
+- **Section:** Developer Tools > Terminal Apps
+- **How to submit:** Open a PR. Read their [contributing guidelines](https://github.com/jaywcjlove/awesome-mac/blob/master/CONTRIBUTING.md). Uses icon badges for open source, freeware, etc.
+- **Ready-to-submit copy:**
+  ```
+  * [Factory Floor](https://factory-floor.com) - Developer workspace that manages parallel tasks in git worktrees, each with its own terminal, AI agent, and embedded browser. [![Open Source Software][oss-icon]](https://github.com/alltuner/factoryfloor) ![Freeware][freeware-icon]
+  ```
+- **Notes:** Highly curated. Quality bar is high; the app needs to be polished with a good README and website screenshots.
+
+#### 4. wyattgill9/Awesome-Ghostty (252+ stars)
 
 Previously fearlessgeekmedia/Awesome-Ghostty (now archived, redirects to this fork).
 
-- **Section:** Tools (most appropriate; lists tools that integrate with Ghostty)
-- **How to submit:** Open a PR. The list accepts direct PRs with new entries.
-- **Pitch angle:** Factory Floor embeds Ghostty (via libghostty xcframework) as its terminal backend. It's a native macOS app built on top of Ghostty's GPU-rendered terminal.
-- **Format:**
+- **Section:** Tools
+- **How to submit:** Open a PR.
+- **Ready-to-submit copy:**
   ```
-  * [Factory Floor](https://factory-floor.com) - Native macOS workspace for parallel development, embedding Ghostty terminals with git worktrees and Claude Code integration.
+  * [Factory Floor](https://factory-floor.com) - Developer workspace built on Ghostty's GPU-rendered terminal for managing parallel git worktrees with integrated Claude Code agents and dev servers.
   ```
-- **Notes:** Smaller list but targeted. Being listed here signals legitimacy in the Ghostty ecosystem. Some overlap with awesome-libghostty, but different audience.
+- **Notes:** Some overlap with awesome-libghostty, but different audience. This list is about the Ghostty ecosystem broadly; awesome-libghostty is about projects using the library.
 
 ### Tier 2: Good fit, worth pursuing
 
-#### 4. rothgar/awesome-tuis (18k stars)
+#### 5. kamranahmedse/developer-roadmap (352k stars)
 
-Community-maintained list of TUI applications. cmux is listed here under Development.
-Factory Floor is a GUI app, not a TUI, so the fit is debatable, but the list does include
-tools with graphical elements that run alongside terminals.
+The most popular developer resource on GitHub. Has a Claude Code roadmap with a
+"Community Tools" page. Currently only lists Conductor.
 
-- **Section:** Development
-- **How to submit:** Open a PR. Simple policy: "If you have a cool tool you'd like to share please open a PR."
-- **Pitch angle:** Developer workspace with embedded terminal UIs for managing parallel Claude Code agents in git worktrees.
-- **Worth it?** Borderline. Factory Floor is native macOS GUI, not a TUI. Only submit if the list shows precedent for GUI tools in the Development section.
+- **Section:** Claude Code roadmap > Community Tools
+- **How to submit:** Open a PR modifying `src/data/roadmaps/claude-code/content/community-tools@e12uqC2SEzaMfmBbz7VZf.md`.
+- **Ready-to-submit copy:**
+  ```
+  - [@opensource@Factory Floor](https://github.com/alltuner/factoryfloor)
+  - [@article@Factory Floor: Parallel Development with Git Worktrees and Claude Code](https://factory-floor.com)
+  ```
+- **Notes:** Extremely high visibility but strict review process. The community tools section is tiny, so there's room.
 
-#### 5. eltociear/awesome-AI-driven-development (325 stars)
+#### 6. openalternative.co (5.7k stars)
 
-522 tools catalogued. Has both "Terminal & CLI Agents" and "Multi-Agent & Orchestration"
-sections. cmux appears here. Covers the full AI dev tool landscape.
+Open source alternatives directory with good SEO. superset.sh is listed here.
 
-- **Section:** Multi-Agent & Orchestration (best fit)
-- **How to submit:** Open a PR
-- **Pitch angle:** Native macOS orchestration for parallel Claude Code agents, each in its own git worktree with dev server port detection.
+- **How to submit:** Submit at [openalternative.co/submit](https://openalternative.co/submit). Approved tools automatically appear in the GitHub repo.
+- **Ready-to-submit copy:**
+  - **Name:** Factory Floor
+  - **URL:** https://factory-floor.com
+  - **Repository:** https://github.com/alltuner/factoryfloor
+  - **Description:** Open source macOS workspace for parallel development. Manages git worktrees, Claude Code agents, and dev servers in a single native app. Built on Ghostty's GPU-rendered terminal. No Electron, no subscription.
 
-#### 6. jiji262/awesome-vibe-coding-tools (72 stars)
+#### 7. eltociear/awesome-AI-driven-development (325 stars)
 
-Emerging list with sections for "Multi-Agent Orchestration & Collaboration" and
-"Task, Memory & Workspace Management". conductor.build appears here.
+522 tools catalogued. cmux appears here. Has "Terminal & CLI Agents" and "Multi-Agent &
+Orchestration" sections.
 
-- **Section:** Multi-Agent Orchestration & Collaboration, or Task, Memory & Workspace Management
-- **How to submit:** Open a PR
-- **Pitch angle:** Workspace manager for parallel vibe coding: git worktrees + Claude Code + embedded dev servers in a single native window.
+- **Section:** Multi-Agent & Orchestration
+- **How to submit:** Open a PR.
+- **Ready-to-submit copy:**
+  ```
+  - [Factory Floor](https://github.com/alltuner/factoryfloor) - Native macOS workspace that orchestrates parallel Claude Code agents, each in its own git worktree with automatic dev server port detection. Built on libghostty for GPU-rendered terminals.
+  ```
+
+#### 8. jiji262/awesome-vibe-coding-tools (72 stars)
+
+Emerging list. conductor.build appears here. Has "Multi-Agent Orchestration &
+Collaboration" and "Task, Memory & Workspace Management" sections.
+
+- **Section:** Multi-Agent Orchestration & Collaboration
+- **How to submit:** Open a PR.
+- **Ready-to-submit copy:**
+  ```
+  - **[alltuner/factoryfloor](https://github.com/alltuner/factoryfloor):** Native macOS workspace for running multiple coding agents in parallel. Each workstream gets its own git worktree, Claude Code terminal (GPU-rendered via Ghostty), and embedded browser with automatic port detection. Keyboard-first, zero config.
+  ```
 - **Notes:** Small but growing. Low barrier to entry. Good for early positioning in the "vibe coding" category.
 
-#### 7. jqueryscript/awesome-claude-code (213 stars)
+#### 9. jqueryscript/awesome-claude-code (213 stars)
 
-Another awesome-claude-code list. Has a dedicated "Clients & GUIs" section listing
+Another awesome-claude-code list with a dedicated "Clients & GUIs" section listing
 desktop apps like Claudiatron, Claude-Code-ChatInWindows, and ccmate.
 
 - **Section:** Clients & GUIs
-- **How to submit:** Open a PR
-- **Pitch angle:** Native macOS GUI for orchestrating Claude Code with git worktrees and embedded dev servers.
-- **Notes:** Smaller than hesreallyhim's list but has a dedicated GUI category that's a natural fit.
-
-#### 8. dictcp/awesome-git (2.8k stars)
-
-General-purpose list of git tools, resources, and extensions.
-
-- **Section:** Tools or Extensions (Factory Floor's worktree management is the angle)
-- **How to submit:** Open a PR. Simple contributing policy: "Pull requests on interesting tools/projects/resources are welcome."
-- **Pitch angle:** Git worktree management GUI. Factory Floor automates `git worktree add/remove` and provides a visual interface for managing multiple parallel workstreams.
-- **Format:**
+- **How to submit:** Open a PR.
+- **Ready-to-submit copy:**
   ```
-  * [Factory Floor](https://github.com/alltuner/factoryfloor) - Native macOS workspace that automates git worktree management with integrated terminals and dev servers
+  - [**Factory Floor**](https://github.com/alltuner/factoryfloor) - Native macOS workspace for running multiple Claude Code agents in parallel, each in its own git worktree with GPU-rendered terminals (libghostty) and automatic dev server detection.
+  ```
+
+#### 10. dictcp/awesome-git (2.8k stars)
+
+General-purpose list of git tools. The angle here is worktree management.
+
+- **Section:** Tools
+- **How to submit:** Open a PR.
+- **Ready-to-submit copy:**
+  ```
+  * [Factory Floor](https://github.com/alltuner/factoryfloor) - macOS workspace that automates git worktree creation, switching, and cleanup. Each worktree gets its own terminal, AI agent, and dev server.
   ```
 - **Notes:** This list hasn't been updated frequently. Check recent activity before investing effort.
 
-#### 9. ai-for-developers/awesome-ai-coding-tools (1.6k stars)
+#### 11. ai-for-developers/awesome-ai-coding-tools (1.6k stars)
 
 Curated list of AI-powered coding tools.
 
-- **Section:** Likely has categories for IDEs/editors or development environments
-- **How to submit:** Check their CONTRIBUTING.md or open a PR
-- **Pitch angle:** Development workspace optimized for AI-assisted parallel coding with Claude Code
+- **How to submit:** Check their CONTRIBUTING.md or open a PR.
+- **Ready-to-submit copy:**
+  ```
+  - [Factory Floor](https://factory-floor.com) - Native macOS workspace for parallel AI-assisted development. Manages git worktrees with integrated Claude Code agents, GPU-rendered terminals, and embedded dev servers.
+  ```
 
-### Directories and non-GitHub listings
+#### 12. rothgar/awesome-tuis (18k stars)
 
-#### 10. awesomeclaude.ai
+Community-maintained list of TUI applications. cmux is listed here under Development.
 
-Curated web directory of Claude-related resources. Organized by categories (Official,
-Applications, Tools, etc.). Has a Claude Code section with tools and integrations.
+- **Section:** Development
+- **How to submit:** Open a PR.
+- **Ready-to-submit copy:**
+  ```
+  - [Factory Floor](https://github.com/alltuner/factoryfloor) Developer workspace for parallel git worktrees with embedded terminal sessions, AI agents, and dev servers. macOS native.
+  ```
+- **Notes:** Borderline fit. Factory Floor is a GUI app, not a TUI. Only submit if the list shows precedent for GUI tools in the Development section.
+
+### Directories and web listings
+
+#### 13. awesomeclaude.ai
+
+Curated web directory of Claude resources. Has an Applications section and Claude Code tools.
 
 - **Section:** Applications or Claude Code tools
 - **How to submit:** Unknown (no visible submission form). Likely contact the maintainer directly or check if there's a GitHub repo backing it.
-- **Pitch angle:** Native macOS workspace for parallel Claude Code development.
-- **Notes:** Well-organized, high-quality directory. Worth investigating the submission process.
+- **Ready-to-submit copy:**
+  - **Name:** Factory Floor
+  - **URL:** https://factory-floor.com
+  - **Repository:** https://github.com/alltuner/factoryfloor
+  - **Description:** Native macOS workspace for running multiple Claude Code agents in parallel, each in its own git worktree with GPU-rendered terminals and automatic dev server detection.
 
-#### 11. openalternative.co (5.7k stars on GitHub)
-
-Open source alternatives directory. Curated list of open source alternatives to proprietary
-software. superset.sh is listed here.
-
-- **Section:** Developer Tools (as an open source alternative to proprietary dev environments)
-- **How to submit:** Submit at [openalternative.co/submit](https://openalternative.co/submit). Approved tools automatically appear in the GitHub repo.
-- **Pitch angle:** Open source alternative to proprietary parallel development environments. Native macOS, no Electron, no subscription.
-- **Notes:** Good SEO. Appearing here drives organic traffic from people searching for open source dev tools.
-
-#### 12. kamranahmedse/developer-roadmap (352k stars)
-
-The most popular developer resource on GitHub. Has a Claude Code roadmap section with a
-"Community Tools" page. conductor.build is already featured there.
-
-- **Section:** Claude Code roadmap > Community Tools
-- **How to submit:** Open a PR modifying the community tools content file. Very high visibility.
-- **Pitch angle:** Parallel development workspace for Claude Code with git worktrees and dev server integration.
-- **Notes:** Extremely high visibility (352k stars). The Claude Code community tools section is small (currently just Conductor), so there's room. But the quality bar and review process will be strict.
-
-### Tier 3: Lower priority
+### Lower priority
 
 #### travisvn/awesome-claude-skills (9.6k stars)
 
@@ -161,48 +177,35 @@ Focused on Claude Skills for Claude Code CLI. Only worth it if they add an apps 
 
 #### sindresorhus/awesome (448k stars)
 
-The meta-list of awesome lists. Not a place to list individual tools, but worth knowing about
-if we ever wanted to create our own "awesome-worktrees" or similar list.
+The meta-list. Not for individual tools. Worth knowing about if we ever create an
+"awesome-worktrees" or "awesome-parallel-development" list.
 
 ## Submission Strategy
 
 ### Before submitting anywhere
 
-1. **Polish the README** - clear description, screenshots/GIFs, installation instructions
-2. **Have a working website** (factory-floor.com) with demo content
-3. **GitHub repo hygiene** - topics set, social preview image, releases published
-4. **Star count matters** - some lists have minimum thresholds (explicit or implicit)
+1. **Polish the README** with clear description, screenshots/GIFs, and install instructions
+2. **Website** (factory-floor.com) should have demo content and the /get/ page working
+3. **GitHub repo hygiene**: topics set, social preview image, releases published
+4. **Star count**: some lists have implicit minimum thresholds
 
 ### Submission order
 
-1. **awesome-claude-code** first (strongest fit, issue-based submission is low friction)
-2. **awesome-libghostty** second (perfect category match, competitors already listed)
-3. **Awesome-Ghostty** third (small community, quick turnaround, Ghostty ecosystem cred)
-4. **awesome-mac** fourth (highest reach, but highest quality bar)
-5. **developer-roadmap** fifth (352k stars, huge visibility, small community tools section)
-6. **openalternative.co** sixth (SEO value, web submission form)
+1. **awesome-claude-code** (strongest fit, issue-based submission is low friction)
+2. **awesome-libghostty** (perfect category match, competitors already listed)
+3. **Awesome-Ghostty** (small community, quick turnaround, Ghostty ecosystem cred)
+4. **awesome-mac** (highest reach, highest quality bar)
+5. **developer-roadmap** (352k stars, huge visibility, small community tools section)
+6. **openalternative.co** (SEO value, web submission form)
 7. **awesome-AI-driven-development** and **awesome-vibe-coding-tools** (easy PRs, emerging lists)
 8. Rest as time permits
 
-### Description templates
+### Link strategy
 
-**Short (one-liner):**
-> Native macOS workspace for parallel development with git worktrees, Claude Code, and embedded dev servers.
-
-**Medium (two sentences):**
-> Native macOS workspace that combines git worktrees, Claude Code terminals, and embedded dev servers in a single GPU-rendered window. Run multiple AI coding agents simultaneously, each in its own isolated worktree with automatic port detection.
-
-**Differentiators to emphasize per list:**
-- awesome-claude-code: parallel Claude Code agents, worktree isolation, native macOS
-- awesome-libghostty: built on libghostty, AI agent orchestration, worktree lifecycle
-- Awesome-Ghostty: built on libghostty, GPU-rendered terminals, native macOS integration
-- awesome-mac: native (not Electron), open source, developer productivity
-- awesome-git: automated worktree lifecycle, visual worktree management
-- developer-roadmap: community tool extending Claude Code with parallel workspaces
-- openalternative: open source, no subscription, native macOS alternative
-- awesome-vibe-coding: multi-agent orchestration, workspace management, parallel coding
-- awesome-AI-driven-dev: multi-agent orchestration for AI-driven development
-- awesomeclaude.ai: Claude Code workspace, parallel agent management
+- **GitHub-focused lists** (awesome-claude-code, awesome-git, awesome-tuis, awesome-AI-driven-development, awesome-vibe-coding-tools, jqueryscript/awesome-claude-code): link to `https://github.com/alltuner/factoryfloor`
+- **User-facing lists** (awesome-mac, awesome-libghostty, Awesome-Ghostty, awesome-ai-coding-tools): link to `https://factory-floor.com`
+- **Directories** (openalternative.co, awesomeclaude.ai): provide both the website and repo URL
+- **developer-roadmap**: link to repo (follows their `@opensource@` tag convention)
 
 ## Tracking
 
@@ -216,8 +219,8 @@ if we ever wanted to create our own "awesome-worktrees" or similar list.
 | openalternative.co | | | |
 | eltociear/awesome-AI-driven-development | | | |
 | jiji262/awesome-vibe-coding-tools | | | |
-| rothgar/awesome-tuis | | | |
 | jqueryscript/awesome-claude-code | | | |
 | dictcp/awesome-git | | | |
 | ai-for-developers/awesome-ai-coding-tools | | | |
+| rothgar/awesome-tuis | | | |
 | awesomeclaude.ai | | | |
