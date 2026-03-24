@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.1.43](https://github.com/alltuner/factoryfloor/compare/v0.1.42...v0.1.43) (2026-03-24)
+
+
+### Bug Fixes
+
+* break up complex ProjectSidebar body to fix release build failure ([#175](https://github.com/alltuner/factoryfloor/issues/175)) ([c49002a](https://github.com/alltuner/factoryfloor/commit/c49002a15646bebb7306db175a5fd0cdf25989c5))
+
 ## [0.1.42](https://github.com/alltuner/factoryfloor/compare/v0.1.41...v0.1.42) (2026-03-24)
 
 
