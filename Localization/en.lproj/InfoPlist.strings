@@ -1,0 +1,44 @@
+/* Privacy - AppleScript */
+"NSAppleEventsUsageDescription" = "A program running within Factory Floor would like to use AppleScript.";
+
+/* Privacy - Audio */
+"NSAudioCaptureUsageDescription" = "A program running within Factory Floor would like to access your system's audio.";
+
+/* Privacy - Bluetooth */
+"NSBluetoothAlwaysUsageDescription" = "A program running within Factory Floor would like to use Bluetooth.";
+
+/* Privacy - Calendars */
+"NSCalendarsUsageDescription" = "A program running within Factory Floor would like to access your Calendar.";
+
+/* Privacy - Camera */
+"NSCameraUsageDescription" = "A program running within Factory Floor would like to use the camera.";
+
+/* Privacy - Contacts */
+"NSContactsUsageDescription" = "A program running within Factory Floor would like to access your Contacts.";
+
+/* Privacy - Local Network */
+"NSLocalNetworkUsageDescription" = "A program running within Factory Floor would like to access the local network.";
+
+/* Privacy - Location (Temporary) */
+"NSLocationTemporaryUsageDescriptionDictionary" = "A program running within Factory Floor would like to use your location temporarily.";
+
+/* Privacy - Location */
+"NSLocationUsageDescription" = "A program running within Factory Floor would like to access your location information.";
+
+/* Privacy - Microphone */
+"NSMicrophoneUsageDescription" = "A program running within Factory Floor would like to use your microphone.";
+
+/* Privacy - Motion */
+"NSMotionUsageDescription" = "A program running within Factory Floor would like to access motion data.";
+
+/* Privacy - Photos */
+"NSPhotoLibraryUsageDescription" = "A program running within Factory Floor would like to access your Photo Library.";
+
+/* Privacy - Reminders */
+"NSRemindersUsageDescription" = "A program running within Factory Floor would like to access your reminders.";
+
+/* Privacy - Speech Recognition */
+"NSSpeechRecognitionUsageDescription" = "A program running within Factory Floor would like to use speech recognition.";
+
+/* Privacy - System Administration */
+"NSSystemAdministrationUsageDescription" = "A program running within Factory Floor requires elevated privileges.";

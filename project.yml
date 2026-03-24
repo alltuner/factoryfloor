@@ -79,6 +79,14 @@ targets:
         buildPhase: resources
       - path: Localization/sv.lproj/Localizable.strings
         buildPhase: resources
+      - path: Localization/en.lproj/InfoPlist.strings
+        buildPhase: resources
+      - path: Localization/ca.lproj/InfoPlist.strings
+        buildPhase: resources
+      - path: Localization/es.lproj/InfoPlist.strings
+        buildPhase: resources
+      - path: Localization/sv.lproj/InfoPlist.strings
+        buildPhase: resources
       - path: Resources/Scripts/ff
         buildPhase: resources
     settings:

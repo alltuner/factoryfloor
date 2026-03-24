@@ -1,0 +1,44 @@
+/* Privacy - AppleScript */
+"NSAppleEventsUsageDescription" = "Un programa ejecutándose dentro de Factory Floor quiere utilizar AppleScript.";
+
+/* Privacy - Audio */
+"NSAudioCaptureUsageDescription" = "Un programa ejecutándose dentro de Factory Floor quiere acceder al audio del sistema.";
+
+/* Privacy - Bluetooth */
+"NSBluetoothAlwaysUsageDescription" = "Un programa ejecutándose dentro de Factory Floor quiere utilizar el Bluetooth.";
+
+/* Privacy - Calendars */
+"NSCalendarsUsageDescription" = "Un programa ejecutándose dentro de Factory Floor quiere acceder al Calendario.";
+
+/* Privacy - Camera */
+"NSCameraUsageDescription" = "Un programa ejecutándose dentro de Factory Floor quiere utilizar la cámara.";
+
+/* Privacy - Contacts */
+"NSContactsUsageDescription" = "Un programa ejecutándose dentro de Factory Floor quiere acceder a los Contactos.";
+
+/* Privacy - Local Network */
+"NSLocalNetworkUsageDescription" = "Un programa ejecutándose dentro de Factory Floor quiere acceder a la red local.";
+
+/* Privacy - Location (Temporary) */
+"NSLocationTemporaryUsageDescriptionDictionary" = "Un programa ejecutándose dentro de Factory Floor quiere utilizar tu ubicación temporalmente.";
+
+/* Privacy - Location */
+"NSLocationUsageDescription" = "Un programa ejecutándose dentro de Factory Floor quiere acceder a tu información de ubicación.";
+
+/* Privacy - Microphone */
+"NSMicrophoneUsageDescription" = "Un programa ejecutándose dentro de Factory Floor quiere utilizar el micrófono.";
+
+/* Privacy - Motion */
+"NSMotionUsageDescription" = "Un programa ejecutándose dentro de Factory Floor quiere acceder a los datos de movimiento.";
+
+/* Privacy - Photos */
+"NSPhotoLibraryUsageDescription" = "Un programa ejecutándose dentro de Factory Floor quiere acceder a la Fototeca.";
+
+/* Privacy - Reminders */
+"NSRemindersUsageDescription" = "Un programa ejecutándose dentro de Factory Floor quiere acceder a los recordatorios.";
+
+/* Privacy - Speech Recognition */
+"NSSpeechRecognitionUsageDescription" = "Un programa ejecutándose dentro de Factory Floor quiere utilizar el reconocimiento de voz.";
+
+/* Privacy - System Administration */
+"NSSystemAdministrationUsageDescription" = "Un programa ejecutándose dentro de Factory Floor requiere privilegios elevados.";

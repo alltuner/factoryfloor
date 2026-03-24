@@ -1,0 +1,44 @@
+/* Privacy - AppleScript */
+"NSAppleEventsUsageDescription" = "Ett program som körs i Factory Floor vill använda AppleScript.";
+
+/* Privacy - Audio */
+"NSAudioCaptureUsageDescription" = "Ett program som körs i Factory Floor vill komma åt systemets ljud.";
+
+/* Privacy - Bluetooth */
+"NSBluetoothAlwaysUsageDescription" = "Ett program som körs i Factory Floor vill använda Bluetooth.";
+
+/* Privacy - Calendars */
+"NSCalendarsUsageDescription" = "Ett program som körs i Factory Floor vill komma åt din Kalender.";
+
+/* Privacy - Camera */
+"NSCameraUsageDescription" = "Ett program som körs i Factory Floor vill använda kameran.";
+
+/* Privacy - Contacts */
+"NSContactsUsageDescription" = "Ett program som körs i Factory Floor vill komma åt dina Kontakter.";
+
+/* Privacy - Local Network */
+"NSLocalNetworkUsageDescription" = "Ett program som körs i Factory Floor vill komma åt det lokala nätverket.";
+
+/* Privacy - Location (Temporary) */
+"NSLocationTemporaryUsageDescriptionDictionary" = "Ett program som körs i Factory Floor vill tillfälligt använda din plats.";
+
+/* Privacy - Location */
+"NSLocationUsageDescription" = "Ett program som körs i Factory Floor vill komma åt din platsinformation.";
+
+/* Privacy - Microphone */
+"NSMicrophoneUsageDescription" = "Ett program som körs i Factory Floor vill använda mikrofonen.";
+
+/* Privacy - Motion */
+"NSMotionUsageDescription" = "Ett program som körs i Factory Floor vill komma åt rörelsedata.";
+
+/* Privacy - Photos */
+"NSPhotoLibraryUsageDescription" = "Ett program som körs i Factory Floor vill komma åt ditt Fotobibliotek.";
+
+/* Privacy - Reminders */
+"NSRemindersUsageDescription" = "Ett program som körs i Factory Floor vill komma åt dina påminnelser.";
+
+/* Privacy - Speech Recognition */
+"NSSpeechRecognitionUsageDescription" = "Ett program som körs i Factory Floor vill använda taligenkänning.";
+
+/* Privacy - System Administration */
+"NSSystemAdministrationUsageDescription" = "Ett program som körs i Factory Floor kräver förhöjda behörigheter.";
