@@ -67,7 +67,6 @@ struct ProjectSidebar: View {
         )
     }
 
-    @ViewBuilder
     private func projectRows() -> some View {
         ForEach(cachedSortedIDs, id: \.self) { projectID in
             let projectBind = projectBinding(for: projectID)
@@ -111,7 +110,6 @@ struct ProjectSidebar: View {
         }
     }
 
-    @ViewBuilder
     private var bottomBar: some View {
         VStack(spacing: 4) {
             if let version = updateChecker.availableVersion {
@@ -158,6 +156,108 @@ struct ProjectSidebar: View {
     }
 
     var body: some View {
+        sidebar
+            .alert(
+                "Remove Project",
+                isPresented: Binding(
+                    get: { projectToDelete != nil },
+                    set: { if !$0 { projectToDelete = nil } }
+                )
+            ) {
+                Button("Cancel", role: .cancel) { projectToDelete = nil }
+                Button("Remove", role: .destructive) {
+                    if let id = projectToDelete {
+                        deleteProject(id: id)
+                    }
+                }
+            } message: {
+                if let id = projectToDelete, let project = projects.first(where: { $0.id == id }) {
+                    Text(String(format: NSLocalizedString("Remove \"%@\" from the list? Files in %@ will not be deleted.", comment: ""), project.name, project.directory))
+                }
+            }
+            .alert(
+                "Archive Workstream",
+                isPresented: Binding(
+                    get: { workstreamToArchive != nil },
+                    set: { if !$0 { workstreamToArchive = nil } }
+                )
+            ) {
+                Button("Cancel", role: .cancel) { workstreamToArchive = nil }
+                Button(archiveWarningDirty ? "Archive Anyway" : "Archive", role: .destructive) {
+                    performArchive()
+                }
+            } message: {
+                if archiveWarningDirty {
+                    Text("This workstream has uncommitted changes that will be lost.")
+                } else {
+                    Text("The worktree and its branch will be removed.")
+                }
+            }
+            .alert(
+                "Worktree Creation Failed",
+                isPresented: $showWorktreeError
+            ) {
+                Button("OK", role: .cancel) {}
+            } message: {
+                Text("Could not create the git worktree. The branch may already exist, or there may be an ongoing merge or rebase.")
+            }
+            .alert(
+                "Not a Git Repository",
+                isPresented: $showNotGitRepoError
+            ) {
+                Button("OK", role: .cancel) {}
+            } message: {
+                Text("Workstreams require a git repository. Initialize one with git init or select a different directory.")
+            }
+    }
+
+    private var sidebar: some View {
+        sidebarList
+            .sheet(isPresented: $showingAddProjectChoice) {
+                AddProjectChoiceSheet(
+                    onNewProject: {
+                        showingAddProjectChoice = false
+                        newProjectName = ""
+                        newProjectError = ""
+                        showingNewProjectName = true
+                    },
+                    onExistingDirectory: {
+                        showingAddProjectChoice = false
+                        openDirectoryPicker()
+                    },
+                    onCancel: { showingAddProjectChoice = false }
+                )
+            }
+            .sheet(isPresented: $showingNewProjectName) {
+                NewProjectSheet(
+                    name: $newProjectName,
+                    error: $newProjectError,
+                    baseDirectory: baseDirectory,
+                    onAdd: { createNewProject() },
+                    onCancel: { showingNewProjectName = false }
+                )
+            }
+            .onReceive(NotificationCenter.default.publisher(for: .addProject)) { _ in
+                showingAddProjectChoice = true
+            }
+            .onReceive(NotificationCenter.default.publisher(for: .addNew)) { _ in
+                if case let .workstream(wsID) = selection,
+                   let project = projects.first(where: { $0.workstreams.contains(where: { $0.id == wsID }) })
+                {
+                    addWorkstream(for: project.id)
+                } else if case let .project(pid) = selection {
+                    addWorkstream(for: pid)
+                } else {
+                    showingAddProjectChoice = true
+                }
+            }
+            .onReceive(NotificationCenter.default.publisher(for: .openDirectory)) { notification in
+                guard let directory = notification.object as? String else { return }
+                addProject(name: URL(fileURLWithPath: directory).lastPathComponent, directory: directory)
+            }
+    }
+
+    private var sidebarList: some View {
         GeometryReader { _ in
             VStack(spacing: 0) {
                 ScrollViewReader { scrollProxy in
@@ -228,100 +328,6 @@ struct ProjectSidebar: View {
         }
         .onDrop(of: [.fileURL], isTargeted: $isDropTargeted) { providers in
             handleDrop(providers)
-        }
-        .sheet(isPresented: $showingAddProjectChoice) {
-            AddProjectChoiceSheet(
-                onNewProject: {
-                    showingAddProjectChoice = false
-                    newProjectName = ""
-                    newProjectError = ""
-                    showingNewProjectName = true
-                },
-                onExistingDirectory: {
-                    showingAddProjectChoice = false
-                    openDirectoryPicker()
-                },
-                onCancel: { showingAddProjectChoice = false }
-            )
-        }
-        .sheet(isPresented: $showingNewProjectName) {
-            NewProjectSheet(
-                name: $newProjectName,
-                error: $newProjectError,
-                baseDirectory: baseDirectory,
-                onAdd: { createNewProject() },
-                onCancel: { showingNewProjectName = false }
-            )
-        }
-        .onReceive(NotificationCenter.default.publisher(for: .addProject)) { _ in
-            showingAddProjectChoice = true
-        }
-        .onReceive(NotificationCenter.default.publisher(for: .addNew)) { _ in
-            if case let .workstream(wsID) = selection,
-               let project = projects.first(where: { $0.workstreams.contains(where: { $0.id == wsID }) })
-            {
-                addWorkstream(for: project.id)
-            } else if case let .project(pid) = selection {
-                addWorkstream(for: pid)
-            } else {
-                showingAddProjectChoice = true
-            }
-        }
-        .onReceive(NotificationCenter.default.publisher(for: .openDirectory)) { notification in
-            guard let directory = notification.object as? String else { return }
-            addProject(name: URL(fileURLWithPath: directory).lastPathComponent, directory: directory)
-        }
-        .alert(
-            "Remove Project",
-            isPresented: Binding(
-                get: { projectToDelete != nil },
-                set: { if !$0 { projectToDelete = nil } }
-            )
-        ) {
-            Button("Cancel", role: .cancel) { projectToDelete = nil }
-            Button("Remove", role: .destructive) {
-                if let id = projectToDelete {
-                    deleteProject(id: id)
-                }
-            }
-        } message: {
-            if let id = projectToDelete, let project = projects.first(where: { $0.id == id }) {
-                Text(String(format: NSLocalizedString("Remove \"%@\" from the list? Files in %@ will not be deleted.", comment: ""), project.name, project.directory))
-            }
-        }
-        .alert(
-            "Archive Workstream",
-            isPresented: Binding(
-                get: { workstreamToArchive != nil },
-                set: { if !$0 { workstreamToArchive = nil } }
-            )
-        ) {
-            Button("Cancel", role: .cancel) { workstreamToArchive = nil }
-            Button(archiveWarningDirty ? "Archive Anyway" : "Archive", role: .destructive) {
-                performArchive()
-            }
-        } message: {
-            if archiveWarningDirty {
-                Text("This workstream has uncommitted changes that will be lost.")
-            } else {
-                Text("The worktree and its branch will be removed.")
-            }
-        }
-        .alert(
-            "Worktree Creation Failed",
-            isPresented: $showWorktreeError
-        ) {
-            Button("OK", role: .cancel) {}
-        } message: {
-            Text("Could not create the git worktree. The branch may already exist, or there may be an ongoing merge or rebase.")
-        }
-        .alert(
-            "Not a Git Repository",
-            isPresented: $showNotGitRepoError
-        ) {
-            Button("OK", role: .cancel) {}
-        } message: {
-            Text("Workstreams require a git repository. Initialize one with git init or select a different directory.")
         }
     }
 
