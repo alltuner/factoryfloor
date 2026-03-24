@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.1.44](https://github.com/alltuner/factoryfloor/compare/v0.1.43...v0.1.44) (2026-03-24)
+
+
+### Bug Fixes
+
+* split ProjectSidebar body into computed properties to fix type-check timeout ([#177](https://github.com/alltuner/factoryfloor/issues/177)) ([a48545c](https://github.com/alltuner/factoryfloor/commit/a48545cb22dc02eb6a585b4efb422d8585ca2f10))
+
 ## [0.1.43](https://github.com/alltuner/factoryfloor/compare/v0.1.42...v0.1.43) (2026-03-24)
 
 
