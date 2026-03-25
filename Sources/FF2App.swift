@@ -50,18 +50,21 @@ struct FF2App: App {
     @State private var pendingURLDirectory: String?
 
     init() {
-        SentrySDK.start { options in
-            options.dsn = "https://45310bb703b438b38aee17e84e10d32e@o4511060356956160.ingest.de.sentry.io/4511060370391120"
-            options.enableCrashHandler = true
-            options.enableAppHangTracking = true
-            options.appHangTimeoutInterval = 5
-            options.sendDefaultPii = false
-            options.releaseName = "\(AppConstants.appID)@\(AppConstants.version)"
-            #if DEBUG
-                options.environment = "development"
-            #else
-                options.environment = "production"
-            #endif
+        let crashReportingEnabled = UserDefaults.standard.object(forKey: "factoryfloor.crashReportingEnabled") as? Bool ?? true
+        if crashReportingEnabled {
+            SentrySDK.start { options in
+                options.dsn = "https://45310bb703b438b38aee17e84e10d32e@o4511060356956160.ingest.de.sentry.io/4511060370391120"
+                options.enableCrashHandler = true
+                options.enableAppHangTracking = true
+                options.appHangTimeoutInterval = 5
+                options.sendDefaultPii = false
+                options.releaseName = "\(AppConstants.appID)@\(AppConstants.version)"
+                #if DEBUG
+                    options.environment = "development"
+                #else
+                    options.environment = "production"
+                #endif
+            }
         }
 
         guard ghostty_init(UInt(CommandLine.argc), CommandLine.unsafeArgv) == GHOSTTY_SUCCESS else {
@@ -97,6 +100,7 @@ struct FF2App: App {
             ContentView()
                 .environmentObject(updater)
                 .onAppear {
+                    Telemetry.shared.trackLaunch()
                     if let dir = Self.launchDirectory {
                         DispatchQueue.main.async {
                             NotificationCenter.default.post(name: .openDirectory, object: dir)

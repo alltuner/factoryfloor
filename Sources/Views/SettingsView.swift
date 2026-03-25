@@ -15,6 +15,8 @@ struct SettingsView: View {
     @AppStorage("factoryfloor.appearance") private var appearance: String = "system"
     @AppStorage("factoryfloor.symlinkEnv") private var symlinkEnv: Bool = true
     @AppStorage("factoryfloor.confirmQuit") private var confirmQuit: Bool = true
+    @AppStorage("factoryfloor.telemetryEnabled") private var telemetryEnabled: Bool = true
+    @AppStorage("factoryfloor.crashReportingEnabled") private var crashReportingEnabled: Bool = true
     @AppStorage("factoryfloor.bleedingEdge") private var bleedingEdge: Bool = false
     @AppStorage("factoryfloor.baseDirectory") private var baseDirectory: String = NSSearchPathForDirectoriesInDomains(.documentDirectory, .userDomainMask, true).first ?? ""
 
@@ -232,6 +234,20 @@ struct SettingsView: View {
                         .font(.caption)
                         .foregroundStyle(.secondary)
                 }
+            }
+
+            // MARK: - Privacy
+
+            Section("Privacy") {
+                Toggle("Usage analytics", isOn: $telemetryEnabled)
+                Text("Send anonymous usage data to help improve Factory Floor. We collect: app version, build type, macOS version, locale, and screen resolution. No project names, file contents, or personal data.")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+
+                Toggle("Crash reports", isOn: $crashReportingEnabled)
+                Text("Send crash reports and performance data. Requires restart to take effect.")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
             }
 
             // MARK: - Danger
