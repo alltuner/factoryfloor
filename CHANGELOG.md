@@ -1,5 +1,26 @@
 # Changelog
 
+## [0.1.45](https://github.com/alltuner/factoryfloor/compare/v0.1.44...v0.1.45) (2026-03-25)
+
+
+### Features
+
+* add anonymous usage telemetry via self-hosted Umami ([#186](https://github.com/alltuner/factoryfloor/issues/186)) ([392848c](https://github.com/alltuner/factoryfloor/commit/392848cfa8da966016f01bf7cc502f08ef59671f))
+* **website:** embed YouTube demo video in hero section ([#185](https://github.com/alltuner/factoryfloor/issues/185)) ([fb94c51](https://github.com/alltuner/factoryfloor/commit/fb94c511f49dd09fdf1b7e3c25a80b347c1bfada))
+
+
+### Bug Fixes
+
+* **browser:** handle JavaScript alert, confirm, and prompt dialogs ([#184](https://github.com/alltuner/factoryfloor/issues/184)) ([e4e40bf](https://github.com/alltuner/factoryfloor/commit/e4e40bfaad9ab6347de3dac5050e7b188158ec68))
+* cache WKWebView instances to prevent browser tab reload on switch ([#183](https://github.com/alltuner/factoryfloor/issues/183)) ([b6bd587](https://github.com/alltuner/factoryfloor/commit/b6bd587cdb252eb849209af8e9e844449548137a))
+
+
+### Documentation
+
+* awesome lists submission guide and README install improvements ([#179](https://github.com/alltuner/factoryfloor/issues/179)) ([ae855a1](https://github.com/alltuner/factoryfloor/commit/ae855a1d0c8314aeb10f5039b9672ef0615e7c31))
+* replace CLI-centric Get Started with in-app workflow ([#181](https://github.com/alltuner/factoryfloor/issues/181)) ([dd6347d](https://github.com/alltuner/factoryfloor/commit/dd6347d48a125f0d391e8a1d9272c93b26fff327))
+* update awesome lists tracking table with submission status ([#182](https://github.com/alltuner/factoryfloor/issues/182)) ([a91bee1](https://github.com/alltuner/factoryfloor/commit/a91bee19e6900cd572bc5da698d454c47908feff))
+
 ## [0.1.44](https://github.com/alltuner/factoryfloor/compare/v0.1.43...v0.1.44) (2026-03-24)
 
 
