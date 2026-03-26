@@ -240,7 +240,9 @@ struct TerminalContainerView: View {
 
         var resume = CommandBuilder(basePath)
         resume.option("--resume", sessionID)
-        resume.option("--name", workstreamName)
+        if appEnv.toolStatus.claudeSupportsSessionName {
+            resume.option("--name", workstreamName)
+        }
         if useTmux { resume.flag("--teammate-mode"); resume.arg("tmux") }
         if bypassPermissions { resume.flag("--dangerously-skip-permissions") }
         if autoRenameBranch {
@@ -249,7 +251,9 @@ struct TerminalContainerView: View {
 
         var fresh = CommandBuilder(basePath)
         fresh.option("--session-id", sessionID)
-        fresh.option("--name", workstreamName)
+        if appEnv.toolStatus.claudeSupportsSessionName {
+            fresh.option("--name", workstreamName)
+        }
         if useTmux { fresh.flag("--teammate-mode"); fresh.arg("tmux") }
         if bypassPermissions { fresh.flag("--dangerously-skip-permissions") }
         if autoRenameBranch {

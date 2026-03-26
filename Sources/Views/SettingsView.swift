@@ -375,6 +375,7 @@ struct ToolStatus {
     var tmuxVersion: String?
     var claude: BinaryStatus = .notFound
     var claudeVersion: String?
+    var claudeSupportsSessionName: Bool = false
     var gh: BinaryStatus = .notFound
     var ghVersion: String?
     var ghAuthDetail: String?
@@ -392,6 +393,7 @@ struct ToolStatus {
         status.claude = findBinary("claude")
         if let path = status.claude.path {
             status.claudeVersion = runForVersion(path, args: ["--version"])
+            status.claudeSupportsSessionName = helpContainsFlag(path, flag: "--name")
         }
 
         status.gh = findBinary("gh")
@@ -421,6 +423,11 @@ struct ToolStatus {
             .replacingOccurrences(of: "gh version ", with: "")
         // Take first line only
         return trimmed.components(separatedBy: .newlines).first?.trimmingCharacters(in: .whitespaces)
+    }
+
+    private static func helpContainsFlag(_ path: String, flag: String) -> Bool {
+        guard let output = runCommand(path, args: ["--help"], includeStderr: true) else { return false }
+        return output.contains(flag)
     }
 
     private static func checkGhAuth(_ ghPath: String) -> String? {
