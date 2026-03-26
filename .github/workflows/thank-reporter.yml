@@ -1,0 +1,27 @@
+name: Thank issue reporter
+
+on:
+  issues:
+    types: [closed]
+
+jobs:
+  thank:
+    if: github.event.issue.state_reason == 'completed'
+    runs-on: ubuntu-latest
+    permissions:
+      issues: write
+    steps:
+      - name: Post thank-you comment
+        env:
+          GH_TOKEN: ${{ github.token }}
+          ISSUE_URL: ${{ github.event.issue.html_url }}
+          REPORTER: ${{ github.event.issue.user.login }}
+        run: |
+          # Skip if the reporter is a repo member (org member or collaborator)
+          ASSOC="${{ github.event.issue.author_association }}"
+          if [[ "$ASSOC" == "OWNER" || "$ASSOC" == "MEMBER" || "$ASSOC" == "COLLABORATOR" ]]; then
+            echo "Reporter is $ASSOC, skipping"
+            exit 0
+          fi
+
+          gh issue comment "$ISSUE_URL" --body "Thanks for reporting this, @${REPORTER}! The fix will ship in the next release."
