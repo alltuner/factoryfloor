@@ -891,7 +891,9 @@ final class TerminalSurfaceCache: ObservableObject {
 
     func webView(for id: UUID) -> WKWebView {
         if let existing = webViews[id] { return existing }
-        let view = WKWebView()
+        let config = WKWebViewConfiguration()
+        config.websiteDataStore = .nonPersistent()
+        let view = WKWebView(frame: .zero, configuration: config)
         webViews[id] = view
         return view
     }
