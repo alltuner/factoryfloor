@@ -1,5 +1,17 @@
 # Changelog
 
+## [0.1.46](https://github.com/alltuner/factoryfloor/compare/v0.1.45...v0.1.46) (2026-03-27)
+
+
+### Bug Fixes
+
+* handle Claude Code versions without --name flag ([#191](https://github.com/alltuner/factoryfloor/issues/191)) ([18d805b](https://github.com/alltuner/factoryfloor/commit/18d805ba3c6b6aaec023b35ac91eb3ae01823f48))
+
+
+### Miscellaneous
+
+* **deps:** update actions/deploy-pages action to v5 ([#187](https://github.com/alltuner/factoryfloor/issues/187)) ([82fa566](https://github.com/alltuner/factoryfloor/commit/82fa566265dcaa9bb4b21d742f1a58162e46b2fc))
+
 ## [0.1.45](https://github.com/alltuner/factoryfloor/compare/v0.1.44...v0.1.45) (2026-03-25)
 
 
