@@ -85,6 +85,7 @@ struct ProjectSidebar: View {
                         }
                     }
                 } : nil,
+                isGitRepo: GitOperations.isGitRepo(at: project.directory),
                 onAdd: { logger.warning("[FF] onAdd button tapped for project \(project.name, privacy: .public)"); addWorkstream(for: project.id) },
                 onAddWithPermissions: { addWorkstream(for: project.id, bypassPermissions: true) },
                 onAddWithoutPermissions: { addWorkstream(for: project.id, bypassPermissions: false) },
@@ -536,6 +537,7 @@ private struct ProjectHeaderRow: View {
     let project: Project
     let isExpanded: Bool
     let onToggle: (() -> Void)?
+    let isGitRepo: Bool
     let onAdd: () -> Void
     let onAddWithPermissions: () -> Void
     let onAddWithoutPermissions: () -> Void
@@ -592,16 +594,18 @@ private struct ProjectHeaderRow: View {
             Spacer()
 
             HStack(spacing: 8) {
-                SidebarIconButton(icon: "plus", action: onAdd)
-                    .accessibilityLabel("Add workstream to \(project.name)")
-                    .contextMenu {
-                        Button(action: onAddWithPermissions) {
-                            Label("New workstream (full permissions)", systemImage: "lock.open")
+                if isGitRepo {
+                    SidebarIconButton(icon: "plus", action: onAdd)
+                        .accessibilityLabel("Add workstream to \(project.name)")
+                        .contextMenu {
+                            Button(action: onAddWithPermissions) {
+                                Label("New workstream (full permissions)", systemImage: "lock.open")
+                            }
+                            Button(action: onAddWithoutPermissions) {
+                                Label("New workstream (with prompts)", systemImage: "lock.shield")
+                            }
                         }
-                        Button(action: onAddWithoutPermissions) {
-                            Label("New workstream (with prompts)", systemImage: "lock.shield")
-                        }
-                    }
+                }
                 SidebarIconButton(icon: "trash", action: onDelete)
                     .accessibilityLabel("Remove project")
             }
