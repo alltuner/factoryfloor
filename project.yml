@@ -13,6 +13,9 @@ settings:
     SWIFT_OBJC_BRIDGING_HEADER: Resources/FactoryFloor-Bridging-Header.h
     HEADER_SEARCH_PATHS:
       - $(PROJECT_DIR)/ghostty/include
+    OTHER_SWIFT_FLAGS:
+      - "-Xcc"
+      - "-Wno-incomplete-umbrella"
     MACOSX_DEPLOYMENT_TARGET: "14.0"
     CODE_SIGN_IDENTITY: "-"
     CODE_SIGNING_REQUIRED: "NO"
