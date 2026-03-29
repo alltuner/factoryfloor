@@ -17,6 +17,7 @@ struct SettingsView: View {
     @AppStorage("factoryfloor.confirmQuit") private var confirmQuit: Bool = true
     @AppStorage("factoryfloor.telemetryEnabled") private var telemetryEnabled: Bool = true
     @AppStorage("factoryfloor.crashReportingEnabled") private var crashReportingEnabled: Bool = true
+    @AppStorage("factoryfloor.detailedLogging") private var detailedLogging: Bool = false
     @AppStorage("factoryfloor.bleedingEdge") private var bleedingEdge: Bool = false
     @AppStorage("factoryfloor.baseDirectory") private var baseDirectory: String = NSSearchPathForDirectoriesInDomains(.documentDirectory, .userDomainMask, true).first ?? ""
 
@@ -135,6 +136,20 @@ struct SettingsView: View {
                 Text("Show a confirmation dialog when quitting with active workstreams.")
                     .font(.caption)
                     .foregroundStyle(.secondary)
+
+                Toggle("Detailed logging", isOn: $detailedLogging)
+                HStack {
+                    Text("Log setup, run, and teardown script output to files for debugging.")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                    if detailedLogging {
+                        Spacer()
+                        Button("Show Logs") {
+                            NSWorkspace.shared.open(ScriptLogger.logDirectory)
+                        }
+                        .font(.caption)
+                    }
+                }
             }
 
             // MARK: - Terminal & Browser

@@ -238,7 +238,14 @@ struct EnvironmentTabView: View {
         } else {
             command = scriptCommand(script: script, role: role)
         }
-        return buildCommand(script: command, role: role)
+        let built = buildCommand(script: command, role: role)
+
+        if ScriptLogger.isEnabled {
+            try? ScriptLogger.ensureLogDirectory()
+            let logPath = ScriptLogger.logPath(workstreamID: workstreamID, role: role).path
+            return ScriptLogger.wrapCommand(built, logPath: logPath, role: role)
+        }
+        return built
     }
 
     private func buildCommand(script: String, role: String) -> String {

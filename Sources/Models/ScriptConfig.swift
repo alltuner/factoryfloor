@@ -23,17 +23,29 @@ struct ScriptConfig {
     }
 
     /// Run the teardown script synchronously in the given directory.
-    static func runTeardown(in directory: String, projectDirectory: String) {
+    static func runTeardown(in directory: String, projectDirectory: String, workstreamID: UUID? = nil) {
         let config = load(from: projectDirectory)
         guard let teardown = config.teardown else { return }
         let process = Process()
         process.executableURL = URL(fileURLWithPath: CommandBuilder.userShell)
         process.arguments = ["-lc", teardown]
         process.currentDirectoryURL = URL(fileURLWithPath: directory)
-        process.standardOutput = FileHandle.nullDevice
-        process.standardError = FileHandle.nullDevice
+
+        let logHandle: FileHandle?
+        if ScriptLogger.isEnabled, let id = workstreamID {
+            try? ScriptLogger.ensureLogDirectory()
+            logHandle = ScriptLogger.openLogForAppend(workstreamID: id, role: "teardown")
+            process.standardOutput = logHandle ?? FileHandle.nullDevice
+            process.standardError = logHandle ?? FileHandle.nullDevice
+        } else {
+            logHandle = nil
+            process.standardOutput = FileHandle.nullDevice
+            process.standardError = FileHandle.nullDevice
+        }
+
         try? process.run()
         process.waitUntilExit()
+        try? logHandle?.close()
     }
 
     // MARK: - Loader
