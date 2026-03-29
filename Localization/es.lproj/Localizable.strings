@@ -96,6 +96,7 @@
 "Show a confirmation dialog when quitting with active workstreams." = "Muestra un diálogo de confirmación al salir con flujos de trabajo activos.";
 "Detailed logging" = "Registro detallado";
 "Log setup, run, and teardown script output to files for debugging." = "Registra la salida de los scripts de configuración, ejecución y desmontaje en archivos para depuración.";
+"Show Logs" = "Mostrar registros";
 
 /* Settings - Environment */
 "Environment" = "Entorno";

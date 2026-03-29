@@ -138,9 +138,18 @@ struct SettingsView: View {
                     .foregroundStyle(.secondary)
 
                 Toggle("Detailed logging", isOn: $detailedLogging)
-                Text("Log setup, run, and teardown script output to files for debugging.")
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
+                HStack {
+                    Text("Log setup, run, and teardown script output to files for debugging.")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                    if detailedLogging {
+                        Spacer()
+                        Button("Show Logs") {
+                            NSWorkspace.shared.open(ScriptLogger.logDirectory)
+                        }
+                        .font(.caption)
+                    }
+                }
             }
 
             // MARK: - Terminal & Browser
