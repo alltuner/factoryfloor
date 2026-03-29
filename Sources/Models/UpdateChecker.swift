@@ -17,19 +17,23 @@ class UpdateChecker: ObservableObject {
     }
 
     func check() {
-        Task.detached { [currentVersion, logger] in
-            do {
-                let (data, _) = try await URLSession.shared.data(from: Self.appcastURL)
-                guard let version = Self.parseVersion(from: data) else { return }
-                if Self.isNewer(version, than: currentVersion) {
-                    await MainActor.run { [weak self] in
-                        self?.availableVersion = version
+        #if DEBUG
+            return
+        #else
+            Task.detached { [currentVersion, logger] in
+                do {
+                    let (data, _) = try await URLSession.shared.data(from: Self.appcastURL)
+                    guard let version = Self.parseVersion(from: data) else { return }
+                    if Self.isNewer(version, than: currentVersion) {
+                        await MainActor.run { [weak self] in
+                            self?.availableVersion = version
+                        }
                     }
+                } catch {
+                    logger.debug("Update check failed: \(error.localizedDescription)")
                 }
-            } catch {
-                logger.debug("Update check failed: \(error.localizedDescription)")
             }
-        }
+        #endif
     }
 
     /// Extracts the sparkle:shortVersionString from the first enclosure in an appcast feed.
