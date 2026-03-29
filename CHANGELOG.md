@@ -1,5 +1,19 @@
 # Changelog
 
+## [0.1.47](https://github.com/alltuner/factoryfloor/compare/v0.1.46...v0.1.47) (2026-03-29)
+
+
+### Features
+
+* add file-based logging for setup, run, and teardown scripts ([#198](https://github.com/alltuner/factoryfloor/issues/198)) ([949cf67](https://github.com/alltuner/factoryfloor/commit/949cf674bf60aba5b57d01bddf667ef39bd0ef64))
+* show changelog in Sparkle update window ([#200](https://github.com/alltuner/factoryfloor/issues/200)) ([3daf92a](https://github.com/alltuner/factoryfloor/commit/3daf92af357e5f69ed804a5f9c388019e21b231b))
+
+
+### Bug Fixes
+
+* discover CLI tools from user's login shell PATH ([#196](https://github.com/alltuner/factoryfloor/issues/196)) ([b00ae30](https://github.com/alltuner/factoryfloor/commit/b00ae30edefa0939a67767ec039537ebc3fc4ce1))
+* suppress incomplete umbrella header warnings from GhosttyKit ([#199](https://github.com/alltuner/factoryfloor/issues/199)) ([9f4ad38](https://github.com/alltuner/factoryfloor/commit/9f4ad38c9e05b842898a8b8bb744c5d9af795336))
+
 ## [0.1.46](https://github.com/alltuner/factoryfloor/compare/v0.1.45...v0.1.46) (2026-03-27)
 
 
