@@ -34,9 +34,7 @@ struct ScriptConfig {
         let logHandle: FileHandle?
         if ScriptLogger.isEnabled, let id = workstreamID {
             try? ScriptLogger.ensureLogDirectory()
-            let logURL = ScriptLogger.logPath(workstreamID: id, role: "teardown")
-            FileManager.default.createFile(atPath: logURL.path, contents: nil)
-            logHandle = FileHandle(forWritingAtPath: logURL.path)
+            logHandle = ScriptLogger.openLogForAppend(workstreamID: id, role: "teardown")
             process.standardOutput = logHandle ?? FileHandle.nullDevice
             process.standardError = logHandle ?? FileHandle.nullDevice
         } else {

@@ -27,24 +27,30 @@ final class ScriptLoggerTests: XCTestCase {
     }
 
     func testWrapCommandUsesScriptForRawCapture() {
-        let wrapped = ScriptLogger.wrapCommand("npm run dev", logPath: "/tmp/test.log")
+        let wrapped = ScriptLogger.wrapCommand("npm run dev", logPath: "/tmp/test.log", role: "run")
 
-        XCTAssertTrue(wrapped.contains("script"))
+        XCTAssertTrue(wrapped.contains("script -a -q"))
         XCTAssertTrue(wrapped.contains("/tmp/test.log"))
         XCTAssertTrue(wrapped.contains("npm run dev"))
     }
 
-    func testWrapCommandPassesOriginalToShell() {
-        let original = "echo hello"
-        let wrapped = ScriptLogger.wrapCommand(original, logPath: "/tmp/test.log")
+    func testWrapCommandWritesHeaderBeforeScript() {
+        let wrapped = ScriptLogger.wrapCommand("echo hello", logPath: "/tmp/test.log", role: "setup")
 
-        // The original command is shell-quoted and passed to sh -c
+        XCTAssertTrue(wrapped.contains("printf"))
+        XCTAssertTrue(wrapped.contains("setup"))
+        XCTAssertTrue(wrapped.contains(">> /tmp/test.log"))
+    }
+
+    func testWrapCommandPassesOriginalToShell() {
+        let wrapped = ScriptLogger.wrapCommand("echo hello", logPath: "/tmp/test.log", role: "run")
+
         XCTAssertTrue(wrapped.contains("sh -c"))
         XCTAssertTrue(wrapped.contains("echo hello"))
     }
 
     func testWrapCommandQuotesLogPathWithSpaces() {
-        let wrapped = ScriptLogger.wrapCommand("echo hi", logPath: "/tmp/my logs/test.log")
+        let wrapped = ScriptLogger.wrapCommand("echo hi", logPath: "/tmp/my logs/test.log", role: "run")
 
         XCTAssertTrue(wrapped.contains("'/tmp/my logs/test.log'"))
     }

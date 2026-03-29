@@ -243,7 +243,7 @@ struct EnvironmentTabView: View {
         if ScriptLogger.isEnabled {
             try? ScriptLogger.ensureLogDirectory()
             let logPath = ScriptLogger.logPath(workstreamID: workstreamID, role: role).path
-            return ScriptLogger.wrapCommand(built, logPath: logPath)
+            return ScriptLogger.wrapCommand(built, logPath: logPath, role: role)
         }
         return built
     }
