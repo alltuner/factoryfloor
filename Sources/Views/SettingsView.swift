@@ -145,6 +145,7 @@ struct SettingsView: View {
                     if detailedLogging {
                         Spacer()
                         Button("Show Logs") {
+                            try? ScriptLogger.ensureLogDirectory()
                             NSWorkspace.shared.open(ScriptLogger.logDirectory)
                         }
                         .font(.caption)
