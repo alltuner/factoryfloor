@@ -16,5 +16,6 @@ fi
 
 # Build so SourceKit can resolve symbols across files in the worktree.
 # dev.sh runs xcodegen + xcodebuild with the shared SPM cache.
+# Runs in background to avoid blocking worktree creation.
 cd "$WORKTREE_DIR"
-./scripts/dev.sh build
+nohup ./scripts/dev.sh build >/dev/null 2>&1 &
