@@ -708,37 +708,36 @@ private struct WorkspaceTabButton: View {
     @State private var isHovering = false
 
     var body: some View {
-        Button(action: onSelect) {
-            HStack(spacing: 4) {
-                Image(systemName: icon)
-                    .font(.system(size: 11))
-                if let label {
-                    Text(label)
-                        .font(.system(size: 12, weight: isActive ? .semibold : .regular))
-                }
-                if let shortcut {
-                    (Text(Image(systemName: "command")) + Text(shortcut))
-                        .font(.system(size: 9))
-                        .foregroundStyle(.tertiary)
-                }
-                if let onClose, isHovering || isActive {
-                    Image(systemName: "xmark")
-                        .font(.system(size: 8, weight: .bold))
-                        .foregroundStyle(.secondary)
-                        .frame(width: 14, height: 14)
-                        .background(Color.primary.opacity(0.1))
-                        .clipShape(Circle())
-                        .onTapGesture(perform: onClose)
-                        .accessibilityLabel("Close tab")
-                }
+        HStack(spacing: 4) {
+            Image(systemName: icon)
+                .font(.system(size: 11))
+            if let label {
+                Text(label)
+                    .font(.system(size: 12, weight: isActive ? .semibold : .regular))
             }
-            .padding(.horizontal, 10)
-            .padding(.vertical, 5)
-            .background(isActive ? Color.accentColor.opacity(0.15) : (isHovering ? Color.primary.opacity(0.05) : .clear))
-            .clipShape(RoundedRectangle(cornerRadius: 5))
-            .foregroundStyle(isActive ? .primary : .secondary)
+            if let shortcut {
+                (Text(Image(systemName: "command")) + Text(shortcut))
+                    .font(.system(size: 9))
+                    .foregroundStyle(.tertiary)
+            }
+            if let onClose, isHovering || isActive {
+                Image(systemName: "xmark")
+                    .font(.system(size: 8, weight: .bold))
+                    .foregroundStyle(.secondary)
+                    .frame(width: 14, height: 14)
+                    .background(Color.primary.opacity(0.1))
+                    .clipShape(Circle())
+                    .onTapGesture(perform: onClose)
+                    .accessibilityLabel("Close tab")
+            }
         }
-        .buttonStyle(.borderless)
+        .padding(.horizontal, 10)
+        .padding(.vertical, 5)
+        .background(isActive ? Color.accentColor.opacity(0.15) : (isHovering ? Color.primary.opacity(0.05) : .clear))
+        .clipShape(RoundedRectangle(cornerRadius: 5))
+        .foregroundStyle(isActive ? .primary : .secondary)
+        .contentShape(Rectangle())
+        .onTapGesture(perform: onSelect)
         .onHover { isHovering = $0 }
     }
 }
