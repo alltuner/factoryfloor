@@ -13,7 +13,6 @@ def build_appcast(
     dmg_length: int,
     dmg_url: str,
     min_os: str = "14.0",
-    release_notes_url: str | None = None,
     release_notes: str | None = None,
 ) -> str:
     rss = ET.Element("rss")
@@ -34,8 +33,6 @@ def build_appcast(
     )
     ET.SubElement(item, "pubDate").text = pub_date
     ET.SubElement(item, "sparkle:minimumSystemVersion").text = min_os
-    if release_notes_url:
-        ET.SubElement(item, "sparkle:releaseNotesLink").text = release_notes_url
 
     if release_notes:
         ET.SubElement(item, "description").text = release_notes
@@ -59,8 +56,7 @@ def main() -> None:
     parser.add_argument("--signature", required=True, help="Ed25519 signature from sign_update")
     parser.add_argument("--dmg-path", required=True, help="Path to the DMG file")
     parser.add_argument("--dmg-url", required=True, help="Download URL for the DMG")
-    parser.add_argument("--release-notes-url", default=None, help="URL for release notes")
-    parser.add_argument("--release-notes", default=None, help="Release notes text to embed")
+    parser.add_argument("--release-notes", default=None, help="Release notes HTML to embed")
     parser.add_argument("--output", default="appcast.xml", help="Output path")
     args = parser.parse_args()
 
@@ -70,7 +66,6 @@ def main() -> None:
         signature=args.signature,
         dmg_length=dmg_length,
         dmg_url=args.dmg_url,
-        release_notes_url=args.release_notes_url,
         release_notes=args.release_notes,
     )
 
