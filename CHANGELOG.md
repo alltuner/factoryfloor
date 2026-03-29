@@ -1,5 +1,26 @@
 # Changelog
 
+## [0.1.48](https://github.com/alltuner/factoryfloor/compare/v0.1.47...v0.1.48) (2026-03-29)
+
+
+### Features
+
+* show changelog in Sparkle update window ([#206](https://github.com/alltuner/factoryfloor/issues/206)) ([e32562c](https://github.com/alltuner/factoryfloor/commit/e32562cb719a3a3c674687e47cca89d6fe5bfd90))
+
+
+### Bug Fixes
+
+* close button on workspace tabs not intercepting clicks ([#208](https://github.com/alltuner/factoryfloor/issues/208)) ([e51bd82](https://github.com/alltuner/factoryfloor/commit/e51bd8233334eb07b0a37fb06dbd1f751683f424))
+* close button on workspace tabs not working ([#203](https://github.com/alltuner/factoryfloor/issues/203)) ([571dab4](https://github.com/alltuner/factoryfloor/commit/571dab4ded1d133ef66d262d1537c6e44636a744))
+* create logs directory before revealing in Finder ([#201](https://github.com/alltuner/factoryfloor/issues/201)) ([86b8344](https://github.com/alltuner/factoryfloor/commit/86b83444ad8cfa52e93f23d6233feaca0b3208fc))
+* hide add-workstream button for non-git projects ([#204](https://github.com/alltuner/factoryfloor/issues/204)) ([af30344](https://github.com/alltuner/factoryfloor/commit/af30344d62018e5015936a92576a799d6f67134d))
+* inject login shell PATH into terminal environment ([#205](https://github.com/alltuner/factoryfloor/issues/205)) ([2aa33aa](https://github.com/alltuner/factoryfloor/commit/2aa33aa111cfafaa42938f8da6009d9971b968ac))
+
+
+### Miscellaneous
+
+* **deps:** update astral-sh/setup-uv action to v7 ([#207](https://github.com/alltuner/factoryfloor/issues/207)) ([8b2cfda](https://github.com/alltuner/factoryfloor/commit/8b2cfda4bbfe0afdbcb6f3965e56e0c9de4608eb))
+
 ## [0.1.47](https://github.com/alltuner/factoryfloor/compare/v0.1.46...v0.1.47) (2026-03-29)
 
 
