@@ -96,7 +96,6 @@
 "Show a confirmation dialog when quitting with active workstreams." = "Visa en bekräftelsedialog vid avslut med aktiva arbetsflöden.";
 "Detailed logging" = "Detaljerad loggning";
 "Log setup, run, and teardown script output to files for debugging." = "Logga utdata från konfigurations-, körnings- och nedmonteringsskript till filer för felsökning.";
-"Show Logs" = "Visa loggar";
 
 /* Settings - Environment */
 "Environment" = "Miljö";
@@ -128,8 +127,8 @@
 "Light" = "Ljust";
 "Dark" = "Mörkt";
 
-/* Settings - Privacy */
-"Privacy" = "Integritet";
+/* Settings - Privacy & Logging */
+"Privacy & Logging" = "Integritet och loggning";
 "Usage analytics" = "Användningsanalys";
 "Send anonymous usage data to help improve Factory Floor. We collect: app version, build type, macOS version, locale, and screen resolution. No project names, file contents, or personal data." = "Skicka anonym användningsdata för att hjälpa förbättra Factory Floor. Vi samlar in: appversion, byggtyp, macOS-version, språk och skärmupplösning. Inga projektnamn, filinnehåll eller personuppgifter.";
 "Crash reports" = "Kraschrapporter";

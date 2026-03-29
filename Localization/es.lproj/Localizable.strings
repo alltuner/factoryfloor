@@ -96,7 +96,6 @@
 "Show a confirmation dialog when quitting with active workstreams." = "Muestra un diálogo de confirmación al salir con flujos de trabajo activos.";
 "Detailed logging" = "Registro detallado";
 "Log setup, run, and teardown script output to files for debugging." = "Registra la salida de los scripts de configuración, ejecución y desmontaje en archivos para depuración.";
-"Show Logs" = "Mostrar registros";
 
 /* Settings - Environment */
 "Environment" = "Entorno";
@@ -128,8 +127,8 @@
 "Light" = "Claro";
 "Dark" = "Oscuro";
 
-/* Settings - Privacy */
-"Privacy" = "Privacidad";
+/* Settings - Privacy & Logging */
+"Privacy & Logging" = "Privacidad y registros";
 "Usage analytics" = "Analíticas de uso";
 "Send anonymous usage data to help improve Factory Floor. We collect: app version, build type, macOS version, locale, and screen resolution. No project names, file contents, or personal data." = "Envía datos de uso anónimos para ayudar a mejorar Factory Floor. Recopilamos: versión de la aplicación, tipo de compilación, versión de macOS, idioma y resolución de pantalla. Sin nombres de proyectos, contenidos de archivos ni datos personales.";
 "Crash reports" = "Informes de errores";

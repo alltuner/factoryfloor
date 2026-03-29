@@ -136,21 +136,6 @@ struct SettingsView: View {
                 Text("Show a confirmation dialog when quitting with active workstreams.")
                     .font(.caption)
                     .foregroundStyle(.secondary)
-
-                Toggle("Detailed logging", isOn: $detailedLogging)
-                HStack {
-                    Text("Log setup, run, and teardown script output to files for debugging.")
-                        .font(.caption)
-                        .foregroundStyle(.secondary)
-                    if detailedLogging {
-                        Spacer()
-                        Button("Show Logs") {
-                            try? ScriptLogger.ensureLogDirectory()
-                            NSWorkspace.shared.open(ScriptLogger.logDirectory)
-                        }
-                        .font(.caption)
-                    }
-                }
             }
 
             // MARK: - Terminal & Browser
@@ -252,9 +237,9 @@ struct SettingsView: View {
                 }
             }
 
-            // MARK: - Privacy
+            // MARK: - Privacy & Logging
 
-            Section("Privacy") {
+            Section("Privacy & Logging") {
                 Toggle("Usage analytics", isOn: $telemetryEnabled)
                 Text("Send anonymous usage data to help improve Factory Floor. We collect: app version, build type, macOS version, locale, and screen resolution. No project names, file contents, or personal data.")
                     .font(.caption)
@@ -262,6 +247,11 @@ struct SettingsView: View {
 
                 Toggle("Crash reports", isOn: $crashReportingEnabled)
                 Text("Send crash reports and performance data. Requires restart to take effect.")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+
+                Toggle("Detailed logging", isOn: $detailedLogging)
+                Text("Log setup, run, and teardown script output to files for debugging.")
                     .font(.caption)
                     .foregroundStyle(.secondary)
             }

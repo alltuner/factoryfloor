@@ -96,7 +96,6 @@
 "Show a confirmation dialog when quitting with active workstreams." = "Show a confirmation dialog when quitting with active workstreams.";
 "Detailed logging" = "Detailed logging";
 "Log setup, run, and teardown script output to files for debugging." = "Log setup, run, and teardown script output to files for debugging.";
-"Show Logs" = "Show Logs";
 
 /* Settings - Environment */
 "Environment" = "Environment";
@@ -128,8 +127,8 @@
 "Light" = "Light";
 "Dark" = "Dark";
 
-/* Settings - Privacy */
-"Privacy" = "Privacy";
+/* Settings - Privacy & Logging */
+"Privacy & Logging" = "Privacy & Logging";
 "Usage analytics" = "Usage analytics";
 "Send anonymous usage data to help improve Factory Floor. We collect: app version, build type, macOS version, locale, and screen resolution. No project names, file contents, or personal data." = "Send anonymous usage data to help improve Factory Floor. We collect: app version, build type, macOS version, locale, and screen resolution. No project names, file contents, or personal data.";
 "Crash reports" = "Crash reports";
