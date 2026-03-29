@@ -24,15 +24,29 @@ func resolvedConfigDirectory(
 }
 
 enum AppConstants {
-    #if DEBUG
-        static let appID = "factoryfloor-debug"
-        static let appName = "Factory Floor Debug"
-        static let urlScheme = "factoryfloor-debug"
-    #else
-        static let appID = "factoryfloor"
-        static let appName = "Factory Floor"
-        static let urlScheme = "factoryfloor"
-    #endif
+    static let appID: String = {
+        #if DEBUG
+            "factoryfloor-debug"
+        #else
+            "factoryfloor"
+        #endif
+    }()
+
+    static let appName: String = {
+        #if DEBUG
+            "Factory Floor Debug"
+        #else
+            "Factory Floor"
+        #endif
+    }()
+
+    static let urlScheme: String = {
+        #if DEBUG
+            "factoryfloor-debug"
+        #else
+            "factoryfloor"
+        #endif
+    }()
 
     static var version: String {
         Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "0.0.0"
