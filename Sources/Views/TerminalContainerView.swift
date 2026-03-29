@@ -722,16 +722,14 @@ private struct WorkspaceTabButton: View {
                         .foregroundStyle(.tertiary)
                 }
                 if let onClose, isHovering || isActive {
-                    Button(action: onClose) {
-                        Image(systemName: "xmark")
-                            .font(.system(size: 8, weight: .bold))
-                            .foregroundStyle(.secondary)
-                            .frame(width: 14, height: 14)
-                            .background(Color.primary.opacity(0.1))
-                            .clipShape(Circle())
-                    }
-                    .buttonStyle(.plain)
-                    .accessibilityLabel("Close tab")
+                    Image(systemName: "xmark")
+                        .font(.system(size: 8, weight: .bold))
+                        .foregroundStyle(.secondary)
+                        .frame(width: 14, height: 14)
+                        .background(Color.primary.opacity(0.1))
+                        .clipShape(Circle())
+                        .onTapGesture(perform: onClose)
+                        .accessibilityLabel("Close tab")
                 }
             }
             .padding(.horizontal, 10)
