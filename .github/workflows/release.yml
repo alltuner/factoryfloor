@@ -54,6 +54,8 @@ jobs:
         with:
           version: 0.15.2
 
+      - uses: astral-sh/setup-uv@v5
+
       - name: Cache SPM packages
         uses: actions/cache@v5
         with:
@@ -217,7 +219,9 @@ jobs:
       - name: Generate appcast
         env:
           SPARKLE_PRIVATE_KEY: ${{ secrets.SPARKLE_PRIVATE_KEY }}
+          GH_TOKEN: ${{ github.token }}
           VERSION: ${{ needs.release-please.outputs.version }}
+          TAG_NAME: ${{ needs.release-please.outputs.tag_name }}
         run: |
           echo "$SPARKLE_PRIVATE_KEY" > /tmp/sparkle_key
           SIGN_OUTPUT=$(sign_update -f /tmp/sparkle_key "build/release/$DMG_NAME")
@@ -231,6 +235,9 @@ jobs:
             exit 1
           fi
 
+          RELEASE_NOTES=$(gh release view "$TAG_NAME" --json body -q .body)
+          RELEASE_NOTES=$(echo "$RELEASE_NOTES" | uvx --with markdown python3 -c "import sys, markdown; print(markdown.markdown(sys.stdin.read()))")
+
           DMG_URL="https://github.com/alltuner/factoryfloor/releases/download/v${VERSION}/${DMG_NAME}"
           RELEASE_NOTES_URL="https://github.com/alltuner/factoryfloor/releases/tag/v${VERSION}"
           python3 scripts/generate_appcast.py \
@@ -239,6 +246,7 @@ jobs:
             --dmg-path "build/release/$DMG_NAME" \
             --dmg-url "$DMG_URL" \
             --release-notes-url "$RELEASE_NOTES_URL" \
+            --release-notes "$RELEASE_NOTES" \
             --output appcast.xml
 
       - name: Upload to release
