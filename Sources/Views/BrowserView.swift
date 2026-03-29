@@ -232,7 +232,7 @@ struct WebViewRepresentable: NSViewRepresentable {
         // MARK: - WKUIDelegate (JavaScript dialogs)
 
         func webView(_ webView: WKWebView, runJavaScriptAlertPanelWithMessage message: String,
-                     initiatedByFrame _: WKFrameInfo, completionHandler: @escaping () -> Void)
+                     initiatedByFrame _: WKFrameInfo, completionHandler: @escaping @MainActor @Sendable () -> Void)
         {
             let alert = NSAlert()
             alert.messageText = message
@@ -246,7 +246,7 @@ struct WebViewRepresentable: NSViewRepresentable {
         }
 
         func webView(_ webView: WKWebView, runJavaScriptConfirmPanelWithMessage message: String,
-                     initiatedByFrame _: WKFrameInfo, completionHandler: @escaping (Bool) -> Void)
+                     initiatedByFrame _: WKFrameInfo, completionHandler: @escaping @MainActor @Sendable (Bool) -> Void)
         {
             let alert = NSAlert()
             alert.messageText = message
@@ -264,7 +264,7 @@ struct WebViewRepresentable: NSViewRepresentable {
 
         func webView(_ webView: WKWebView, runJavaScriptTextInputPanelWithPrompt prompt: String,
                      defaultText: String?, initiatedByFrame _: WKFrameInfo,
-                     completionHandler: @escaping (String?) -> Void)
+                     completionHandler: @escaping @MainActor @Sendable (String?) -> Void)
         {
             let alert = NSAlert()
             alert.messageText = prompt
