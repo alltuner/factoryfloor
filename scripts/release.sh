@@ -50,10 +50,27 @@ spctl --assess --type execute --verbose=2 "$APP_PATH" 2>&1
 
 echo "==> Creating DMG..."
 rm -f "$BUILD_DIR/$DMG_NAME"
-hdiutil create -volname "$APP_NAME" \
-  -srcfolder "$APP_PATH" \
-  -ov -format UDZO \
-  "$BUILD_DIR/$DMG_NAME"
+DMG_STAGING="$BUILD_DIR/dmg-staging"
+rm -rf "$DMG_STAGING"
+mkdir -p "$DMG_STAGING"
+cp -R "$APP_PATH" "$DMG_STAGING/"
+
+# create-dmg exits non-zero when skipping deprecated internet-enable
+create-dmg \
+  --volname "$APP_NAME" \
+  --background "Resources/dmg-background@2x.png" \
+  --window-size 660 400 \
+  --icon-size 128 \
+  --icon "${APP_NAME}.app" 170 180 \
+  --app-drop-link 490 180 \
+  --no-internet-enable \
+  "$BUILD_DIR/$DMG_NAME" \
+  "$DMG_STAGING" || true
+
+if [ ! -f "$BUILD_DIR/$DMG_NAME" ]; then
+  echo "Error: DMG was not created"
+  exit 1
+fi
 
 codesign --sign "$SIGNING_IDENTITY" "$BUILD_DIR/$DMG_NAME"
 

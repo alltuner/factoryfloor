@@ -175,10 +175,28 @@ jobs:
           codesign --verify --verbose=2 --deep --strict "$APP"
 
           DMG_NAME="${SCHEME}.dmg"
-          hdiutil create -volname "$APP_NAME" \
-            -srcfolder "$APP" \
-            -ov -format UDZO \
-            "build/release/$DMG_NAME"
+          brew install create-dmg
+
+          DMG_STAGING="build/dmg-staging"
+          mkdir -p "$DMG_STAGING"
+          cp -R "$APP" "$DMG_STAGING/"
+
+          # create-dmg exits non-zero when skipping deprecated internet-enable
+          create-dmg \
+            --volname "$APP_NAME" \
+            --background "Resources/dmg-background@2x.png" \
+            --window-size 660 400 \
+            --icon-size 128 \
+            --icon "${APP_NAME}.app" 170 180 \
+            --app-drop-link 490 180 \
+            --no-internet-enable \
+            "build/release/$DMG_NAME" \
+            "$DMG_STAGING" || true
+
+          if [ ! -f "build/release/$DMG_NAME" ]; then
+            echo "Error: DMG was not created"
+            exit 1
+          fi
 
           codesign --sign "$SIGNING_IDENTITY" --timestamp "build/release/$DMG_NAME"
 

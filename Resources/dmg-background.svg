@@ -1,0 +1,38 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="660" height="400" viewBox="0 0 660 400">
+  <defs>
+    <!-- Subtle wine glow between icon positions -->
+    <radialGradient id="glow" cx="50%" cy="45%" r="35%">
+      <stop offset="0%" stop-color="#5B2333" stop-opacity="0.08"/>
+      <stop offset="100%" stop-color="#5B2333" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+
+  <!-- Background -->
+  <rect width="660" height="400" fill="#F7F4F3"/>
+
+  <!-- Wine glow -->
+  <ellipse cx="330" cy="180" rx="240" ry="160" fill="url(#glow)"/>
+
+  <!-- Chevrons between icon positions -->
+  <g stroke="#5B2333" stroke-opacity="0.3" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round">
+    <polyline points="305,177 315,187 305,197"/>
+    <polyline points="325,177 335,187 325,197"/>
+    <polyline points="345,177 355,187 345,197"/>
+  </g>
+
+  <!-- Drag label -->
+  <text x="330" y="230" text-anchor="middle" font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="11" fill="#928E8D">Drag to Applications</text>
+
+  <!-- Skyline (same as website hero, scaled to fit) -->
+  <g transform="translate(-5.5, 280) scale(0.556, 0.5)" opacity="0.2">
+    <defs>
+      <linearGradient id="skyGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+        <stop offset="0%" stop-color="transparent"/>
+        <stop offset="10%" stop-color="#5B2333"/>
+        <stop offset="90%" stop-color="#5B2333"/>
+        <stop offset="100%" stop-color="transparent"/>
+      </linearGradient>
+    </defs>
+    <path d="M20,220 L80,220 L80,200 L120,200 L120,220 L170,220 L170,195 L220,195 L220,220 L240,220 L240,130 L256,130 L256,220 L280,220 L280,205 L320,205 L320,220 L340,220 L340,200 L360,190 L380,200 L400,190 L420,200 L440,190 L460,200 L480,200 L480,220 L520,220 L520,140 L538,140 L538,220 L560,220 L560,190 L630,190 L630,220 L660,220 L660,115 L676,115 L676,220 L700,220 L700,200 L735,200 L735,180 L770,180 L770,220 L800,220 L800,150 L816,150 L816,220 L882,220 Q882,100 915,100 Q948,100 948,220 L1040,220 L1040,205 L1080,205 L1080,220 L1120,220 L1120,190 L1160,190 L1160,220 L1180,220" fill="none" stroke="url(#skyGrad)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+  </g>
+</svg>
