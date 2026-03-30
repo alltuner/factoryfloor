@@ -98,12 +98,20 @@ final class CommandBuilderTests: XCTestCase {
 
     func testWithFallbackBasic() {
         let result = CommandBuilder.withFallback("cmd1", "cmd2", shell: "/bin/zsh")
-        XCTAssertEqual(result, "/bin/zsh -lc 'exec sh -c '\\''cmd1 2>/dev/null || cmd2'\\'''")
+        XCTAssertTrue(result.hasPrefix("/bin/zsh -lc "), "Should use login shell")
+        XCTAssertTrue(result.contains("exec sh -c"), "Should use sh for POSIX syntax")
+        XCTAssertTrue(result.contains("cmd1 2>"), "Primary stderr should be redirected to file")
+        XCTAssertFalse(result.contains("2>/dev/null"), "Stderr should go to a file, not /dev/null")
+        XCTAssertTrue(result.contains("|| ("), "Should have fallback group with diagnostic")
+        XCTAssertTrue(result.contains("cmd2"), "Should contain fallback command")
     }
 
     func testWithFallbackMessage() {
         let result = CommandBuilder.withFallback("cmd1", "cmd2", message: "Retrying...", shell: "/bin/zsh")
-        XCTAssertEqual(result, "/bin/zsh -lc 'exec sh -c '\\''cmd1 2>/dev/null || (echo Retrying... && cmd2)'\\'''")
+        XCTAssertTrue(result.contains("echo"), "Should contain echo for diagnostic")
+        XCTAssertTrue(result.contains("Retrying..."), "Should contain user message")
+        XCTAssertTrue(result.contains("cmd2"), "Should contain fallback command")
+        XCTAssertTrue(result.contains("Primary command failed"), "Should contain diagnostic about failure")
     }
 
     func testWithFallbackMessageWithSpecialChars() {
