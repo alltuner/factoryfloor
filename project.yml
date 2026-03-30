@@ -40,8 +40,8 @@ targets:
       path: FactoryFloor/Info.plist
       properties:
         CFBundleDisplayName: $(PRODUCT_NAME)
-        CFBundleVersion: "0.1.48" # x-release-please-version
-        CFBundleShortVersionString: "0.1.48" # x-release-please-version
+        CFBundleVersion: "0.1.49" # x-release-please-version
+        CFBundleShortVersionString: "0.1.49" # x-release-please-version
         LSMinimumSystemVersion: $(MACOSX_DEPLOYMENT_TARGET)
         NSMainStoryboardFile: ""
         NSPrincipalClass: NSApplication

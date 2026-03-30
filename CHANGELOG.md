@@ -1,5 +1,39 @@
 # Changelog
 
+## [0.1.49](https://github.com/alltuner/factoryfloor/compare/v0.1.48...v0.1.49) (2026-03-30)
+
+
+### Features
+
+* add launch at login toggle in Settings ([#227](https://github.com/alltuner/factoryfloor/issues/227)) ([6c5dd43](https://github.com/alltuner/factoryfloor/commit/6c5dd43e957001e675a9ba4ebb5fa92ab1744baa)), closes [#224](https://github.com/alltuner/factoryfloor/issues/224)
+* direct DMG download and styled installer ([#225](https://github.com/alltuner/factoryfloor/issues/225)) ([8fbafdf](https://github.com/alltuner/factoryfloor/commit/8fbafdfd7d1fc3dc0fa3c45de8d943b17d95b3cb))
+
+
+### Bug Fixes
+
+* disable update checker in debug builds ([#209](https://github.com/alltuner/factoryfloor/issues/209)) ([ddb0e54](https://github.com/alltuner/factoryfloor/commit/ddb0e54414eaf84e82af172e5758025843af75a4))
+* match WKUIDelegate completion handler signatures for concurrency ([#212](https://github.com/alltuner/factoryfloor/issues/212)) ([9d807a5](https://github.com/alltuner/factoryfloor/commit/9d807a5213049db058ca715c3d0b2c961a4d1944))
+* read Sparkle changelog from CHANGELOG.md instead of GitHub release ([#221](https://github.com/alltuner/factoryfloor/issues/221)) ([087afee](https://github.com/alltuner/factoryfloor/commit/087afee420dd88c7028870e5a571c8a19066b511))
+* resolve LSP false positives for conditionally compiled AppConstants ([#213](https://github.com/alltuner/factoryfloor/issues/213)) ([a105cf6](https://github.com/alltuner/factoryfloor/commit/a105cf6964f123743a9b0abf6b2bf5e463c86763)), closes [#211](https://github.com/alltuner/factoryfloor/issues/211)
+* run worktree build in background to speed up creation ([#214](https://github.com/alltuner/factoryfloor/issues/214)) ([a2ed834](https://github.com/alltuner/factoryfloor/commit/a2ed83426974ec7a962e59a0e29d6e1c9c0adf5b))
+* **website:** prevent horizontal scroll on mobile Safari ([#218](https://github.com/alltuner/factoryfloor/issues/218)) ([8e68359](https://github.com/alltuner/factoryfloor/commit/8e683590c89c5498222c72dd761b901a9c7934f0))
+
+
+### Refactoring
+
+* remove ScriptLogger and move logging toggle to privacy section ([#216](https://github.com/alltuner/factoryfloor/issues/216)) ([3858229](https://github.com/alltuner/factoryfloor/commit/385822910afd9ab3d9ac6b549938d0a6cb144932))
+
+
+### Miscellaneous
+
+* add __pycache__ to .gitignore ([#223](https://github.com/alltuner/factoryfloor/issues/223)) ([015d9ec](https://github.com/alltuner/factoryfloor/commit/015d9ec53554bceead26d10f4973e5891acea72a)), closes [#222](https://github.com/alltuner/factoryfloor/issues/222)
+
+
+### Documentation
+
+* add terminal resilience design doc ([#219](https://github.com/alltuner/factoryfloor/issues/219)) ([06ab89a](https://github.com/alltuner/factoryfloor/commit/06ab89ad0ba0a14f6250ea77e1e6a6246da4da1d))
+* add terminal spawning architecture reference ([#217](https://github.com/alltuner/factoryfloor/issues/217)) ([77b11c3](https://github.com/alltuner/factoryfloor/commit/77b11c3c21ae58dc7f592ffa20b651f0d1282c5c))
+
 ## [0.1.48](https://github.com/alltuner/factoryfloor/compare/v0.1.47...v0.1.48) (2026-03-29)
 
 
