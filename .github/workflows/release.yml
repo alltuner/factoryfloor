@@ -174,7 +174,7 @@ jobs:
 
           codesign --verify --verbose=2 --deep --strict "$APP"
 
-          DMG_NAME="FactoryFloor-${VERSION}.dmg"
+          DMG_NAME="${SCHEME}.dmg"
           hdiutil create -volname "$APP_NAME" \
             -srcfolder "$APP" \
             -ov -format UDZO \
@@ -268,7 +268,7 @@ jobs:
           GH_TOKEN: ${{ secrets.HOMEBREW_TAP_TOKEN }}
           VERSION: ${{ needs.release-please.outputs.version }}
         run: |
-          DMG_URL="https://github.com/alltuner/factoryfloor/releases/download/v${VERSION}/FactoryFloor-${VERSION}.dmg"
+          DMG_URL="https://github.com/alltuner/factoryfloor/releases/download/v${VERSION}/${DMG_NAME}"
           SHA256=$(shasum -a 256 "build/release/$DMG_NAME" | awk '{print $1}')
 
           CASK_SHA=$(gh api repos/alltuner/homebrew-tap/contents/Casks/factoryfloor.rb \

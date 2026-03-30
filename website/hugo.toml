@@ -33,6 +33,7 @@ defaultContentLanguage = "en"
   description = "A native macOS app that manages git worktrees, Claude Code sessions, and dev servers from a single window."
   ogImage = "/img/og-image.png"
   githubURL = "https://github.com/alltuner/factoryfloor"
+  downloadURL = "https://github.com/alltuner/factoryfloor/releases/latest/download/FactoryFloor.dmg"
   analyticsID = "81a482e5-52a9-467e-87f8-28c38f2d7e9e"
   analyticsSrc = "https://meta.factory-floor.com/meta.js"
 

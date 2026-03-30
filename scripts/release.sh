@@ -10,7 +10,7 @@ APP_NAME="Factory Floor"
 SCHEME="FactoryFloor"
 PROJECT="FactoryFloor.xcodeproj"
 VERSION="${1:-$(python3 -c "import json; print(json.load(open('.release-please-manifest.json'))['.'])")}"
-DMG_NAME="FactoryFloor-${VERSION}.dmg"
+DMG_NAME="${SCHEME}.dmg"
 BUILD_DIR="build/release"
 APP_PATH="${BUILD_DIR}/${APP_NAME}.app"
 
