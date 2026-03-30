@@ -44,6 +44,16 @@ struct EnvironmentTabView: View {
     }
 
     var body: some View {
+        VStack(spacing: 0) {
+            if let error = scriptConfig.loadError {
+                configErrorBanner(error: error)
+                Divider()
+            }
+            environmentContent
+        }
+    }
+
+    private var environmentContent: some View {
         HSplitView {
             scriptPane(
                 title: NSLocalizedString("Setup", comment: ""),
@@ -205,6 +215,23 @@ struct EnvironmentTabView: View {
                 scriptInstructions(title: title)
             }
         }
+    }
+
+    private func configErrorBanner(error: String) -> some View {
+        HStack(spacing: 8) {
+            Image(systemName: "exclamationmark.triangle.fill")
+                .foregroundStyle(.yellow)
+            VStack(alignment: .leading, spacing: 2) {
+                Text("Failed to load .factoryfloor.json")
+                    .font(.system(size: 12, weight: .semibold))
+                Text(error)
+                    .font(.system(size: 11, design: .monospaced))
+                    .foregroundStyle(.secondary)
+            }
+            Spacer()
+        }
+        .padding(10)
+        .background(Color.yellow.opacity(0.08))
     }
 
     private func scriptInstructions(title: String) -> some View {
