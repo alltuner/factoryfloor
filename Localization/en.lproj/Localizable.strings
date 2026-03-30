@@ -94,6 +94,8 @@
 "Quit" = "Quit";
 "Confirm before quitting" = "Confirm before quitting";
 "Show a confirmation dialog when quitting with active workstreams." = "Show a confirmation dialog when quitting with active workstreams.";
+"Launch at login" = "Launch at login";
+"Automatically open Factory Floor when you log in." = "Automatically open Factory Floor when you log in.";
 "Detailed logging" = "Detailed logging";
 "Log setup, run, and teardown script output to files for debugging." = "Log setup, run, and teardown script output to files for debugging.";
 

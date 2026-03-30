@@ -94,6 +94,8 @@
 "Quit" = "Sortir";
 "Confirm before quitting" = "Confirma abans de sortir";
 "Show a confirmation dialog when quitting with active workstreams." = "Mostra un diàleg de confirmació en sortir amb fluxos de treball actius.";
+"Launch at login" = "Obre en iniciar sessió";
+"Automatically open Factory Floor when you log in." = "Obre Factory Floor automàticament en iniciar sessió.";
 "Detailed logging" = "Registre detallat";
 "Log setup, run, and teardown script output to files for debugging." = "Registra la sortida dels scripts de configuració, execució i desmuntatge en fitxers per a depuració.";
 

@@ -21,6 +21,8 @@ struct SettingsView: View {
     @AppStorage("factoryfloor.bleedingEdge") private var bleedingEdge: Bool = false
     @AppStorage("factoryfloor.baseDirectory") private var baseDirectory: String = NSSearchPathForDirectoriesInDomains(.documentDirectory, .userDomainMask, true).first ?? ""
 
+    @State private var launchAtLogin = LaunchAtLogin.isEnabled
+
     @EnvironmentObject private var appEnv: AppEnvironment
     @State private var showingClearConfirm = false
     #if DEBUG
@@ -134,6 +136,14 @@ struct SettingsView: View {
 
                 Toggle("Confirm before quitting", isOn: $confirmQuit)
                 Text("Show a confirmation dialog when quitting with active workstreams.")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+
+                Toggle("Launch at login", isOn: $launchAtLogin)
+                    .onChange(of: launchAtLogin) { _, newValue in
+                        LaunchAtLogin.setEnabled(newValue)
+                    }
+                Text("Automatically open Factory Floor when you log in.")
                     .font(.caption)
                     .foregroundStyle(.secondary)
             }
