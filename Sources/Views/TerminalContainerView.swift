@@ -790,7 +790,58 @@ private struct AddTabButton: View {
 
 // MARK: - SingleTerminalView
 
-struct SingleTerminalView: NSViewRepresentable {
+struct SingleTerminalView: View {
+    let surfaceID: UUID
+    let workingDirectory: String
+    var command: String?
+    var isFocused: Bool = true
+    var environmentVars: [String: String] = [:]
+
+    @EnvironmentObject var surfaceCache: TerminalSurfaceCache
+
+    var body: some View {
+        if let failedCommand = surfaceCache.failedSurfaces[surfaceID] {
+            SurfaceErrorView(command: failedCommand) {
+                surfaceCache.retrySurface(for: surfaceID)
+            }
+        } else {
+            TerminalSurfaceView(
+                surfaceID: surfaceID,
+                workingDirectory: workingDirectory,
+                command: command,
+                isFocused: isFocused,
+                environmentVars: environmentVars
+            )
+        }
+    }
+}
+
+private struct SurfaceErrorView: View {
+    let command: String
+    let onRetry: () -> Void
+
+    var body: some View {
+        VStack(spacing: 16) {
+            Image(systemName: "exclamationmark.triangle")
+                .font(.system(size: 36))
+                .foregroundStyle(.secondary)
+            Text("Terminal failed to start")
+                .font(.title3)
+                .foregroundStyle(.secondary)
+            Text(command)
+                .font(.system(size: 11, design: .monospaced))
+                .foregroundStyle(.tertiary)
+                .lineLimit(3)
+                .truncationMode(.middle)
+                .padding(.horizontal, 40)
+            Button("Retry", action: onRetry)
+                .buttonStyle(.bordered)
+        }
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
+    }
+}
+
+private struct TerminalSurfaceView: NSViewRepresentable {
     let surfaceID: UUID
     let workingDirectory: String
     var command: String?
@@ -853,6 +904,8 @@ final class TerminalSurfaceCache: ObservableObject {
     var respawnableIDs: Set<UUID> = []
     /// Guards against concurrent respawns for the same surface ID.
     private var respawning = Set<UUID>()
+    /// Surface IDs where creation failed, with the command that was attempted.
+    private(set) var failedSurfaces: [UUID: String] = [:]
 
     struct SurfaceParams {
         let workingDirectory: String
@@ -892,7 +945,31 @@ final class TerminalSurfaceCache: ObservableObject {
         view.workstreamID = id
         surfaces[id] = view
         surfaceParams[id] = SurfaceParams(workingDirectory: workingDirectory, command: command, initialInput: initialInput, environmentVars: environmentVars)
+        if view.surface == nil {
+            logger.error("Surface creation failed for \(id) command=\(command ?? "<shell>")")
+            failedSurfaces[id] = command ?? "(default shell)"
+            objectWillChange.send()
+        }
         return view
+    }
+
+    /// Retry creating a surface that previously failed.
+    func retrySurface(for id: UUID) {
+        guard let params = surfaceParams[id],
+              let app = TerminalApp.shared.app else { return }
+        logger.detailed("Retrying surface creation for \(id)")
+        if let view = surfaces.removeValue(forKey: id) {
+            view.destroy()
+        }
+        failedSurfaces.removeValue(forKey: id)
+        let view = TerminalView(app: app, workingDirectory: params.workingDirectory, command: params.command, initialInput: params.initialInput, environmentVars: params.environmentVars)
+        view.workstreamID = id
+        surfaces[id] = view
+        if view.surface == nil {
+            logger.error("Surface retry failed for \(id)")
+            failedSurfaces[id] = params.command ?? "(default shell)"
+        }
+        objectWillChange.send()
     }
 
     func webView(for id: UUID) -> WKWebView {
@@ -911,6 +988,7 @@ final class TerminalSurfaceCache: ObservableObject {
             view.destroy()
         }
         surfaceParams.removeValue(forKey: id)
+        failedSurfaces.removeValue(forKey: id)
     }
 
     func removeWorkstreamSurfaces(for workstreamID: UUID) {
@@ -947,7 +1025,12 @@ final class TerminalSurfaceCache: ObservableObject {
             newView.workstreamID = id
             surfaces[id] = newView
             respawning.remove(id)
-            logger.detailed("Respawned surface \(id)")
+            if newView.surface == nil {
+                logger.error("Respawn failed for surface \(id)")
+                failedSurfaces[id] = params.command ?? "(default shell)"
+            } else {
+                logger.detailed("Respawned surface \(id)")
+            }
             objectWillChange.send()
         } else {
             removeSurface(for: id)
