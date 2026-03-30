@@ -15,6 +15,9 @@ ghostty/.zig-cache/
 # Node dependencies (installed via bun in CI)
 node_modules/
 
+# Python
+__pycache__/
+
 # macOS
 .DS_Store
 *.swp
