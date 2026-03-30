@@ -906,6 +906,10 @@ final class TerminalSurfaceCache: ObservableObject {
     private var respawning = Set<UUID>()
     /// Surface IDs where creation failed, with the command that was attempted.
     private(set) var failedSurfaces: [UUID: String] = [:]
+    /// Tracks when each surface was created, for detecting immediate process death.
+    private var creationTimes: [UUID: Date] = [:]
+    /// Surfaces that died within this interval after creation are treated as launch failures.
+    private static let healthCheckWindow: TimeInterval = 2.0
 
     struct SurfaceParams {
         let workingDirectory: String
@@ -949,6 +953,8 @@ final class TerminalSurfaceCache: ObservableObject {
             logger.error("Surface creation failed for \(id) command=\(command ?? "<shell>")")
             failedSurfaces[id] = command ?? "(default shell)"
             objectWillChange.send()
+        } else {
+            creationTimes[id] = Date()
         }
         return view
     }
@@ -968,6 +974,8 @@ final class TerminalSurfaceCache: ObservableObject {
         if view.surface == nil {
             logger.error("Surface retry failed for \(id)")
             failedSurfaces[id] = params.command ?? "(default shell)"
+        } else {
+            creationTimes[id] = Date()
         }
         objectWillChange.send()
     }
@@ -989,6 +997,7 @@ final class TerminalSurfaceCache: ObservableObject {
         }
         surfaceParams.removeValue(forKey: id)
         failedSurfaces.removeValue(forKey: id)
+        creationTimes.removeValue(forKey: id)
     }
 
     func removeWorkstreamSurfaces(for workstreamID: UUID) {
@@ -1011,7 +1020,27 @@ final class TerminalSurfaceCache: ObservableObject {
     private func handleSurfaceClosed(_ closedView: TerminalView) {
         guard let (id, _) = surfaces.first(where: { $0.value === closedView }) else { return }
 
+        // Check if the surface died immediately after creation (launch failure).
+        let diedImmediately: Bool
+        if let created = creationTimes[id] {
+            let age = Date().timeIntervalSince(created)
+            diedImmediately = age < Self.healthCheckWindow
+            if diedImmediately {
+                logger.error("Surface \(id) died after \(String(format: "%.1f", age))s, treating as launch failure")
+            }
+        } else {
+            diedImmediately = false
+        }
+
         if respawnableIDs.contains(id) {
+            // If the surface died immediately, show error state instead of respawning in a loop.
+            if diedImmediately {
+                let command = surfaceParams[id]?.command ?? "(default shell)"
+                failedSurfaces[id] = command
+                objectWillChange.send()
+                return
+            }
+
             guard !respawning.contains(id) else {
                 logger.detailed("Skipping concurrent respawn for surface \(id)")
                 return
@@ -1029,8 +1058,14 @@ final class TerminalSurfaceCache: ObservableObject {
                 logger.error("Respawn failed for surface \(id)")
                 failedSurfaces[id] = params.command ?? "(default shell)"
             } else {
+                creationTimes[id] = Date()
                 logger.detailed("Respawned surface \(id)")
             }
+            objectWillChange.send()
+        } else if diedImmediately {
+            // Terminal tab died immediately: show error instead of closing the tab.
+            let command = surfaceParams[id]?.command ?? "(default shell)"
+            failedSurfaces[id] = command
             objectWillChange.send()
         } else {
             removeSurface(for: id)
