@@ -21,6 +21,13 @@ extension Notification.Name {
 
 @MainActor
 final class AppDelegate: NSObject, NSApplicationDelegate {
+    func applicationWillTerminate(_: Notification) {
+        let tmuxPath = ToolStatus.detect().tmux.path
+        if let tmuxPath {
+            TmuxSession.killAllSessions(tmuxPath: tmuxPath)
+        }
+    }
+
     func applicationShouldTerminate(_: NSApplication) -> NSApplication.TerminateReply {
         let confirmQuit = UserDefaults.standard.object(forKey: "factoryfloor.confirmQuit") as? Bool ?? true
         guard confirmQuit else { return .terminateNow }

@@ -2,8 +2,16 @@
 // ABOUTME: Sessions survive app restarts but not system restarts.
 
 import Foundation
+import os
+
+private let logger = Logger(subsystem: "factoryfloor", category: "tmux")
 
 enum TmuxSession {
+    /// Path to the tmux stderr log file in the cache directory.
+    static var stderrLogPath: String {
+        AppConstants.cacheDirectory.appendingPathComponent("tmux-stderr.log").path
+    }
+
     /// Build a deterministic session name from project, workstream, and role.
     static func sessionName(project: String, workstream: String, role: String) -> String {
         "\(AppConstants.appID)/\(sanitize(project))/\(sanitize(workstream))/\(role)"
@@ -106,6 +114,19 @@ enum TmuxSession {
         killSession(tmuxPath: tmuxPath, sessionName: agentSession)
     }
 
+    /// Kill the entire tmux server on the factoryfloor socket.
+    /// Call on app termination to prevent orphaned sessions.
+    static func killAllSessions(tmuxPath: String) {
+        logger.detailed("Killing tmux server on socket \(socketName)")
+        let process = Process()
+        process.executableURL = URL(fileURLWithPath: tmuxPath)
+        process.arguments = ["-L", socketName, "kill-server"]
+        process.standardOutput = FileHandle.nullDevice
+        process.standardError = FileHandle.nullDevice
+        try? process.run()
+        process.waitUntilExit()
+    }
+
     private static func sanitize(_ name: String) -> String {
         name.replacingOccurrences(of: ":", with: "-")
             .replacingOccurrences(of: ".", with: "-")
@@ -127,9 +148,10 @@ enum TmuxSession {
     private static func serverSetupCommand(tmuxPath: String, configPath: String) -> String {
         let socket = shellEscape(socketName)
         let conf = shellEscape(configPath)
-        let startServer = "\(tmuxPath) -L \(socket) start-server >/dev/null 2>&1 || true"
-        let sourceFile = "\(tmuxPath) -L \(socket) source-file \(conf) >/dev/null 2>&1 || true"
-        let clearPaneDiedHook = "\(tmuxPath) -L \(socket) set-hook -gu pane-died >/dev/null 2>&1 || true"
+        let logFile = shellEscape(stderrLogPath)
+        let startServer = "\(tmuxPath) -L \(socket) start-server 2>>\(logFile) || true"
+        let sourceFile = "\(tmuxPath) -L \(socket) source-file \(conf) 2>>\(logFile)"
+        let clearPaneDiedHook = "\(tmuxPath) -L \(socket) set-hook -gu pane-died 2>>\(logFile) || true"
         return "\(startServer); \(sourceFile); \(clearPaneDiedHook)"
     }
 }
