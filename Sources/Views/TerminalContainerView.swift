@@ -1,8 +1,11 @@
 // ABOUTME: Workspace view with dynamic tabs for agent, terminals, and browsers.
 // ABOUTME: Info and Agent are always present; terminals and browsers are added on demand.
 
+import os
 import SwiftUI
 import WebKit
+
+private let logger = Logger(subsystem: "factoryfloor", category: "surface-cache")
 
 extension Notification.Name {
     static let terminalSurfaceClosed = Notification.Name("factoryfloor.terminalSurfaceClosed")
@@ -848,6 +851,8 @@ final class TerminalSurfaceCache: ObservableObject {
     private var webViews: [UUID: WKWebView] = [:]
     /// Surface IDs that should respawn when closed (e.g., the agent).
     var respawnableIDs: Set<UUID> = []
+    /// Guards against concurrent respawns for the same surface ID.
+    private var respawning = Set<UUID>()
 
     struct SurfaceParams {
         let workingDirectory: String
@@ -929,16 +934,22 @@ final class TerminalSurfaceCache: ObservableObject {
         guard let (id, _) = surfaces.first(where: { $0.value === closedView }) else { return }
 
         if respawnableIDs.contains(id) {
-            // Agent: respawn the surface
+            guard !respawning.contains(id) else {
+                logger.detailed("Skipping concurrent respawn for surface \(id)")
+                return
+            }
             guard let params = surfaceParams[id],
                   let app = TerminalApp.shared.app else { return }
+
+            respawning.insert(id)
             surfaces.removeValue(forKey: id)
             let newView = TerminalView(app: app, workingDirectory: params.workingDirectory, command: params.command, initialInput: params.initialInput, environmentVars: params.environmentVars)
             newView.workstreamID = id
             surfaces[id] = newView
+            respawning.remove(id)
+            logger.detailed("Respawned surface \(id)")
             objectWillChange.send()
         } else {
-            // Terminal/browser tabs: close the tab
             removeSurface(for: id)
             NotificationCenter.default.post(name: .terminalTabExited, object: id)
         }
