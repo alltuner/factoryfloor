@@ -159,6 +159,13 @@ struct EnvironmentTabView: View {
                         .truncationMode(.tail)
                 }
 
+                if scriptConfig.run != nil, RunLauncher.executableURL() == nil {
+                    Text("No port detection")
+                        .font(.system(size: 9))
+                        .foregroundStyle(.orange)
+                        .help("ff-run helper not found. Run scripts will work but port detection is unavailable.")
+                }
+
                 Spacer()
 
                 if scriptConfig.run != nil {

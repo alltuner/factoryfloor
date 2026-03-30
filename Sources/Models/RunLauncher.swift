@@ -2,6 +2,9 @@
 // ABOUTME: Keeps Environment tab command assembly small and consistent across tmux modes.
 
 import Foundation
+import os
+
+private let logger = Logger(subsystem: "factoryfloor", category: "run-launcher")
 
 enum RunLauncher {
     static func executableURL(bundle: Bundle = .main) -> URL? {
@@ -17,6 +20,7 @@ enum RunLauncher {
             }
         }
 
+        logger.warning("ff-run helper not found, port detection will be unavailable")
         return nil
     }
 }
