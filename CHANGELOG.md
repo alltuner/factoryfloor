@@ -1,5 +1,25 @@
 # Changelog
 
+## [0.1.50](https://github.com/alltuner/factoryfloor/compare/v0.1.49...v0.1.50) (2026-03-31)
+
+
+### Features
+
+* improve terminal spawning resilience ([#235](https://github.com/alltuner/factoryfloor/issues/235)) ([8313c13](https://github.com/alltuner/factoryfloor/commit/8313c13a03134c3800248c06a520afa7cee73c2d))
+* improve update experience for Homebrew users ([#246](https://github.com/alltuner/factoryfloor/issues/246)) ([c4db1d2](https://github.com/alltuner/factoryfloor/commit/c4db1d2b8fce6d2ca8f6967ac2d1a6d54d810418))
+* per-workstream debug log files for launches ([#247](https://github.com/alltuner/factoryfloor/issues/247)) ([5c156f5](https://github.com/alltuner/factoryfloor/commit/5c156f5b27d9029d270b71dbd236a7aeab5b7ff0))
+* **website:** add download button to /get/ page ([#240](https://github.com/alltuner/factoryfloor/issues/240)) ([3f1b212](https://github.com/alltuner/factoryfloor/commit/3f1b212fdbdd18aee032053a16642271fe793fb8)), closes [#231](https://github.com/alltuner/factoryfloor/issues/231)
+
+
+### Bug Fixes
+
+* consolidate settings from 7 sections to 4 ([#242](https://github.com/alltuner/factoryfloor/issues/242)) ([9607073](https://github.com/alltuner/factoryfloor/commit/9607073d1155333d6c2270ac61b78b005728f361)), closes [#233](https://github.com/alltuner/factoryfloor/issues/233)
+* fade onboarding content so skyline remains visible in small windows ([#245](https://github.com/alltuner/factoryfloor/issues/245)) ([c0b998c](https://github.com/alltuner/factoryfloor/commit/c0b998c81827e0321f1cff9dc3e5e8e2ee03eb45))
+* increase DMG window height so skyline is visible ([#238](https://github.com/alltuner/factoryfloor/issues/238)) ([79e9a32](https://github.com/alltuner/factoryfloor/commit/79e9a32919973d639418d06a71929a0e83f2c360)), closes [#230](https://github.com/alltuner/factoryfloor/issues/230)
+* resolve compiler warnings in Launcher, BrowserView, and Updater ([#241](https://github.com/alltuner/factoryfloor/issues/241)) ([645ea15](https://github.com/alltuner/factoryfloor/commit/645ea15efdfd3e7a6424eff7a958fa2e5ebb04af)), closes [#228](https://github.com/alltuner/factoryfloor/issues/228)
+* trigger Sparkle update from sidebar instead of opening website ([#237](https://github.com/alltuner/factoryfloor/issues/237)) ([5b74416](https://github.com/alltuner/factoryfloor/commit/5b7441650749205026c9316c49f2f03db976f4c8)), closes [#232](https://github.com/alltuner/factoryfloor/issues/232)
+* use interactive login shell (-lic) for tool version manager support ([#243](https://github.com/alltuner/factoryfloor/issues/243)) ([d48ee31](https://github.com/alltuner/factoryfloor/commit/d48ee3131ca760cfe2876bddb2c4a8ec2b2370b1))
+
 ## [0.1.49](https://github.com/alltuner/factoryfloor/compare/v0.1.48...v0.1.49) (2026-03-30)
 
 
