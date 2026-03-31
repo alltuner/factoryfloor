@@ -268,11 +268,38 @@ struct TerminalContainerView: View {
             message: "Starting new session..."
         )
 
+        let finalCommand: String
+        var intermediates = [resume.command, fresh.command, cmd]
         if useTmux, let tmuxPath = appEnv.toolStatus.tmux.path {
             let session = TmuxSession.sessionName(project: projectName, workstream: workstreamName, role: "agent")
-            return TmuxSession.wrapCommand(tmuxPath: tmuxPath, sessionName: session, command: cmd, environmentVars: envVars)
+            finalCommand = TmuxSession.wrapCommand(tmuxPath: tmuxPath, sessionName: session, command: cmd, environmentVars: envVars)
+            intermediates.append(finalCommand)
+        } else {
+            finalCommand = cmd
         }
-        return cmd
+
+        LaunchLogger.log(LaunchLogEntry(
+            workstreamID: workstreamID,
+            event: "agent-start",
+            finalCommand: finalCommand,
+            intermediateCommands: intermediates,
+            environmentVariables: envVars,
+            workingDirectory: workingDirectory,
+            toolPaths: LaunchLogEntry.ToolPaths(
+                claude: appEnv.toolStatus.claude.path,
+                tmux: appEnv.toolStatus.tmux.path,
+                ffRun: RunLauncher.executableURL()?.path
+            ),
+            settings: LaunchLogEntry.Settings(
+                tmuxMode: tmuxMode,
+                bypassPermissions: bypassPermissions,
+                agentTeams: agentTeams,
+                autoRenameBranch: autoRenameBranch
+            ),
+            shell: CommandBuilder.userShell
+        ))
+
+        return finalCommand
     }
 
     private var tabBar: some View {

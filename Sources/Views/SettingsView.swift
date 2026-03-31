@@ -256,6 +256,14 @@ struct SettingsView: View {
                 Text("Log setup, run, and teardown script output to files for debugging.")
                     .font(.caption)
                     .foregroundStyle(.secondary)
+                if detailedLogging {
+                    Button("Open Logs Directory") {
+                        let url = LaunchLogger.logsDirectoryURL
+                        try? FileManager.default.createDirectory(at: url, withIntermediateDirectories: true)
+                        NSWorkspace.shared.open(url)
+                    }
+                    .font(.caption)
+                }
 
                 Toggle("Bleeding edge", isOn: $bleedingEdge)
                 Text("Receive pre-release builds with the latest features. These may be less stable.")

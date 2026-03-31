@@ -98,6 +98,7 @@
 "Automatically open Factory Floor when you log in." = "Automatically open Factory Floor when you log in.";
 "Detailed logging" = "Detailed logging";
 "Log setup, run, and teardown script output to files for debugging." = "Log setup, run, and teardown script output to files for debugging.";
+"Open Logs Directory" = "Open Logs Directory";
 
 /* Settings - Environment */
 "Environment" = "Environment";

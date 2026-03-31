@@ -33,6 +33,7 @@ enum WorkstreamArchiver {
             }
         }
         surfaceCache.removeWorkstreamSurfaces(for: workstreamID)
+        LaunchLogger.removeLog(for: workstreamID)
         project.workstreams.removeAll { $0.id == workstreamID }
     }
 }

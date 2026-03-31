@@ -98,6 +98,7 @@
 "Automatically open Factory Floor when you log in." = "Obre Factory Floor automàticament en iniciar sessió.";
 "Detailed logging" = "Registre detallat";
 "Log setup, run, and teardown script output to files for debugging." = "Registra la sortida dels scripts de configuració, execució i desmuntatge en fitxers per a depuració.";
+"Open Logs Directory" = "Obre el directori de registres";
 
 /* Settings - Environment */
 "Environment" = "Entorn";

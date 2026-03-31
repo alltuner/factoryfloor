@@ -264,15 +264,42 @@ struct EnvironmentTabView: View {
     }
 
     private func envCommand(script: String, role: String) -> String {
-        let command: String
-        if role == "run",
-           let launcherPath = RunLauncher.executableURL()?.path
-        {
-            command = runScriptCommand(script: script, workstreamID: workstreamID, launcherPath: launcherPath)
+        let baseCommand: String
+        let ffRunPath = RunLauncher.executableURL()?.path
+        if role == "run", let launcherPath = ffRunPath {
+            baseCommand = runScriptCommand(script: script, workstreamID: workstreamID, launcherPath: launcherPath)
         } else {
-            command = scriptCommand(script: script, role: role)
+            baseCommand = scriptCommand(script: script, role: role)
         }
-        return buildCommand(script: command, role: role)
+        let finalCommand = buildCommand(script: baseCommand, role: role)
+
+        let event = role == "run" ? "run-start" : "setup-start"
+        var intermediates = [script, baseCommand]
+        if finalCommand != baseCommand {
+            intermediates.append(finalCommand)
+        }
+        LaunchLogger.log(LaunchLogEntry(
+            workstreamID: workstreamID,
+            event: event,
+            finalCommand: finalCommand,
+            intermediateCommands: intermediates,
+            environmentVariables: environmentVars,
+            workingDirectory: workingDirectory,
+            toolPaths: LaunchLogEntry.ToolPaths(
+                claude: nil,
+                tmux: useTmux ? appEnv.toolStatus.tmux.path : nil,
+                ffRun: ffRunPath
+            ),
+            settings: LaunchLogEntry.Settings(
+                tmuxMode: useTmux,
+                bypassPermissions: false,
+                agentTeams: false,
+                autoRenameBranch: false
+            ),
+            shell: CommandBuilder.userShell
+        ))
+
+        return finalCommand
     }
 
     private func buildCommand(script: String, role: String) -> String {

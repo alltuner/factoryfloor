@@ -98,6 +98,7 @@
 "Automatically open Factory Floor when you log in." = "Öppna Factory Floor automatiskt vid inloggning.";
 "Detailed logging" = "Detaljerad loggning";
 "Log setup, run, and teardown script output to files for debugging." = "Logga utdata från konfigurations-, körnings- och nedmonteringsskript till filer för felsökning.";
+"Open Logs Directory" = "Öppna loggkatalog";
 
 /* Settings - Environment */
 "Environment" = "Miljö";
