@@ -128,6 +128,13 @@ struct OnboardingView: View {
             .frame(maxWidth: .infinity)
             .padding(.bottom, 24)
         }
+        .mask(
+            VStack(spacing: 0) {
+                Rectangle()
+                LinearGradient(colors: [.black, .clear], startPoint: .top, endPoint: .bottom)
+                    .frame(height: 120)
+            }
+        )
         .background(alignment: .bottom) {
             PoblenouSkylineView()
                 .padding(.horizontal, 40)
