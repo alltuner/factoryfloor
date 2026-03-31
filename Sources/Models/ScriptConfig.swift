@@ -1,5 +1,5 @@
 // ABOUTME: Loads setup/run/teardown script configuration from project config files.
-// ABOUTME: Resolves from .factoryfloor.json or .factoryfloor/config.json.
+// ABOUTME: Resolves from .factoryfloor.json, conductor.json, or .superset/config.json.
 
 import Foundation
 import os
@@ -16,15 +16,27 @@ struct ScriptConfig {
     static let empty = ScriptConfig(setup: nil, run: nil, teardown: nil, source: nil, loadError: nil)
 
     /// Load script config for a project directory.
+    /// Checks .factoryfloor.json first, then conductor.json, then .superset/config.json.
     static func load(from directory: String) -> ScriptConfig {
-        let path = URL(fileURLWithPath: directory).appendingPathComponent(".factoryfloor.json").path
-        guard FileManager.default.fileExists(atPath: path) else { return .empty }
-        do {
-            return try loadFF2(path)
-        } catch {
-            logger.error("Failed to load \(path): \(error.localizedDescription)")
-            return ScriptConfig(setup: nil, run: nil, teardown: nil, source: URL(fileURLWithPath: path).lastPathComponent, loadError: error.localizedDescription)
+        let dir = URL(fileURLWithPath: directory)
+
+        let candidates: [(path: String, source: String, loader: (String) throws -> ScriptConfig)] = [
+            (dir.appendingPathComponent(".factoryfloor.json").path, ".factoryfloor.json", loadFF2),
+            (dir.appendingPathComponent("conductor.json").path, "conductor.json", loadConductor),
+            (dir.appendingPathComponent(".superset/config.json").path, ".superset/config.json", loadSuperset),
+        ]
+
+        for candidate in candidates {
+            guard FileManager.default.fileExists(atPath: candidate.path) else { continue }
+            do {
+                return try candidate.loader(candidate.path)
+            } catch {
+                logger.error("Failed to load \(candidate.path): \(error.localizedDescription)")
+                return ScriptConfig(setup: nil, run: nil, teardown: nil, source: candidate.source, loadError: error.localizedDescription)
+            }
         }
+
+        return .empty
     }
 
     var hasAnyScript: Bool {
@@ -73,7 +85,40 @@ struct ScriptConfig {
         return ScriptConfig(setup: nonEmpty(setup), run: nonEmpty(run), teardown: nonEmpty(teardown), source: URL(fileURLWithPath: path).lastPathComponent, loadError: nil)
     }
 
+    /// conductor.json: { "scripts": { "setup": "cmd", "run": "cmd", "archive": "cmd" } }
+    private static func loadConductor(_ path: String) throws -> ScriptConfig {
+        let dict = try loadJSON(path)
+        guard let scripts = dict["scripts"] as? [String: Any] else { return .empty }
+        let setup = scripts["setup"] as? String
+        let run = scripts["run"] as? String
+        let teardown = scripts["archive"] as? String
+        guard setup != nil || run != nil || teardown != nil else { return .empty }
+        return ScriptConfig(setup: nonEmpty(setup), run: nonEmpty(run), teardown: nonEmpty(teardown), source: "conductor.json", loadError: nil)
+    }
+
+    /// .superset/config.json: { "setup": ["cmd1", "cmd2"], "run": ["cmd"], "teardown": ["cmd"] }
+    private static func loadSuperset(_ path: String) throws -> ScriptConfig {
+        let dict = try loadJSON(path)
+        let setup = joinCommands(dict["setup"])
+        let run = joinCommands(dict["run"])
+        let teardown = joinCommands(dict["teardown"])
+        guard setup != nil || run != nil || teardown != nil else { return .empty }
+        return ScriptConfig(setup: setup, run: run, teardown: teardown, source: ".superset/config.json", loadError: nil)
+    }
+
     // MARK: - Helpers
+
+    /// Join a string array into a single command with &&, or return a plain string.
+    private static func joinCommands(_ value: Any?) -> String? {
+        if let array = value as? [String] {
+            let joined = array.filter { !$0.trimmingCharacters(in: .whitespaces).isEmpty }.joined(separator: " && ")
+            return nonEmpty(joined)
+        }
+        if let str = value as? String {
+            return nonEmpty(str)
+        }
+        return nil
+    }
 
     private static func loadJSON(_ path: String) throws -> [String: Any] {
         guard let data = FileManager.default.contents(atPath: path) else {

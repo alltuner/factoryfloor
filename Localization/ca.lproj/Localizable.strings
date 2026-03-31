@@ -248,3 +248,4 @@
 /* Update Banner */
 "v%@ available" = "v%@ disponible";
 "Release Notes" = "Notes de la versió";
+"Using scripts from %@" = "S'utilitzen els scripts de %@";

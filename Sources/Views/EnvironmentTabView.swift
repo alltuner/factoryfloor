@@ -49,6 +49,10 @@ struct EnvironmentTabView: View {
                 configErrorBanner(error: error)
                 Divider()
             }
+            if let source = scriptConfig.source, source != ".factoryfloor.json" {
+                configSourceBanner(source: source)
+                Divider()
+            }
             environmentContent
         }
     }
@@ -239,6 +243,19 @@ struct EnvironmentTabView: View {
         }
         .padding(10)
         .background(Color.yellow.opacity(0.08))
+    }
+
+    private func configSourceBanner(source: String) -> some View {
+        HStack(spacing: 8) {
+            Image(systemName: "info.circle")
+                .foregroundStyle(.blue)
+            Text(String(format: NSLocalizedString("Using scripts from %@", comment: ""), source))
+                .font(.system(size: 12))
+                .foregroundStyle(.secondary)
+            Spacer()
+        }
+        .padding(10)
+        .background(Color.blue.opacity(0.05))
     }
 
     private func scriptInstructions(title: String) -> some View {
