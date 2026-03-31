@@ -91,6 +91,18 @@ other = "Automate your workstream lifecycle with setup, run, and teardown script
 other = "Add a"
 [config_or_use]
 other = "to your project root."
+[config_hook]
+other = "Hook"
+[config_when]
+other = "When it runs"
+[config_setup_desc]
+other = "Once, when a workstream is created. Use for installing dependencies or build steps."
+[config_run_desc]
+other = "On demand via the Environment tab. Wrapped in ff-run for automatic port detection."
+[config_teardown_desc]
+other = "When a workstream is archived. Use for cleanup like stopping containers."
+[config_optional_note]
+other = "All fields are optional. Scripts run in the workstream directory using your login shell."
 
 # Env vars
 [env_label]

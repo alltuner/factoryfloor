@@ -60,7 +60,7 @@ Factory Floor is a native macOS app built on [Ghostty](https://ghostty.org)'s GP
 
 ### Script Configuration
 
-Add a `.factoryfloor.json` to your project root:
+Add a `.factoryfloor.json` to your project root to automate your workstream lifecycle. All fields are optional.
 
 ```json
 {
@@ -69,6 +69,14 @@ Add a `.factoryfloor.json` to your project root:
   "teardown": "docker-compose down"
 }
 ```
+
+| Hook | When it runs | Example use case |
+|---|---|---|
+| `setup` | Once, when a workstream is created | Install deps, copy .env, run build steps |
+| `run` | On demand via the Environment tab | Start dev server, docker-compose up |
+| `teardown` | When a workstream is archived | docker-compose down, clean temp files |
+
+Scripts run in the workstream directory using your login shell. The `run` script is wrapped in the `ff-run` launcher for automatic port detection.
 
 ### Environment Variables
 
