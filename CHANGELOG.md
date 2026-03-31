@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.1.54](https://github.com/alltuner/factoryfloor/compare/v0.1.53...v0.1.54) (2026-03-31)
+
+
+### Bug Fixes
+
+* dispatch notification authorization handler to main thread ([#275](https://github.com/alltuner/factoryfloor/issues/275)) ([fee40fc](https://github.com/alltuner/factoryfloor/commit/fee40fc4a99acc49d0243ed7d863927af6872202)), closes [#274](https://github.com/alltuner/factoryfloor/issues/274)
+
 ## [0.1.53](https://github.com/alltuner/factoryfloor/compare/v0.1.52...v0.1.53) (2026-03-31)
 
 
