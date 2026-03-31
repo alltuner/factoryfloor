@@ -1,10 +1,13 @@
 // ABOUTME: Main application entry point.
 // ABOUTME: Initializes the ghostty terminal engine and presents the main window.
 
+import os
 import Sentry
 import Sparkle
 import SwiftUI
 import UserNotifications
+
+private let logger = Logger(subsystem: "factoryfloor", category: "app")
 
 extension Notification.Name {
     static let openDirectory = Notification.Name("factoryfloor.openDirectory")
@@ -23,7 +26,15 @@ extension Notification.Name {
 @MainActor
 final class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCenterDelegate {
     func applicationDidFinishLaunching(_: Notification) {
-        UNUserNotificationCenter.current().delegate = self
+        let center = UNUserNotificationCenter.current()
+        center.delegate = self
+        center.requestAuthorization(options: [.alert, .sound]) { granted, error in
+            if let error {
+                logger.warning("Notification permission error: \(error.localizedDescription)")
+            } else if !granted {
+                logger.info("Notification permission denied by user")
+            }
+        }
     }
 
     nonisolated func userNotificationCenter(
