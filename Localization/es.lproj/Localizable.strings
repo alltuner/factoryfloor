@@ -243,3 +243,7 @@
 "Stop" = "Detener";
 
 "Restarting..." = "Reiniciando...";
+
+/* Update Banner */
+"v%@ available" = "v%@ disponible";
+"Release Notes" = "Notas de la versión";

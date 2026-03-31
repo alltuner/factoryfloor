@@ -114,7 +114,7 @@ struct ProjectSidebar: View {
     private var bottomBar: some View {
         VStack(spacing: 4) {
             if let version = updateChecker.availableVersion {
-                UpdateBanner(version: version, updater: updater)
+                UpdateBanner(version: version, releaseNotesURL: updateChecker.releaseNotesURL, updater: updater)
             }
 
             // Credit
@@ -738,43 +738,6 @@ private struct SidebarBottomButton: View {
                 NSCursor.pop()
             }
         }
-    }
-}
-
-private struct UpdateBanner: View {
-    let version: String
-    @ObservedObject var updater: Updater
-
-    @State private var isHovering = false
-
-    private var getURL: URL {
-        let lang = Locale.current.language.languageCode?.identifier ?? "en"
-        let path = lang == "en" ? "/get" : "/\(lang)/get"
-        return URL(string: "https://factory-floor.com\(path)")!
-    }
-
-    var body: some View {
-        Button {
-            if updater.isConfigured {
-                updater.checkForUpdates()
-            } else {
-                NSWorkspace.shared.open(getURL)
-            }
-        } label: {
-            HStack(spacing: 6) {
-                Image(systemName: "arrow.up.circle.fill")
-                    .font(.system(size: 11))
-                Text("v\(version) available")
-                    .font(.system(size: 11, weight: .medium))
-            }
-            .frame(maxWidth: .infinity)
-            .padding(.vertical, 5)
-            .foregroundStyle(isHovering ? .white : .white.opacity(0.9))
-            .background(Color(nsColor: NSColor(red: 0.55, green: 0.15, blue: 0.2, alpha: 1.0)))
-            .clipShape(RoundedRectangle(cornerRadius: 6))
-        }
-        .buttonStyle(.borderless)
-        .onHover { isHovering = $0 }
     }
 }
 
