@@ -1,5 +1,5 @@
 // ABOUTME: Tests for tmux session configuration and command composition.
-// ABOUTME: Verifies the generated config preserves finished panes instead of respawning them.
+// ABOUTME: Verifies the generated config respawns panes on exit for agent persistence.
 
 @testable import FactoryFloor
 import XCTest
@@ -18,9 +18,8 @@ final class TmuxSessionTests: XCTestCase {
         XCTAssertTrue(TmuxSession.configContents.contains("set -g alternate-screen off"))
     }
 
-    func testConfigDoesNotRespawnDeadPanes() {
-        XCTAssertFalse(TmuxSession.configContents.contains("pane-died"))
-        XCTAssertFalse(TmuxSession.configContents.contains("respawn-pane"))
+    func testConfigRespawnsDeadPanes() {
+        XCTAssertTrue(TmuxSession.configContents.contains("set-hook -g pane-died 'respawn-pane'"))
         XCTAssertTrue(TmuxSession.configContents.contains("set -g remain-on-exit on"))
         XCTAssertTrue(TmuxSession.configContents.contains("set -g remain-on-exit-format \"\""))
     }
@@ -56,7 +55,7 @@ final class TmuxSessionTests: XCTestCase {
         XCTAssertTrue(command.contains("\\$project"))
     }
 
-    func testWrapCommandClearsStalePaneDiedHookBeforeAttaching() {
+    func testWrapCommandUsesLoginShellAndStartsServer() {
         let command = TmuxSession.wrapCommand(
             tmuxPath: "/opt/homebrew/bin/tmux",
             sessionName: "project/workstream/setup",
@@ -68,7 +67,6 @@ final class TmuxSessionTests: XCTestCase {
         XCTAssertTrue(command.contains("exec sh -c"), "Should use sh for POSIX syntax")
         XCTAssertTrue(command.contains("start-server"))
         XCTAssertTrue(command.contains("source-file"))
-        XCTAssertTrue(command.contains("set-hook -gu pane-died"))
         XCTAssertTrue(command.contains("new-session -A -s"))
         XCTAssertTrue(command.contains("bun run build"))
     }
