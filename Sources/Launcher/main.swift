@@ -33,7 +33,7 @@ private func launchCommand(configuration: Configuration) throws {
     guard _NSGetExecutablePath(&pathBuf, &pathLen) == 0 else {
         throw LauncherError(exitCode: 1, message: "cannot determine ff-run path")
     }
-    let selfPath = String(cString: pathBuf)
+    let selfPath = String(decoding: pathBuf.prefix(while: { $0 != 0 }).map { UInt8(bitPattern: $0) }, as: UTF8.self)
 
     let monitorArgs = [
         selfPath,
