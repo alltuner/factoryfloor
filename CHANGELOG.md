@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.1.51](https://github.com/alltuner/factoryfloor/compare/v0.1.50...v0.1.51) (2026-03-31)
+
+
+### Bug Fixes
+
+* stop overriding PATH and redirecting stderr in agent launch ([#248](https://github.com/alltuner/factoryfloor/issues/248)) ([cbc1d19](https://github.com/alltuner/factoryfloor/commit/cbc1d194999e706abbbb324dea71330ae5ae46ab))
+
 ## [0.1.50](https://github.com/alltuner/factoryfloor/compare/v0.1.49...v0.1.50) (2026-03-31)
 
 
