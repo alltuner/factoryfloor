@@ -60,9 +60,11 @@ case "${1:-build}" in
       CODE_SIGN_STYLE=Manual \
       ENABLE_HARDENED_RUNTIME=YES \
       CODE_SIGN_INJECT_BASE_ENTITLEMENTS=NO \
+      CODE_SIGN_ENTITLEMENTS=Resources/ff2-local.entitlements \
       OTHER_CODE_SIGN_FLAGS="--options=runtime" \
       build
-    echo "==> Release build at: $RELEASE_DIR/Build/Products/Release/Factory Floor.app"
+    APP_BUNDLE="$RELEASE_DIR/Build/Products/Release/Factory Floor.app"
+    echo "==> Release build at: $APP_BUNDLE"
     if [ "${2:-}" = "--run" ]; then
       pkill -xf ".*/Contents/MacOS/Factory Floor" 2>/dev/null || true
       sleep 0.5
