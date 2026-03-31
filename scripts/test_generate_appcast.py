@@ -66,6 +66,23 @@ def test_release_notes_with_html_entities() -> None:
     print("PASS: release_notes_with_html_entities")
 
 
+def test_item_contains_release_link() -> None:
+    """Each item should have a <link> pointing to the GitHub release."""
+    xml = build_appcast(
+        version="1.4.0",
+        signature="sigabc",
+        dmg_length=2000,
+        dmg_url="https://example.com/app.dmg",
+    )
+    root = parse(xml)
+    item = root.find(".//item")
+    assert item is not None, "Expected <item> element"
+    link = item.find("link")
+    assert link is not None, "Expected <link> element in item"
+    assert link.text == "https://github.com/alltuner/factoryfloor/releases/tag/v1.4.0"
+    print("PASS: item_contains_release_link")
+
+
 if __name__ == "__main__":
     failures = 0
     for name, func in list(globals().items()):
