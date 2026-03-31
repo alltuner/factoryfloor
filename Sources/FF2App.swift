@@ -4,6 +4,7 @@
 import Sentry
 import Sparkle
 import SwiftUI
+import UserNotifications
 
 extension Notification.Name {
     static let openDirectory = Notification.Name("factoryfloor.openDirectory")
@@ -20,7 +21,19 @@ extension Notification.Name {
 }
 
 @MainActor
-final class AppDelegate: NSObject, NSApplicationDelegate {
+final class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCenterDelegate {
+    func applicationDidFinishLaunching(_: Notification) {
+        UNUserNotificationCenter.current().delegate = self
+    }
+
+    nonisolated func userNotificationCenter(
+        _: UNUserNotificationCenter,
+        willPresent _: UNNotification,
+        withCompletionHandler completionHandler: @escaping (UNNotificationPresentationOptions) -> Void
+    ) {
+        completionHandler([.banner, .sound])
+    }
+
     func applicationWillTerminate(_: Notification) {
         let tmuxPath = ToolStatus.detect().tmux.path
         if let tmuxPath {
