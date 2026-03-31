@@ -104,40 +104,31 @@
 "Installed" = "Installed";
 "Install..." = "Install...";
 
-/* Settings - Projects */
-"Projects" = "Projects";
+/* Settings - General */
+"General" = "General";
 "Base directory" = "Base directory";
 "Change..." = "Change...";
 "Choose base directory for projects" = "Choose base directory for projects";
 "Default location when adding new projects." = "Default location when adding new projects.";
 "Branch prefix" = "Branch prefix";
-
-/* Settings - Terminal & Browser */
-"Terminal & Browser" = "Terminal & Browser";
-"External Browser" = "External Browser";
+"Theme" = "Theme";
+"System" = "System";
+"Light" = "Light";
+"Dark" = "Dark";
 
 /* Settings - Coding Agent */
 "Agent Teams" = "Agent Teams";
 "Enables experimental multi-agent coordination. Agents can spawn teammates, delegate tasks, and collaborate across workstreams." = "Enables experimental multi-agent coordination. Agents can spawn teammates, delegate tasks, and collaborate across workstreams.";
 "Auto-rename branch" = "Auto-rename branch";
 "The agent will rename the worktree branch to match the task on the first request (e.g., fix-login-timeout)." = "The agent will rename the worktree branch to match the task on the first request (e.g., fix-login-timeout).";
+"External Browser" = "External Browser";
 
-/* Settings - Appearance */
-"Appearance" = "Appearance";
-"Theme" = "Theme";
-"System" = "System";
-"Light" = "Light";
-"Dark" = "Dark";
-
-/* Settings - Privacy & Logging */
-"Privacy & Logging" = "Privacy & Logging";
+/* Settings - Advanced */
+"Advanced" = "Advanced";
 "Usage analytics" = "Usage analytics";
 "Send anonymous usage data to help improve Factory Floor. We collect: app version, build type, macOS version, locale, and screen resolution. No project names, file contents, or personal data." = "Send anonymous usage data to help improve Factory Floor. We collect: app version, build type, macOS version, locale, and screen resolution. No project names, file contents, or personal data.";
 "Crash reports" = "Crash reports";
 "Send crash reports and performance data. Requires restart to take effect." = "Send crash reports and performance data. Requires restart to take effect.";
-
-/* Settings - Danger Zone */
-"Danger Zone" = "Danger Zone";
 "Bleeding edge" = "Bleeding edge";
 "Receive pre-release builds with the latest features. These may be less stable." = "Receive pre-release builds with the latest features. These may be less stable.";
 "Clear project list" = "Clear project list";

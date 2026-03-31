@@ -104,40 +104,31 @@
 "Installed" = "Installerad";
 "Install..." = "Installera...";
 
-/* Settings - Projects */
-"Projects" = "Projekt";
+/* Settings - General */
+"General" = "Allmänt";
 "Base directory" = "Baskatalog";
 "Change..." = "Ändra...";
 "Choose base directory for projects" = "Välj baskatalog för projekt";
 "Default location when adding new projects." = "Standardplats när nya projekt läggs till.";
 "Branch prefix" = "Grenprefix";
-
-/* Settings - Terminal & Browser */
-"Terminal & Browser" = "Terminal och webbläsare";
-"External Browser" = "Extern webbläsare";
+"Theme" = "Tema";
+"System" = "System";
+"Light" = "Ljust";
+"Dark" = "Mörkt";
 
 /* Settings - Coding Agent */
 "Agent Teams" = "Agentteam";
 "Enables experimental multi-agent coordination. Agents can spawn teammates, delegate tasks, and collaborate across workstreams." = "Aktiverar experimentell multi-agentkoordinering. Agenter kan skapa teammedlemmar, delegera uppgifter och samarbeta mellan arbetsflöden.";
 "Auto-rename branch" = "Byt namn på gren automatiskt";
 "The agent will rename the worktree branch to match the task on the first request (e.g., fix-login-timeout)." = "Agenten byter namn på arbetsträdsgrenen för att matcha uppgiften vid den första förfrågan (t.ex. fix-login-timeout).";
+"External Browser" = "Extern webbläsare";
 
-/* Settings - Appearance */
-"Appearance" = "Utseende";
-"Theme" = "Tema";
-"System" = "System";
-"Light" = "Ljust";
-"Dark" = "Mörkt";
-
-/* Settings - Privacy & Logging */
-"Privacy & Logging" = "Integritet och loggning";
+/* Settings - Advanced */
+"Advanced" = "Avancerat";
 "Usage analytics" = "Användningsanalys";
 "Send anonymous usage data to help improve Factory Floor. We collect: app version, build type, macOS version, locale, and screen resolution. No project names, file contents, or personal data." = "Skicka anonym användningsdata för att hjälpa förbättra Factory Floor. Vi samlar in: appversion, byggtyp, macOS-version, språk och skärmupplösning. Inga projektnamn, filinnehåll eller personuppgifter.";
 "Crash reports" = "Kraschrapporter";
 "Send crash reports and performance data. Requires restart to take effect." = "Skicka kraschrapporter och prestandadata. Kräver omstart av appen.";
-
-/* Settings - Danger Zone */
-"Danger Zone" = "Riskzon";
 "Bleeding edge" = "Senaste versionen";
 "Receive pre-release builds with the latest features. These may be less stable." = "Ta emot förhandsversioner med de senaste funktionerna. Dessa kan vara mindre stabila.";
 "Clear project list" = "Rensa projektlistan";

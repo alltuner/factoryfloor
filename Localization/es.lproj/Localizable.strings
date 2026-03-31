@@ -104,40 +104,31 @@
 "Installed" = "Instalado";
 "Install..." = "Instalar...";
 
-/* Settings - Projects */
-"Projects" = "Proyectos";
+/* Settings - General */
+"General" = "General";
 "Base directory" = "Directorio base";
 "Change..." = "Cambiar...";
 "Choose base directory for projects" = "Elige el directorio base para los proyectos";
 "Default location when adding new projects." = "Ubicación predeterminada al añadir nuevos proyectos.";
 "Branch prefix" = "Prefijo de rama";
-
-/* Settings - Terminal & Browser */
-"Terminal & Browser" = "Terminal y navegador";
-"External Browser" = "Navegador externo";
+"Theme" = "Tema";
+"System" = "Sistema";
+"Light" = "Claro";
+"Dark" = "Oscuro";
 
 /* Settings - Coding Agent */
 "Agent Teams" = "Equipos de agentes";
 "Enables experimental multi-agent coordination. Agents can spawn teammates, delegate tasks, and collaborate across workstreams." = "Activa la coordinación experimental multi-agente. Los agentes pueden crear compañeros, delegar tareas y colaborar entre flujos de trabajo.";
 "Auto-rename branch" = "Renombrar rama automáticamente";
 "The agent will rename the worktree branch to match the task on the first request (e.g., fix-login-timeout)." = "El agente renombrará la rama del árbol de trabajo para coincidir con la tarea en la primera solicitud (p. ej., fix-login-timeout).";
+"External Browser" = "Navegador externo";
 
-/* Settings - Appearance */
-"Appearance" = "Apariencia";
-"Theme" = "Tema";
-"System" = "Sistema";
-"Light" = "Claro";
-"Dark" = "Oscuro";
-
-/* Settings - Privacy & Logging */
-"Privacy & Logging" = "Privacidad y registros";
+/* Settings - Advanced */
+"Advanced" = "Avanzado";
 "Usage analytics" = "Analíticas de uso";
 "Send anonymous usage data to help improve Factory Floor. We collect: app version, build type, macOS version, locale, and screen resolution. No project names, file contents, or personal data." = "Envía datos de uso anónimos para ayudar a mejorar Factory Floor. Recopilamos: versión de la aplicación, tipo de compilación, versión de macOS, idioma y resolución de pantalla. Sin nombres de proyectos, contenidos de archivos ni datos personales.";
 "Crash reports" = "Informes de errores";
 "Send crash reports and performance data. Requires restart to take effect." = "Envía informes de errores y datos de rendimiento. Requiere reiniciar la aplicación.";
-
-/* Settings - Danger Zone */
-"Danger Zone" = "Zona de peligro";
 "Bleeding edge" = "Últimas novedades";
 "Receive pre-release builds with the latest features. These may be less stable." = "Recibe versiones preliminares con las últimas funciones. Pueden ser menos estables.";
 "Clear project list" = "Borrar lista de proyectos";

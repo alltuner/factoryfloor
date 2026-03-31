@@ -104,40 +104,31 @@
 "Installed" = "Instal·lat";
 "Install..." = "Instal·la...";
 
-/* Settings - Projects */
-"Projects" = "Projectes";
+/* Settings - General */
+"General" = "General";
 "Base directory" = "Directori base";
 "Change..." = "Canvia...";
 "Choose base directory for projects" = "Tria el directori base per als projectes";
 "Default location when adding new projects." = "Ubicació per defecte en afegir nous projectes.";
 "Branch prefix" = "Prefix de branca";
-
-/* Settings - Terminal & Browser */
-"Terminal & Browser" = "Terminal i navegador";
-"External Browser" = "Navegador extern";
+"Theme" = "Tema";
+"System" = "Sistema";
+"Light" = "Clar";
+"Dark" = "Fosc";
 
 /* Settings - Coding Agent */
 "Agent Teams" = "Equips d'agents";
 "Enables experimental multi-agent coordination. Agents can spawn teammates, delegate tasks, and collaborate across workstreams." = "Activa la coordinació experimental multi-agent. Els agents poden crear companys d'equip, delegar tasques i col·laborar entre fluxos de treball.";
 "Auto-rename branch" = "Canvia el nom de la branca automàticament";
 "The agent will rename the worktree branch to match the task on the first request (e.g., fix-login-timeout)." = "L'agent canviarà el nom de la branca de l'arbre de treball per coincidir amb la tasca a la primera sol·licitud (p. ex., fix-login-timeout).";
+"External Browser" = "Navegador extern";
 
-/* Settings - Appearance */
-"Appearance" = "Aparença";
-"Theme" = "Tema";
-"System" = "Sistema";
-"Light" = "Clar";
-"Dark" = "Fosc";
-
-/* Settings - Privacy & Logging */
-"Privacy & Logging" = "Privacitat i registres";
+/* Settings - Advanced */
+"Advanced" = "Avançat";
 "Usage analytics" = "Analítiques d'ús";
 "Send anonymous usage data to help improve Factory Floor. We collect: app version, build type, macOS version, locale, and screen resolution. No project names, file contents, or personal data." = "Envia dades d'ús anònimes per ajudar a millorar Factory Floor. Recollim: versió de l'aplicació, tipus de compilació, versió de macOS, idioma i resolució de pantalla. Cap nom de projecte, contingut de fitxers ni dades personals.";
 "Crash reports" = "Informes d'errors";
 "Send crash reports and performance data. Requires restart to take effect." = "Envia informes d'errors i dades de rendiment. Requereix reiniciar l'aplicació.";
-
-/* Settings - Danger Zone */
-"Danger Zone" = "Zona de perill";
 "Bleeding edge" = "Últimes novetats";
 "Receive pre-release builds with the latest features. These may be less stable." = "Rep versions preliminars amb les últimes funcions. Poden ser menys estables.";
 "Clear project list" = "Esborra la llista de projectes";

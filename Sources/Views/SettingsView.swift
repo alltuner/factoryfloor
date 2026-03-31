@@ -1,5 +1,5 @@
 // ABOUTME: Application settings pane displayed in the detail area.
-// ABOUTME: Session, tools, default apps, and language settings.
+// ABOUTME: Environment, general, coding agent, and advanced settings.
 
 import SwiftUI
 
@@ -83,9 +83,9 @@ struct SettingsView: View {
                     .foregroundStyle(.secondary)
             }
 
-            // MARK: - Projects
+            // MARK: - General
 
-            Section("Projects") {
+            Section("General") {
                 HStack {
                     Text("Base directory")
                     Spacer()
@@ -134,6 +134,30 @@ struct SettingsView: View {
                     .font(.caption)
                     .foregroundStyle(.secondary)
 
+                Picker("Theme", selection: $appearance) {
+                    Text("System").tag("system")
+                    Text("Light").tag("light")
+                    Text("Dark").tag("dark")
+                }
+                .onChange(of: appearance) { _, newValue in
+                    applyAppearance(newValue)
+                }
+
+                Picker("Language", selection: $languageOverride) {
+                    ForEach(availableLanguages, id: \.code) { lang in
+                        Text(lang.name).tag(lang.code)
+                    }
+                }
+                .onChange(of: languageOverride) { _, newValue in
+                    applyLanguage(newValue)
+                }
+
+                if !languageOverride.isEmpty {
+                    Text("Restart the app for the language change to take effect.")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                }
+
                 Toggle("Confirm before quitting", isOn: $confirmQuit)
                 Text("Show a confirmation dialog when quitting with active workstreams.")
                     .font(.caption)
@@ -148,9 +172,24 @@ struct SettingsView: View {
                     .foregroundStyle(.secondary)
             }
 
-            // MARK: - Terminal & Browser
+            // MARK: - Coding Agent
 
-            Section("Terminal & Browser") {
+            Section("Coding Agent") {
+                Toggle("Bypass permission prompts", isOn: $bypassPermissions)
+                Text("When enabled, the coding agent will not ask for confirmation before making changes. Use with caution: the agent will be able to edit files, run commands, and make git commits without asking.")
+                    .font(.caption)
+                    .foregroundStyle(bypassPermissions ? .orange : .secondary)
+
+                Toggle("Agent Teams", isOn: $agentTeams)
+                Text("Enables experimental multi-agent coordination. Agents can spawn teammates, delegate tasks, and collaborate across workstreams.")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+
+                Toggle("Auto-rename branch", isOn: $autoRenameBranch)
+                Text("The agent will rename the worktree branch to match the task on the first request (e.g., fix-login-timeout).")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+
                 Toggle("Tmux Mode", isOn: $tmuxMode)
                     .disabled(!appEnv.toolStatus.tmux.isInstalled)
                 Text("Coding Agent sessions persist across app restarts. The Terminal tab is not affected. Sessions are lost on system restart.")
@@ -200,56 +239,9 @@ struct SettingsView: View {
                 }
             }
 
-            // MARK: - Coding Agent
+            // MARK: - Advanced
 
-            Section("Coding Agent") {
-                Toggle("Bypass permission prompts", isOn: $bypassPermissions)
-                Text("When enabled, the coding agent will not ask for confirmation before making changes. Use with caution: the agent will be able to edit files, run commands, and make git commits without asking.")
-                    .font(.caption)
-                    .foregroundStyle(bypassPermissions ? .orange : .secondary)
-
-                Toggle("Agent Teams", isOn: $agentTeams)
-                Text("Enables experimental multi-agent coordination. Agents can spawn teammates, delegate tasks, and collaborate across workstreams.")
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
-
-                Toggle("Auto-rename branch", isOn: $autoRenameBranch)
-                Text("The agent will rename the worktree branch to match the task on the first request (e.g., fix-login-timeout).")
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
-            }
-
-            // MARK: - Appearance
-
-            Section("Appearance") {
-                Picker("Theme", selection: $appearance) {
-                    Text("System").tag("system")
-                    Text("Light").tag("light")
-                    Text("Dark").tag("dark")
-                }
-                .onChange(of: appearance) { _, newValue in
-                    applyAppearance(newValue)
-                }
-
-                Picker("Language", selection: $languageOverride) {
-                    ForEach(availableLanguages, id: \.code) { lang in
-                        Text(lang.name).tag(lang.code)
-                    }
-                }
-                .onChange(of: languageOverride) { _, newValue in
-                    applyLanguage(newValue)
-                }
-
-                if !languageOverride.isEmpty {
-                    Text("Restart the app for the language change to take effect.")
-                        .font(.caption)
-                        .foregroundStyle(.secondary)
-                }
-            }
-
-            // MARK: - Privacy & Logging
-
-            Section("Privacy & Logging") {
+            Section("Advanced") {
                 Toggle("Usage analytics", isOn: $telemetryEnabled)
                 Text("Send anonymous usage data to help improve Factory Floor. We collect: app version, build type, macOS version, locale, and screen resolution. No project names, file contents, or personal data.")
                     .font(.caption)
@@ -264,11 +256,7 @@ struct SettingsView: View {
                 Text("Log setup, run, and teardown script output to files for debugging.")
                     .font(.caption)
                     .foregroundStyle(.secondary)
-            }
 
-            // MARK: - Danger
-
-            Section("Danger Zone") {
                 Toggle("Bleeding edge", isOn: $bleedingEdge)
                 Text("Receive pre-release builds with the latest features. These may be less stable.")
                     .font(.caption)
