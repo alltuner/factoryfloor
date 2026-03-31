@@ -5,78 +5,29 @@
 import XCTest
 
 final class CommandLineToolsTests: XCTestCase {
-    func testPathPrefersKnownExecutableLocations() {
-        let resolved = CommandLineTools.path(for: "git") { path in
-            path == "/opt/homebrew/bin/git"
-        } resolveFromPath: { _, _ in
-            XCTFail("PATH lookup should not run when a known location exists")
-            return nil
-        }
-
-        XCTAssertEqual(resolved, "/opt/homebrew/bin/git")
-    }
-
-    func testPathFallsBackToEnvironmentPath() {
+    func testPrefersLoginShellPath() {
+        // The login shell PATH should take priority over known locations
+        // so we find the same binary the user's terminal would.
+        var knownLocationChecked = false
         let resolved = CommandLineTools.path(
-            for: "git",
-            environment: ["PATH": "/tmp/custom/bin:/usr/bin"],
-            isExecutable: { _ in
-                false
-            },
-            resolveFromPath: { name, environment in
-                let rawPath = environment["PATH"] ?? ""
-                return rawPath.split(separator: ":").map(String.init)
-                    .map { "\($0)/\(name)" }
-                    .first
-            }
-        )
-
-        XCTAssertEqual(resolved, "/tmp/custom/bin/git")
-    }
-
-    func testPathFallsBackToShellPath() {
-        // Simulates a GUI app where ProcessInfo PATH is minimal (no custom dirs)
-        // but the user's login shell has the tool in its PATH
-        let resolved = CommandLineTools.path(
-            for: "mytool",
-            environment: ["PATH": "/usr/bin:/bin", "SHELL": "/bin/zsh"],
+            for: "claude",
+            environment: ["SHELL": "/bin/zsh"],
             isExecutable: { path in
-                // Not in known locations, not in process PATH
-                // Only found via shell PATH
-                path == "/nix/store/abc123/bin/mytool"
+                if path == "/opt/homebrew/bin/claude" { knownLocationChecked = true }
+                return path == "/Users/me/.nvm/versions/node/v22/bin/claude"
             },
             resolveFromPath: { _, _ in nil },
             resolveFromShellPath: { shell in
                 XCTAssertEqual(shell, "/bin/zsh")
-                return "/nix/store/abc123/bin:/usr/bin"
+                return "/Users/me/.nvm/versions/node/v22/bin:/opt/homebrew/bin:/usr/bin"
             }
         )
 
-        XCTAssertEqual(resolved, "/nix/store/abc123/bin/mytool")
+        XCTAssertEqual(resolved, "/Users/me/.nvm/versions/node/v22/bin/claude")
+        XCTAssertFalse(knownLocationChecked, "Known locations should not be checked when shell PATH matches")
     }
 
-    func testShellPathNotUsedWhenKnownLocationMatches() {
-        var shellPathCalled = false
-        let resolved = CommandLineTools.path(
-            for: "git",
-            environment: ["SHELL": "/bin/zsh"],
-            isExecutable: { $0 == "/opt/homebrew/bin/git" },
-            resolveFromPath: { _, _ in
-                XCTFail("Should not reach process PATH")
-                return nil
-            },
-            resolveFromShellPath: { _ in
-                shellPathCalled = true
-                return "/some/path"
-            }
-        )
-
-        XCTAssertEqual(resolved, "/opt/homebrew/bin/git")
-        XCTAssertFalse(shellPathCalled, "Shell PATH should not be queried when known location matches")
-    }
-
-    func testShellPathSkippedWhenProcessPathMatches() {
-        var shellPathCalled = false
+    func testFallsBackToProcessPathWhenShellPathMisses() {
         let resolved = CommandLineTools.path(
             for: "mytool",
             environment: ["PATH": "/custom/bin", "SHELL": "/bin/zsh"],
@@ -85,19 +36,59 @@ final class CommandLineToolsTests: XCTestCase {
                 let rawPath = env["PATH"] ?? ""
                 for dir in rawPath.split(separator: ":") {
                     let candidate = "\(dir)/\(name)"
-                    if FileManager.default.isExecutableFile(atPath: candidate) || candidate == "/custom/bin/mytool" {
-                        return candidate
-                    }
+                    if candidate == "/custom/bin/mytool" { return candidate }
                 }
                 return nil
             },
             resolveFromShellPath: { _ in
-                shellPathCalled = true
-                return "/some/path"
+                // Shell PATH doesn't contain the tool
+                "/usr/bin:/bin"
             }
         )
 
         XCTAssertEqual(resolved, "/custom/bin/mytool")
-        XCTAssertFalse(shellPathCalled, "Shell PATH should not be queried when process PATH matches")
+    }
+
+    func testFallsBackToKnownLocationsAsLastResort() {
+        let resolved = CommandLineTools.path(
+            for: "git",
+            environment: ["PATH": "", "SHELL": "/bin/zsh"],
+            isExecutable: { $0 == "/opt/homebrew/bin/git" },
+            resolveFromPath: { _, _ in nil },
+            resolveFromShellPath: { _ in
+                // Shell PATH doesn't contain the tool either
+                "/usr/bin:/bin"
+            }
+        )
+
+        XCTAssertEqual(resolved, "/opt/homebrew/bin/git")
+    }
+
+    func testReturnsNilWhenNothingFound() {
+        let resolved = CommandLineTools.path(
+            for: "nonexistent",
+            environment: ["PATH": "", "SHELL": "/bin/zsh"],
+            isExecutable: { _ in false },
+            resolveFromPath: { _, _ in nil },
+            resolveFromShellPath: { _ in "/usr/bin:/bin" }
+        )
+
+        XCTAssertNil(resolved)
+    }
+
+    func testSkipsShellPathWhenShellNotSet() {
+        // No SHELL in environment, should skip shell PATH and fall through
+        let resolved = CommandLineTools.path(
+            for: "git",
+            environment: ["PATH": ""],
+            isExecutable: { $0 == "/usr/local/bin/git" },
+            resolveFromPath: { _, _ in nil },
+            resolveFromShellPath: { _ in
+                XCTFail("Shell PATH should not be queried when SHELL is not set")
+                return nil
+            }
+        )
+
+        XCTAssertEqual(resolved, "/usr/local/bin/git")
     }
 }
