@@ -1,5 +1,41 @@
 # Changelog
 
+## [0.1.53](https://github.com/alltuner/factoryfloor/compare/v0.1.52...v0.1.53) (2026-03-31)
+
+
+### Features
+
+* auto-fetch origin/main before worktree creation ([#257](https://github.com/alltuner/factoryfloor/issues/257)) ([cfa8dc6](https://github.com/alltuner/factoryfloor/commit/cfa8dc640decdad5d7816f6a3826f79c5370885a)), closes [#253](https://github.com/alltuner/factoryfloor/issues/253)
+* handle ghostty desktop notifications and bell actions ([#264](https://github.com/alltuner/factoryfloor/issues/264)) ([fde32f5](https://github.com/alltuner/factoryfloor/commit/fde32f563e40bb00643dc0721043c774b3b1ef04))
+* support conductor.json and superset config as script fallbacks ([#261](https://github.com/alltuner/factoryfloor/issues/261)) ([0a4f0bc](https://github.com/alltuner/factoryfloor/commit/0a4f0bc32c522b6053d843df1c3c0cc7f5076894)), closes [#256](https://github.com/alltuner/factoryfloor/issues/256)
+
+
+### Bug Fixes
+
+* enable desktop notifications by adding UNUserNotificationCenterDelegate ([#269](https://github.com/alltuner/factoryfloor/issues/269)) ([0c5d9f1](https://github.com/alltuner/factoryfloor/commit/0c5d9f14edd352a9f84af8cafa476d2f2fca637f))
+* match ghostty trackpad scroll speed and momentum ([#263](https://github.com/alltuner/factoryfloor/issues/263)) ([60996a2](https://github.com/alltuner/factoryfloor/commit/60996a2e26a8fae0df891e51babbfe527a2bba81)), closes [#262](https://github.com/alltuner/factoryfloor/issues/262)
+* prevent user tmux config from leaking into sessions ([#272](https://github.com/alltuner/factoryfloor/issues/272)) ([c7ccef9](https://github.com/alltuner/factoryfloor/commit/c7ccef93ed8236a6bcbb8ee277c6c1ffe4fa24b7))
+* resolve build error and warnings in ContentView and TerminalApp ([#265](https://github.com/alltuner/factoryfloor/issues/265)) ([06d476d](https://github.com/alltuner/factoryfloor/commit/06d476d7fb54bd2d4d9b643fb13ad378824f93f2))
+* respawn agent in tmux mode when process exits ([#267](https://github.com/alltuner/factoryfloor/issues/267)) ([f8e54a1](https://github.com/alltuner/factoryfloor/commit/f8e54a1c32152c064748540ed95550201824706f))
+* revert worktree-create hook to symlink only xcframework ([#273](https://github.com/alltuner/factoryfloor/issues/273)) ([9ed32b5](https://github.com/alltuner/factoryfloor/commit/9ed32b5584ba69ce097bb7c8f10123b8a9568151))
+* scope tmux respawn hook to agent sessions only ([#268](https://github.com/alltuner/factoryfloor/issues/268)) ([e4b57af](https://github.com/alltuner/factoryfloor/commit/e4b57af886f826acc73b30c1dd4c857ff2d7aaf4))
+* show explicit desktop notifications even when app is active ([#266](https://github.com/alltuner/factoryfloor/issues/266)) ([f0b04ca](https://github.com/alltuner/factoryfloor/commit/f0b04caa4ab9bbda5c02b731ecf82184fb2ac301))
+
+
+### Performance
+
+* show workstream UI instantly during worktree creation ([#258](https://github.com/alltuner/factoryfloor/issues/258)) ([8f31121](https://github.com/alltuner/factoryfloor/commit/8f31121cf49c260b08119c109ab41c1e6c987b85)), closes [#254](https://github.com/alltuner/factoryfloor/issues/254)
+
+
+### Miscellaneous
+
+* **deps:** update actions/checkout action to v6 ([#271](https://github.com/alltuner/factoryfloor/issues/271)) ([0ac67a2](https://github.com/alltuner/factoryfloor/commit/0ac67a28ac9d8bc53a349db69ec48878434b75c5))
+
+
+### Documentation
+
+* document .factoryfloor.json script configuration ([#259](https://github.com/alltuner/factoryfloor/issues/259)) ([d52c0a2](https://github.com/alltuner/factoryfloor/commit/d52c0a2878a273c75118b950c7cb295d5c2b334a)), closes [#255](https://github.com/alltuner/factoryfloor/issues/255)
+
 ## [0.1.52](https://github.com/alltuner/factoryfloor/compare/v0.1.51...v0.1.52) (2026-03-31)
 
 
