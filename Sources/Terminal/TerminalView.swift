@@ -460,15 +460,35 @@ final class TerminalView: NSView {
 
     override func scrollWheel(with event: NSEvent) {
         guard let surface else { return }
-        let x = event.scrollingDeltaX
-        let y = event.scrollingDeltaY
+        var x = event.scrollingDeltaX
+        var y = event.scrollingDeltaY
+        let precision = event.hasPreciseScrollingDeltas
 
-        // Build scroll mods as a packed int matching ghostty's expectations
-        var scrollMods: Int32 = 0
-        if event.hasPreciseScrollingDeltas {
-            scrollMods |= (1 << 0) // precision bit
+        if precision {
+            x *= 2
+            y *= 2
         }
+
+        // Pack scroll mods matching ghostty's expectations:
+        // bit 0 = precision, bits 1-3 = momentum phase
+        var scrollMods: Int32 = 0
+        if precision {
+            scrollMods |= (1 << 0)
+        }
+        scrollMods |= Int32(Self.momentumValue(event.momentumPhase)) << 1
         ghostty_surface_mouse_scroll(surface, x, y, scrollMods)
+    }
+
+    private static func momentumValue(_ phase: NSEvent.Phase) -> UInt8 {
+        switch phase {
+        case .began: 1
+        case .stationary: 2
+        case .changed: 3
+        case .ended: 4
+        case .cancelled: 5
+        case .mayBegin: 6
+        default: 0
+        }
     }
 
     // MARK: - Modifier translation
