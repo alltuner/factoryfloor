@@ -92,6 +92,24 @@ targets:
         buildPhase: resources
       - path: Resources/Scripts/ff
         buildPhase: resources
+      - path: Resources/PixelAgents
+        buildPhase: resources
+        type: folder
+    preBuildScripts:
+      - script: |
+          set -e
+          cd "${PROJECT_DIR}/pixel-agents"
+          if [ -f package.json ]; then
+            npm run build --silent
+            rsync -a --delete dist/ "${PROJECT_DIR}/Resources/PixelAgents/"
+            cp -r public/assets "${PROJECT_DIR}/Resources/PixelAgents/"
+            # WKWebView file:// requires no crossorigin and no type="module"
+            # Add defer so script runs after DOM is parsed
+            sed -i '' 's/ crossorigin//g; s/type="module" /defer /g' "${PROJECT_DIR}/Resources/PixelAgents/index.html"
+          fi
+        name: Build Pixel Agents
+        outputFiles:
+          - $(PROJECT_DIR)/Resources/PixelAgents/index.html
     settings:
       base:
         PRODUCT_MODULE_NAME: FactoryFloor

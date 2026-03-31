@@ -406,9 +406,13 @@ struct TerminalContainerView: View {
 
     private var mainContent: some View {
         VStack(spacing: 0) {
-            tabBar
+            VStack(spacing: 0) {
+                tabBar
+                Divider()
+                tabContent
+            }
             Divider()
-            tabContent
+            PixelAgentsPanelView(projectDirectory: projectDirectory)
         }
         .onAppear {
             cachedClaudeCommand = buildClaudeCommand()

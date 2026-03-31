@@ -361,29 +361,45 @@ struct ProjectSidebar: View {
         let name = NameGenerator.generate(avoiding: existingNames)
         logger.warning("[FF] addWorkstream: generated name=\(name, privacy: .public)")
 
-        guard let worktreePath = GitOperations.createWorktree(
-            projectPath: project.directory,
-            projectName: project.name,
-            workstreamName: name,
-            branchPrefix: branchPrefix,
-            symlinkEnv: symlinkEnv
-        ) else {
-            logger.warning("[FF] addWorkstream: createWorktree FAILED")
-            showWorktreeError = true
-            return
-        }
-        logger.warning("[FF] addWorkstream: worktree created at \(worktreePath, privacy: .public)")
-
         let bypass = bypassPermissions ?? defaultBypass
-        let workstream = Workstream(name: name, worktreePath: worktreePath, bypassPermissions: bypass)
-        expandedProjects.insert(projectID)
-        NotificationCenter.default.post(
-            name: .workstreamCreated,
-            object: nil,
-            userInfo: ["projectID": projectID, "workstream": workstream]
-        )
-        rebuildIndices()
-        logger.warning("[FF] addWorkstream: done, posted notification")
+        let workstreamID = UUID()
+        let capturedBranchPrefix = branchPrefix
+        let capturedProjectDir = project.directory
+        let capturedProjectName = project.name
+
+        // Use AsyncSetupService: creates worktree (blocking), then runs env/symlink/deps
+        // in the background. Claude Code terminal launches immediately after worktree creation.
+        Task {
+            guard let worktreePath = await AsyncSetupService.shared.setup(
+                workstreamID: workstreamID,
+                projectPath: capturedProjectDir,
+                projectName: capturedProjectName,
+                workstreamName: name,
+                branchPrefix: capturedBranchPrefix
+            ) else {
+                await MainActor.run {
+                    logger.warning("[FF] addWorkstream: createWorktree FAILED")
+                    showWorktreeError = true
+                }
+                return
+            }
+
+            await MainActor.run {
+                logger.warning("[FF] addWorkstream: worktree created at \(worktreePath, privacy: .public)")
+                let workstream = Workstream(
+                    name: name, worktreePath: worktreePath,
+                    bypassPermissions: bypass, id: workstreamID
+                )
+                expandedProjects.insert(projectID)
+                NotificationCenter.default.post(
+                    name: .workstreamCreated,
+                    object: nil,
+                    userInfo: ["projectID": projectID, "workstream": workstream]
+                )
+                rebuildIndices()
+                logger.warning("[FF] addWorkstream: done, posted notification")
+            }
+        }
     }
 
     @EnvironmentObject private var surfaceCache: TerminalSurfaceCache
