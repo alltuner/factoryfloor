@@ -36,9 +36,12 @@ enum GitOperations {
         return FileManager.default.fileExists(atPath: gitDir.path)
     }
 
-    /// Initialize a git repo at the given path.
+    /// Initialize a git repo at the given path with an empty initial commit.
     static func initRepo(at path: String) -> Bool {
-        return run(args: ["init"], in: path) != nil
+        guard run(args: ["init"], in: path) != nil else { return false }
+        // Create an empty commit so the repo has a HEAD ref, which is
+        // required for worktree creation.
+        return run(args: ["commit", "--allow-empty", "-m", "Initial commit"], in: path) != nil
     }
 
     /// Get repo information for display.
