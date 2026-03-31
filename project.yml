@@ -92,6 +92,8 @@ targets:
         buildPhase: resources
       - path: Resources/Scripts/ff
         buildPhase: resources
+      - path: Resources/notification.wav
+        buildPhase: resources
     settings:
       base:
         PRODUCT_MODULE_NAME: FactoryFloor

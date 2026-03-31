@@ -3,6 +3,7 @@
 
 import Cocoa
 import os
+import UserNotifications
 
 private let logger = Logger(subsystem: "factoryfloor", category: "terminal-app")
 
@@ -17,7 +18,7 @@ private func handleTerminalWakeup(_ userdata: UnsafeMutableRawPointer?) {
 }
 
 private func handleTerminalAction(
-    _ userdata: UnsafeMutableRawPointer?,
+    _: UnsafeMutableRawPointer?,
     _ target: ghostty_target_s,
     _ action: ghostty_action_s
 ) -> Bool {
@@ -36,6 +37,15 @@ private func handleTerminalAction(
             )
         }
         return true
+    case GHOSTTY_ACTION_DESKTOP_NOTIFICATION:
+        let notification = action.action.desktop_notification
+        let title = notification.title.map { String(cString: $0) } ?? AppConstants.appName
+        let body = notification.body.map { String(cString: $0) } ?? ""
+        sendDesktopNotification(title: title, body: body)
+        return true
+    case GHOSTTY_ACTION_RING_BELL:
+        sendDesktopNotification(title: AppConstants.appName, body: "Terminal bell")
+        return true
     default:
         return false
     }
@@ -43,7 +53,7 @@ private func handleTerminalAction(
 
 private func readTerminalClipboard(
     _ userdata: UnsafeMutableRawPointer?,
-    _ location: ghostty_clipboard_e,
+    _: ghostty_clipboard_e,
     _ state: UnsafeMutableRawPointer?
 ) -> Bool {
     guard let userdata else { return false }
@@ -60,14 +70,14 @@ private func readTerminalClipboard(
 }
 
 private func writeTerminalClipboard(
-    _ userdata: UnsafeMutableRawPointer?,
-    _ location: ghostty_clipboard_e,
+    _: UnsafeMutableRawPointer?,
+    _: ghostty_clipboard_e,
     _ content: UnsafePointer<ghostty_clipboard_content_s>?,
     _ len: Int,
-    _ confirm: Bool
+    _: Bool
 ) {
     guard let content, len > 0 else { return }
-    let entries = (0..<len).compactMap { index -> String? in
+    let entries = (0 ..< len).compactMap { index -> String? in
         let item = content[index]
         guard let mime = item.mime, let data = item.data else { return nil }
         let mimeStr = String(cString: mime)
@@ -87,7 +97,7 @@ private func writeTerminalClipboard(
 
 private func closeTerminalSurface(
     _ userdata: UnsafeMutableRawPointer?,
-    _ processAlive: Bool
+    _: Bool
 ) {
     guard let userdata else { return }
     let userdataBits = UInt(bitPattern: userdata)
@@ -118,11 +128,30 @@ private func writeClipboardText(_ plainText: String) {
     pasteboard.setString(plainText, forType: .string)
 }
 
+private func sendDesktopNotification(title: String, body: String) {
+    guard !NSApp.isActive else { return }
+    let center = UNUserNotificationCenter.current()
+    let content = UNMutableNotificationContent()
+    content.title = title
+    content.body = body
+    content.sound = UNNotificationSound(named: UNNotificationSoundName("notification.wav"))
+    let request = UNNotificationRequest(
+        identifier: UUID().uuidString,
+        content: content,
+        trigger: nil
+    )
+    center.add(request) { error in
+        if let error {
+            logger.warning("Failed to deliver notification: \(error.localizedDescription)")
+        }
+    }
+}
+
 @MainActor
 final class TerminalApp {
     static let shared = TerminalApp()
 
-    nonisolated(unsafe) private(set) var app: ghostty_app_t?
+    private(set) nonisolated(unsafe) var app: ghostty_app_t?
 
     private init() {
         // Create config
@@ -158,6 +187,16 @@ final class TerminalApp {
             guard let self, let app = self.app else { return }
             if let nsApp = NSApp {
                 ghostty_app_set_focus(app, nsApp.isActive)
+            }
+        }
+
+        UNUserNotificationCenter.current().requestAuthorization(
+            options: [.alert, .sound]
+        ) { granted, error in
+            if let error {
+                logger.warning("Notification permission error: \(error.localizedDescription)")
+            } else if !granted {
+                logger.info("Notification permission denied by user")
             }
         }
 
