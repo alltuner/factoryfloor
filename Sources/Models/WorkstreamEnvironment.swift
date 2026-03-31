@@ -23,10 +23,6 @@ enum WorkstreamEnvironment {
         if agentTeams {
             vars["CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS"] = "1"
         }
-        let shell = CommandBuilder.userShell
-        if let path = CommandLineTools.loginShellPath(shell: shell) {
-            vars["PATH"] = path
-        }
         return vars
     }
 }
