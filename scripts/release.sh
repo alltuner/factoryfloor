@@ -59,10 +59,10 @@ cp -R "$APP_PATH" "$DMG_STAGING/"
 create-dmg \
   --volname "$APP_NAME" \
   --background "Resources/dmg-background@2x.png" \
-  --window-size 660 400 \
+  --window-size 660 460 \
   --icon-size 128 \
-  --icon "${APP_NAME}.app" 170 180 \
-  --app-drop-link 490 180 \
+  --icon "${APP_NAME}.app" 170 170 \
+  --app-drop-link 490 170 \
   --no-internet-enable \
   "$BUILD_DIR/$DMG_NAME" \
   "$DMG_STAGING" || true
