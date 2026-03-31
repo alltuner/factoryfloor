@@ -41,10 +41,10 @@ private func handleTerminalAction(
         let notification = action.action.desktop_notification
         let title = notification.title.map { String(cString: $0) } ?? AppConstants.appName
         let body = notification.body.map { String(cString: $0) } ?? ""
-        sendDesktopNotification(title: title, body: body)
+        sendDesktopNotification(title: title, body: body, suppressWhenActive: false)
         return true
     case GHOSTTY_ACTION_RING_BELL:
-        sendDesktopNotification(title: AppConstants.appName, body: "Terminal bell")
+        sendDesktopNotification(title: AppConstants.appName, body: "Terminal bell", suppressWhenActive: true)
         return true
     default:
         return false
@@ -128,9 +128,9 @@ private func writeClipboardText(_ plainText: String) {
     pasteboard.setString(plainText, forType: .string)
 }
 
-private func sendDesktopNotification(title: String, body: String) {
+private func sendDesktopNotification(title: String, body: String, suppressWhenActive: Bool) {
     DispatchQueue.main.async {
-        guard !NSApp.isActive else { return }
+        if suppressWhenActive, NSApp.isActive { return }
         let center = UNUserNotificationCenter.current()
         let content = UNMutableNotificationContent()
         content.title = title
