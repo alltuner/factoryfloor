@@ -152,7 +152,7 @@ enum TmuxSession {
         let socket = shellEscape(socketName)
         let conf = shellEscape(configPath)
         let logFile = shellEscape(stderrLogPath)
-        let startServer = "\(tmuxPath) -L \(socket) start-server 2>>\(logFile) || true"
+        let startServer = "\(tmuxPath) -L \(socket) -f \(conf) start-server 2>>\(logFile) || true"
         let sourceFile = "\(tmuxPath) -L \(socket) source-file \(conf) 2>>\(logFile)"
         return "\(startServer); \(sourceFile)"
     }
