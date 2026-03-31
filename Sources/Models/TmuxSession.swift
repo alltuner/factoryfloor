@@ -35,6 +35,7 @@ enum TmuxSession {
         set -g window-size latest
         set -g remain-on-exit on
         set -g remain-on-exit-format ""
+        set-hook -g pane-died 'respawn-pane'
         """
     }
 
@@ -151,7 +152,6 @@ enum TmuxSession {
         let logFile = shellEscape(stderrLogPath)
         let startServer = "\(tmuxPath) -L \(socket) start-server 2>>\(logFile) || true"
         let sourceFile = "\(tmuxPath) -L \(socket) source-file \(conf) 2>>\(logFile)"
-        let clearPaneDiedHook = "\(tmuxPath) -L \(socket) set-hook -gu pane-died 2>>\(logFile) || true"
-        return "\(startServer); \(sourceFile); \(clearPaneDiedHook)"
+        return "\(startServer); \(sourceFile)"
     }
 }
