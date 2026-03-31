@@ -107,6 +107,7 @@ enum GitOperations {
             ? workstreamName
             : "\(branchPrefix)/\(workstreamName)"
 
+        fetchDefaultBranch(at: projectPath)
         let baseBranch = defaultBranch(at: projectPath)
 
         // Create parent directories
@@ -255,6 +256,59 @@ enum GitOperations {
     }
 
     // MARK: - Private
+
+    /// Fetch the default branch from origin. Fails silently when there is no
+    /// remote or the network is unreachable.
+    private static func fetchDefaultBranch(at path: String) {
+        // Check if origin remote exists first (fast, no network)
+        guard run(args: ["remote", "get-url", "origin"], in: path) != nil else { return }
+
+        // Determine which branch to fetch
+        let branch: String
+        if let ref = run(args: ["symbolic-ref", "refs/remotes/origin/HEAD", "--short"], in: path) {
+            // e.g. "origin/main" -> "main"
+            branch = ref.trimmingCharacters(in: .whitespacesAndNewlines)
+                .replacingOccurrences(of: "origin/", with: "")
+        } else {
+            branch = "main"
+        }
+
+        // Fetch with timeout — don't block worktree creation
+        runWithTimeout(args: ["fetch", "origin", branch, "--no-tags"], in: path, timeout: 5)
+    }
+
+    @discardableResult
+    private static func runWithTimeout(args: [String], in directory: String, timeout: TimeInterval) -> String? {
+        guard let gitPath else { return nil }
+        let process = Process()
+        let pipe = Pipe()
+        let errPipe = Pipe()
+        process.executableURL = URL(fileURLWithPath: gitPath)
+        process.arguments = args
+        process.currentDirectoryURL = URL(fileURLWithPath: directory)
+        process.standardOutput = pipe
+        process.standardError = errPipe
+        do {
+            try process.run()
+        } catch {
+            return nil
+        }
+
+        let deadline = DispatchTime.now() + timeout
+        let group = DispatchGroup()
+        group.enter()
+        process.terminationHandler = { _ in group.leave() }
+
+        if group.wait(timeout: deadline) == .timedOut {
+            process.terminate()
+            logger.info("[FF] git \(args.joined(separator: " "), privacy: .public) timed out after \(timeout, privacy: .public)s")
+            return nil
+        }
+
+        guard process.terminationStatus == 0 else { return nil }
+        let data = pipe.fileHandleForReading.readDataToEndOfFile()
+        return String(data: data, encoding: .utf8)
+    }
 
     private static func sanitize(_ name: String) -> String {
         var result = name.replacingOccurrences(of: "/", with: "--")
