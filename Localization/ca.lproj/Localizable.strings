@@ -243,3 +243,7 @@
 "Stop" = "Atura";
 
 "Restarting..." = "Reiniciant...";
+
+/* Update Banner */
+"v%@ available" = "v%@ disponible";
+"Release Notes" = "Notes de la versió";

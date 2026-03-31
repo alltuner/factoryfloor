@@ -243,3 +243,7 @@
 "Stop" = "Stoppa";
 
 "Restarting..." = "Startar om...";
+
+/* Update Banner */
+"v%@ available" = "v%@ tillgänglig";
+"Release Notes" = "Versionsanteckningar";

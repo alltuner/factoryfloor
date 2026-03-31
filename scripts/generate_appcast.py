@@ -28,6 +28,9 @@ def build_appcast(
 
     item = ET.SubElement(channel, "item")
     ET.SubElement(item, "title").text = f"Version {version}"
+    ET.SubElement(
+        item, "link"
+    ).text = f"https://github.com/alltuner/factoryfloor/releases/tag/v{version}"
     pub_date = datetime.datetime.now(datetime.timezone.utc).strftime(
         "%a, %d %b %Y %H:%M:%S %z"
     )
