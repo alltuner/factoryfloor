@@ -272,7 +272,7 @@ struct TerminalContainerView: View {
         var intermediates = [resume.command, fresh.command, cmd]
         if useTmux, let tmuxPath = appEnv.toolStatus.tmux.path {
             let session = TmuxSession.sessionName(project: projectName, workstream: workstreamName, role: "agent")
-            finalCommand = TmuxSession.wrapCommand(tmuxPath: tmuxPath, sessionName: session, command: cmd, environmentVars: envVars)
+            finalCommand = TmuxSession.wrapCommand(tmuxPath: tmuxPath, sessionName: session, command: cmd, environmentVars: envVars, respawnOnExit: true)
             intermediates.append(finalCommand)
         } else {
             finalCommand = cmd

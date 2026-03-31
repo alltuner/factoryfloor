@@ -1,5 +1,5 @@
 // ABOUTME: Tests for tmux session configuration and command composition.
-// ABOUTME: Verifies the generated config respawns panes on exit for agent persistence.
+// ABOUTME: Verifies respawn behavior is scoped to agent sessions, not global.
 
 @testable import FactoryFloor
 import XCTest
@@ -18,10 +18,31 @@ final class TmuxSessionTests: XCTestCase {
         XCTAssertTrue(TmuxSession.configContents.contains("set -g alternate-screen off"))
     }
 
-    func testConfigRespawnsDeadPanes() {
-        XCTAssertTrue(TmuxSession.configContents.contains("set-hook -g pane-died 'respawn-pane'"))
+    func testConfigDoesNotGloballyRespawnDeadPanes() {
+        XCTAssertFalse(TmuxSession.configContents.contains("pane-died"))
         XCTAssertTrue(TmuxSession.configContents.contains("set -g remain-on-exit on"))
         XCTAssertTrue(TmuxSession.configContents.contains("set -g remain-on-exit-format \"\""))
+    }
+
+    func testRespawnOnExitAddsSessionLevelHook() {
+        let command = TmuxSession.wrapCommand(
+            tmuxPath: "/opt/homebrew/bin/tmux",
+            sessionName: "proj/ws/agent",
+            command: "claude",
+            respawnOnExit: true,
+            shell: "/bin/zsh"
+        )
+        XCTAssertTrue(command.contains("set-hook pane-died"))
+    }
+
+    func testDefaultDoesNotRespawn() {
+        let command = TmuxSession.wrapCommand(
+            tmuxPath: "/opt/homebrew/bin/tmux",
+            sessionName: "proj/ws/setup",
+            command: "setup.sh",
+            shell: "/bin/zsh"
+        )
+        XCTAssertFalse(command.contains("pane-died"))
     }
 
     func testWrapCommandQuotesEnvVarValuesWithSpaces() {

@@ -35,7 +35,6 @@ enum TmuxSession {
         set -g window-size latest
         set -g remain-on-exit on
         set -g remain-on-exit-format ""
-        set-hook -g pane-died 'respawn-pane'
         """
     }
 
@@ -59,7 +58,7 @@ enum TmuxSession {
     /// Dedicated socket name so we don't interfere with the user's tmux.
     private static let socketName = AppConstants.appID
 
-    static func wrapCommand(tmuxPath: String, sessionName: String, command: String?, environmentVars: [String: String] = [:], shell: String = CommandBuilder.userShell) -> String {
+    static func wrapCommand(tmuxPath: String, sessionName: String, command: String?, environmentVars: [String: String] = [:], respawnOnExit: Bool = false, shell: String = CommandBuilder.userShell) -> String {
         let socket = shellEscape(socketName)
         let conf = shellEscape(configPath)
         let escaped = shellEscape(sessionName)
@@ -74,6 +73,9 @@ enum TmuxSession {
         if let command {
             // Command is already shell-quoted by the caller (runScriptCommand/scriptCommand)
             tmuxCmd += " \(command)"
+        }
+        if respawnOnExit {
+            tmuxCmd += " \\; set-hook pane-died 'respawn-pane'"
         }
 
         // Use login shell for proper PATH, with inner sh for POSIX syntax.
