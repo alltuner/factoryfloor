@@ -8,6 +8,8 @@ private let logger = Logger(subsystem: "factoryfloor", category: "content-view")
 
 extension Notification.Name {
     static let workstreamCreated = Notification.Name("factoryfloor.workstreamCreated")
+    static let workstreamWorktreeReady = Notification.Name("factoryfloor.workstreamWorktreeReady")
+    static let workstreamCreationFailed = Notification.Name("factoryfloor.workstreamCreationFailed")
     static let projectCreated = Notification.Name("factoryfloor.projectCreated")
 }
 
@@ -81,17 +83,29 @@ struct ContentView: View {
                 .navigationTitle("Help")
                 .navigationSubtitle(AppConstants.appName)
         } else if let workstream = activeWorkstream, let project = activeProject {
-            TerminalContainerView(
-                workstreamID: workstream.id,
-                workingDirectory: workstream.workingDirectory(projectDirectory: project.directory),
-                projectDirectory: project.directory,
-                projectName: project.name,
-                workstreamName: workstream.name,
-                bypassPermissions: workstream.bypassPermissions
-            )
-            .id(workstream.id)
-            .navigationTitle(workstream.name)
-            .navigationSubtitle(project.name)
+            if workstream.worktreePath != nil {
+                TerminalContainerView(
+                    workstreamID: workstream.id,
+                    workingDirectory: workstream.workingDirectory(projectDirectory: project.directory),
+                    projectDirectory: project.directory,
+                    projectName: project.name,
+                    workstreamName: workstream.name,
+                    bypassPermissions: workstream.bypassPermissions
+                )
+                .id(workstream.id)
+                .navigationTitle(workstream.name)
+                .navigationSubtitle(project.name)
+            } else {
+                VStack(spacing: 12) {
+                    ProgressView()
+                        .controlSize(.large)
+                    Text("Preparing workstream...")
+                        .foregroundStyle(.secondary)
+                }
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
+                .navigationTitle(workstream.name)
+                .navigationSubtitle(project.name)
+            }
         } else if let project = activeProject,
                   let projectIndex = projects.firstIndex(where: { $0.id == project.id })
         {
@@ -248,6 +262,31 @@ struct ContentView: View {
             selection = .workstream(workstream.id)
             ProjectStore.save(projects)
             logger.warning("[FF] workstreamCreated notification handled: \(workstream.name, privacy: .public)")
+        }
+        .onReceive(NotificationCenter.default.publisher(for: .workstreamWorktreeReady)) { notification in
+            guard let info = notification.userInfo,
+                  let workstreamID = info["workstreamID"] as? UUID,
+                  let worktreePath = info["worktreePath"] as? String else { return }
+            for pi in projects.indices {
+                if let wi = projects[pi].workstreams.firstIndex(where: { $0.id == workstreamID }) {
+                    projects[pi].workstreams[wi].worktreePath = worktreePath
+                    ProjectStore.save(projects)
+                    logger.warning("[FF] workstreamWorktreeReady: updated \(workstreamID, privacy: .public) with path \(worktreePath, privacy: .public)")
+                    return
+                }
+            }
+        }
+        .onReceive(NotificationCenter.default.publisher(for: .workstreamCreationFailed)) { notification in
+            guard let info = notification.userInfo,
+                  let projectID = info["projectID"] as? UUID,
+                  let workstreamID = info["workstreamID"] as? UUID,
+                  let pi = projects.firstIndex(where: { $0.id == projectID }) else { return }
+            projects[pi].workstreams.removeAll { $0.id == workstreamID }
+            if case let .workstream(selectedID) = selection, selectedID == workstreamID {
+                selection = .project(projectID)
+            }
+            ProjectStore.save(projects)
+            logger.warning("[FF] workstreamCreationFailed: removed \(workstreamID, privacy: .public)")
         }
         .onReceive(NotificationCenter.default.publisher(for: .projectCreated)) { notification in
             guard let project = notification.userInfo?["project"] as? Project else { return }

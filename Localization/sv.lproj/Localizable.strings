@@ -244,6 +244,7 @@
 "Stop" = "Stoppa";
 
 "Restarting..." = "Startar om...";
+"Preparing workstream..." = "Förbereder arbetsflöde...";
 
 /* Update Banner */
 "v%@ available" = "v%@ tillgänglig";

@@ -244,6 +244,7 @@
 "Stop" = "Detener";
 
 "Restarting..." = "Reiniciando...";
+"Preparing workstream..." = "Preparando flujo de trabajo...";
 
 /* Update Banner */
 "v%@ available" = "v%@ disponible";

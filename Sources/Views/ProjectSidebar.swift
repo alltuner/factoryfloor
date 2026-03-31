@@ -361,21 +361,8 @@ struct ProjectSidebar: View {
         let name = NameGenerator.generate(avoiding: existingNames)
         logger.warning("[FF] addWorkstream: generated name=\(name, privacy: .public)")
 
-        guard let worktreePath = GitOperations.createWorktree(
-            projectPath: project.directory,
-            projectName: project.name,
-            workstreamName: name,
-            branchPrefix: branchPrefix,
-            symlinkEnv: symlinkEnv
-        ) else {
-            logger.warning("[FF] addWorkstream: createWorktree FAILED")
-            showWorktreeError = true
-            return
-        }
-        logger.warning("[FF] addWorkstream: worktree created at \(worktreePath, privacy: .public)")
-
         let bypass = bypassPermissions ?? defaultBypass
-        let workstream = Workstream(name: name, worktreePath: worktreePath, bypassPermissions: bypass)
+        let workstream = Workstream(name: name, worktreePath: nil, bypassPermissions: bypass)
         expandedProjects.insert(projectID)
         NotificationCenter.default.post(
             name: .workstreamCreated,
@@ -383,7 +370,41 @@ struct ProjectSidebar: View {
             userInfo: ["projectID": projectID, "workstream": workstream]
         )
         rebuildIndices()
-        logger.warning("[FF] addWorkstream: done, posted notification")
+        logger.warning("[FF] addWorkstream: posted notification (optimistic), starting background worktree creation")
+
+        let projectPath = project.directory
+        let projectName = project.name
+        let prefix = branchPrefix
+        let symlink = symlinkEnv
+        let workstreamID = workstream.id
+
+        DispatchQueue.global(qos: .userInitiated).async {
+            let worktreePath = GitOperations.createWorktree(
+                projectPath: projectPath,
+                projectName: projectName,
+                workstreamName: name,
+                branchPrefix: prefix,
+                symlinkEnv: symlink
+            )
+            DispatchQueue.main.async {
+                if let worktreePath {
+                    logger.warning("[FF] addWorkstream: worktree created at \(worktreePath, privacy: .public)")
+                    NotificationCenter.default.post(
+                        name: .workstreamWorktreeReady,
+                        object: nil,
+                        userInfo: ["workstreamID": workstreamID, "worktreePath": worktreePath]
+                    )
+                } else {
+                    logger.warning("[FF] addWorkstream: createWorktree FAILED, rolling back")
+                    NotificationCenter.default.post(
+                        name: .workstreamCreationFailed,
+                        object: nil,
+                        userInfo: ["projectID": projectID, "workstreamID": workstreamID]
+                    )
+                    showWorktreeError = true
+                }
+            }
+        }
     }
 
     @EnvironmentObject private var surfaceCache: TerminalSurfaceCache

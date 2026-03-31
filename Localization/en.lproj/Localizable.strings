@@ -244,6 +244,7 @@
 "Stop" = "Stop";
 
 "Restarting..." = "Restarting...";
+"Preparing workstream..." = "Preparing workstream...";
 
 /* Update Banner */
 "v%@ available" = "v%@ available";

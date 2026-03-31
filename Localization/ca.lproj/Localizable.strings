@@ -244,6 +244,7 @@
 "Stop" = "Atura";
 
 "Restarting..." = "Reiniciant...";
+"Preparing workstream..." = "Preparant el flux de treball...";
 
 /* Update Banner */
 "v%@ available" = "v%@ disponible";
