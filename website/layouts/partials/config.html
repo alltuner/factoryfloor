@@ -23,5 +23,21 @@
 <span class="text-fg-muted">}</span></code></pre>
       </div>
     </div>
+    <div class="mt-10 rounded-xl overflow-hidden border border-fg-faint bg-bg-surface max-w-[560px] reveal">
+      <table class="w-full text-left">
+        <thead>
+          <tr class="border-b border-fg-faint bg-bg-elevated">
+            <th class="px-6 py-3 font-mono text-xs font-semibold text-fg-muted">{{ T "config_hook" }}</th>
+            <th class="px-6 py-3 font-mono text-xs font-semibold text-fg-muted">{{ T "config_when" }}</th>
+          </tr>
+        </thead>
+        <tbody class="font-mono text-sm">
+          <tr class="border-b border-fg-faint"><td class="px-6 py-3 text-code-key text-xs">setup</td><td class="px-6 py-3 font-sans text-sm text-fg-dim">{{ T "config_setup_desc" }}</td></tr>
+          <tr class="border-b border-fg-faint"><td class="px-6 py-3 text-code-key text-xs">run</td><td class="px-6 py-3 font-sans text-sm text-fg-dim">{{ T "config_run_desc" }}</td></tr>
+          <tr><td class="px-6 py-3 text-code-key text-xs">teardown</td><td class="px-6 py-3 font-sans text-sm text-fg-dim">{{ T "config_teardown_desc" }}</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="mt-4 text-fg-muted text-sm max-w-[560px] reveal">{{ T "config_optional_note" }}</p>
   </div>
 </section>

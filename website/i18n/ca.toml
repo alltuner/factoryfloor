@@ -91,6 +91,18 @@ other = "Automatitza el cicle de vida dels workstreams amb scripts de setup, run
 other = "Afegeix un"
 [config_or_use]
 other = "a l'arrel del projecte."
+[config_hook]
+other = "Hook"
+[config_when]
+other = "Quan s'executa"
+[config_setup_desc]
+other = "Un cop, quan es crea un workstream. Per instal·lar dependències o passos de build."
+[config_run_desc]
+other = "Sota demanda des de la pestanya Environment. Embolcallat amb ff-run per detectar ports automàticament."
+[config_teardown_desc]
+other = "Quan s'arxiva un workstream. Per netejar recursos com aturar contenidors."
+[config_optional_note]
+other = "Tots els camps són opcionals. Els scripts s'executen al directori del workstream amb el teu shell de login."
 
 # Env vars
 [env_label]

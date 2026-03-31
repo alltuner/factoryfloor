@@ -87,6 +87,18 @@ other = "Automatiza el ciclo de vida de workstreams con scripts de setup, run y 
 other = "Añade un"
 [config_or_use]
 other = "a la raíz de tu proyecto."
+[config_hook]
+other = "Hook"
+[config_when]
+other = "Cuándo se ejecuta"
+[config_setup_desc]
+other = "Una vez, al crear un workstream. Para instalar dependencias o pasos de build."
+[config_run_desc]
+other = "Bajo demanda desde la pestaña Environment. Envuelto en ff-run para detección automática de puertos."
+[config_teardown_desc]
+other = "Al archivar un workstream. Para limpiar recursos como detener contenedores."
+[config_optional_note]
+other = "Todos los campos son opcionales. Los scripts se ejecutan en el directorio del workstream con tu shell de login."
 
 [env_label]
 other = "Entorno"

@@ -86,6 +86,18 @@ other = "Automatisera workstream-livscykeln med setup, run och teardown scripts.
 other = "Lägg till en"
 [config_or_use]
 other = "i din projektrot."
+[config_hook]
+other = "Hook"
+[config_when]
+other = "När det körs"
+[config_setup_desc]
+other = "En gång, när en workstream skapas. För att installera dependencies eller bygga."
+[config_run_desc]
+other = "On demand via Environment-tabben. Wrappat i ff-run för automatisk portdetektering."
+[config_teardown_desc]
+other = "När en workstream arkiveras. För att städa resurser som att stoppa containrar."
+[config_optional_note]
+other = "Alla fält är valfria. Scripts körs i workstreamens directory med ditt login shell."
 
 [env_label]
 other = "Environment"
