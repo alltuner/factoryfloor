@@ -393,14 +393,16 @@ struct TerminalContainerView: View {
                         .buttonStyle(.bordered)
                 }
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
-            } else {
+            } else if let claudeCommand = cachedClaudeCommand {
                 SingleTerminalView(
                     surfaceID: claudeID,
                     workingDirectory: workingDirectory,
-                    command: cachedClaudeCommand,
+                    command: claudeCommand,
                     isFocused: true,
                     environmentVars: envVars
                 )
+            } else {
+                terminalLoadingView(message: "Preparing Coding Agent...")
             }
         case .environment:
             if sessionMode == .waitingForTools {
