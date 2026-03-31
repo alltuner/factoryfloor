@@ -6,13 +6,12 @@ set -euo pipefail
 : "${WORKTREE_DIR:?WORKTREE_DIR must be set}"
 : "${CLAUDE_PROJECT_DIR:?CLAUDE_PROJECT_DIR must be set}"
 
-# Ghostty submodule (headers + xcframework, built with zig, not in git)
-GHOSTTY_SRC="$CLAUDE_PROJECT_DIR/ghostty"
-GHOSTTY_DST="$WORKTREE_DIR/ghostty"
+# Ghostty xcframework (built with zig, not in git)
+XCFW_SRC="$CLAUDE_PROJECT_DIR/ghostty/macos/GhosttyKit.xcframework"
+XCFW_DST="$WORKTREE_DIR/ghostty/macos/GhosttyKit.xcframework"
 
-if [ -d "$GHOSTTY_SRC" ] && [ ! -e "$GHOSTTY_DST/include" ]; then
-    rm -rf "$GHOSTTY_DST"
-    ln -sfn "$GHOSTTY_SRC" "$GHOSTTY_DST"
+if [ -d "$XCFW_SRC" ] && [ ! -e "$XCFW_DST" ]; then
+    ln -sfn "$XCFW_SRC" "$XCFW_DST"
 fi
 
 # Build so SourceKit can resolve symbols across files in the worktree.
