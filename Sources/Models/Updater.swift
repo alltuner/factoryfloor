@@ -20,7 +20,7 @@ final class Updater: ObservableObject {
         #if !DEBUG
             let userDriver = SilentErrorUserDriver(hostBundle: .main, delegate: nil)
             do {
-                let spuUpdater = try SPUUpdater(
+                let spuUpdater = SPUUpdater(
                     hostBundle: .main,
                     applicationBundle: .main,
                     userDriver: userDriver,

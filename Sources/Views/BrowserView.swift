@@ -245,6 +245,7 @@ struct WebViewRepresentable: NSViewRepresentable {
             }
         }
 
+        @MainActor
         func webView(_ webView: WKWebView, runJavaScriptConfirmPanelWithMessage message: String,
                      initiatedByFrame _: WKFrameInfo, completionHandler: @escaping @MainActor @Sendable (Bool) -> Void)
         {
