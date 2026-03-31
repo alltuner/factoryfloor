@@ -129,20 +129,22 @@ private func writeClipboardText(_ plainText: String) {
 }
 
 private func sendDesktopNotification(title: String, body: String) {
-    guard !NSApp.isActive else { return }
-    let center = UNUserNotificationCenter.current()
-    let content = UNMutableNotificationContent()
-    content.title = title
-    content.body = body
-    content.sound = UNNotificationSound(named: UNNotificationSoundName("notification.wav"))
-    let request = UNNotificationRequest(
-        identifier: UUID().uuidString,
-        content: content,
-        trigger: nil
-    )
-    center.add(request) { error in
-        if let error {
-            logger.warning("Failed to deliver notification: \(error.localizedDescription)")
+    DispatchQueue.main.async {
+        guard !NSApp.isActive else { return }
+        let center = UNUserNotificationCenter.current()
+        let content = UNMutableNotificationContent()
+        content.title = title
+        content.body = body
+        content.sound = UNNotificationSound(named: UNNotificationSoundName("notification.wav"))
+        let request = UNNotificationRequest(
+            identifier: UUID().uuidString,
+            content: content,
+            trigger: nil
+        )
+        center.add(request) { error in
+            if let error {
+                logger.warning("Failed to deliver notification: \(error.localizedDescription)")
+            }
         }
     }
 }

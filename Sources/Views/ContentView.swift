@@ -196,6 +196,61 @@ struct ContentView: View {
     }
 
     private var navigationView: some View {
+        navigationViewBase
+            .onChange(of: appEnvironment.missingProjectIDs) { _, missing in
+                guard !missing.isEmpty else { return }
+                logger.warning("[FF] missingProjectIDs changed: \(missing.count, privacy: .public) missing, \(projects.count, privacy: .public) total projects")
+                let names = projects.filter { missing.contains($0.id) }.map(\.name)
+                logger.warning("[FF] removing projects: \(names, privacy: .public)")
+                for id in missing {
+                    if let project = projects.first(where: { $0.id == id }) {
+                        for ws in project.workstreams {
+                            surfaceCache.removeWorkstreamSurfaces(for: ws.id)
+                        }
+                    }
+                }
+                projects.removeAll { missing.contains($0.id) }
+                if let sel = selection, case let .project(pid) = sel, missing.contains(pid) {
+                    selection = nil
+                }
+                if let sel = selection, case .workstream = sel, activeProject == nil {
+                    selection = nil
+                }
+                ProjectStore.save(projects)
+                removedProjectNames = names
+            }
+            .onChange(of: selection) { oldValue, newValue in
+                logger.warning("[FF] selection changed: \(String(describing: oldValue), privacy: .public) -> \(String(describing: newValue), privacy: .public)")
+                if newValue == .settings || newValue == .help {
+                    selectionBeforeSettings = oldValue
+                }
+                // Don't persist settings/help as saved selection
+                if newValue != .settings && newValue != .help {
+                    newValue?.save()
+                }
+            }
+            .onKeyPress(.escape) {
+                if selection == .settings || selection == .help {
+                    selection = selectionBeforeSettings
+                    return .handled
+                }
+                return .ignored
+            }
+            .onAppear {
+                // Intercept Cmd+W at the app level to close tabs instead of the window
+                guard !keyMonitorInstalled else { return }
+                keyMonitorInstalled = true
+                NSEvent.addLocalMonitorForEvents(matching: .keyDown) { event in
+                    if event.modifierFlags.contains(.command) && event.charactersIgnoringModifiers == "w" {
+                        NotificationCenter.default.post(name: .closeTerminal, object: nil)
+                        return nil // swallow the event
+                    }
+                    return event
+                }
+            }
+    }
+
+    private var navigationViewBase: some View {
         NavigationSplitView {
             ProjectSidebar(
                 projects: $projectList.items,
@@ -303,57 +358,6 @@ struct ContentView: View {
         }
         .onReceive(Timer.publish(every: 6 * 60 * 60, on: .main, in: .common).autoconnect()) { _ in
             updateChecker.check()
-        }
-        .onChange(of: appEnvironment.missingProjectIDs) { _, missing in
-            guard !missing.isEmpty else { return }
-            logger.warning("[FF] missingProjectIDs changed: \(missing.count, privacy: .public) missing, \(projects.count, privacy: .public) total projects")
-            let names = projects.filter { missing.contains($0.id) }.map(\.name)
-            logger.warning("[FF] removing projects: \(names, privacy: .public)")
-            for id in missing {
-                if let project = projects.first(where: { $0.id == id }) {
-                    for ws in project.workstreams {
-                        surfaceCache.removeWorkstreamSurfaces(for: ws.id)
-                    }
-                }
-            }
-            projects.removeAll { missing.contains($0.id) }
-            if let sel = selection, case let .project(pid) = sel, missing.contains(pid) {
-                selection = nil
-            }
-            if let sel = selection, case .workstream = sel, activeProject == nil {
-                selection = nil
-            }
-            ProjectStore.save(projects)
-            removedProjectNames = names
-        }
-        .onChange(of: selection) { oldValue, newValue in
-            logger.warning("[FF] selection changed: \(String(describing: oldValue), privacy: .public) -> \(String(describing: newValue), privacy: .public)")
-            if newValue == .settings || newValue == .help {
-                selectionBeforeSettings = oldValue
-            }
-            // Don't persist settings/help as saved selection
-            if newValue != .settings && newValue != .help {
-                newValue?.save()
-            }
-        }
-        .onKeyPress(.escape) {
-            if selection == .settings || selection == .help {
-                selection = selectionBeforeSettings
-                return .handled
-            }
-            return .ignored
-        }
-        .onAppear {
-            // Intercept Cmd+W at the app level to close tabs instead of the window
-            guard !keyMonitorInstalled else { return }
-            keyMonitorInstalled = true
-            NSEvent.addLocalMonitorForEvents(matching: .keyDown) { event in
-                if event.modifierFlags.contains(.command) && event.charactersIgnoringModifiers == "w" {
-                    NotificationCenter.default.post(name: .closeTerminal, object: nil)
-                    return nil // swallow the event
-                }
-                return event
-            }
         }
     }
 
