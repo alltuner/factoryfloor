@@ -195,10 +195,12 @@ final class TerminalApp {
         UNUserNotificationCenter.current().requestAuthorization(
             options: [.alert, .sound]
         ) { granted, error in
-            if let error {
-                logger.warning("Notification permission error: \(error.localizedDescription)")
-            } else if !granted {
-                logger.info("Notification permission denied by user")
+            DispatchQueue.main.async {
+                if let error {
+                    logger.warning("Notification permission error: \(error.localizedDescription)")
+                } else if !granted {
+                    logger.info("Notification permission denied by user")
+                }
             }
         }
 
