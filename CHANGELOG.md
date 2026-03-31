@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.1.55](https://github.com/alltuner/factoryfloor/compare/v0.1.54...v0.1.55) (2026-03-31)
+
+
+### Bug Fixes
+
+* move notification authorization to applicationDidFinishLaunching ([#277](https://github.com/alltuner/factoryfloor/issues/277)) ([6085ffd](https://github.com/alltuner/factoryfloor/commit/6085ffd0e0ed57d2ec82f579964c4499281285af)), closes [#274](https://github.com/alltuner/factoryfloor/issues/274)
+
 ## [0.1.54](https://github.com/alltuner/factoryfloor/compare/v0.1.53...v0.1.54) (2026-03-31)
 
 
