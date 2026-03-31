@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.1.52](https://github.com/alltuner/factoryfloor/compare/v0.1.51...v0.1.52) (2026-03-31)
+
+
+### Bug Fixes
+
+* create empty initial commit on git init to enable worktrees ([#252](https://github.com/alltuner/factoryfloor/issues/252)) ([656e5f3](https://github.com/alltuner/factoryfloor/commit/656e5f38a80530fa037b898b6a4a2cc4c0703961))
+* prefer login shell PATH for tool detection ([#250](https://github.com/alltuner/factoryfloor/issues/250)) ([407683d](https://github.com/alltuner/factoryfloor/commit/407683dccfcb27f3b00f30a989dc0b216a54b331))
+
 ## [0.1.51](https://github.com/alltuner/factoryfloor/compare/v0.1.50...v0.1.51) (2026-03-31)
 
 
