@@ -755,7 +755,7 @@ private struct UpdateBanner: View {
 
     var body: some View {
         Button {
-            if updater.canCheckForUpdates {
+            if updater.isConfigured {
                 updater.checkForUpdates()
             } else {
                 NSWorkspace.shared.open(getURL)

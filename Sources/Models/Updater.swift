@@ -38,6 +38,12 @@ final class Updater: ObservableObject {
         updater?.canCheckForUpdates ?? false
     }
 
+    /// Whether Sparkle was successfully initialized (DMG installs).
+    /// Unlike `canCheckForUpdates`, this doesn't depend on transient Sparkle state.
+    var isConfigured: Bool {
+        updater != nil
+    }
+
     func checkForUpdates() {
         updater?.checkForUpdates()
     }
