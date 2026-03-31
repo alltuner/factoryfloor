@@ -64,7 +64,7 @@ final class TmuxSessionTests: XCTestCase {
             shell: "/bin/zsh"
         )
 
-        XCTAssertTrue(command.hasPrefix("/bin/zsh -lc "), "Should use login shell for PATH")
+        XCTAssertTrue(command.hasPrefix("/bin/zsh -lic "), "Should use interactive login shell for PATH")
         XCTAssertTrue(command.contains("exec sh -c"), "Should use sh for POSIX syntax")
         XCTAssertTrue(command.contains("start-server"))
         XCTAssertTrue(command.contains("source-file"))

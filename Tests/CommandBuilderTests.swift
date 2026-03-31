@@ -98,7 +98,7 @@ final class CommandBuilderTests: XCTestCase {
 
     func testWithFallbackBasic() {
         let result = CommandBuilder.withFallback("cmd1", "cmd2", shell: "/bin/zsh")
-        XCTAssertTrue(result.hasPrefix("/bin/zsh -lc "), "Should use login shell")
+        XCTAssertTrue(result.hasPrefix("/bin/zsh -lic "), "Should use interactive login shell")
         XCTAssertTrue(result.contains("exec sh -c"), "Should use sh for POSIX syntax")
         XCTAssertTrue(result.contains("cmd1 2>"), "Primary stderr should be redirected to file")
         XCTAssertFalse(result.contains("2>/dev/null"), "Stderr should go to a file, not /dev/null")
@@ -117,7 +117,7 @@ final class CommandBuilderTests: XCTestCase {
     func testWithFallbackMessageWithSpecialChars() {
         let result = CommandBuilder.withFallback("cmd1", "cmd2", message: "it's failing", shell: "/bin/zsh")
         XCTAssertTrue(result.contains("echo"), "Should contain echo")
-        XCTAssertTrue(result.hasPrefix("/bin/zsh -lc "), "Should use login shell")
+        XCTAssertTrue(result.hasPrefix("/bin/zsh -lic "), "Should use interactive login shell")
         XCTAssertTrue(result.contains("exec sh -c"), "Should use sh for POSIX syntax")
     }
 
@@ -129,7 +129,7 @@ final class CommandBuilderTests: XCTestCase {
         cmd2.option("--session-id", "abc-123")
 
         let result = CommandBuilder.withFallback(cmd1.command, cmd2.command, shell: "/bin/zsh")
-        XCTAssertTrue(result.hasPrefix("/bin/zsh -lc '"))
+        XCTAssertTrue(result.hasPrefix("/bin/zsh -lic '"))
         XCTAssertTrue(result.contains("exec sh -c"))
         XCTAssertTrue(result.contains("--name"))
         XCTAssertTrue(result.contains("--session-id"))

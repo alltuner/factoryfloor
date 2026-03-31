@@ -79,7 +79,7 @@ enum TmuxSession {
         let setup = serverSetupCommand(tmuxPath: tmuxPath, configPath: configPath)
         let posixCmd = shellEscape("\(setup); exec \(tmuxCmd)")
         let shCmd = "exec sh -c \(posixCmd)"
-        return "\(shell) -lc \(shellEscape(shCmd))"
+        return "\(shell) -lic \(shellEscape(shCmd))"
     }
 
     /// Kill a tmux session by name.

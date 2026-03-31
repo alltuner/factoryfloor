@@ -37,7 +37,7 @@ struct ScriptConfig {
         guard let teardown = config.teardown else { return }
         let process = Process()
         process.executableURL = URL(fileURLWithPath: CommandBuilder.userShell)
-        process.arguments = ["-lc", teardown]
+        process.arguments = ["-lic", teardown]
         process.currentDirectoryURL = URL(fileURLWithPath: directory)
 
         process.standardOutput = FileHandle.nullDevice

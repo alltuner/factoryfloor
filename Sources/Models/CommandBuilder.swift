@@ -45,7 +45,7 @@ struct CommandBuilder {
         }
         let posixCmd = "\(primary) 2>\(stderrFile) || \(fallbackCmd)"
         let shCmd = "exec sh -c \(shellQuote(posixCmd))"
-        return "\(shell) -lc \(shellQuote(shCmd))"
+        return "\(shell) -lic \(shellQuote(shCmd))"
     }
 
     /// Path for capturing stderr from primary commands in fallback pipelines.
