@@ -94,6 +94,12 @@ targets:
         buildPhase: resources
       - path: Resources/notification.wav
         buildPhase: resources
+      - path: ghostty/zig-out/share/terminfo
+        type: folder
+        buildPhase: resources
+      - path: ghostty/zig-out/share/ghostty
+        type: folder
+        buildPhase: resources
     settings:
       base:
         PRODUCT_MODULE_NAME: FactoryFloor
