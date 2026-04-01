@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.1.61](https://github.com/alltuner/factoryfloor/compare/v0.1.60...v0.1.61) (2026-04-01)
+
+
+### Bug Fixes
+
+* handle notification delivery callback off main thread ([#293](https://github.com/alltuner/factoryfloor/issues/293)) ([d31f06f](https://github.com/alltuner/factoryfloor/commit/d31f06fcb42113e420fabb820d7104d237026157))
+
 ## [0.1.60](https://github.com/alltuner/factoryfloor/compare/v0.1.59...v0.1.60) (2026-04-01)
 
 
