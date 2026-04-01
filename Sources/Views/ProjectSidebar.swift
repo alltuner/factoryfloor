@@ -85,7 +85,7 @@ struct ProjectSidebar: View {
                         }
                     }
                 } : nil,
-                isGitRepo: GitOperations.isGitRepo(at: project.directory),
+                isGitRepo: appEnv.isGitRepo(project.directory),
                 onAdd: { logger.warning("[FF] onAdd button tapped for project \(project.name, privacy: .public)"); addWorkstream(for: project.id) },
                 onAddWithPermissions: { addWorkstream(for: project.id, bypassPermissions: true) },
                 onAddWithoutPermissions: { addWorkstream(for: project.id, bypassPermissions: false) },
@@ -101,7 +101,7 @@ struct ProjectSidebar: View {
                         branchName: appEnv.branchName(for: workstream.worktreePath),
                         worktreePath: workstream.worktreePath,
                         isPathValid: appEnv.isPathValid(workstream.worktreePath),
-                        hasActivePort: Self.hasPort(workstream.id),
+                        hasActivePort: appEnv.hasActivePort(workstream.id),
                         onArchive: { confirmArchive(workstream) }
                     )
                     .tag(SidebarSelection.workstream(workstream.id))
@@ -336,10 +336,6 @@ struct ProjectSidebar: View {
 
     @AppStorage("factoryfloor.bypassPermissions") private var defaultBypass: Bool = false
     @AppStorage("factoryfloor.symlinkEnv") private var symlinkEnv: Bool = true
-
-    private static func hasPort(_ workstreamID: UUID) -> Bool {
-        RunStateStore.loadValidated(for: workstreamID)?.detectedPorts.isEmpty == false
-    }
 
     private func addWorkstream(for projectID: UUID, bypassPermissions: Bool? = nil) {
         logger.warning("[FF] addWorkstream called for projectID=\(projectID, privacy: .public)")

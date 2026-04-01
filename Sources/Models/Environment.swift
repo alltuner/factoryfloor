@@ -1,8 +1,8 @@
 // ABOUTME: Detects installed tools, apps, and git repo status.
 // ABOUTME: Shared across the app as an environment object with async background updates.
 
-import SwiftUI
 import OSLog
+import SwiftUI
 
 private let logger = Logger(subsystem: "factoryfloor", category: "environment")
 
@@ -17,11 +17,17 @@ final class AppEnvironment: ObservableObject {
     @Published private var repoInfoCache: [String: GitRepoInfo] = [:]
     private var repoInfoTimestamps: [String: Date] = [:]
 
-    // Worktree path validity cache
+    /// Worktree path validity cache
     @Published private var pathValidityCache: [String: Bool] = [:]
 
-    // Branch name cache per worktree path
+    /// Branch name cache per worktree path
     @Published private var branchNameCache: [String: String] = [:]
+
+    /// Git repo detection cache per project directory
+    @Published private var gitRepoCache: [String: Bool] = [:]
+
+    /// Active port cache per workstream ID
+    @Published private var activePortCache: Set<UUID> = []
 
     // GitHub info cache
     @Published private var githubRepoCache: [String: GitHubRepoInfo] = [:]
@@ -52,7 +58,8 @@ final class AppEnvironment: ObservableObject {
     func refreshRepoInfo(for directory: String) {
         // Skip if refreshed within the last 5 seconds
         if let lastRefresh = repoInfoTimestamps[directory],
-           Date().timeIntervalSince(lastRefresh) < 5 {
+           Date().timeIntervalSince(lastRefresh) < 5
+        {
             return
         }
         repoInfoTimestamps[directory] = Date()
@@ -74,7 +81,8 @@ final class AppEnvironment: ObservableObject {
             let minInterval: TimeInterval = age < 300 ? 10 : 60 // 10s for recent, 60s for stale
 
             if let lastRefresh = repoInfoTimestamps[project.directory],
-               now.timeIntervalSince(lastRefresh) < minInterval {
+               now.timeIntervalSince(lastRefresh) < minInterval
+            {
                 continue
             }
 
@@ -101,6 +109,14 @@ final class AppEnvironment: ObservableObject {
         return branchNameCache[path]
     }
 
+    func isGitRepo(_ directory: String) -> Bool {
+        gitRepoCache[directory] ?? false
+    }
+
+    func hasActivePort(_ workstreamID: UUID) -> Bool {
+        activePortCache.contains(workstreamID)
+    }
+
     /// Returns IDs of projects whose directories no longer exist.
     @Published var missingProjectIDs: Set<UUID> = []
 
@@ -108,6 +124,8 @@ final class AppEnvironment: ObservableObject {
         Task.detached {
             var results: [String: Bool] = [:]
             var missing: Set<UUID> = []
+            var gitRepoResults: [String: Bool] = [:]
+            var portResults: Set<UUID> = []
 
             // Collect valid worktree paths that need git info
             var validPaths: [String] = []
@@ -120,7 +138,13 @@ final class AppEnvironment: ObservableObject {
                     missing.insert(project.id)
                 }
 
+                gitRepoResults[project.directory] = GitOperations.isGitRepo(at: project.directory)
+
                 for ws in project.workstreams {
+                    if RunStateStore.loadValidated(for: ws.id)?.detectedPorts.isEmpty == false {
+                        portResults.insert(ws.id)
+                    }
+
                     guard let path = ws.worktreePath else { continue }
                     var wsIsDir: ObjCBool = false
                     let valid = FileManager.default.fileExists(atPath: path, isDirectory: &wsIsDir) && wsIsDir.boolValue
@@ -154,6 +178,8 @@ final class AppEnvironment: ObservableObject {
                 self.pathValidityCache.merge(results) { _, new in new }
                 self.branchNameCache.merge(branches) { _, new in new }
                 self.missingProjectIDs = missing
+                self.gitRepoCache.merge(gitRepoResults) { _, new in new }
+                self.activePortCache = portResults
             }
         }
     }
