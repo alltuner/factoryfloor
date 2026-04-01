@@ -44,8 +44,35 @@ else
   echo "Install with: brew install getsentry/tools/sentry-cli"
 fi
 
+echo "==> Re-signing embedded frameworks and helpers..."
+# Sparkle framework components (XPC services, helpers, then framework itself)
+codesign --force --sign "$SIGNING_IDENTITY" --timestamp --options=runtime \
+  "$APP_PATH/Contents/Frameworks/Sparkle.framework/Versions/B/XPCServices/Downloader.xpc"
+codesign --force --sign "$SIGNING_IDENTITY" --timestamp --options=runtime \
+  "$APP_PATH/Contents/Frameworks/Sparkle.framework/Versions/B/XPCServices/Installer.xpc"
+codesign --force --sign "$SIGNING_IDENTITY" --timestamp --options=runtime \
+  "$APP_PATH/Contents/Frameworks/Sparkle.framework/Versions/B/Autoupdate"
+codesign --force --sign "$SIGNING_IDENTITY" --timestamp --options=runtime \
+  "$APP_PATH/Contents/Frameworks/Sparkle.framework/Versions/B/Updater.app"
+codesign --force --sign "$SIGNING_IDENTITY" --timestamp --options=runtime \
+  "$APP_PATH/Contents/Frameworks/Sparkle.framework"
+
+# Re-sign all embedded frameworks with secure timestamp and hardened runtime
+find "$APP_PATH/Contents/Frameworks" -type f -perm +111 -o -name "*.dylib" | while read -r bin; do
+  codesign --force --sign "$SIGNING_IDENTITY" --timestamp --options=runtime "$bin"
+done
+
+# Re-sign helpers with hardened runtime and secure timestamp
+find "$APP_PATH/Contents/Helpers" -type f -perm +111 | while read -r bin; do
+  codesign --force --sign "$SIGNING_IDENTITY" --timestamp --options=runtime "$bin"
+done
+
+# Sign the main app binary (not --deep, nested code is already signed above)
+codesign --force --sign "$SIGNING_IDENTITY" --timestamp --options=runtime \
+  --entitlements Resources/ff2.entitlements "$APP_PATH"
+
 echo "==> Verifying signature..."
-codesign --verify --verbose=2 "$APP_PATH"
+codesign --verify --verbose=2 --deep --strict "$APP_PATH"
 spctl --assess --type execute --verbose=2 "$APP_PATH" 2>&1
 
 echo "==> Creating DMG..."
