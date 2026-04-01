@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.1.59](https://github.com/alltuner/factoryfloor/compare/v0.1.58...v0.1.59) (2026-04-01)
+
+
+### Bug Fixes
+
+* avoid main-actor notification callback crash ([#289](https://github.com/alltuner/factoryfloor/issues/289)) ([ec03f7d](https://github.com/alltuner/factoryfloor/commit/ec03f7d7cd2b1fcce5713de683b84b0060eb2d79))
+
 ## [0.1.58](https://github.com/alltuner/factoryfloor/compare/v0.1.57...v0.1.58) (2026-04-01)
 
 
