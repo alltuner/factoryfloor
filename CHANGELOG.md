@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.1.60](https://github.com/alltuner/factoryfloor/compare/v0.1.59...v0.1.60) (2026-04-01)
+
+
+### Bug Fixes
+
+* remove sendable requirement from notification request protocol ([#291](https://github.com/alltuner/factoryfloor/issues/291)) ([337ff89](https://github.com/alltuner/factoryfloor/commit/337ff893ede250ac3f8ccaa65d863696eaf0b14f))
+
 ## [0.1.59](https://github.com/alltuner/factoryfloor/compare/v0.1.58...v0.1.59) (2026-04-01)
 
 
