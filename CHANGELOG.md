@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.1.58](https://github.com/alltuner/factoryfloor/compare/v0.1.57...v0.1.58) (2026-04-01)
+
+
+### Bug Fixes
+
+* handle notification authorization on main thread ([#287](https://github.com/alltuner/factoryfloor/issues/287)) ([6376d3a](https://github.com/alltuner/factoryfloor/commit/6376d3a78e9a630f0bdf4a4d97811d9c18d0f9aa))
+
 ## [0.1.57](https://github.com/alltuner/factoryfloor/compare/v0.1.56...v0.1.57) (2026-04-01)
 
 
