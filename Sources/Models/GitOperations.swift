@@ -72,9 +72,15 @@ enum GitOperations {
         )
     }
 
-    /// Detect the default branch (origin/main, origin/master, main, master).
+    /// Detect the default branch. Prefers `development`, then falls back to auto-detection.
     static func defaultBranch(at path: String) -> String {
-        // Try remote HEAD first
+        // Prefer development branch if it exists (remote then local)
+        for branch in ["origin/development", "development"] {
+            if run(args: ["rev-parse", "--verify", branch], in: path) != nil {
+                return branch
+            }
+        }
+        // Try remote HEAD
         if let ref = run(args: ["symbolic-ref", "refs/remotes/origin/HEAD", "--short"], in: path) {
             return ref.trimmingCharacters(in: .whitespacesAndNewlines)
         }
