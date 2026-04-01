@@ -68,8 +68,10 @@ jobs:
         id: ghostty-cache
         uses: actions/cache@v5
         with:
-          path: ghostty/macos/GhosttyKit.xcframework
-          key: ghostty-xcframework-${{ hashFiles('ghostty/.git') }}
+          path: |
+            ghostty/macos/GhosttyKit.xcframework
+            ghostty/zig-out/share
+          key: ghostty-build-${{ hashFiles('ghostty/.git') }}
 
       - name: Build Ghostty xcframework
         if: steps.ghostty-cache.outputs.cache-hit != 'true'
