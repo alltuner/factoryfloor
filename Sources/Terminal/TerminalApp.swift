@@ -7,6 +7,15 @@ import UserNotifications
 
 private let logger = Logger(subsystem: "factoryfloor", category: "terminal-app")
 
+protocol NotificationRequestAdding {
+    func add(
+        _ request: UNNotificationRequest,
+        withCompletionHandler completionHandler: (@Sendable (Error?) -> Void)?
+    )
+}
+
+extension UNUserNotificationCenter: NotificationRequestAdding {}
+
 private func handleTerminalWakeup(_ userdata: UnsafeMutableRawPointer?) {
     guard let userdata else { return }
     let userdataBits = UInt(bitPattern: userdata)
@@ -141,10 +150,23 @@ private func sendDesktopNotification(title: String, body: String, suppressWhenAc
             content: content,
             trigger: nil
         )
-        center.add(request) { error in
-            if let error {
-                logger.warning("Failed to deliver notification: \(error.localizedDescription)")
-            }
+        addDesktopNotification(request, using: center)
+    }
+}
+
+private func addDesktopNotification(
+    _ request: UNNotificationRequest,
+    using center: NotificationRequestAdding
+) {
+    center.add(request) { error in
+        guard let error else { return }
+        if Thread.isMainThread {
+            logger.warning("Failed to deliver notification: \(error.localizedDescription)")
+            return
+        }
+
+        Task { @MainActor in
+            logger.warning("Failed to deliver notification: \(error.localizedDescription)")
         }
     }
 }
