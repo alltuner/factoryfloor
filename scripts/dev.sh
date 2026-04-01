@@ -12,9 +12,19 @@ BUILD_DIR="build/debug/derived"
 APP_PATH="$BUILD_DIR/Build/Products/Debug/$APP_NAME.app"
 SPM_CACHE="$HOME/Library/Caches/factoryfloor/spm"
 BRANCH=$(git branch --show-current 2>/dev/null || echo "unknown")
+GHOSTTY_RESOURCES="ghostty/zig-out/share"
+
+ensure_ghostty_resources() {
+  if [ ! -d "$GHOSTTY_RESOURCES/terminfo" ] || [ ! -d "$GHOSTTY_RESOURCES/ghostty" ]; then
+    echo "error: Ghostty resources not found at $GHOSTTY_RESOURCES/"
+    echo "       Build the xcframework first: cd ghostty && zig build"
+    exit 1
+  fi
+}
 
 case "${1:-build}" in
   build)
+    ensure_ghostty_resources
     xcodegen generate
     xcodebuild -project "$PROJECT" -scheme "$SCHEME" -configuration Debug \
       -derivedDataPath "$BUILD_DIR" -clonedSourcePackagesDirPath "$SPM_CACHE" \
@@ -33,6 +43,7 @@ case "${1:-build}" in
     ;;
   br)
     shift 2>/dev/null || true
+    ensure_ghostty_resources
     xcodegen generate
     xcodebuild -project "$PROJECT" -scheme "$SCHEME" -configuration Debug \
       -derivedDataPath "$BUILD_DIR" -clonedSourcePackagesDirPath "$SPM_CACHE" \
@@ -47,12 +58,14 @@ case "${1:-build}" in
     fi
     ;;
   test)
+    ensure_ghostty_resources
     xcodegen generate
     xcodebuild -project "$PROJECT" -scheme "$TEST_SCHEME" -configuration Debug \
       -derivedDataPath "$BUILD_DIR" -clonedSourcePackagesDirPath "$SPM_CACHE" test
     ;;
   release)
     RELEASE_DIR="build/release-local/derived"
+    ensure_ghostty_resources
     xcodegen generate
     xcodebuild -project "$PROJECT" -scheme "$SCHEME" -configuration Release \
       -derivedDataPath "$RELEASE_DIR" -clonedSourcePackagesDirPath "$SPM_CACHE" \
