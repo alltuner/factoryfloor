@@ -25,14 +25,45 @@ extension Notification.Name {
 
 @MainActor
 final class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCenterDelegate {
+    enum NotificationAuthorizationLogLevel {
+        case info
+        case warning
+    }
+
     func applicationDidFinishLaunching(_: Notification) {
         let center = UNUserNotificationCenter.current()
         center.delegate = self
         center.requestAuthorization(options: [.alert, .sound]) { granted, error in
+            Self.handleNotificationAuthorizationResult(granted: granted, error: error)
+        }
+    }
+
+    nonisolated static func handleNotificationAuthorizationResult(
+        granted: Bool,
+        error: (any Error)?,
+        log: @escaping @Sendable (String, NotificationAuthorizationLogLevel) -> Void = { message, level in
+            switch level {
+            case .info:
+                logger.info("\(message, privacy: .public)")
+            case .warning:
+                logger.warning("\(message, privacy: .public)")
+            }
+        }
+    ) {
+        if Thread.isMainThread {
             if let error {
-                logger.warning("Notification permission error: \(error.localizedDescription)")
+                log("Notification permission error: \(error.localizedDescription)", .warning)
             } else if !granted {
-                logger.info("Notification permission denied by user")
+                log("Notification permission denied by user", .info)
+            }
+            return
+        }
+
+        Task { @MainActor in
+            if let error {
+                log("Notification permission error: \(error.localizedDescription)", .warning)
+            } else if !granted {
+                log("Notification permission denied by user", .info)
             }
         }
     }
