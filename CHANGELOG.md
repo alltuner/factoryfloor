@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.1.62](https://github.com/alltuner/factoryfloor/compare/v0.1.61...v0.1.62) (2026-04-01)
+
+
+### Bug Fixes
+
+* retry GitHub release asset uploads ([#295](https://github.com/alltuner/factoryfloor/issues/295)) ([f37aa7f](https://github.com/alltuner/factoryfloor/commit/f37aa7fbeab771937a8999ae191389a3041ac48d))
+
 ## [0.1.61](https://github.com/alltuner/factoryfloor/compare/v0.1.60...v0.1.61) (2026-04-01)
 
 
