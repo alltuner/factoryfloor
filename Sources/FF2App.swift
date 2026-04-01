@@ -9,7 +9,7 @@ import UserNotifications
 
 private let logger = Logger(subsystem: "factoryfloor", category: "app")
 
-protocol NotificationAuthorizationRequesting: Sendable {
+protocol NotificationAuthorizationRequesting {
     func requestAuthorization(
         options: UNAuthorizationOptions,
         completionHandler: @escaping @Sendable (Bool, (any Error)?) -> Void
