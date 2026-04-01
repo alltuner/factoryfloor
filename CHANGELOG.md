@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.1.57](https://github.com/alltuner/factoryfloor/compare/v0.1.56...v0.1.57) (2026-04-01)
+
+
+### Bug Fixes
+
+* **ci:** cache ghostty share dirs needed by xcodegen ([#285](https://github.com/alltuner/factoryfloor/issues/285)) ([7b243c3](https://github.com/alltuner/factoryfloor/commit/7b243c30e3f2d1dd5e1111099f2388e9e8b9177d))
+
 ## [0.1.56](https://github.com/alltuner/factoryfloor/compare/v0.1.55...v0.1.56) (2026-04-01)
 
 
