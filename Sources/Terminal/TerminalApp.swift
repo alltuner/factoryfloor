@@ -131,6 +131,15 @@ final class TerminalApp {
             return
         }
         ghostty_config_load_default_files(config)
+
+        // Enable left Option as Alt so Option+Backspace deletes words in terminal
+        let appConfigStr = "macos-option-as-alt = left\n"
+        let tmpFile = FileManager.default.temporaryDirectory
+            .appendingPathComponent("factoryfloor-ghostty.conf")
+        FileManager.default.createFile(atPath: tmpFile.path, contents: Data(appConfigStr.utf8))
+        ghostty_config_load_file(config, tmpFile.path)
+        try? FileManager.default.removeItem(at: tmpFile)
+
         ghostty_config_finalize(config)
 
         // Create runtime config with callbacks
