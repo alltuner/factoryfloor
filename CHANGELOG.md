@@ -1,5 +1,14 @@
 # Changelog
 
+## [0.1.56](https://github.com/alltuner/factoryfloor/compare/v0.1.55...v0.1.56) (2026-04-01)
+
+
+### Bug Fixes
+
+* align local release script signing with CI workflow ([#282](https://github.com/alltuner/factoryfloor/issues/282)) ([76a0dcf](https://github.com/alltuner/factoryfloor/commit/76a0dcfb7ceaba7d2db25614a1da33d39f3a13d2))
+* bundle ghostty terminfo and shell integration in app resources ([#283](https://github.com/alltuner/factoryfloor/issues/283)) ([bd4ea71](https://github.com/alltuner/factoryfloor/commit/bd4ea712cec51ae8d750dfc12afb10500e722eec))
+* use local entitlements to bypass library validation in dev release builds ([#280](https://github.com/alltuner/factoryfloor/issues/280)) ([2f8161c](https://github.com/alltuner/factoryfloor/commit/2f8161cb99efb4e811eb58c7582453acbe65a8c2)), closes [#279](https://github.com/alltuner/factoryfloor/issues/279)
+
 ## [0.1.55](https://github.com/alltuner/factoryfloor/compare/v0.1.54...v0.1.55) (2026-03-31)
 
 
