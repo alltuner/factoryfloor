@@ -9,6 +9,15 @@ import UserNotifications
 
 private let logger = Logger(subsystem: "factoryfloor", category: "app")
 
+protocol NotificationAuthorizationRequesting: Sendable {
+    func requestAuthorization(
+        options: UNAuthorizationOptions,
+        completionHandler: @escaping @Sendable (Bool, (any Error)?) -> Void
+    )
+}
+
+extension UNUserNotificationCenter: NotificationAuthorizationRequesting {}
+
 extension Notification.Name {
     static let openDirectory = Notification.Name("factoryfloor.openDirectory")
     static let openSettings = Notification.Name("factoryfloor.openSettings")
@@ -33,9 +42,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCent
     func applicationDidFinishLaunching(_: Notification) {
         let center = UNUserNotificationCenter.current()
         center.delegate = self
-        center.requestAuthorization(options: [.alert, .sound]) { granted, error in
-            Self.handleNotificationAuthorizationResult(granted: granted, error: error)
-        }
+        Self.requestNotificationAuthorization(using: center)
     }
 
     nonisolated static func handleNotificationAuthorizationResult(
@@ -65,6 +72,22 @@ final class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCent
             } else if !granted {
                 log("Notification permission denied by user", .info)
             }
+        }
+    }
+
+    nonisolated static func requestNotificationAuthorization(
+        using center: NotificationAuthorizationRequesting,
+        log: @escaping @Sendable (String, NotificationAuthorizationLogLevel) -> Void = { message, level in
+            switch level {
+            case .info:
+                logger.info("\(message, privacy: .public)")
+            case .warning:
+                logger.warning("\(message, privacy: .public)")
+            }
+        }
+    ) {
+        center.requestAuthorization(options: [.alert, .sound]) { granted, error in
+            handleNotificationAuthorizationResult(granted: granted, error: error, log: log)
         }
     }
 
