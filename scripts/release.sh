@@ -16,6 +16,7 @@ APP_PATH="${BUILD_DIR}/${APP_NAME}.app"
 
 echo "==> Building ${APP_NAME} v${VERSION}..."
 xcodegen generate
+rm -rf "$BUILD_DIR/derived"
 xcodebuild -project "$PROJECT" -scheme "$SCHEME" -configuration Release \
   -derivedDataPath "$BUILD_DIR/derived" \
   DEVELOPMENT_TEAM=J5TAY75Q3F \
