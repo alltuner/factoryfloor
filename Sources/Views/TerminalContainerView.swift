@@ -1102,6 +1102,17 @@ final class TerminalSurfaceCache: ObservableObject {
         }
     }
 
+    // MARK: - Text injection
+
+    /// Send text to a terminal surface as if it were typed.
+    func sendText(to surfaceID: UUID, text: String) {
+        guard let view = surfaces[surfaceID],
+              let surface = view.surface else { return }
+        text.withCString { ptr in
+            ghostty_surface_text(surface, ptr, UInt(text.utf8.count))
+        }
+    }
+
     // MARK: - Workspace tab snapshots
 
     func saveTabSnapshot(for workstreamID: UUID, snapshot: WorkspaceTabSnapshot) {
