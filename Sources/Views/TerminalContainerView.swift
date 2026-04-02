@@ -314,7 +314,7 @@ struct TerminalContainerView: View {
             AddTabButton(label: NSLocalizedString("Terminal", comment: ""), icon: "terminal", shortcut: "T", action: addTerminal)
             AddTabButton(label: NSLocalizedString("Browser", comment: ""), icon: "globe", shortcut: "B", action: addBrowser)
 
-            QuickActionMenuButton(
+            QuickActionButtons(
                 runner: quickActionRunner,
                 claudePath: appEnv.toolStatus.claude.path,
                 workingDirectory: workingDirectory,
@@ -547,15 +547,24 @@ struct TerminalContainerView: View {
 
     // MARK: - Tab management
 
+    /// Number of closeable tabs beyond which labels are hidden to save space.
+    private static let compactTabThreshold = 3
+
+    private var useCompactTabs: Bool {
+        tabs.filter(\.isCloseable).count > Self.compactTabThreshold
+    }
+
     private func tabLabel(_ tab: WorkspaceTab) -> String? {
         switch tab {
         case .info: return NSLocalizedString("Info", comment: "")
         case .agent: return NSLocalizedString("Agent", comment: "")
         case .environment: return NSLocalizedString("Environment", comment: "")
         case let .terminal(id):
+            guard !useCompactTabs else { return nil }
             guard let title = terminalTitles[id], !title.isEmpty else { return nil }
             return title.count > 20 ? String(title.prefix(20)) + "..." : title
         case let .browser(id):
+            guard !useCompactTabs else { return nil }
             guard let title = browserTitles[id], !title.isEmpty else { return nil }
             return title.count > 20 ? String(title.prefix(20)) + "..." : title
         }
@@ -796,7 +805,7 @@ private struct WorkspaceTabDropDelegate: DropDelegate {
     }
 }
 
-private struct QuickActionMenuButton: View {
+private struct QuickActionButtons: View {
     @ObservedObject var runner: QuickActionRunner
     let claudePath: String?
     let workingDirectory: String
@@ -816,60 +825,29 @@ private struct QuickActionMenuButton: View {
         return nil
     }
 
-    private var isRunning: Bool {
-        if case .running = runner.state { return true }
+    private func isRunningAction(_ action: QuickAction) -> Bool {
+        if case let .running(a) = runner.state { return a == action }
         return false
     }
 
-    var body: some View {
-        Menu {
-            ForEach(QuickAction.allCases) { action in
-                let reason = disabledReason(for: action)
-                Button(action: { runAction(action) }) {
-                    Label(action.label, systemImage: action.icon)
-                }
-                .disabled(reason != nil || isRunning)
-                .help(reason ?? "")
-            }
-
-            if isRunning {
-                Divider()
-                Button(action: { runner.cancel() }) {
-                    Label(NSLocalizedString("Cancel", comment: ""), systemImage: "xmark.circle")
-                }
-            }
-        } label: {
-            HStack(spacing: 4) {
-                switch runner.state {
-                case .idle:
-                    Image(systemName: "bolt.fill")
-                        .font(.system(size: 11))
-                case .running:
-                    ProgressView()
-                        .controlSize(.mini)
-                case .succeeded:
-                    Image(systemName: "checkmark.circle.fill")
-                        .font(.system(size: 11))
-                        .foregroundStyle(.green)
-                case .failed:
-                    Image(systemName: "xmark.circle.fill")
-                        .font(.system(size: 11))
-                        .foregroundStyle(.red)
-                }
-                Image(systemName: "chevron.down")
-                    .font(.system(size: 8))
-            }
-            .padding(.horizontal, 8)
-            .padding(.vertical, 4)
-            .background(Color.primary.opacity(0.05))
-            .clipShape(RoundedRectangle(cornerRadius: 5))
-            .foregroundStyle(.secondary)
+    private func resultState(for action: QuickAction) -> QuickActionState? {
+        switch runner.state {
+        case let .succeeded(a) where a == action: return runner.state
+        case let .failed(a) where a == action: return runner.state
+        default: return nil
         }
-        .menuStyle(.borderlessButton)
-        .menuIndicator(.hidden)
-        .fixedSize()
-        .help(NSLocalizedString("Quick Actions", comment: ""))
-        .accessibilityLabel("Quick Actions")
+    }
+
+    var body: some View {
+        ForEach(QuickAction.allCases) { action in
+            QuickActionButton(
+                action: action,
+                isRunning: isRunningAction(action),
+                resultState: resultState(for: action),
+                disabledReason: disabledReason(for: action),
+                onRun: { runAction(action) }
+            )
+        }
     }
 
     private func runAction(_ action: QuickAction) {
@@ -879,6 +857,54 @@ private struct QuickActionMenuButton: View {
             claudePath: claudePath,
             workingDirectory: workingDirectory
         )
+    }
+}
+
+private struct QuickActionButton: View {
+    let action: QuickAction
+    let isRunning: Bool
+    let resultState: QuickActionState?
+    let disabledReason: String?
+    let onRun: () -> Void
+
+    @State private var isHovering = false
+
+    private var isDisabled: Bool {
+        disabledReason != nil || isRunning
+    }
+
+    var body: some View {
+        Button(action: onRun) {
+            HStack(spacing: 4) {
+                if isRunning {
+                    ProgressView()
+                        .controlSize(.mini)
+                } else if case .succeeded = resultState {
+                    Image(systemName: "checkmark.circle.fill")
+                        .font(.system(size: 11))
+                        .foregroundStyle(.green)
+                } else if case .failed = resultState {
+                    Image(systemName: "xmark.circle.fill")
+                        .font(.system(size: 11))
+                        .foregroundStyle(.red)
+                } else {
+                    Image(systemName: action.icon)
+                        .font(.system(size: 11))
+                }
+                Text(action.label)
+                    .font(.system(size: 11))
+            }
+            .padding(.horizontal, 8)
+            .padding(.vertical, 4)
+            .background(isHovering && !isDisabled ? Color.primary.opacity(0.05) : .clear)
+            .clipShape(RoundedRectangle(cornerRadius: 5))
+            .foregroundStyle(isDisabled ? .tertiary : .secondary)
+        }
+        .buttonStyle(.borderless)
+        .disabled(isDisabled)
+        .onHover { isHovering = $0 }
+        .help(disabledReason ?? action.label)
+        .accessibilityLabel(action.label)
     }
 }
 
