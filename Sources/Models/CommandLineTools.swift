@@ -40,6 +40,8 @@ enum CommandLineTools {
             "/usr/local/bin/\(name)",
             "/usr/bin/\(name)",
             "\(NSHomeDirectory())/.local/bin/\(name)",
+            "/run/current-system/sw/bin/\(name)",
+            "\(NSHomeDirectory())/.nix-profile/bin/\(name)",
         ]
 
         for location in knownLocations where isExecutable(location) {

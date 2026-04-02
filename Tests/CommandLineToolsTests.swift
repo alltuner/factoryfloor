@@ -76,6 +76,31 @@ final class CommandLineToolsTests: XCTestCase {
         XCTAssertNil(resolved)
     }
 
+    func testFallsBackToNixSystemLocation() {
+        let resolved = CommandLineTools.path(
+            for: "tmux",
+            environment: ["PATH": "", "SHELL": "/bin/zsh"],
+            isExecutable: { $0 == "/run/current-system/sw/bin/tmux" },
+            resolveFromPath: { _, _ in nil },
+            resolveFromShellPath: { _ in "/usr/bin:/bin" }
+        )
+
+        XCTAssertEqual(resolved, "/run/current-system/sw/bin/tmux")
+    }
+
+    func testFallsBackToNixProfileLocation() {
+        let nixProfilePath = "\(NSHomeDirectory())/.nix-profile/bin/gh"
+        let resolved = CommandLineTools.path(
+            for: "gh",
+            environment: ["PATH": "", "SHELL": "/bin/zsh"],
+            isExecutable: { $0 == nixProfilePath },
+            resolveFromPath: { _, _ in nil },
+            resolveFromShellPath: { _ in "/usr/bin:/bin" }
+        )
+
+        XCTAssertEqual(resolved, nixProfilePath)
+    }
+
     func testSkipsShellPathWhenShellNotSet() {
         // No SHELL in environment, should skip shell PATH and fall through
         let resolved = CommandLineTools.path(
