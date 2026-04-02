@@ -29,6 +29,9 @@ final class AppEnvironment: ObservableObject {
     /// Active port cache per workstream ID
     @Published private var activePortCache: Set<UUID> = []
 
+    /// GitHub remote detection cache per project directory (lightweight git check)
+    @Published private var githubRemoteCache: [String: Bool] = [:]
+
     // GitHub info cache
     @Published private var githubRepoCache: [String: GitHubRepoInfo] = [:]
     @Published private var githubPRCache: [String: [GitHubPR]] = [:]
@@ -113,6 +116,10 @@ final class AppEnvironment: ObservableObject {
         gitRepoCache[directory] ?? false
     }
 
+    func hasGitHubRemote(_ directory: String) -> Bool {
+        githubRemoteCache[directory] ?? false
+    }
+
     func hasActivePort(_ workstreamID: UUID) -> Bool {
         activePortCache.contains(workstreamID)
     }
@@ -125,6 +132,7 @@ final class AppEnvironment: ObservableObject {
             var results: [String: Bool] = [:]
             var missing: Set<UUID> = []
             var gitRepoResults: [String: Bool] = [:]
+            var githubRemoteResults: [String: Bool] = [:]
             var portResults: Set<UUID> = []
 
             // Collect valid worktree paths that need git info
@@ -139,6 +147,7 @@ final class AppEnvironment: ObservableObject {
                 }
 
                 gitRepoResults[project.directory] = GitOperations.isGitRepo(at: project.directory)
+                githubRemoteResults[project.directory] = GitHubOperations.hasGitHubRemote(at: project.directory)
 
                 for ws in project.workstreams {
                     if RunStateStore.loadValidated(for: ws.id)?.detectedPorts.isEmpty == false {
@@ -179,6 +188,7 @@ final class AppEnvironment: ObservableObject {
                 self.branchNameCache.merge(branches) { _, new in new }
                 self.missingProjectIDs = missing
                 self.gitRepoCache.merge(gitRepoResults) { _, new in new }
+                self.githubRemoteCache.merge(githubRemoteResults) { _, new in new }
                 self.activePortCache = portResults
             }
         }

@@ -574,7 +574,7 @@ struct TerminalContainerView: View {
                         claudePath: appEnv.toolStatus.claude.path,
                         workingDirectory: workingDirectory,
                         bypassPermissions: bypassPermissions,
-                        hasGitHubRemote: appEnv.githubRepo(for: projectDirectory) != nil
+                        hasGitHubRemote: appEnv.hasGitHubRemote(projectDirectory)
                     )
                 }
             }
