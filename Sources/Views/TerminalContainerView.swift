@@ -394,7 +394,7 @@ struct TerminalContainerView: View {
                 scriptConfig: scriptConfig
             )
         case .agent:
-            if sessionMode == .waitingForTools {
+            if sessionMode == .waitingForTools || appEnv.isDetecting {
                 terminalLoadingView(message: "Checking terminal tools...")
             } else if appEnv.toolStatus.claude.path == nil {
                 VStack(spacing: 16) {
