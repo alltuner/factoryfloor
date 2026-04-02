@@ -764,6 +764,7 @@ private struct WorkspaceTabButton: View {
             if let label {
                 Text(label)
                     .font(.system(size: 12, weight: isActive ? .semibold : .regular))
+                    .lineLimit(1)
             }
             if let shortcut {
                 (Text(Image(systemName: "command")) + Text(shortcut))
