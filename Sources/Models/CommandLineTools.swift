@@ -75,7 +75,7 @@ enum CommandLineTools {
             let process = Process()
             let pipe = Pipe()
             process.executableURL = URL(fileURLWithPath: shell)
-            process.arguments = ["-lic", "echo $PATH"]
+            process.arguments = ["-lic", "printenv PATH"]
             process.standardOutput = pipe
             process.standardError = FileHandle.nullDevice
             do {
