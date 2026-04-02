@@ -606,10 +606,8 @@ struct TerminalContainerView: View {
         case .info: return NSLocalizedString("Info", comment: "")
         case .agent: return NSLocalizedString("Agent", comment: "")
         case .environment: return NSLocalizedString("Environment", comment: "")
-        case let .terminal(id):
-            guard !useCompactTabs else { return nil }
-            guard let title = terminalTitles[id], !title.isEmpty else { return nil }
-            return title.count > 20 ? String(title.prefix(20)) + "..." : title
+        case .terminal:
+            return nil
         case let .browser(id):
             guard !useCompactTabs else { return nil }
             guard let title = browserTitles[id], !title.isEmpty else { return nil }
