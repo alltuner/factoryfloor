@@ -109,7 +109,7 @@ struct ProjectSidebar: View {
                         onArchive: { confirmArchive(workstream) }
                     )
                     .tag(SidebarSelection.workstream(workstream.id))
-                    .padding(.leading, 22)
+                    .padding(.leading, 34)
                 }
             }
         }
