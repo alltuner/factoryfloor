@@ -461,6 +461,13 @@ struct TerminalContainerView: View {
             }
         }
         .onAppear {
+            quickActionRunner.onSuccess = { action in
+                if action == .createPR {
+                    if let branch = appEnv.branchName(for: workingDirectory) {
+                        appEnv.refreshGitHubInfo(for: projectDirectory, branch: branch)
+                    }
+                }
+            }
             cachedClaudeCommand = buildClaudeCommand()
             scriptConfig = ScriptConfig.load(from: projectDirectory)
             surfaceCache.respawnableIDs.insert(claudeID)
@@ -574,7 +581,8 @@ struct TerminalContainerView: View {
                         claudePath: appEnv.toolStatus.claude.path,
                         workingDirectory: workingDirectory,
                         bypassPermissions: bypassPermissions,
-                        hasGitHubRemote: appEnv.hasGitHubRemote(projectDirectory)
+                        hasGitHubRemote: appEnv.hasGitHubRemote(projectDirectory),
+                        hasPR: branchPR != nil
                     )
                 }
             }
@@ -847,6 +855,12 @@ private struct QuickActionButtons: View {
     let workingDirectory: String
     let bypassPermissions: Bool
     let hasGitHubRemote: Bool
+    let hasPR: Bool
+
+    private func isVisible(_ action: QuickAction) -> Bool {
+        if action == .createPR, hasPR { return false }
+        return true
+    }
 
     private func disabledReason(for action: QuickAction) -> String? {
         if claudePath == nil {
@@ -876,13 +890,15 @@ private struct QuickActionButtons: View {
 
     var body: some View {
         ForEach(QuickAction.allCases) { action in
-            QuickActionButton(
-                action: action,
-                isRunning: isRunningAction(action),
-                resultState: resultState(for: action),
-                disabledReason: disabledReason(for: action),
-                onRun: { runAction(action) }
-            )
+            if isVisible(action) {
+                QuickActionButton(
+                    action: action,
+                    isRunning: isRunningAction(action),
+                    resultState: resultState(for: action),
+                    disabledReason: disabledReason(for: action),
+                    onRun: { runAction(action) }
+                )
+            }
         }
     }
 

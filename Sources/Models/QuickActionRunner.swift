@@ -65,6 +65,7 @@ struct QuickActionLogEntry: Identifiable {
 final class QuickActionRunner: ObservableObject {
     @Published var state: QuickActionState = .idle
     @Published var log: [QuickActionLogEntry] = []
+    var onSuccess: ((QuickAction) -> Void)?
     private var runningProcess: Process?
     private var dismissWork: DispatchWorkItem?
 
@@ -82,6 +83,8 @@ final class QuickActionRunner: ObservableObject {
         args.append(claudePath)
         args.append("-p")
         args.append(CommandBuilder.shellQuote(action.prompt))
+        args.append("--output-format")
+        args.append("json")
         args.append("--continue")
         args.append("--fork-session")
         args.append("--no-session-persistence")
@@ -122,7 +125,7 @@ final class QuickActionRunner: ObservableObject {
                 process.waitUntilExit()
                 let data = pipe.fileHandleForReading.readDataToEndOfFile()
                 output = String(data: data, encoding: .utf8) ?? ""
-                success = process.terminationStatus == 0
+                success = Self.parseSuccess(output: output, exitCode: process.terminationStatus)
                 if success {
                     logger.info("Quick action \(actionRaw) succeeded")
                 } else {
@@ -142,6 +145,9 @@ final class QuickActionRunner: ObservableObject {
                 }
                 self.runningProcess = nil
                 self.state = success ? .succeeded(action) : .failed(action)
+                if success {
+                    self.onSuccess?(action)
+                }
                 self.scheduleDismiss()
             }
         }
@@ -155,6 +161,19 @@ final class QuickActionRunner: ObservableObject {
 
     func clearLog() {
         log.removeAll()
+    }
+
+    private nonisolated static func parseSuccess(output: String, exitCode: Int32) -> Bool {
+        guard exitCode == 0 else { return false }
+        // Parse the JSON output from claude --output-format json
+        guard let data = output.data(using: .utf8),
+              let json = try? JSONSerialization.jsonObject(with: data) as? [String: Any]
+        else {
+            // If we can't parse JSON, fall back to exit code
+            return true
+        }
+        let isError = json["is_error"] as? Bool ?? false
+        return !isError
     }
 
     private func scheduleDismiss() {
