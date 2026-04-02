@@ -306,7 +306,8 @@ final class AppEnvironment: ObservableObject {
 
     private var lastBranchPRRefresh: Date = .distantPast
 
-    /// Refresh PRs for all workstream branches. Throttled to run at most every 30 seconds.
+    /// Refresh PRs for all workstream branches. One gh call per project.
+    /// Throttled to run at most every 30 seconds.
     func refreshAllBranchPRs(projects: [Project]) {
         let now = Date()
         guard now.timeIntervalSince(lastBranchPRRefresh) >= 30 else { return }
@@ -314,41 +315,44 @@ final class AppEnvironment: ObservableObject {
 
         guard ghAvailable, let ghPath = toolStatus.gh.path else { return }
 
-        // Collect (projectDir, branch) pairs from cached branch names
-        var lookups: [(projectDir: String, branch: String)] = []
+        // Collect branches per project directory
+        var projectBranches: [String: Set<String>] = [:]
         for project in projects {
+            var branches: Set<String> = []
             for ws in project.workstreams {
                 guard let path = ws.worktreePath,
                       let branch = branchNameCache[path] else { continue }
-                lookups.append((project.directory, branch))
+                branches.insert(branch)
+            }
+            if !branches.isEmpty {
+                projectBranches[project.directory] = branches
             }
         }
 
-        guard !lookups.isEmpty else { return }
-
-        // Deduplicate by key to avoid redundant gh calls
-        var seen: Set<String> = []
-        let unique = lookups.filter { seen.insert("\($0.projectDir)|\($0.branch)").inserted }
+        guard !projectBranches.isEmpty else { return }
 
         Task.detached {
-            await withTaskGroup(of: (String, GitHubPR?).self) { group in
-                for lookup in unique {
-                    let dir = lookup.projectDir
-                    let branch = lookup.branch
-                    let key = "\(dir)|\(branch)"
+            // One gh call per project fetches all open PRs
+            await withTaskGroup(of: (String, [GitHubPR]).self) { group in
+                for (dir, _) in projectBranches {
                     group.addTask {
-                        let pr = GitHubOperations.prForBranch(ghPath: ghPath, at: dir, branch: branch)
-                        return (key, pr)
+                        let prs = GitHubOperations.openPRs(ghPath: ghPath, at: dir, limit: 100)
+                        return (dir, prs)
                     }
                 }
-                for await (key, pr) in group {
-                    let capturedKey = key
-                    let capturedPR = pr
+                for await (dir, prs) in group {
+                    let branches = projectBranches[dir] ?? []
+                    // Build a lookup from branch name to PR
+                    let prsByBranch = Dictionary(prs.map { ($0.branch, $0) }, uniquingKeysWith: { first, _ in first })
+
                     await MainActor.run {
-                        if let pr = capturedPR {
-                            self.githubBranchPRCache[capturedKey] = pr
-                        } else {
-                            self.githubBranchPRCache.removeValue(forKey: capturedKey)
+                        for branch in branches {
+                            let key = "\(dir)|\(branch)"
+                            if let pr = prsByBranch[branch] {
+                                self.githubBranchPRCache[key] = pr
+                            } else {
+                                self.githubBranchPRCache.removeValue(forKey: key)
+                            }
                         }
                     }
                 }
