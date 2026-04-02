@@ -18,6 +18,7 @@ struct SettingsView: View {
     @AppStorage("factoryfloor.telemetryEnabled") private var telemetryEnabled: Bool = true
     @AppStorage("factoryfloor.crashReportingEnabled") private var crashReportingEnabled: Bool = true
     @AppStorage("factoryfloor.detailedLogging") private var detailedLogging: Bool = false
+    @AppStorage("factoryfloor.quickActionDebug") private var quickActionDebug: Bool = false
     @AppStorage("factoryfloor.bleedingEdge") private var bleedingEdge: Bool = false
     @AppStorage("factoryfloor.baseDirectory") private var baseDirectory: String = NSSearchPathForDirectoriesInDomains(.documentDirectory, .userDomainMask, true).first ?? ""
 
@@ -254,6 +255,11 @@ struct SettingsView: View {
 
                 Toggle("Detailed logging", isOn: $detailedLogging)
                 Text("Log setup, run, and teardown script output to files for debugging.")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+
+                Toggle("Quick action debug", isOn: $quickActionDebug)
+                Text("Show a debug panel with command output from quick actions (Create PR, Commit & Push).")
                     .font(.caption)
                     .foregroundStyle(.secondary)
                 if detailedLogging {

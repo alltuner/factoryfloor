@@ -258,3 +258,5 @@
 "Claude Code is not installed." = "Claude Code no está instalado.";
 "Enable \"Bypass permission prompts\" in Settings." = "Activa \"Omitir permisos\" en Configuración.";
 "No GitHub remote found for this project." = "No se encontró un remoto de GitHub para este proyecto.";
+"Quick action debug" = "Depuración de acciones rápidas";
+"Show a debug panel with command output from quick actions (Create PR, Commit & Push)." = "Muestra un panel de depuración con la salida de las acciones rápidas (Crear PR, Commit y Push).";

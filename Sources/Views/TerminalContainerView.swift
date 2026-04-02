@@ -166,6 +166,7 @@ struct TerminalContainerView: View {
     @AppStorage("factoryfloor.tmuxMode") private var tmuxMode: Bool = false
     @AppStorage("factoryfloor.agentTeams") private var agentTeams: Bool = false
     @AppStorage("factoryfloor.autoRenameBranch") private var autoRenameBranch: Bool = false
+    @AppStorage("factoryfloor.quickActionDebug") private var quickActionDebug: Bool = false
     @State private var activeTab: WorkspaceTab = .info
     @State private var tabs: [WorkspaceTab] = [.info, .agent]
     @State private var terminalCount = 0
@@ -454,6 +455,10 @@ struct TerminalContainerView: View {
             tabBar
             Divider()
             tabContent
+            if quickActionDebug {
+                Divider()
+                QuickActionDebugView(runner: quickActionRunner)
+            }
         }
         .onAppear {
             cachedClaudeCommand = buildClaudeCommand()
@@ -1138,6 +1143,83 @@ private struct TerminalSurfaceView: NSViewRepresentable {
                 terminalView.window?.makeFirstResponder(terminalView)
             }
         }
+    }
+}
+
+// MARK: - Quick action debug
+
+private struct QuickActionDebugView: View {
+    @ObservedObject var runner: QuickActionRunner
+
+    private static let timeFormatter: DateFormatter = {
+        let f = DateFormatter()
+        f.dateFormat = "HH:mm:ss"
+        return f
+    }()
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 0) {
+            HStack {
+                Text("Quick Action Log")
+                    .font(.system(size: 11, weight: .semibold, design: .monospaced))
+                    .foregroundStyle(.secondary)
+                Spacer()
+                if !runner.log.isEmpty {
+                    Button("Clear") { runner.clearLog() }
+                        .font(.system(size: 10))
+                        .buttonStyle(.borderless)
+                }
+            }
+            .padding(.horizontal, 8)
+            .padding(.vertical, 4)
+
+            if runner.log.isEmpty {
+                Text("No quick actions run yet.")
+                    .font(.system(size: 11, design: .monospaced))
+                    .foregroundStyle(.tertiary)
+                    .padding(.horizontal, 8)
+                    .padding(.bottom, 4)
+            } else {
+                ScrollView {
+                    LazyVStack(alignment: .leading, spacing: 8) {
+                        ForEach(runner.log) { entry in
+                            VStack(alignment: .leading, spacing: 4) {
+                                HStack(spacing: 6) {
+                                    Text(Self.timeFormatter.string(from: entry.timestamp))
+                                        .foregroundStyle(.tertiary)
+                                    Text(entry.action.label)
+                                        .foregroundStyle(.primary)
+                                    if let code = entry.exitCode {
+                                        Text("exit \(code)")
+                                            .foregroundStyle(code == 0 ? .green : .red)
+                                    } else {
+                                        ProgressView()
+                                            .controlSize(.mini)
+                                    }
+                                }
+                                .font(.system(size: 11, weight: .medium, design: .monospaced))
+
+                                Text("$ " + entry.command)
+                                    .font(.system(size: 10, design: .monospaced))
+                                    .foregroundStyle(.secondary)
+                                    .textSelection(.enabled)
+
+                                if !entry.output.isEmpty {
+                                    Text(entry.output)
+                                        .font(.system(size: 10, design: .monospaced))
+                                        .foregroundStyle(.primary)
+                                        .textSelection(.enabled)
+                                }
+                            }
+                            .padding(.horizontal, 8)
+                        }
+                    }
+                    .padding(.vertical, 4)
+                }
+            }
+        }
+        .frame(height: 200)
+        .background(.background)
     }
 }
 

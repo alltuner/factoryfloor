@@ -258,3 +258,5 @@
 "Claude Code is not installed." = "Claude Code är inte installerat.";
 "Enable \"Bypass permission prompts\" in Settings." = "Aktivera \"Hoppa över behörighetsfrågor\" i Inställningar.";
 "No GitHub remote found for this project." = "Ingen GitHub-fjärrserver hittades för detta projekt.";
+"Quick action debug" = "Felsökning av snabbåtgärder";
+"Show a debug panel with command output from quick actions (Create PR, Commit & Push)." = "Visa en felsökningspanel med kommandoutdata från snabbåtgärder (Skapa PR, Commit & Push).";

@@ -52,9 +52,19 @@ enum QuickActionState: Equatable {
     case failed(QuickAction)
 }
 
+struct QuickActionLogEntry: Identifiable {
+    let id = UUID()
+    let timestamp: Date
+    let action: QuickAction
+    let command: String
+    var output: String
+    var exitCode: Int32?
+}
+
 @MainActor
 final class QuickActionRunner: ObservableObject {
     @Published var state: QuickActionState = .idle
+    @Published var log: [QuickActionLogEntry] = []
     private var runningProcess: Process?
     private var dismissWork: DispatchWorkItem?
 
@@ -81,8 +91,19 @@ final class QuickActionRunner: ObservableObject {
         let shell = CommandBuilder.userShell
         let dir = workingDirectory
         let actionRaw = action.rawValue
+        let fullCommand = "\(shell) -lic \(innerCommand)"
+
+        let entry = QuickActionLogEntry(
+            timestamp: Date(),
+            action: action,
+            command: fullCommand,
+            output: ""
+        )
+        log.append(entry)
+        let entryID = entry.id
 
         logger.info("Quick action \(actionRaw) starting in \(dir)")
+        logger.info("Command: \(fullCommand)")
 
         Task.detached {
             let process = Process()
@@ -94,12 +115,13 @@ final class QuickActionRunner: ObservableObject {
             process.standardError = pipe
 
             let success: Bool
+            let output: String
             do {
                 try process.run()
                 await MainActor.run { self.runningProcess = process }
                 process.waitUntilExit()
                 let data = pipe.fileHandleForReading.readDataToEndOfFile()
-                let output = String(data: data, encoding: .utf8) ?? ""
+                output = String(data: data, encoding: .utf8) ?? ""
                 success = process.terminationStatus == 0
                 if success {
                     logger.info("Quick action \(actionRaw) succeeded")
@@ -108,10 +130,16 @@ final class QuickActionRunner: ObservableObject {
                 }
             } catch {
                 logger.error("Quick action \(actionRaw) failed to launch: \(error)")
+                output = "Failed to launch: \(error.localizedDescription)"
                 success = false
             }
 
+            let exitCode = process.terminationStatus
             await MainActor.run {
+                if let idx = self.log.firstIndex(where: { $0.id == entryID }) {
+                    self.log[idx].output = output
+                    self.log[idx].exitCode = exitCode
+                }
                 self.runningProcess = nil
                 self.state = success ? .succeeded(action) : .failed(action)
                 self.scheduleDismiss()
@@ -123,6 +151,10 @@ final class QuickActionRunner: ObservableObject {
         runningProcess?.terminate()
         runningProcess = nil
         state = .idle
+    }
+
+    func clearLog() {
+        log.removeAll()
     }
 
     private func scheduleDismiss() {
