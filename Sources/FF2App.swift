@@ -40,6 +40,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCent
     }
 
     func applicationDidFinishLaunching(_: Notification) {
+        // Debug settings should not persist across launches
+        UserDefaults.standard.set(false, forKey: "factoryfloor.quickActionDebug")
+
         let center = UNUserNotificationCenter.current()
         center.delegate = self
         Self.requestNotificationAuthorization(using: center)
