@@ -562,8 +562,6 @@ struct TerminalContainerView: View {
                     }
                     .help("New Browser (\u{2318}B)")
 
-                    Divider()
-
                     QuickActionButtons(
                         runner: quickActionRunner,
                         claudePath: appEnv.toolStatus.claude.path,
