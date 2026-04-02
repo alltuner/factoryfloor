@@ -303,10 +303,28 @@ struct TerminalContainerView: View {
         return finalCommand
     }
 
+    private var fixedTabs: [WorkspaceTab] {
+        tabs.filter { !$0.isCloseable }
+    }
+
+    private var closeableTabs: [WorkspaceTab] {
+        tabs.filter(\.isCloseable)
+    }
+
     private var tabBar: some View {
         HStack(spacing: 0) {
-            ForEach(Array(tabs.enumerated()), id: \.element) { _, tab in
+            // Fixed tabs (Info, Agent, Environment)
+            ForEach(fixedTabs, id: \.self) { tab in
                 tabButton(for: tab)
+            }
+
+            // Scrollable closeable tabs (terminals, browsers)
+            if !closeableTabs.isEmpty {
+                ScrollableTabStrip(
+                    tabs: closeableTabs,
+                    activeTab: activeTab,
+                    tabButton: { tab in tabButton(for: tab) }
+                )
             }
 
             Spacer()
@@ -906,6 +924,91 @@ private struct QuickActionButton: View {
         .onHover { isHovering = $0 }
         .help(disabledReason ?? action.label)
         .accessibilityLabel(action.label)
+    }
+}
+
+private struct ScrollableTabStrip<TabContent: View>: View {
+    let tabs: [WorkspaceTab]
+    let activeTab: WorkspaceTab
+    @ViewBuilder let tabButton: (WorkspaceTab) -> TabContent
+
+    @State private var contentOverflows = false
+    @State private var scrollOffset: CGFloat = 0
+    @State private var contentWidth: CGFloat = 0
+    @State private var viewportWidth: CGFloat = 0
+
+    private var canScrollLeft: Bool {
+        scrollOffset > 0
+    }
+
+    private var canScrollRight: Bool {
+        scrollOffset < contentWidth - viewportWidth
+    }
+
+    var body: some View {
+        HStack(spacing: 0) {
+            if contentOverflows, canScrollLeft {
+                scrollArrow(direction: .left)
+            }
+
+            ScrollViewReader { proxy in
+                ScrollView(.horizontal, showsIndicators: false) {
+                    HStack(spacing: 0) {
+                        ForEach(tabs, id: \.self) { tab in
+                            tabButton(tab)
+                                .id(tab)
+                        }
+                    }
+                    .background(GeometryReader { geo in
+                        Color.clear.preference(key: ContentWidthKey.self, value: geo.size.width)
+                    })
+                }
+                .onPreferenceChange(ContentWidthKey.self) { width in
+                    contentWidth = width
+                    checkOverflow()
+                }
+                .background(GeometryReader { geo in
+                    Color.clear
+                        .onAppear { viewportWidth = geo.size.width; checkOverflow() }
+                        .onChange(of: geo.size.width) { _, new in viewportWidth = new; checkOverflow() }
+                })
+                .onChange(of: activeTab) {
+                    withAnimation(.easeInOut(duration: 0.2)) {
+                        proxy.scrollTo(activeTab, anchor: .center)
+                    }
+                }
+            }
+
+            if contentOverflows, canScrollRight {
+                scrollArrow(direction: .right)
+            }
+        }
+    }
+
+    private enum ScrollDirection {
+        case left, right
+    }
+
+    private func scrollArrow(direction: ScrollDirection) -> some View {
+        Button(action: {}) {
+            Image(systemName: direction == .left ? "chevron.left" : "chevron.right")
+                .font(.system(size: 9, weight: .semibold))
+                .foregroundStyle(.secondary)
+                .frame(width: 16, height: 20)
+                .contentShape(Rectangle())
+        }
+        .buttonStyle(.borderless)
+    }
+
+    private func checkOverflow() {
+        contentOverflows = contentWidth > viewportWidth + 1
+    }
+}
+
+private struct ContentWidthKey: PreferenceKey {
+    nonisolated(unsafe) static var defaultValue: CGFloat = 0
+    static func reduce(value: inout CGFloat, nextValue: () -> CGFloat) {
+        value = nextValue()
     }
 }
 
