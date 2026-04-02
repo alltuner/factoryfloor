@@ -4,6 +4,12 @@
 import Foundation
 
 enum WorkstreamArchiver {
+    /// Paths currently being archived (background removal in progress).
+    @MainActor static var archivingPaths: Set<String> = []
+
+    /// Posted on MainActor when a background worktree removal finishes.
+    static let archivingDidComplete = Notification.Name("FFWorktreeArchivingComplete")
+
     /// Archives a workstream by running teardown, removing the git worktree, killing tmux sessions,
     /// and evicting terminal surfaces from the cache. Removes the workstream from the project in place.
     ///
@@ -22,13 +28,19 @@ enum WorkstreamArchiver {
         if let ws = project.workstreams.first(where: { $0.id == workstreamID }) {
             let projectDir = project.directory
             let worktreeDir = ws.worktreePath ?? projectDir
+            let standardizedPath = URL(fileURLWithPath: worktreeDir).standardizedFileURL.path
             let wsName = ws.name
             let projName = project.name
+            archivingPaths.insert(standardizedPath)
             Task.detached {
                 ScriptConfig.runTeardown(in: worktreeDir, projectDirectory: projectDir)
                 GitOperations.removeWorktree(projectPath: projectDir, workstreamName: wsName, projectName: projName)
                 if let tmuxPath {
                     TmuxSession.killWorkstreamSessions(tmuxPath: tmuxPath, project: projName, workstream: wsName)
+                }
+                await MainActor.run {
+                    archivingPaths.remove(standardizedPath)
+                    NotificationCenter.default.post(name: archivingDidComplete, object: nil)
                 }
             }
         }

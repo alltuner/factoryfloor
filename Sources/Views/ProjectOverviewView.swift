@@ -194,8 +194,11 @@ struct ProjectOverviewView: View {
                 if !worktrees.isEmpty {
                     Section {
                         ForEach(worktrees) { wt in
-                            if wt.isMain {
-                                WorktreeInfoRow(worktree: wt)
+                            let isArchiving = WorkstreamArchiver.archivingPaths.contains(
+                                URL(fileURLWithPath: wt.path).standardizedFileURL.path
+                            )
+                            if wt.isMain || isArchiving {
+                                WorktreeInfoRow(worktree: wt, isArchiving: isArchiving)
                             } else {
                                 Button(action: { selectedWorktreeForDetail = wt }) {
                                     WorktreeInfoRow(worktree: wt)
@@ -279,6 +282,9 @@ struct ProjectOverviewView: View {
             refreshWorktrees()
             loadDocFiles()
         }
+        .onReceive(NotificationCenter.default.publisher(for: WorkstreamArchiver.archivingDidComplete)) { _ in
+            refreshWorktrees()
+        }
         .popover(item: $selectedWorktreeForDetail, arrowEdge: .trailing) { wt in
             WorktreeDetailSheet(
                 worktree: wt,
@@ -302,7 +308,10 @@ struct ProjectOverviewView: View {
     }
 
     private var prunableCount: Int {
-        worktrees.filter { !$0.isMain && !$0.isDirty }.count
+        worktrees.filter { wt in
+            !wt.isMain && !wt.isDirty
+                && !WorkstreamArchiver.archivingPaths.contains(URL(fileURLWithPath: wt.path).standardizedFileURL.path)
+        }.count
     }
 
     private func loadRepoDetail() {
@@ -374,6 +383,7 @@ struct ProjectOverviewView: View {
 
 private struct WorktreeInfoRow: View {
     let worktree: WorktreeInfo
+    var isArchiving: Bool = false
 
     @State private var isHovering = false
 
@@ -390,7 +400,17 @@ private struct WorktreeInfoRow: View {
                     .foregroundStyle(.tertiary)
             }
             Spacer()
-            if worktree.isMain {
+            if isArchiving {
+                HStack(spacing: 4) {
+                    ProgressView()
+                        .controlSize(.mini)
+                    Text("Archiving...")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                }
+                .padding(.horizontal, 8)
+                .padding(.vertical, 3)
+            } else if worktree.isMain {
                 Text("main")
                     .font(.caption)
                     .foregroundStyle(.secondary)
@@ -423,7 +443,7 @@ private struct WorktreeInfoRow: View {
         }
         .contentShape(Rectangle())
         .onHover { hovering in
-            if !worktree.isMain {
+            if !worktree.isMain && !isArchiving {
                 isHovering = hovering
             }
         }
