@@ -4,37 +4,19 @@
 import type { SpriteEngine } from './SpriteEngine';
 import type { Agent } from './AgentManager';
 
-const CHAR_W = 16;
+
 const CHAR_H = 32;
 const DEFAULT_DURATION = 0.3;
 const TOTAL_COLUMNS = 16;
 
-// Green tint for the leading edge columns (#00FF41 at 50% mix)
-const TINT_R = 0x00;
-const TINT_G = 0xff;
-const TINT_B = 0x41;
-const TINT_MIX = 0.5;
+// Green tint for leading edge overlay
+const TINT_COLOR = '#00FF41';
 
 export interface MatrixState {
   type: 'reveal' | 'hide';
   progress: number; // 0.0 to 1.0
   duration: number; // seconds
   columnsRevealed: number; // 0-16
-}
-
-// Reusable offscreen canvas (created lazily)
-let offscreenCanvas: OffscreenCanvas | null = null;
-let offscreenCtx: OffscreenCanvasRenderingContext2D | null = null;
-
-function getOffscreenCanvas(): {
-  canvas: OffscreenCanvas;
-  ctx: OffscreenCanvasRenderingContext2D;
-} {
-  if (!offscreenCanvas || !offscreenCtx) {
-    offscreenCanvas = new OffscreenCanvas(CHAR_W, CHAR_H);
-    offscreenCtx = offscreenCanvas.getContext('2d')!;
-  }
-  return { canvas: offscreenCanvas, ctx: offscreenCtx };
 }
 
 export class MatrixEffect {
@@ -72,7 +54,8 @@ export class MatrixEffect {
 
   /**
    * Draw a character with the matrix effect applied.
-   * Uses an offscreen canvas to manipulate pixel data per-column.
+   * Uses clip-based column masking to avoid getImageData (which fails on
+   * cross-origin tainted canvases in WKWebView file:// mode).
    */
   static draw(
     ctx: CanvasRenderingContext2D,
@@ -83,59 +66,43 @@ export class MatrixEffect {
     const state = agent.matrixState;
     if (!state) return;
 
-    const { canvas: offCanvas, ctx: offCtx } = getOffscreenCanvas();
     const sm = agent.stateMachine;
+    const cols = state.columnsRevealed;
+    if (cols <= 0) return;
 
-    // Clear and draw sprite to offscreen canvas at 1:1 scale
-    offCtx.clearRect(0, 0, CHAR_W, CHAR_H);
+    const colW = zoom; // each source pixel column = 1 * zoom screen pixels
+    const revealW = cols * colW;
+
+    ctx.save();
+    ctx.imageSmoothingEnabled = false;
+
+    // Clip to revealed columns only
+    ctx.beginPath();
+    ctx.rect(agent.pixelX, agent.pixelY, revealW, CHAR_H * zoom);
+    ctx.clip();
+
+    // Draw the full character (clipped to revealed region)
     sprites.drawCharacter(
-      offCtx as unknown as CanvasRenderingContext2D,
+      ctx,
       agent.palette,
       sm.direction,
       sm.getCurrentFrame(),
-      0,
-      0,
-      1, // zoom=1 for offscreen
-    );
-
-    // Get pixel data and apply column effects
-    const imageData = offCtx.getImageData(0, 0, CHAR_W, CHAR_H);
-    const data = imageData.data;
-    const cols = state.columnsRevealed;
-
-    for (let y = 0; y < CHAR_H; y++) {
-      for (let x = 0; x < CHAR_W; x++) {
-        const idx = (y * CHAR_W + x) * 4;
-
-        if (x >= cols) {
-          // Column not yet revealed (or already hidden) — make invisible
-          data[idx + 3] = 0;
-        } else if (x >= cols - 2 && x < cols) {
-          // Leading edge: apply green tint (#00FF41 at 50% mix)
-          if (data[idx + 3] > 0) {
-            data[idx] = Math.round(data[idx] * (1 - TINT_MIX) + TINT_R * TINT_MIX);
-            data[idx + 1] = Math.round(
-              data[idx + 1] * (1 - TINT_MIX) + TINT_G * TINT_MIX,
-            );
-            data[idx + 2] = Math.round(
-              data[idx + 2] * (1 - TINT_MIX) + TINT_B * TINT_MIX,
-            );
-          }
-        }
-        // Columns left of the leading edge: fully visible (no changes needed)
-      }
-    }
-
-    offCtx.putImageData(imageData, 0, 0);
-
-    // Draw the modified offscreen canvas to the main canvas with zoom
-    ctx.imageSmoothingEnabled = false;
-    ctx.drawImage(
-      offCanvas,
       agent.pixelX,
       agent.pixelY,
-      CHAR_W * zoom,
-      CHAR_H * zoom,
+      zoom,
     );
+
+    // Green tint overlay on leading edge (2 columns)
+    if (cols < TOTAL_COLUMNS) {
+      const edgeCols = Math.min(2, cols);
+      const edgeX = agent.pixelX + (cols - edgeCols) * colW;
+      const edgeW = edgeCols * colW;
+      ctx.globalAlpha = 0.4;
+      ctx.fillStyle = TINT_COLOR;
+      ctx.fillRect(edgeX, agent.pixelY, edgeW, CHAR_H * zoom);
+      ctx.globalAlpha = 1;
+    }
+
+    ctx.restore();
   }
 }
