@@ -98,7 +98,6 @@ struct ContentView: View {
         {
             ProjectOverviewView(
                 project: $projectList.items[projectIndex],
-                onSelectWorkstream: { wsID in selection = .workstream(wsID) },
                 onArchiveWorkstream: { wsID in confirmArchive(wsID) },
                 onProjectChanged: { ProjectStore.save(projects) }
             )
