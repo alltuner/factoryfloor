@@ -462,12 +462,14 @@ struct TerminalContainerView: View {
         }
         .onAppear {
             quickActionRunner.onSuccess = { action in
-                if action == .createPR {
+                appEnv.refreshWorktreeState(for: workingDirectory, projectDirectory: projectDirectory)
+                if action == .createPR || action == .abandonPR {
                     if let branch = appEnv.branchName(for: workingDirectory) {
                         appEnv.refreshGitHubInfo(for: projectDirectory, branch: branch)
                     }
                 }
             }
+            appEnv.refreshWorktreeState(for: workingDirectory, projectDirectory: projectDirectory)
             cachedClaudeCommand = buildClaudeCommand()
             scriptConfig = ScriptConfig.load(from: projectDirectory)
             surfaceCache.respawnableIDs.insert(claudeID)
@@ -579,8 +581,10 @@ struct TerminalContainerView: View {
                     QuickActionButtons(
                         runner: quickActionRunner,
                         claudePath: appEnv.toolStatus.claude.path,
+                        ghPath: appEnv.toolStatus.gh.path,
                         workingDirectory: workingDirectory,
                         bypassPermissions: bypassPermissions,
+                        worktreeState: appEnv.worktreeState(for: workingDirectory),
                         hasGitHubRemote: appEnv.hasGitHubRemote(projectDirectory),
                         hasPR: branchPR != nil
                     )
@@ -852,25 +856,37 @@ private struct WorkspaceTabDropDelegate: DropDelegate {
 private struct QuickActionButtons: View {
     @ObservedObject var runner: QuickActionRunner
     let claudePath: String?
+    let ghPath: String?
     let workingDirectory: String
     let bypassPermissions: Bool
+    let worktreeState: WorktreeState
     let hasGitHubRemote: Bool
     let hasPR: Bool
 
     private func isVisible(_ action: QuickAction) -> Bool {
-        if action == .createPR, hasPR { return false }
-        return true
+        switch action {
+        case .commit:
+            return worktreeState.hasUncommittedChanges
+        case .push:
+            return worktreeState.hasUnpushedCommits && worktreeState.hasRemote
+        case .createPR:
+            return hasGitHubRemote && worktreeState.hasBranchCommits && !hasPR
+        case .abandonPR:
+            return hasPR
+        }
     }
 
     private func disabledReason(for action: QuickAction) -> String? {
-        if claudePath == nil {
-            return NSLocalizedString("Claude Code is not installed.", comment: "")
+        if action.usesLLM {
+            if claudePath == nil {
+                return NSLocalizedString("Claude Code is not installed.", comment: "")
+            }
+            if !bypassPermissions {
+                return NSLocalizedString("Enable \"Bypass permission prompts\" in Settings.", comment: "")
+            }
         }
-        if !bypassPermissions {
-            return NSLocalizedString("Enable \"Bypass permission prompts\" in Settings.", comment: "")
-        }
-        if action.requiresGitHubRemote, !hasGitHubRemote {
-            return NSLocalizedString("No GitHub remote found for this project.", comment: "")
+        if action == .abandonPR, ghPath == nil {
+            return NSLocalizedString("gh CLI is not installed.", comment: "")
         }
         return nil
     }
@@ -903,10 +919,11 @@ private struct QuickActionButtons: View {
     }
 
     private func runAction(_ action: QuickAction) {
-        guard let claudePath, disabledReason(for: action) == nil else { return }
+        guard disabledReason(for: action) == nil else { return }
         runner.run(
             action: action,
             claudePath: claudePath,
+            ghPath: ghPath,
             workingDirectory: workingDirectory
         )
     }

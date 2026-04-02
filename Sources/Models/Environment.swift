@@ -6,6 +6,13 @@ import SwiftUI
 
 private let logger = Logger(subsystem: "factoryfloor", category: "environment")
 
+struct WorktreeState {
+    var hasUncommittedChanges: Bool = false
+    var hasUnpushedCommits: Bool = false
+    var hasBranchCommits: Bool = false
+    var hasRemote: Bool = false
+}
+
 @MainActor
 final class AppEnvironment: ObservableObject {
     @Published var toolStatus = ToolStatus()
@@ -25,6 +32,9 @@ final class AppEnvironment: ObservableObject {
 
     /// Git repo detection cache per project directory
     @Published private var gitRepoCache: [String: Bool] = [:]
+
+    /// Working tree state cache per worktree path
+    @Published private var worktreeStateCache: [String: WorktreeState] = [:]
 
     /// Active port cache per workstream ID
     @Published private var activePortCache: Set<UUID> = []
@@ -120,6 +130,27 @@ final class AppEnvironment: ObservableObject {
         githubRemoteCache[directory] ?? false
     }
 
+    func worktreeState(for path: String) -> WorktreeState {
+        worktreeStateCache[path] ?? WorktreeState()
+    }
+
+    /// Refresh working tree state for a single worktree path.
+    func refreshWorktreeState(for worktreePath: String, projectDirectory: String) {
+        let path = worktreePath
+        let projectDir = projectDirectory
+        Task.detached {
+            let state = WorktreeState(
+                hasUncommittedChanges: GitOperations.hasUncommittedChanges(at: path),
+                hasUnpushedCommits: GitOperations.hasUnpushedCommits(at: path),
+                hasBranchCommits: GitOperations.hasBranchCommits(at: path, projectPath: projectDir),
+                hasRemote: GitOperations.hasRemote(at: path)
+            )
+            await MainActor.run {
+                self.worktreeStateCache[path] = state
+            }
+        }
+    }
+
     func hasActivePort(_ workstreamID: UUID) -> Bool {
         activePortCache.contains(workstreamID)
     }
@@ -164,6 +195,16 @@ final class AppEnvironment: ObservableObject {
                 }
             }
 
+            // Map worktree paths to their project directory for state detection
+            var worktreeToProject: [String: String] = [:]
+            for project in projects {
+                for ws in project.workstreams {
+                    if let path = ws.worktreePath, validPaths.contains(path) {
+                        worktreeToProject[path] = project.directory
+                    }
+                }
+            }
+
             // Run git info calls in parallel
             let branches: [String: String] = await withTaskGroup(
                 of: (String, String?).self
@@ -183,12 +224,35 @@ final class AppEnvironment: ObservableObject {
                 return collected
             }
 
+            // Compute worktree state in parallel
+            let worktreeStates: [String: WorktreeState] = await withTaskGroup(
+                of: (String, WorktreeState).self
+            ) { group in
+                for (path, projectDir) in worktreeToProject {
+                    group.addTask {
+                        let state = WorktreeState(
+                            hasUncommittedChanges: GitOperations.hasUncommittedChanges(at: path),
+                            hasUnpushedCommits: GitOperations.hasUnpushedCommits(at: path),
+                            hasBranchCommits: GitOperations.hasBranchCommits(at: path, projectPath: projectDir),
+                            hasRemote: GitOperations.hasRemote(at: path)
+                        )
+                        return (path, state)
+                    }
+                }
+                var collected: [String: WorktreeState] = [:]
+                for await (path, state) in group {
+                    collected[path] = state
+                }
+                return collected
+            }
+
             await MainActor.run {
                 self.pathValidityCache.merge(results) { _, new in new }
                 self.branchNameCache.merge(branches) { _, new in new }
                 self.missingProjectIDs = missing
                 self.gitRepoCache.merge(gitRepoResults) { _, new in new }
                 self.githubRemoteCache.merge(githubRemoteResults) { _, new in new }
+                self.worktreeStateCache.merge(worktreeStates) { _, new in new }
                 self.activePortCache = portResults
             }
         }

@@ -174,6 +174,49 @@ enum GitOperations {
         return !status.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
     }
 
+    /// Check if the current branch has commits not yet pushed to its upstream.
+    static func hasUnpushedCommits(at path: String) -> Bool {
+        guard let output = run(args: ["log", "@{upstream}..HEAD", "--oneline"], in: path) else {
+            // No upstream set means everything is unpushed (if there are commits)
+            guard let commits = run(args: ["log", "--oneline", "-1"], in: path) else { return false }
+            return !commits.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+        }
+        return !output.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+    }
+
+    /// Check if the current branch has commits ahead of the default branch.
+    static func hasBranchCommits(at path: String, projectPath: String) -> Bool {
+        let base = defaultBranch(at: projectPath)
+        guard let output = run(args: ["log", "\(base)..HEAD", "--oneline"], in: path) else { return false }
+        return !output.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+    }
+
+    /// Check if a remote exists for this repository.
+    static func hasRemote(at path: String) -> Bool {
+        guard let output = run(args: ["remote"], in: path) else { return false }
+        return !output.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+    }
+
+    /// Push the current branch to origin, setting upstream if needed.
+    static func pushCurrentBranch(at path: String) -> (success: Bool, output: String) {
+        guard let gitPath else { return (false, "git not found") }
+        let process = Process()
+        let pipe = Pipe()
+        process.executableURL = URL(fileURLWithPath: gitPath)
+        process.arguments = ["-C", path, "push", "-u", "origin", "HEAD"]
+        process.standardOutput = pipe
+        process.standardError = pipe
+        do {
+            try process.run()
+            process.waitUntilExit()
+            let data = pipe.fileHandleForReading.readDataToEndOfFile()
+            let output = String(data: data, encoding: .utf8) ?? ""
+            return (process.terminationStatus == 0, output)
+        } catch {
+            return (false, error.localizedDescription)
+        }
+    }
+
     /// List existing worktrees for a project with branch and dirty status.
     static func listWorktreesWithInfo(at projectPath: String) -> [WorktreeInfo] {
         guard let output = run(args: ["worktree", "list", "--porcelain"], in: projectPath) else {

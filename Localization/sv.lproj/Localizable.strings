@@ -253,8 +253,11 @@
 
 /* Quick Actions */
 "Quick Actions" = "Snabbåtgärder";
+"Commit" = "Commit";
+"Push" = "Push";
 "Create PR" = "Skapa PR";
-"Commit & Push" = "Commit & Push";
+"Abandon PR" = "Överge PR";
+"gh CLI is not installed." = "gh CLI är inte installerat.";
 "Claude Code is not installed." = "Claude Code är inte installerat.";
 "Enable \"Bypass permission prompts\" in Settings." = "Aktivera \"Hoppa över behörighetsfrågor\" i Inställningar.";
 "No GitHub remote found for this project." = "Ingen GitHub-fjärrserver hittades för detta projekt.";

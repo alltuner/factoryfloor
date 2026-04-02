@@ -253,8 +253,11 @@
 
 /* Quick Actions */
 "Quick Actions" = "Quick Actions";
+"Commit" = "Commit";
+"Push" = "Push";
 "Create PR" = "Create PR";
-"Commit & Push" = "Commit & Push";
+"Abandon PR" = "Abandon PR";
+"gh CLI is not installed." = "gh CLI is not installed.";
 "Claude Code is not installed." = "Claude Code is not installed.";
 "Enable \"Bypass permission prompts\" in Settings." = "Enable \"Bypass permission prompts\" in Settings.";
 "No GitHub remote found for this project." = "No GitHub remote found for this project.";
