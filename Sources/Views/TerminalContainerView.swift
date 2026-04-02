@@ -553,12 +553,12 @@ struct TerminalContainerView: View {
             .toolbar {
                 ToolbarItemGroup(placement: .primaryAction) {
                     Button(action: addTerminal) {
-                        Label(NSLocalizedString("New Terminal", comment: ""), systemImage: "terminal")
+                        Label(NSLocalizedString("Terminal", comment: ""), systemImage: "terminal")
                     }
                     .help("New Terminal (\u{2318}T)")
 
                     Button(action: addBrowser) {
-                        Label(NSLocalizedString("New Browser", comment: ""), systemImage: "globe")
+                        Label(NSLocalizedString("Browser", comment: ""), systemImage: "globe")
                     }
                     .help("New Browser (\u{2318}B)")
 
@@ -570,6 +570,7 @@ struct TerminalContainerView: View {
                         hasGitHubRemote: appEnv.githubRepo(for: projectDirectory) != nil
                     )
                 }
+                .labelStyle(.titleAndIcon)
             }
     }
 
