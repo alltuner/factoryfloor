@@ -106,8 +106,8 @@ Every workstream terminal has access to:
 | `Cmd+L` | Address bar (browser) |
 | `Cmd+0` | Back to project |
 | `Cmd+1-9` | Switch tab |
-| `Ctrl+1-9` | Switch workstream |
-| `Cmd+Shift+[` / `]` | Cycle tabs |
+| `Opt+Cmd+↑` / `↓` | Cycle workstreams |
+| `Opt+Cmd+←` / `→` | Cycle tabs |
 | `Cmd+Shift+O` | External browser |
 | `Cmd+Shift+E` | External terminal |
 | `Ctrl+Shift+R` | Rebuild setup |

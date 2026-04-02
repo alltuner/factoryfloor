@@ -16,7 +16,8 @@ extension Notification.Name {
     static let openExternalBrowser = Notification.Name("factoryfloor.openExternalBrowser")
     static let clearProjects = Notification.Name("factoryfloor.clearProjects")
     static let openExternalTerminal = Notification.Name("factoryfloor.openExternalTerminal")
-    static let switchToWorkstream = Notification.Name("factoryfloor.switchToWorkstream")
+    static let nextWorkstream = Notification.Name("factoryfloor.nextWorkstream")
+    static let prevWorkstream = Notification.Name("factoryfloor.prevWorkstream")
 }
 
 @MainActor
@@ -240,12 +241,12 @@ struct FF2App: App {
                 Button("Next Tab") {
                     NotificationCenter.default.post(name: .nextTab, object: nil)
                 }
-                .keyboardShortcut("]", modifiers: [.command, .shift])
+                .keyboardShortcut(.rightArrow, modifiers: [.command, .option])
 
                 Button("Previous Tab") {
                     NotificationCenter.default.post(name: .prevTab, object: nil)
                 }
-                .keyboardShortcut("[", modifiers: [.command, .shift])
+                .keyboardShortcut(.leftArrow, modifiers: [.command, .option])
 
                 Button("Address Bar") {
                     NotificationCenter.default.post(name: .focusAddressBar, object: nil)
@@ -275,10 +276,15 @@ struct FF2App: App {
                     Button("Switch to Tab \(n)") { NotificationCenter.default.post(name: .switchByNumber, object: n) }
                         .keyboardShortcut(KeyEquivalent(Character("\(n)")), modifiers: .command)
                 }
-                ForEach(1 ... 9, id: \.self) { n in
-                    Button("Switch to Workstream \(n)") { NotificationCenter.default.post(name: .switchToWorkstream, object: n) }
-                        .keyboardShortcut(KeyEquivalent(Character("\(n)")), modifiers: .control)
+                Button("Next Workstream") {
+                    NotificationCenter.default.post(name: .nextWorkstream, object: nil)
                 }
+                .keyboardShortcut(.downArrow, modifiers: [.command, .option])
+
+                Button("Previous Workstream") {
+                    NotificationCenter.default.post(name: .prevWorkstream, object: nil)
+                }
+                .keyboardShortcut(.upArrow, modifiers: [.command, .option])
             }
         }
     }

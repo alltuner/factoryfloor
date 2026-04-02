@@ -73,8 +73,8 @@ Workstream:
 - `Cmd+L` — address bar (browser)
 - `Cmd+0` — back to project
 - `Cmd+1-9` — switch tab
-- `Ctrl+1-9` — switch workstream
-- `Cmd+Shift+[` / `]` — cycle tabs
+- `Opt+Cmd+↑` / `↓` — cycle workstreams
+- `Opt+Cmd+←` / `→` — cycle tabs
 - `Ctrl+Shift+R` — rebuild setup
 - `Ctrl+Shift+S` — start/rerun
 

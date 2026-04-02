@@ -210,23 +210,6 @@ struct ContentView: View {
             default: NSApp.appearance = nil
             }
         }
-        .onReceive(NotificationCenter.default.publisher(for: .switchToWorkstream)) { notification in
-            guard let n = notification.object as? Int else { return }
-            // Find the active project (from project view or workstream view)
-            let project: Project?
-            if case let .project(pid) = selection {
-                project = projects.first(where: { $0.id == pid })
-            } else if let wsID = selection?.workstreamID {
-                project = projects.first(where: { $0.workstreams.contains(where: { $0.id == wsID }) })
-            } else {
-                project = nil
-            }
-            guard let project else { return }
-            let sorted = project.workstreams.sorted { $0.lastAccessedAt > $1.lastAccessedAt }
-            if n >= 1 && n <= sorted.count {
-                selection = .workstream(sorted[n - 1].id)
-            }
-        }
         .onReceive(NotificationCenter.default.publisher(for: .switchToProject)) { _ in
             // Go back to project view from any workstream
             if let wsID = selection?.workstreamID,
@@ -235,10 +218,10 @@ struct ContentView: View {
                 selection = .project(project.id)
             }
         }
-        .onReceive(NotificationCenter.default.publisher(for: .nextTab)) { _ in
+        .onReceive(NotificationCenter.default.publisher(for: .nextWorkstream)) { _ in
             cycleWorkstream(direction: 1)
         }
-        .onReceive(NotificationCenter.default.publisher(for: .prevTab)) { _ in
+        .onReceive(NotificationCenter.default.publisher(for: .prevWorkstream)) { _ in
             cycleWorkstream(direction: -1)
         }
         .onReceive(NotificationCenter.default.publisher(for: .workstreamCreated)) { notification in

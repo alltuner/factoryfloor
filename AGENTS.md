@@ -160,8 +160,8 @@ Current shortcuts:
 - **Cmd+L**: Address bar (browser)
 - **Cmd+0**: Back to project
 - **Cmd+1-9**: Switch tab (custom tabs only; Info=Cmd+I, Agent=Cmd+Return)
-- **Ctrl+1-9**: Switch workstream (works from any view in a project)
-- **Cmd+Shift+[/]**: Cycle tabs
+- **Opt+Cmd+Up/Down**: Cycle workstreams (works from any view in a project)
+- **Opt+Cmd+Left/Right**: Cycle tabs
 - **Cmd+Shift+O**: External browser
 - **Cmd+Shift+E**: External terminal
 - **Cmd+/**: Help

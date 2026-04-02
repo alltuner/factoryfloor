@@ -89,14 +89,15 @@ struct HelpView: View {
                         ShortcutRow(keys: "L", description: "Address bar")
                         ShortcutRow(keys: "0", description: "Back to project")
                         ShortcutRow(keys: "1-9", description: "Switch tab")
-                        ShortcutRow(keys: "[", shift: true, description: "Previous tab")
-                        ShortcutRow(keys: "]", shift: true, description: "Next tab")
+                        ShortcutRow(keys: "←", option: true, description: "Previous tab")
+                        ShortcutRow(keys: "→", option: true, description: "Next tab")
                     } header: {
                         ShortcutSectionHeader(title: "Workstream", description: "When a workstream is active")
                     }
 
                     Section {
-                        ShortcutRow(keys: "1-9", ctrl: true, cmd: false, description: "Switch workstream")
+                        ShortcutRow(keys: "↑", option: true, description: "Previous workstream")
+                        ShortcutRow(keys: "↓", option: true, description: "Next workstream")
                     } header: {
                         ShortcutSectionHeader(title: "Navigation", description: "Works from any view in a project")
                     }
@@ -151,6 +152,7 @@ private struct ShortcutSectionHeader: View {
 private struct ShortcutRow: View {
     let keys: String
     var ctrl: Bool = false
+    var option: Bool = false
     var shift: Bool = false
     var cmd: Bool = true
     let description: String
@@ -159,6 +161,7 @@ private struct ShortcutRow: View {
         LabeledContent(description) {
             HStack(spacing: 2) {
                 if ctrl { Image(systemName: "control") }
+                if option { Image(systemName: "option") }
                 if cmd { Image(systemName: "command") }
                 if shift { Image(systemName: "shift") }
                 Text(keys)

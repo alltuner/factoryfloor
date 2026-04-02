@@ -128,7 +128,7 @@ other = "Nuevo workstream o proyecto"
 [sc_settings]
 other = "Ajustes"
 [sc_open_ws]
-other = "Abrir workstream por posición"
+other = "Recorrer workstreams"
 [sc_back]
 other = "Volver al proyecto"
 [sc_tabs]

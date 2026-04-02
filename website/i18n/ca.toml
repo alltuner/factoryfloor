@@ -134,7 +134,7 @@ other = "Nou workstream o projecte"
 [sc_settings]
 other = "Configuració"
 [sc_open_ws]
-other = "Obre workstream per posició"
+other = "Cicla workstreams"
 [sc_back]
 other = "Torna al projecte"
 [sc_tabs]

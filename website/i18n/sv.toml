@@ -127,7 +127,7 @@ other = "Ny workstream eller projekt"
 [sc_settings]
 other = "Inställningar"
 [sc_open_ws]
-other = "Öppna workstream efter position"
+other = "Växla workstreams"
 [sc_back]
 other = "Tillbaka till projektet"
 [sc_tabs]
