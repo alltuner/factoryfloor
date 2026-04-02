@@ -254,22 +254,29 @@ struct SettingsView: View {
                     .foregroundStyle(.secondary)
 
                 Toggle("Detailed logging", isOn: $detailedLogging)
-                Text("Log setup, run, and teardown script output to files for debugging.")
+                if detailedLogging {
+                    HStack(spacing: 0) {
+                        Text("Log setup, run, and teardown script output to files for debugging. ")
+                            .foregroundStyle(.secondary)
+                        Button("Open Logs Directory") {
+                            let url = LaunchLogger.logsDirectoryURL
+                            try? FileManager.default.createDirectory(at: url, withIntermediateDirectories: true)
+                            NSWorkspace.shared.open(url)
+                        }
+                        .buttonStyle(.plain)
+                        .foregroundStyle(Color.accentColor)
+                    }
                     .font(.caption)
-                    .foregroundStyle(.secondary)
+                } else {
+                    Text("Log setup, run, and teardown script output to files for debugging.")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                }
 
                 Toggle("Quick action debug", isOn: $quickActionDebug)
                 Text("Show a debug panel with command output from quick actions (Create PR, Commit & Push).")
                     .font(.caption)
                     .foregroundStyle(.secondary)
-                if detailedLogging {
-                    Button("Open Logs Directory") {
-                        let url = LaunchLogger.logsDirectoryURL
-                        try? FileManager.default.createDirectory(at: url, withIntermediateDirectories: true)
-                        NSWorkspace.shared.open(url)
-                    }
-                    .font(.caption)
-                }
 
                 Toggle("Bleeding edge", isOn: $bleedingEdge)
                 Text("Receive pre-release builds with the latest features. These may be less stable.")
