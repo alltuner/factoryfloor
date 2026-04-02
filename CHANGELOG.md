@@ -1,5 +1,26 @@
 # Changelog
 
+## [0.1.63](https://github.com/alltuner/factoryfloor/compare/v0.1.62...v0.1.63) (2026-04-02)
+
+
+### Features
+
+* quick actions, workspace UI improvements, and settings redesign ([#307](https://github.com/alltuner/factoryfloor/issues/307)) ([3842c21](https://github.com/alltuner/factoryfloor/commit/3842c21dd4be4877f82ed35b4e232a42b6c34857))
+
+
+### Bug Fixes
+
+* cache isGitRepo and port state to avoid main-thread I/O in sidebar ([#299](https://github.com/alltuner/factoryfloor/issues/299)) ([1a9999f](https://github.com/alltuner/factoryfloor/commit/1a9999f109d4f1a43480424ea85f95aeb972dc84))
+* check Ghostty resources exist before building ([#297](https://github.com/alltuner/factoryfloor/issues/297)) ([c89ca5a](https://github.com/alltuner/factoryfloor/commit/c89ca5a2c1b22b472427a605eadc2d1683bb982c)), closes [#284](https://github.com/alltuner/factoryfloor/issues/284)
+* detect CLI tools in fish shell and Nix environments ([#300](https://github.com/alltuner/factoryfloor/issues/300)) ([2c2c5b1](https://github.com/alltuner/factoryfloor/commit/2c2c5b1e624fc284e9d86443b7066c8134e87ba1))
+* PR number formatting and worktree zig-out symlink ([#301](https://github.com/alltuner/factoryfloor/issues/301)) ([d9b3a9b](https://github.com/alltuner/factoryfloor/commit/d9b3a9b68fd072a9d545fa254cdccee9111eab12))
+* sidebar branch name delay and improve workstream row content ([#306](https://github.com/alltuner/factoryfloor/issues/306)) ([86b83cf](https://github.com/alltuner/factoryfloor/commit/86b83cfa62b70a941db72b16d55fcca5a9756346))
+
+
+### Miscellaneous
+
+* **deps:** update actions/checkout action to v6 ([#305](https://github.com/alltuner/factoryfloor/issues/305)) ([1dc5605](https://github.com/alltuner/factoryfloor/commit/1dc5605a0cd8212e01b11a3c6575aefa6cdcf5ce))
+
 ## [0.1.62](https://github.com/alltuner/factoryfloor/compare/v0.1.61...v0.1.62) (2026-04-01)
 
 
