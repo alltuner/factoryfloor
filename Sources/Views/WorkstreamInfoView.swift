@@ -69,7 +69,7 @@ struct WorkstreamInfoView: View {
                     Image(systemName: "arrow.triangle.pull")
                         .font(.system(size: 10))
                         .foregroundStyle(.green)
-                    Text("#\(pr.number)")
+                    Text(verbatim: "#\(pr.number)")
                         .font(.system(size: 11, weight: .medium, design: .monospaced))
                     Text(pr.title)
                         .font(.system(size: 11))

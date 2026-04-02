@@ -114,10 +114,12 @@ struct ProjectOverviewView: View {
                                     .foregroundStyle(.secondary)
                             }
                             ForEach(prs, id: \.number) { pr in
-                                LabeledContent("#\(pr.number)") {
+                                LabeledContent {
                                     Text(pr.title)
                                         .foregroundStyle(.secondary)
                                         .lineLimit(1)
+                                } label: {
+                                    Text(verbatim: "#\(pr.number)")
                                 }
                             }
                         }

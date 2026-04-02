@@ -318,7 +318,7 @@ struct TerminalContainerView: View {
                     HStack(spacing: 4) {
                         Image(systemName: "arrow.triangle.pull")
                             .font(.system(size: 11))
-                        Text("#\(pr.number)")
+                        Text(verbatim: "#\(pr.number)")
                             .font(.system(size: 11, weight: .medium, design: .monospaced))
                     }
                     .padding(.horizontal, 8)
@@ -329,7 +329,7 @@ struct TerminalContainerView: View {
                 }
                 .buttonStyle(.borderless)
                 .help(pr.title)
-                .accessibilityLabel("Pull request #\(pr.number)")
+                .accessibilityLabel(Text(verbatim: "Pull request #\(pr.number)"))
                 .accessibilityHint(pr.title)
             }
         }
