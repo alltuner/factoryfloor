@@ -89,7 +89,8 @@ final class QuickActionRunner: ObservableObject {
         action: QuickAction,
         claudePath: String?,
         ghPath: String?,
-        workingDirectory: String
+        workingDirectory: String,
+        branchName: String? = nil
     ) {
         guard case .idle = state else { return }
 
@@ -103,8 +104,8 @@ final class QuickActionRunner: ObservableObject {
         case .push:
             runPush(workingDirectory: workingDirectory)
         case .abandonPR:
-            guard let ghPath else { return }
-            runAbandonPR(ghPath: ghPath, workingDirectory: workingDirectory)
+            guard let ghPath, let branchName else { return }
+            runAbandonPR(ghPath: ghPath, branchName: branchName, workingDirectory: workingDirectory)
         }
     }
 
@@ -149,19 +150,20 @@ final class QuickActionRunner: ObservableObject {
         }
     }
 
-    private func runAbandonPR(ghPath: String, workingDirectory: String) {
-        let command = "\(ghPath) pr close --comment 'Abandoned from Factory Floor'"
+    private func runAbandonPR(ghPath: String, branchName: String, workingDirectory: String) {
+        let command = "\(ghPath) pr close \(branchName) --comment 'Abandoned from Factory Floor'"
 
         appendLog(action: .abandonPR, command: command)
         logger.info("Quick action abandonPR starting in \(workingDirectory)")
 
         let dir = workingDirectory
         let path = ghPath
+        let branch = branchName
         Task.detached {
             let process = Process()
             let pipe = Pipe()
             process.executableURL = URL(fileURLWithPath: path)
-            process.arguments = ["pr", "close", "--comment", "Abandoned from Factory Floor"]
+            process.arguments = ["pr", "close", branch, "--comment", "Abandoned from Factory Floor"]
             process.currentDirectoryURL = URL(fileURLWithPath: dir)
             process.standardOutput = pipe
             process.standardError = pipe

@@ -583,6 +583,7 @@ struct TerminalContainerView: View {
                         claudePath: appEnv.toolStatus.claude.path,
                         ghPath: appEnv.toolStatus.gh.path,
                         workingDirectory: workingDirectory,
+                        branchName: appEnv.branchName(for: workingDirectory),
                         bypassPermissions: bypassPermissions,
                         worktreeState: appEnv.worktreeState(for: workingDirectory),
                         hasGitHubRemote: appEnv.hasGitHubRemote(projectDirectory),
@@ -856,6 +857,7 @@ private struct QuickActionButtons: View {
     let claudePath: String?
     let ghPath: String?
     let workingDirectory: String
+    let branchName: String?
     let bypassPermissions: Bool
     let worktreeState: WorktreeState
     let hasGitHubRemote: Bool
@@ -922,7 +924,8 @@ private struct QuickActionButtons: View {
             action: action,
             claudePath: claudePath,
             ghPath: ghPath,
-            workingDirectory: workingDirectory
+            workingDirectory: workingDirectory,
+            branchName: branchName
         )
     }
 }
