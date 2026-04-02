@@ -501,6 +501,11 @@ struct TerminalContainerView: View {
         .onChange(of: activeTab) {
             surfaceCache.updateOcclusion(visibleSurfaceIDs: visibleSurfaceIDs)
             WorkspaceStateStore.save(RestorableWorkspaceTab(activeTab: activeTab), for: workstreamID)
+            appEnv.refreshWorktreeState(for: workingDirectory, projectDirectory: projectDirectory)
+        }
+        .onReceive(NotificationCenter.default.publisher(for: .terminalActivity)) { notification in
+            guard let wsID = notification.object as? UUID, wsID == workstreamID else { return }
+            appEnv.refreshWorktreeState(for: workingDirectory, projectDirectory: projectDirectory)
         }
         .onChange(of: tmuxMode) { cachedClaudeCommand = buildClaudeCommand() }
         .onChange(of: bypassPermissions) { cachedClaudeCommand = buildClaudeCommand() }
