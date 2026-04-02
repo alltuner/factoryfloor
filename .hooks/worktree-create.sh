@@ -14,6 +14,14 @@ if [ -d "$XCFW_SRC" ] && [ ! -e "$XCFW_DST" ]; then
     ln -sfn "$XCFW_SRC" "$XCFW_DST"
 fi
 
+# Ghostty zig build output (resources, headers, etc.)
+ZIGOUT_SRC="$CLAUDE_PROJECT_DIR/ghostty/zig-out"
+ZIGOUT_DST="$WORKTREE_DIR/ghostty/zig-out"
+
+if [ -d "$ZIGOUT_SRC" ] && [ ! -e "$ZIGOUT_DST" ]; then
+    ln -sfn "$ZIGOUT_SRC" "$ZIGOUT_DST"
+fi
+
 # Build so SourceKit can resolve symbols across files in the worktree.
 # dev.sh runs xcodegen + xcodebuild with the shared SPM cache.
 # Runs in background to avoid blocking worktree creation.
