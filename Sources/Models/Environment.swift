@@ -276,6 +276,10 @@ final class AppEnvironment: ObservableObject {
         githubBranchPRCache["\(directory)|\(branch)"]
     }
 
+    func clearBranchPR(for directory: String, branch: String) {
+        githubBranchPRCache.removeValue(forKey: "\(directory)|\(branch)")
+    }
+
     func refreshGitHubInfo(for directory: String, branch: String? = nil) {
         guard ghAvailable, let ghPath = toolStatus.gh.path else { return }
         guard GitHubOperations.hasGitHubRemote(at: directory) else { return }

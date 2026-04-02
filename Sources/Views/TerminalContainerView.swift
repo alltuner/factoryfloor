@@ -463,8 +463,11 @@ struct TerminalContainerView: View {
         .onAppear {
             quickActionRunner.onSuccess = { action in
                 appEnv.refreshWorktreeState(for: workingDirectory, projectDirectory: projectDirectory)
-                if action == .createPR || action == .abandonPR {
-                    if let branch = appEnv.branchName(for: workingDirectory) {
+                if let branch = appEnv.branchName(for: workingDirectory) {
+                    if action == .abandonPR {
+                        appEnv.clearBranchPR(for: projectDirectory, branch: branch)
+                    }
+                    if action == .createPR || action == .abandonPR {
                         appEnv.refreshGitHubInfo(for: projectDirectory, branch: branch)
                     }
                 }
