@@ -898,42 +898,26 @@ private struct QuickActionButton: View {
     let disabledReason: String?
     let onRun: () -> Void
 
-    @State private var isHovering = false
-
     private var isDisabled: Bool {
         disabledReason != nil || isRunning
     }
 
     var body: some View {
         Button(action: onRun) {
-            HStack(spacing: 4) {
-                if isRunning {
-                    ProgressView()
-                        .controlSize(.mini)
-                } else if case .succeeded = resultState {
-                    Image(systemName: "checkmark.circle.fill")
-                        .font(.system(size: 11))
-                        .foregroundStyle(.green)
-                } else if case .failed = resultState {
-                    Image(systemName: "xmark.circle.fill")
-                        .font(.system(size: 11))
-                        .foregroundStyle(.red)
-                } else {
-                    Image(systemName: action.icon)
-                        .font(.system(size: 11))
-                }
-                Text(action.label)
-                    .font(.system(size: 11))
+            if isRunning {
+                ProgressView()
+                    .controlSize(.mini)
+            } else if case .succeeded = resultState {
+                Label(action.label, systemImage: "checkmark.circle.fill")
+                    .foregroundStyle(.green)
+            } else if case .failed = resultState {
+                Label(action.label, systemImage: "xmark.circle.fill")
+                    .foregroundStyle(.red)
+            } else {
+                Label(action.label, systemImage: action.icon)
             }
-            .padding(.horizontal, 8)
-            .padding(.vertical, 4)
-            .background(isHovering && !isDisabled ? Color.primary.opacity(0.05) : .clear)
-            .clipShape(RoundedRectangle(cornerRadius: 5))
-            .foregroundStyle(isDisabled ? .tertiary : .secondary)
         }
-        .buttonStyle(.borderless)
         .disabled(isDisabled)
-        .onHover { isHovering = $0 }
         .help(disabledReason ?? action.label)
         .accessibilityLabel(action.label)
     }
