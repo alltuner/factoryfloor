@@ -166,6 +166,7 @@ struct TerminalContainerView: View {
     @AppStorage("factoryfloor.tmuxMode") private var tmuxMode: Bool = false
     @AppStorage("factoryfloor.agentTeams") private var agentTeams: Bool = false
     @AppStorage("factoryfloor.autoRenameBranch") private var autoRenameBranch: Bool = false
+    @AppStorage("factoryfloor.quickActionDebug") private var quickActionDebug: Bool = false
     @State private var activeTab: WorkspaceTab = .info
     @State private var tabs: [WorkspaceTab] = [.info, .agent]
     @State private var terminalCount = 0
@@ -178,6 +179,7 @@ struct TerminalContainerView: View {
     @StateObject private var portDetector: PortDetector
     @State private var runStoppedManually = false
     @State private var runStarted = false
+    @StateObject private var quickActionRunner = QuickActionRunner()
 
     init(workstreamID: UUID, workingDirectory: String, projectDirectory: String, projectName: String, workstreamName: String, bypassPermissions: Bool) {
         self.workstreamID = workstreamID
@@ -302,16 +304,31 @@ struct TerminalContainerView: View {
         return finalCommand
     }
 
+    private var fixedTabs: [WorkspaceTab] {
+        tabs.filter { !$0.isCloseable }
+    }
+
+    private var closeableTabs: [WorkspaceTab] {
+        tabs.filter(\.isCloseable)
+    }
+
     private var tabBar: some View {
         HStack(spacing: 0) {
-            ForEach(Array(tabs.enumerated()), id: \.element) { _, tab in
+            // Fixed tabs (Info, Agent, Environment)
+            ForEach(fixedTabs, id: \.self) { tab in
                 tabButton(for: tab)
             }
 
-            Spacer()
+            // Scrollable closeable tabs (terminals, browsers)
+            if !closeableTabs.isEmpty {
+                ScrollableTabStrip(
+                    tabs: closeableTabs,
+                    activeTab: activeTab,
+                    tabButton: { tab in tabButton(for: tab) }
+                )
+            }
 
-            AddTabButton(label: NSLocalizedString("Terminal", comment: ""), icon: "terminal", shortcut: "T", action: addTerminal)
-            AddTabButton(label: NSLocalizedString("Browser", comment: ""), icon: "globe", shortcut: "B", action: addBrowser)
+            Spacer()
 
             if let pr = branchPR, let url = URL(string: pr.url) {
                 Button(action: { NSWorkspace.shared.open(url) }) {
@@ -377,7 +394,7 @@ struct TerminalContainerView: View {
                 scriptConfig: scriptConfig
             )
         case .agent:
-            if sessionMode == .waitingForTools {
+            if sessionMode == .waitingForTools || appEnv.isDetecting {
                 terminalLoadingView(message: "Checking terminal tools...")
             } else if appEnv.toolStatus.claude.path == nil {
                 VStack(spacing: 16) {
@@ -438,8 +455,24 @@ struct TerminalContainerView: View {
             tabBar
             Divider()
             tabContent
+            if quickActionDebug {
+                Divider()
+                QuickActionDebugView(runner: quickActionRunner)
+            }
         }
         .onAppear {
+            quickActionRunner.onSuccess = { action in
+                appEnv.refreshWorktreeState(for: workingDirectory, projectDirectory: projectDirectory)
+                if let branch = appEnv.branchName(for: workingDirectory) {
+                    if action == .abandonPR {
+                        appEnv.clearBranchPR(for: projectDirectory, branch: branch)
+                    }
+                    if action == .createPR || action == .abandonPR {
+                        appEnv.refreshGitHubInfo(for: projectDirectory, branch: branch)
+                    }
+                }
+            }
+            appEnv.refreshWorktreeState(for: workingDirectory, projectDirectory: projectDirectory)
             cachedClaudeCommand = buildClaudeCommand()
             scriptConfig = ScriptConfig.load(from: projectDirectory)
             surfaceCache.respawnableIDs.insert(claudeID)
@@ -468,6 +501,11 @@ struct TerminalContainerView: View {
         .onChange(of: activeTab) {
             surfaceCache.updateOcclusion(visibleSurfaceIDs: visibleSurfaceIDs)
             WorkspaceStateStore.save(RestorableWorkspaceTab(activeTab: activeTab), for: workstreamID)
+            appEnv.refreshWorktreeState(for: workingDirectory, projectDirectory: projectDirectory)
+        }
+        .onReceive(NotificationCenter.default.publisher(for: .terminalActivity)) { notification in
+            guard let wsID = notification.object as? UUID, wsID == workstreamID else { return }
+            appEnv.refreshWorktreeState(for: workingDirectory, projectDirectory: projectDirectory)
         }
         .onChange(of: tmuxMode) { cachedClaudeCommand = buildClaudeCommand() }
         .onChange(of: bypassPermissions) { cachedClaudeCommand = buildClaudeCommand() }
@@ -534,19 +572,53 @@ struct TerminalContainerView: View {
                 }
             }
             .navigationSubtitle(portSubtitle)
+            .toolbar {
+                ToolbarItemGroup(placement: .primaryAction) {
+                    Button(action: addTerminal) {
+                        Label(NSLocalizedString("Terminal", comment: ""), systemImage: "terminal")
+                            .labelStyle(.titleAndIcon)
+                    }
+                    .help("New Terminal (\u{2318}T)")
+
+                    Button(action: addBrowser) {
+                        Label(NSLocalizedString("Browser", comment: ""), systemImage: "globe")
+                            .labelStyle(.titleAndIcon)
+                    }
+                    .help("New Browser (\u{2318}B)")
+
+                    QuickActionButtons(
+                        runner: quickActionRunner,
+                        claudePath: appEnv.toolStatus.claude.path,
+                        ghPath: appEnv.toolStatus.gh.path,
+                        workingDirectory: workingDirectory,
+                        branchName: appEnv.branchName(for: workingDirectory),
+                        bypassPermissions: bypassPermissions,
+                        worktreeState: appEnv.worktreeState(for: workingDirectory),
+                        hasGitHubRemote: appEnv.hasGitHubRemote(projectDirectory),
+                        hasPR: branchPR != nil
+                    )
+                }
+            }
     }
 
     // MARK: - Tab management
+
+    /// Number of closeable tabs beyond which labels are hidden to save space.
+    private static let compactTabThreshold = 3
+
+    private var useCompactTabs: Bool {
+        tabs.filter(\.isCloseable).count > Self.compactTabThreshold
+    }
 
     private func tabLabel(_ tab: WorkspaceTab) -> String? {
         switch tab {
         case .info: return NSLocalizedString("Info", comment: "")
         case .agent: return NSLocalizedString("Agent", comment: "")
         case .environment: return NSLocalizedString("Environment", comment: "")
-        case let .terminal(id):
-            guard let title = terminalTitles[id], !title.isEmpty else { return nil }
-            return title.count > 20 ? String(title.prefix(20)) + "..." : title
+        case .terminal:
+            return nil
         case let .browser(id):
+            guard !useCompactTabs else { return nil }
             guard let title = browserTitles[id], !title.isEmpty else { return nil }
             return title.count > 20 ? String(title.prefix(20)) + "..." : title
         }
@@ -746,6 +818,7 @@ private struct WorkspaceTabButton: View {
             if let label {
                 Text(label)
                     .font(.system(size: 12, weight: isActive ? .semibold : .regular))
+                    .lineLimit(1)
             }
             if let shortcut {
                 (Text(Image(systemName: "command")) + Text(shortcut))
@@ -784,6 +857,204 @@ private struct WorkspaceTabDropDelegate: DropDelegate {
     func performDrop(info _: DropInfo) -> Bool {
         onDropTab()
         return true
+    }
+}
+
+private struct QuickActionButtons: View {
+    @ObservedObject var runner: QuickActionRunner
+    let claudePath: String?
+    let ghPath: String?
+    let workingDirectory: String
+    let branchName: String?
+    let bypassPermissions: Bool
+    let worktreeState: WorktreeState
+    let hasGitHubRemote: Bool
+    let hasPR: Bool
+
+    private func isVisible(_ action: QuickAction) -> Bool {
+        switch action {
+        case .commit:
+            return worktreeState.hasUncommittedChanges
+        case .push:
+            return worktreeState.hasUnpushedCommits && worktreeState.hasRemote
+        case .createPR:
+            return hasGitHubRemote && worktreeState.hasBranchCommits && !hasPR
+        case .abandonPR:
+            return hasPR
+        }
+    }
+
+    private func disabledReason(for action: QuickAction) -> String? {
+        if action.usesLLM {
+            if claudePath == nil {
+                return NSLocalizedString("Claude Code is not installed.", comment: "")
+            }
+            if !bypassPermissions {
+                return NSLocalizedString("Enable \"Bypass permission prompts\" in Settings.", comment: "")
+            }
+        }
+        if action == .abandonPR, ghPath == nil {
+            return NSLocalizedString("gh CLI is not installed.", comment: "")
+        }
+        return nil
+    }
+
+    private func isRunningAction(_ action: QuickAction) -> Bool {
+        if case let .running(a) = runner.state { return a == action }
+        return false
+    }
+
+    private func resultState(for action: QuickAction) -> QuickActionState? {
+        switch runner.state {
+        case let .succeeded(a) where a == action: return runner.state
+        case let .failed(a) where a == action: return runner.state
+        default: return nil
+        }
+    }
+
+    var body: some View {
+        ForEach(QuickAction.allCases) { action in
+            if isVisible(action) {
+                QuickActionButton(
+                    action: action,
+                    isRunning: isRunningAction(action),
+                    resultState: resultState(for: action),
+                    disabledReason: disabledReason(for: action),
+                    onRun: { runAction(action) }
+                )
+            }
+        }
+    }
+
+    private func runAction(_ action: QuickAction) {
+        guard disabledReason(for: action) == nil else { return }
+        runner.run(
+            action: action,
+            claudePath: claudePath,
+            ghPath: ghPath,
+            workingDirectory: workingDirectory,
+            branchName: branchName
+        )
+    }
+}
+
+private struct QuickActionButton: View {
+    let action: QuickAction
+    let isRunning: Bool
+    let resultState: QuickActionState?
+    let disabledReason: String?
+    let onRun: () -> Void
+
+    private var isDisabled: Bool {
+        disabledReason != nil || isRunning
+    }
+
+    var body: some View {
+        Button(action: onRun) {
+            if isRunning {
+                ProgressView()
+                    .controlSize(.mini)
+            } else if case .succeeded = resultState {
+                Label(action.label, systemImage: "checkmark.circle.fill")
+                    .labelStyle(.titleAndIcon)
+                    .foregroundStyle(.green)
+            } else if case .failed = resultState {
+                Label(action.label, systemImage: "xmark.circle.fill")
+                    .labelStyle(.titleAndIcon)
+                    .foregroundStyle(.red)
+            } else {
+                Label(action.label, systemImage: action.icon)
+                    .labelStyle(.titleAndIcon)
+            }
+        }
+        .disabled(isDisabled)
+        .help(disabledReason ?? action.label)
+        .accessibilityLabel(action.label)
+    }
+}
+
+private struct ScrollableTabStrip<TabContent: View>: View {
+    let tabs: [WorkspaceTab]
+    let activeTab: WorkspaceTab
+    @ViewBuilder let tabButton: (WorkspaceTab) -> TabContent
+
+    @State private var contentOverflows = false
+    @State private var scrollOffset: CGFloat = 0
+    @State private var contentWidth: CGFloat = 0
+    @State private var viewportWidth: CGFloat = 0
+
+    private var canScrollLeft: Bool {
+        scrollOffset > 0
+    }
+
+    private var canScrollRight: Bool {
+        scrollOffset < contentWidth - viewportWidth
+    }
+
+    var body: some View {
+        HStack(spacing: 0) {
+            if contentOverflows, canScrollLeft {
+                scrollArrow(direction: .left)
+            }
+
+            ScrollViewReader { proxy in
+                ScrollView(.horizontal, showsIndicators: false) {
+                    HStack(spacing: 0) {
+                        ForEach(tabs, id: \.self) { tab in
+                            tabButton(tab)
+                                .id(tab)
+                        }
+                    }
+                    .background(GeometryReader { geo in
+                        Color.clear.preference(key: ContentWidthKey.self, value: geo.size.width)
+                    })
+                }
+                .onPreferenceChange(ContentWidthKey.self) { width in
+                    contentWidth = width
+                    checkOverflow()
+                }
+                .background(GeometryReader { geo in
+                    Color.clear
+                        .onAppear { viewportWidth = geo.size.width; checkOverflow() }
+                        .onChange(of: geo.size.width) { _, new in viewportWidth = new; checkOverflow() }
+                })
+                .onChange(of: activeTab) {
+                    withAnimation(.easeInOut(duration: 0.2)) {
+                        proxy.scrollTo(activeTab, anchor: .center)
+                    }
+                }
+            }
+
+            if contentOverflows, canScrollRight {
+                scrollArrow(direction: .right)
+            }
+        }
+    }
+
+    private enum ScrollDirection {
+        case left, right
+    }
+
+    private func scrollArrow(direction: ScrollDirection) -> some View {
+        Button(action: {}) {
+            Image(systemName: direction == .left ? "chevron.left" : "chevron.right")
+                .font(.system(size: 9, weight: .semibold))
+                .foregroundStyle(.secondary)
+                .frame(width: 16, height: 20)
+                .contentShape(Rectangle())
+        }
+        .buttonStyle(.borderless)
+    }
+
+    private func checkOverflow() {
+        contentOverflows = contentWidth > viewportWidth + 1
+    }
+}
+
+private struct ContentWidthKey: PreferenceKey {
+    nonisolated(unsafe) static var defaultValue: CGFloat = 0
+    static func reduce(value: inout CGFloat, nextValue: () -> CGFloat) {
+        value = nextValue()
     }
 }
 
@@ -914,6 +1185,83 @@ private struct TerminalSurfaceView: NSViewRepresentable {
                 terminalView.window?.makeFirstResponder(terminalView)
             }
         }
+    }
+}
+
+// MARK: - Quick action debug
+
+private struct QuickActionDebugView: View {
+    @ObservedObject var runner: QuickActionRunner
+
+    private static let timeFormatter: DateFormatter = {
+        let f = DateFormatter()
+        f.dateFormat = "HH:mm:ss"
+        return f
+    }()
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 0) {
+            HStack {
+                Text("Quick Action Log")
+                    .font(.system(size: 11, weight: .semibold, design: .monospaced))
+                    .foregroundStyle(.secondary)
+                Spacer()
+                if !runner.log.isEmpty {
+                    Button("Clear") { runner.clearLog() }
+                        .font(.system(size: 10))
+                        .buttonStyle(.borderless)
+                }
+            }
+            .padding(.horizontal, 8)
+            .padding(.vertical, 4)
+
+            if runner.log.isEmpty {
+                Text("No quick actions run yet.")
+                    .font(.system(size: 11, design: .monospaced))
+                    .foregroundStyle(.tertiary)
+                    .padding(.horizontal, 8)
+                    .padding(.bottom, 4)
+            } else {
+                ScrollView {
+                    LazyVStack(alignment: .leading, spacing: 8) {
+                        ForEach(runner.log) { entry in
+                            VStack(alignment: .leading, spacing: 4) {
+                                HStack(spacing: 6) {
+                                    Text(Self.timeFormatter.string(from: entry.timestamp))
+                                        .foregroundStyle(.tertiary)
+                                    Text(entry.action.label)
+                                        .foregroundStyle(.primary)
+                                    if let code = entry.exitCode {
+                                        Text("exit \(code)")
+                                            .foregroundStyle(code == 0 ? .green : .red)
+                                    } else {
+                                        ProgressView()
+                                            .controlSize(.mini)
+                                    }
+                                }
+                                .font(.system(size: 11, weight: .medium, design: .monospaced))
+
+                                Text("$ " + entry.command)
+                                    .font(.system(size: 10, design: .monospaced))
+                                    .foregroundStyle(.secondary)
+                                    .textSelection(.enabled)
+
+                                if !entry.output.isEmpty {
+                                    Text(entry.output)
+                                        .font(.system(size: 10, design: .monospaced))
+                                        .foregroundStyle(.primary)
+                                        .textSelection(.enabled)
+                                }
+                            }
+                            .padding(.horizontal, 8)
+                        }
+                    }
+                    .padding(.vertical, 4)
+                }
+            }
+        }
+        .frame(height: 200)
+        .background(.background)
     }
 }
 
@@ -1099,6 +1447,17 @@ final class TerminalSurfaceCache: ObservableObject {
         } else {
             removeSurface(for: id)
             NotificationCenter.default.post(name: .terminalTabExited, object: id)
+        }
+    }
+
+    // MARK: - Text injection
+
+    /// Send text to a terminal surface as if it were typed.
+    func sendText(to surfaceID: UUID, text: String) {
+        guard let view = surfaces[surfaceID],
+              let surface = view.surface else { return }
+        text.withCString { ptr in
+            ghostty_surface_text(surface, ptr, UInt(text.utf8.count))
         }
     }
 

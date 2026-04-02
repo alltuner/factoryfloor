@@ -18,6 +18,7 @@ struct SettingsView: View {
     @AppStorage("factoryfloor.telemetryEnabled") private var telemetryEnabled: Bool = true
     @AppStorage("factoryfloor.crashReportingEnabled") private var crashReportingEnabled: Bool = true
     @AppStorage("factoryfloor.detailedLogging") private var detailedLogging: Bool = false
+    @AppStorage("factoryfloor.quickActionDebug") private var quickActionDebug: Bool = false
     @AppStorage("factoryfloor.bleedingEdge") private var bleedingEdge: Bool = false
     @AppStorage("factoryfloor.baseDirectory") private var baseDirectory: String = NSSearchPathForDirectoriesInDomains(.documentDirectory, .userDomainMask, true).first ?? ""
 
@@ -87,7 +88,12 @@ struct SettingsView: View {
 
             Section("General") {
                 HStack {
-                    Text("Base directory")
+                    VStack(alignment: .leading, spacing: 2) {
+                        Text("Base directory")
+                        Text("Default location when adding new projects.")
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+                    }
                     Spacer()
                     Text(baseDirectory.abbreviatedPath)
                         .font(.system(.body, design: .monospaced))
@@ -107,32 +113,31 @@ struct SettingsView: View {
                         }
                     }
                 }
-                Text("Default location when adding new projects.")
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
 
-                LabeledContent("Branch prefix") {
-                    TextField("", text: Binding(
-                        get: { branchPrefix },
-                        set: { newValue in
-                            // Only allow lowercase letters and hyphens, no leading/trailing hyphens, no double hyphens
-                            let filtered = String(newValue.lowercased().filter { $0.isLetter || $0 == "-" })
-                                .replacingOccurrences(of: "--", with: "-")
-                            let trimmed = filtered.trimmingCharacters(in: CharacterSet(charactersIn: "-"))
-                            branchPrefix = trimmed
-                        }
-                    ))
-                    .textFieldStyle(.roundedBorder)
-                    .frame(maxWidth: 150)
+                VStack(alignment: .leading, spacing: 2) {
+                    LabeledContent("Branch prefix") {
+                        TextField("", text: Binding(
+                            get: { branchPrefix },
+                            set: { newValue in
+                                let filtered = String(newValue.lowercased().filter { $0.isLetter || $0 == "-" })
+                                    .replacingOccurrences(of: "--", with: "-")
+                                let trimmed = filtered.trimmingCharacters(in: CharacterSet(charactersIn: "-"))
+                                branchPrefix = trimmed
+                            }
+                        ))
+                        .textFieldStyle(.roundedBorder)
+                        .frame(maxWidth: 150)
+                    }
+                    Text("e.g. \(branchPrefix.isEmpty ? "ff" : branchPrefix)/deploy-ludicrous-speed")
+                        .font(.system(.caption, design: .monospaced))
+                        .foregroundStyle(.tertiary)
                 }
-                Text("e.g. \(branchPrefix.isEmpty ? "ff" : branchPrefix)/deploy-ludicrous-speed")
-                    .font(.system(.caption, design: .monospaced))
-                    .foregroundStyle(.tertiary)
 
-                Toggle("Symlink .env files", isOn: $symlinkEnv)
-                Text("Symlink .env and .env.local from the main repository into new worktrees.")
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
+                SettingToggle(
+                    "Symlink .env files",
+                    isOn: $symlinkEnv,
+                    description: "Symlink .env and .env.local from the main repository into new worktrees."
+                )
 
                 Picker("Theme", selection: $appearance) {
                     Text("System").tag("system")
@@ -158,43 +163,50 @@ struct SettingsView: View {
                         .foregroundStyle(.secondary)
                 }
 
-                Toggle("Confirm before quitting", isOn: $confirmQuit)
-                Text("Show a confirmation dialog when quitting with active workstreams.")
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
+                SettingToggle(
+                    "Confirm before quitting",
+                    isOn: $confirmQuit,
+                    description: "Show a confirmation dialog when quitting with active workstreams."
+                )
 
-                Toggle("Launch at login", isOn: $launchAtLogin)
-                    .onChange(of: launchAtLogin) { _, newValue in
-                        LaunchAtLogin.setEnabled(newValue)
-                    }
-                Text("Automatically open Factory Floor when you log in.")
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
+                SettingToggle(
+                    "Launch at login",
+                    isOn: $launchAtLogin,
+                    description: "Automatically open Factory Floor when you log in."
+                )
+                .onChange(of: launchAtLogin) { _, newValue in
+                    LaunchAtLogin.setEnabled(newValue)
+                }
             }
 
             // MARK: - Coding Agent
 
             Section("Coding Agent") {
-                Toggle("Bypass permission prompts", isOn: $bypassPermissions)
-                Text("When enabled, the coding agent will not ask for confirmation before making changes. Use with caution: the agent will be able to edit files, run commands, and make git commits without asking.")
-                    .font(.caption)
-                    .foregroundStyle(bypassPermissions ? .orange : .secondary)
+                SettingToggle(
+                    "Bypass permission prompts",
+                    isOn: $bypassPermissions,
+                    description: "When enabled, the coding agent will not ask for confirmation before making changes. Use with caution: the agent will be able to edit files, run commands, and make git commits without asking.",
+                    descriptionStyle: bypassPermissions ? .warning : .secondary
+                )
 
-                Toggle("Agent Teams", isOn: $agentTeams)
-                Text("Enables experimental multi-agent coordination. Agents can spawn teammates, delegate tasks, and collaborate across workstreams.")
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
+                SettingToggle(
+                    "Agent Teams",
+                    isOn: $agentTeams,
+                    description: "Enables experimental multi-agent coordination. Agents can spawn teammates, delegate tasks, and collaborate across workstreams."
+                )
 
-                Toggle("Auto-rename branch", isOn: $autoRenameBranch)
-                Text("The agent will rename the worktree branch to match the task on the first request (e.g., fix-login-timeout).")
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
+                SettingToggle(
+                    "Auto-rename branch",
+                    isOn: $autoRenameBranch,
+                    description: "The agent will rename the worktree branch to match the task on the first request (e.g., fix-login-timeout)."
+                )
 
-                Toggle("Tmux Mode", isOn: $tmuxMode)
-                    .disabled(!appEnv.toolStatus.tmux.isInstalled)
-                Text("Coding Agent sessions persist across app restarts. The Terminal tab is not affected. Sessions are lost on system restart.")
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
+                SettingToggle(
+                    "Tmux Mode",
+                    isOn: $tmuxMode,
+                    description: "Coding Agent sessions persist across app restarts. The Terminal tab is not affected. Sessions are lost on system restart."
+                )
+                .disabled(!appEnv.toolStatus.tmux.isInstalled)
 
                 if !appEnv.toolStatus.tmux.isInstalled {
                     Text("Requires tmux to be installed.")
@@ -242,33 +254,54 @@ struct SettingsView: View {
             // MARK: - Advanced
 
             Section("Advanced") {
-                Toggle("Usage analytics", isOn: $telemetryEnabled)
-                Text("Send anonymous usage data to help improve Factory Floor. We collect: app version, build type, macOS version, locale, and screen resolution. No project names, file contents, or personal data.")
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
+                SettingToggle(
+                    "Usage analytics",
+                    isOn: $telemetryEnabled,
+                    description: "Send anonymous usage data to help improve Factory Floor. We collect: app version, build type, macOS version, locale, and screen resolution. No project names, file contents, or personal data."
+                )
 
-                Toggle("Crash reports", isOn: $crashReportingEnabled)
-                Text("Send crash reports and performance data. Requires restart to take effect.")
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
+                SettingToggle(
+                    "Crash reports",
+                    isOn: $crashReportingEnabled,
+                    description: "Send crash reports and performance data. Requires restart to take effect."
+                )
 
-                Toggle("Detailed logging", isOn: $detailedLogging)
-                Text("Log setup, run, and teardown script output to files for debugging.")
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
-                if detailedLogging {
-                    Button("Open Logs Directory") {
-                        let url = LaunchLogger.logsDirectoryURL
-                        try? FileManager.default.createDirectory(at: url, withIntermediateDirectories: true)
-                        NSWorkspace.shared.open(url)
+                Toggle(isOn: $detailedLogging) {
+                    VStack(alignment: .leading, spacing: 2) {
+                        Text("Detailed logging")
+                        if detailedLogging {
+                            HStack(spacing: 0) {
+                                Text("Log setup, run, and teardown script output to files for debugging. ")
+                                    .foregroundStyle(.secondary)
+                                Button("Open Logs Directory") {
+                                    let url = LaunchLogger.logsDirectoryURL
+                                    try? FileManager.default.createDirectory(at: url, withIntermediateDirectories: true)
+                                    NSWorkspace.shared.open(url)
+                                }
+                                .buttonStyle(.plain)
+                                .foregroundStyle(Color.accentColor)
+                            }
+                            .font(.caption)
+                        } else {
+                            Text("Log setup, run, and teardown script output to files for debugging.")
+                                .font(.caption)
+                                .foregroundStyle(.secondary)
+                        }
                     }
-                    .font(.caption)
                 }
 
-                Toggle("Bleeding edge", isOn: $bleedingEdge)
-                Text("Receive pre-release builds with the latest features. These may be less stable.")
-                    .font(.caption)
-                    .foregroundStyle(bleedingEdge ? .orange : .secondary)
+                SettingToggle(
+                    "Quick action debug",
+                    isOn: $quickActionDebug,
+                    description: "Show a debug panel with command output from quick actions (Create PR, Commit & Push)."
+                )
+
+                SettingToggle(
+                    "Bleeding edge",
+                    isOn: $bleedingEdge,
+                    description: "Receive pre-release builds with the latest features. These may be less stable.",
+                    descriptionStyle: bleedingEdge ? .warning : .secondary
+                )
 
                 LabeledContent("Clear project list") {
                     Button("Clear All...", role: .destructive, action: { showingClearConfirm = true })
@@ -365,6 +398,38 @@ struct SettingsView: View {
     }
 }
 
+// MARK: - Setting Toggle
+
+private enum SettingDescriptionStyle {
+    case secondary
+    case warning
+}
+
+private struct SettingToggle: View {
+    let title: String
+    @Binding var isOn: Bool
+    let description: String
+    var descriptionStyle: SettingDescriptionStyle
+
+    init(_ title: String, isOn: Binding<Bool>, description: String, descriptionStyle: SettingDescriptionStyle = .secondary) {
+        self.title = title
+        _isOn = isOn
+        self.description = description
+        self.descriptionStyle = descriptionStyle
+    }
+
+    var body: some View {
+        Toggle(isOn: $isOn) {
+            VStack(alignment: .leading, spacing: 2) {
+                Text(title)
+                Text(description)
+                    .font(.caption)
+                    .foregroundStyle(descriptionStyle == .warning ? .orange : .secondary)
+            }
+        }
+    }
+}
+
 // MARK: - Tool Detection
 
 enum BinaryStatus {
@@ -429,11 +494,9 @@ struct ToolStatus {
 
     private static func runForVersion(_ path: String, args: [String]) -> String? {
         guard let output = runCommand(path, args: args) else { return nil }
-        // Extract just the version number from output like "tmux 3.4" or "gh version 2.40.1"
         let trimmed = output
             .replacingOccurrences(of: "tmux ", with: "")
             .replacingOccurrences(of: "gh version ", with: "")
-        // Take first line only
         return trimmed.components(separatedBy: .newlines).first?.trimmingCharacters(in: .whitespaces)
     }
 
@@ -446,7 +509,6 @@ struct ToolStatus {
         guard let output = runCommand(ghPath, args: ["auth", "status"], includeStderr: true) else {
             return "Not authenticated"
         }
-        // Parse "Logged in to github.com account username"
         if let range = output.range(of: "account ") {
             let afterAccount = output[range.upperBound...]
             let username = afterAccount.prefix(while: { !$0.isWhitespace && $0 != "(" })

@@ -6,6 +6,13 @@ import SwiftUI
 
 private let logger = Logger(subsystem: "factoryfloor", category: "environment")
 
+struct WorktreeState {
+    var hasUncommittedChanges: Bool = false
+    var hasUnpushedCommits: Bool = false
+    var hasBranchCommits: Bool = false
+    var hasRemote: Bool = false
+}
+
 @MainActor
 final class AppEnvironment: ObservableObject {
     @Published var toolStatus = ToolStatus()
@@ -26,8 +33,14 @@ final class AppEnvironment: ObservableObject {
     /// Git repo detection cache per project directory
     @Published private var gitRepoCache: [String: Bool] = [:]
 
+    /// Working tree state cache per worktree path
+    @Published private var worktreeStateCache: [String: WorktreeState] = [:]
+
     /// Active port cache per workstream ID
     @Published private var activePortCache: Set<UUID> = []
+
+    /// GitHub remote detection cache per project directory (lightweight git check)
+    @Published private var githubRemoteCache: [String: Bool] = [:]
 
     // GitHub info cache
     @Published private var githubRepoCache: [String: GitHubRepoInfo] = [:]
@@ -113,6 +126,31 @@ final class AppEnvironment: ObservableObject {
         gitRepoCache[directory] ?? false
     }
 
+    func hasGitHubRemote(_ directory: String) -> Bool {
+        githubRemoteCache[directory] ?? false
+    }
+
+    func worktreeState(for path: String) -> WorktreeState {
+        worktreeStateCache[path] ?? WorktreeState()
+    }
+
+    /// Refresh working tree state for a single worktree path.
+    func refreshWorktreeState(for worktreePath: String, projectDirectory: String) {
+        let path = worktreePath
+        let projectDir = projectDirectory
+        Task.detached {
+            let state = WorktreeState(
+                hasUncommittedChanges: GitOperations.hasUncommittedChanges(at: path),
+                hasUnpushedCommits: GitOperations.hasUnpushedCommits(at: path),
+                hasBranchCommits: GitOperations.hasBranchCommits(at: path, projectPath: projectDir),
+                hasRemote: GitOperations.hasRemote(at: path)
+            )
+            await MainActor.run {
+                self.worktreeStateCache[path] = state
+            }
+        }
+    }
+
     func hasActivePort(_ workstreamID: UUID) -> Bool {
         activePortCache.contains(workstreamID)
     }
@@ -125,6 +163,7 @@ final class AppEnvironment: ObservableObject {
             var results: [String: Bool] = [:]
             var missing: Set<UUID> = []
             var gitRepoResults: [String: Bool] = [:]
+            var githubRemoteResults: [String: Bool] = [:]
             var portResults: Set<UUID> = []
 
             // Collect valid worktree paths that need git info
@@ -139,6 +178,7 @@ final class AppEnvironment: ObservableObject {
                 }
 
                 gitRepoResults[project.directory] = GitOperations.isGitRepo(at: project.directory)
+                githubRemoteResults[project.directory] = GitHubOperations.hasGitHubRemote(at: project.directory)
 
                 for ws in project.workstreams {
                     if RunStateStore.loadValidated(for: ws.id)?.detectedPorts.isEmpty == false {
@@ -151,6 +191,16 @@ final class AppEnvironment: ObservableObject {
                     results[path] = valid
                     if valid {
                         validPaths.append(path)
+                    }
+                }
+            }
+
+            // Map worktree paths to their project directory for state detection
+            var worktreeToProject: [String: String] = [:]
+            for project in projects {
+                for ws in project.workstreams {
+                    if let path = ws.worktreePath, validPaths.contains(path) {
+                        worktreeToProject[path] = project.directory
                     }
                 }
             }
@@ -174,11 +224,35 @@ final class AppEnvironment: ObservableObject {
                 return collected
             }
 
+            // Compute worktree state in parallel
+            let worktreeStates: [String: WorktreeState] = await withTaskGroup(
+                of: (String, WorktreeState).self
+            ) { group in
+                for (path, projectDir) in worktreeToProject {
+                    group.addTask {
+                        let state = WorktreeState(
+                            hasUncommittedChanges: GitOperations.hasUncommittedChanges(at: path),
+                            hasUnpushedCommits: GitOperations.hasUnpushedCommits(at: path),
+                            hasBranchCommits: GitOperations.hasBranchCommits(at: path, projectPath: projectDir),
+                            hasRemote: GitOperations.hasRemote(at: path)
+                        )
+                        return (path, state)
+                    }
+                }
+                var collected: [String: WorktreeState] = [:]
+                for await (path, state) in group {
+                    collected[path] = state
+                }
+                return collected
+            }
+
             await MainActor.run {
                 self.pathValidityCache.merge(results) { _, new in new }
                 self.branchNameCache.merge(branches) { _, new in new }
                 self.missingProjectIDs = missing
                 self.gitRepoCache.merge(gitRepoResults) { _, new in new }
+                self.githubRemoteCache.merge(githubRemoteResults) { _, new in new }
+                self.worktreeStateCache.merge(worktreeStates) { _, new in new }
                 self.activePortCache = portResults
             }
         }
@@ -200,6 +274,10 @@ final class AppEnvironment: ObservableObject {
 
     func githubPR(for directory: String, branch: String) -> GitHubPR? {
         githubBranchPRCache["\(directory)|\(branch)"]
+    }
+
+    func clearBranchPR(for directory: String, branch: String) {
+        githubBranchPRCache.removeValue(forKey: "\(directory)|\(branch)")
     }
 
     func refreshGitHubInfo(for directory: String, branch: String? = nil) {
@@ -228,7 +306,8 @@ final class AppEnvironment: ObservableObject {
 
     private var lastBranchPRRefresh: Date = .distantPast
 
-    /// Refresh PRs for all workstream branches. Throttled to run at most every 30 seconds.
+    /// Refresh PRs for all workstream branches. One gh call per project.
+    /// Throttled to run at most every 30 seconds.
     func refreshAllBranchPRs(projects: [Project]) {
         let now = Date()
         guard now.timeIntervalSince(lastBranchPRRefresh) >= 30 else { return }
@@ -236,41 +315,44 @@ final class AppEnvironment: ObservableObject {
 
         guard ghAvailable, let ghPath = toolStatus.gh.path else { return }
 
-        // Collect (projectDir, branch) pairs from cached branch names
-        var lookups: [(projectDir: String, branch: String)] = []
+        // Collect branches per project directory
+        var projectBranches: [String: Set<String>] = [:]
         for project in projects {
+            var branches: Set<String> = []
             for ws in project.workstreams {
                 guard let path = ws.worktreePath,
                       let branch = branchNameCache[path] else { continue }
-                lookups.append((project.directory, branch))
+                branches.insert(branch)
+            }
+            if !branches.isEmpty {
+                projectBranches[project.directory] = branches
             }
         }
 
-        guard !lookups.isEmpty else { return }
-
-        // Deduplicate by key to avoid redundant gh calls
-        var seen: Set<String> = []
-        let unique = lookups.filter { seen.insert("\($0.projectDir)|\($0.branch)").inserted }
+        guard !projectBranches.isEmpty else { return }
 
         Task.detached {
-            await withTaskGroup(of: (String, GitHubPR?).self) { group in
-                for lookup in unique {
-                    let dir = lookup.projectDir
-                    let branch = lookup.branch
-                    let key = "\(dir)|\(branch)"
+            // One gh call per project fetches all open PRs
+            await withTaskGroup(of: (String, [GitHubPR]).self) { group in
+                for (dir, _) in projectBranches {
                     group.addTask {
-                        let pr = GitHubOperations.prForBranch(ghPath: ghPath, at: dir, branch: branch)
-                        return (key, pr)
+                        let prs = GitHubOperations.openPRs(ghPath: ghPath, at: dir, limit: 100)
+                        return (dir, prs)
                     }
                 }
-                for await (key, pr) in group {
-                    let capturedKey = key
-                    let capturedPR = pr
+                for await (dir, prs) in group {
+                    let branches = projectBranches[dir] ?? []
+                    // Build a lookup from branch name to PR
+                    let prsByBranch = Dictionary(prs.map { ($0.branch, $0) }, uniquingKeysWith: { first, _ in first })
+
                     await MainActor.run {
-                        if let pr = capturedPR {
-                            self.githubBranchPRCache[capturedKey] = pr
-                        } else {
-                            self.githubBranchPRCache.removeValue(forKey: capturedKey)
+                        for branch in branches {
+                            let key = "\(dir)|\(branch)"
+                            if let pr = prsByBranch[branch] {
+                                self.githubBranchPRCache[key] = pr
+                            } else {
+                                self.githubBranchPRCache.removeValue(forKey: key)
+                            }
                         }
                     }
                 }
