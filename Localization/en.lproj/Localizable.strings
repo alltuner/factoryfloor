@@ -250,3 +250,12 @@
 "v%@ available" = "v%@ available";
 "Release Notes" = "Release Notes";
 "Using scripts from %@" = "Using scripts from %@";
+
+/* Quick Actions */
+"Quick Actions" = "Quick Actions";
+"Create PR" = "Create PR";
+"Commit & Push" = "Commit & Push";
+"Summarize Progress" = "Summarize Progress";
+"Claude Code is not installed." = "Claude Code is not installed.";
+"Enable \"Bypass permission prompts\" in Settings." = "Enable \"Bypass permission prompts\" in Settings.";
+"No GitHub remote found for this project." = "No GitHub remote found for this project.";

@@ -178,6 +178,7 @@ struct TerminalContainerView: View {
     @StateObject private var portDetector: PortDetector
     @State private var runStoppedManually = false
     @State private var runStarted = false
+    @StateObject private var quickActionRunner = QuickActionRunner()
 
     init(workstreamID: UUID, workingDirectory: String, projectDirectory: String, projectName: String, workstreamName: String, bypassPermissions: Bool) {
         self.workstreamID = workstreamID
@@ -312,6 +313,14 @@ struct TerminalContainerView: View {
 
             AddTabButton(label: NSLocalizedString("Terminal", comment: ""), icon: "terminal", shortcut: "T", action: addTerminal)
             AddTabButton(label: NSLocalizedString("Browser", comment: ""), icon: "globe", shortcut: "B", action: addBrowser)
+
+            QuickActionMenuButton(
+                runner: quickActionRunner,
+                claudePath: appEnv.toolStatus.claude.path,
+                workingDirectory: workingDirectory,
+                bypassPermissions: bypassPermissions,
+                hasGitHubRemote: appEnv.githubRepo(for: projectDirectory) != nil
+            )
 
             if let pr = branchPR, let url = URL(string: pr.url) {
                 Button(action: { NSWorkspace.shared.open(url) }) {
@@ -784,6 +793,92 @@ private struct WorkspaceTabDropDelegate: DropDelegate {
     func performDrop(info _: DropInfo) -> Bool {
         onDropTab()
         return true
+    }
+}
+
+private struct QuickActionMenuButton: View {
+    @ObservedObject var runner: QuickActionRunner
+    let claudePath: String?
+    let workingDirectory: String
+    let bypassPermissions: Bool
+    let hasGitHubRemote: Bool
+
+    private func disabledReason(for action: QuickAction) -> String? {
+        if claudePath == nil {
+            return NSLocalizedString("Claude Code is not installed.", comment: "")
+        }
+        if !bypassPermissions {
+            return NSLocalizedString("Enable \"Bypass permission prompts\" in Settings.", comment: "")
+        }
+        if action.requiresGitHubRemote, !hasGitHubRemote {
+            return NSLocalizedString("No GitHub remote found for this project.", comment: "")
+        }
+        return nil
+    }
+
+    private var isRunning: Bool {
+        if case .running = runner.state { return true }
+        return false
+    }
+
+    var body: some View {
+        Menu {
+            ForEach(QuickAction.allCases) { action in
+                let reason = disabledReason(for: action)
+                Button(action: { runAction(action) }) {
+                    Label(action.label, systemImage: action.icon)
+                }
+                .disabled(reason != nil || isRunning)
+                .help(reason ?? "")
+            }
+
+            if isRunning {
+                Divider()
+                Button(action: { runner.cancel() }) {
+                    Label(NSLocalizedString("Cancel", comment: ""), systemImage: "xmark.circle")
+                }
+            }
+        } label: {
+            HStack(spacing: 4) {
+                switch runner.state {
+                case .idle:
+                    Image(systemName: "bolt.fill")
+                        .font(.system(size: 11))
+                case .running:
+                    ProgressView()
+                        .controlSize(.mini)
+                case .succeeded:
+                    Image(systemName: "checkmark.circle.fill")
+                        .font(.system(size: 11))
+                        .foregroundStyle(.green)
+                case .failed:
+                    Image(systemName: "xmark.circle.fill")
+                        .font(.system(size: 11))
+                        .foregroundStyle(.red)
+                }
+                Image(systemName: "chevron.down")
+                    .font(.system(size: 8))
+            }
+            .padding(.horizontal, 8)
+            .padding(.vertical, 4)
+            .background(Color.primary.opacity(0.05))
+            .clipShape(RoundedRectangle(cornerRadius: 5))
+            .foregroundStyle(.secondary)
+        }
+        .menuStyle(.borderlessButton)
+        .menuIndicator(.hidden)
+        .fixedSize()
+        .help(NSLocalizedString("Quick Actions", comment: ""))
+        .accessibilityLabel("Quick Actions")
+    }
+
+    private func runAction(_ action: QuickAction) {
+        guard let claudePath, disabledReason(for: action) == nil else { return }
+        runner.run(
+            action: action,
+            claudePath: claudePath,
+            workingDirectory: workingDirectory
+        )
     }
 }
 
