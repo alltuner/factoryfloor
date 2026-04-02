@@ -96,12 +96,16 @@ struct ProjectSidebar: View {
             if hasChildren && expandedProjects.contains(project.id) {
                 let sortedWS = project.workstreams.sorted { $0.lastAccessedAt > $1.lastAccessedAt }
                 ForEach(sortedWS) { workstream in
+                    let branch = appEnv.branchName(for: workstream.worktreePath)
+                    let pr = branch.flatMap { appEnv.githubPR(for: project.directory, branch: $0) }
                     WorkstreamRow(
                         name: workstream.name,
-                        branchName: appEnv.branchName(for: workstream.worktreePath),
+                        branchName: branch,
                         worktreePath: workstream.worktreePath,
                         isPathValid: appEnv.isPathValid(workstream.worktreePath),
                         hasActivePort: appEnv.hasActivePort(workstream.id),
+                        prTitle: pr?.title,
+                        prNumber: pr?.number,
                         onArchive: { confirmArchive(workstream) }
                     )
                     .tag(SidebarSelection.workstream(workstream.id))
@@ -648,39 +652,51 @@ private struct WorkstreamRow: View {
     var worktreePath: String?
     let isPathValid: Bool
     var hasActivePort: Bool = false
+    var prTitle: String?
+    var prNumber: Int?
     let onArchive: () -> Void
 
     @State private var isHovering = false
 
+    /// Subtext to display below the workstream name.
+    /// Priority: PR title (#number) > branch name (only if different from workstream name)
+    private var subtitle: String? {
+        guard isPathValid else { return nil }
+        if let prTitle, let prNumber {
+            return "\(prTitle) #\(prNumber)"
+        }
+        if let branchName, branchName != name {
+            return branchName
+        }
+        return nil
+    }
+
     var body: some View {
         HStack {
-            Label {
-                VStack(alignment: .leading, spacing: 1) {
-                    HStack(spacing: 4) {
-                        Text(name)
-                            .font(.system(.body))
-                            .strikethrough(!isPathValid)
-                            .foregroundStyle(isPathValid ? .primary : .secondary)
-                        if hasActivePort {
-                            Image(systemName: "circle.fill")
-                                .font(.system(size: 6))
-                                .foregroundStyle(.green)
-                        }
-                    }
-                    if let branchName, isPathValid {
-                        HStack(spacing: 3) {
-                            Image(systemName: "arrow.triangle.branch")
-                                .font(.system(size: 9))
-                            Text(branchName)
-                                .font(.system(size: 10))
-                        }
-                        .foregroundStyle(.tertiary)
-                        .lineLimit(1)
+            if !isPathValid {
+                Image(systemName: "exclamationmark.triangle")
+                    .foregroundStyle(.orange)
+                    .font(.system(size: 12))
+            }
+
+            VStack(alignment: .leading, spacing: 1) {
+                HStack(spacing: 4) {
+                    Text(name)
+                        .font(.system(.body))
+                        .strikethrough(!isPathValid)
+                        .foregroundStyle(isPathValid ? .primary : .secondary)
+                    if hasActivePort {
+                        Image(systemName: "circle.fill")
+                            .font(.system(size: 6))
+                            .foregroundStyle(.green)
                     }
                 }
-            } icon: {
-                Image(systemName: isPathValid ? "terminal" : "exclamationmark.triangle")
-                    .foregroundStyle(isPathValid ? Color.secondary : Color.orange)
+                if let subtitle {
+                    Text(subtitle)
+                        .font(.system(size: 10))
+                        .foregroundStyle(.tertiary)
+                        .lineLimit(1)
+                }
             }
 
             Spacer()

@@ -326,6 +326,7 @@ struct ContentView: View {
                 if let wi = projects[pi].workstreams.firstIndex(where: { $0.id == workstreamID }) {
                     projects[pi].workstreams[wi].worktreePath = worktreePath
                     ProjectStore.save(projects)
+                    appEnvironment.refreshPathValidity(projects: projects)
                     logger.warning("[FF] workstreamWorktreeReady: updated \(workstreamID, privacy: .public) with path \(worktreePath, privacy: .public)")
                     return
                 }

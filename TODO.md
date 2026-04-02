@@ -8,6 +8,15 @@
 
 - [ ] Auto-update mechanism (Sparkle): in-app update for direct DMG users
 
+## Bugs
+
+- [x] Branch name doesn't appear in sidebar after workstream creation until the 15s refresh timer fires. Fixed: call `refreshPathValidity` immediately in the `.workstreamWorktreeReady` handler.
+
+## UI improvements
+
+- [x] Sidebar workstream rows: removed repetitive terminal icons, kept warning icon only for invalid paths
+- [x] Sidebar workstream subtext: show PR title (#number) when available, fall back to branch name only when it differs from the workstream name
+
 ## Future
 
 - [ ] External Chrome integration: launch with --remote-debugging-port for WebMCP/CDP
