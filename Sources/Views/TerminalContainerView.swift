@@ -554,11 +554,13 @@ struct TerminalContainerView: View {
                 ToolbarItemGroup(placement: .primaryAction) {
                     Button(action: addTerminal) {
                         Label(NSLocalizedString("Terminal", comment: ""), systemImage: "terminal")
+                            .labelStyle(.titleAndIcon)
                     }
                     .help("New Terminal (\u{2318}T)")
 
                     Button(action: addBrowser) {
                         Label(NSLocalizedString("Browser", comment: ""), systemImage: "globe")
+                            .labelStyle(.titleAndIcon)
                     }
                     .help("New Browser (\u{2318}B)")
 
@@ -570,7 +572,6 @@ struct TerminalContainerView: View {
                         hasGitHubRemote: appEnv.githubRepo(for: projectDirectory) != nil
                     )
                 }
-                .labelStyle(.titleAndIcon)
             }
     }
 
@@ -908,12 +909,15 @@ private struct QuickActionButton: View {
                     .controlSize(.mini)
             } else if case .succeeded = resultState {
                 Label(action.label, systemImage: "checkmark.circle.fill")
+                    .labelStyle(.titleAndIcon)
                     .foregroundStyle(.green)
             } else if case .failed = resultState {
                 Label(action.label, systemImage: "xmark.circle.fill")
+                    .labelStyle(.titleAndIcon)
                     .foregroundStyle(.red)
             } else {
                 Label(action.label, systemImage: action.icon)
+                    .labelStyle(.titleAndIcon)
             }
         }
         .disabled(isDisabled)
