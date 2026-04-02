@@ -114,7 +114,7 @@ const FLOOR_ZONES: FloorZone[] = [
   // Work area left — warm amber tint (brown wood flooring)
   { colStart: 0, colEnd: 6, rowStart: 1, rowEnd: 2, tileIndex: 5, tint: 'rgba(120,75,30,0.42)' },
   // Work area right — same warm tint
-  { colStart: 11, colEnd: 15, rowStart: 1, rowEnd: 2, tileIndex: 5, tint: 'rgba(120,75,30,0.42)' },
+  { colStart: 11, colEnd: 16, rowStart: 1, rowEnd: 2, tileIndex: 5, tint: 'rgba(120,75,30,0.42)' },
   // Meeting/break zone center — warm neutral
   { colStart: 7, colEnd: 10, rowStart: 1, rowEnd: 2, tileIndex: 3, tint: 'rgba(150,110,50,0.25)' },
   // Boss zone — cool blue carpet
@@ -124,7 +124,7 @@ const FLOOR_ZONES: FloorZone[] = [
 const DEFAULT_FLOOR_TILE = 2;
 
 export class OfficeLayout {
-  readonly cols = 16;
+  readonly cols = 17;
   readonly rows = 5;
   readonly tileSize = 16;
   readonly zoom = 3;
