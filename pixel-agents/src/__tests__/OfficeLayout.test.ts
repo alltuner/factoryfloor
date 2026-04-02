@@ -10,8 +10,8 @@ describe('OfficeLayout', () => {
   });
 
   describe('constants', () => {
-    it('has 14 cols, 5 rows, tileSize 16, zoom 3', () => {
-      expect(layout.cols).toBe(14);
+    it('has 16 cols, 5 rows, tileSize 16, zoom 3', () => {
+      expect(layout.cols).toBe(16);
       expect(layout.rows).toBe(5);
       expect(layout.tileSize).toBe(16);
       expect(layout.zoom).toBe(3);
@@ -28,7 +28,7 @@ describe('OfficeLayout', () => {
       expect(seats).toHaveLength(5);
     });
 
-    it('each seat has id, chairTile, deskTile, pcTile, facing', () => {
+    it('each seat has id, chairTile, deskTile, pcTile, facing, isBoss', () => {
       const seats = layout.getSeats();
       for (const seat of seats) {
         expect(seat.id).toBeTypeOf('number');
@@ -36,26 +36,40 @@ describe('OfficeLayout', () => {
         expect(seat.deskTile).toHaveLength(2);
         expect(seat.pcTile).toHaveLength(2);
         expect(seat.facing).toBeDefined();
+        expect(seat.isBoss).toBeTypeOf('boolean');
         expect(seat.occupied).toBe(false);
         expect(seat.agentId).toBeNull();
       }
     });
 
-    it('seat 0 has correct tile positions', () => {
+    it('seat 0 is the boss seat at center position', () => {
       const seats = layout.getSeats();
       const s0 = seats[0];
-      expect(s0.chairTile).toEqual([2, 2]);
-      expect(s0.deskTile).toEqual([1, 1]);
-      expect(s0.pcTile).toEqual([2, 1]);
+      expect(s0.isBoss).toBe(true);
+      expect(s0.chairTile).toEqual([8, 4]);
+      expect(s0.deskTile).toEqual([7, 3]);
+      expect(s0.pcTile).toEqual([8, 3]);
+    });
+
+    it('has exactly one boss seat', () => {
+      const seats = layout.getSeats();
+      const bossSeats = seats.filter(s => s.isBoss);
+      expect(bossSeats).toHaveLength(1);
     });
   });
 
   describe('claimSeat / releaseSeat', () => {
-    it('claims the first available seat', () => {
-      const seat = layout.claimSeat('agent-1');
+    it('claimSeat with reserveBoss claims the boss seat', () => {
+      const seat = layout.claimSeat('main-agent', true);
       expect(seat).not.toBeNull();
-      expect(seat!.occupied).toBe(true);
-      expect(seat!.agentId).toBe('agent-1');
+      expect(seat!.isBoss).toBe(true);
+      expect(seat!.agentId).toBe('main-agent');
+    });
+
+    it('claimSeat without reserveBoss skips the boss seat', () => {
+      const seat = layout.claimSeat('sub-agent');
+      expect(seat).not.toBeNull();
+      expect(seat!.isBoss).toBe(false);
     });
 
     it('claims different seats for different agents', () => {
@@ -67,11 +81,22 @@ describe('OfficeLayout', () => {
     });
 
     it('returns null when all seats are taken', () => {
-      for (let i = 0; i < 5; i++) {
+      layout.claimSeat('boss', true);
+      for (let i = 0; i < 4; i++) {
         layout.claimSeat(`agent-${i}`);
       }
       const result = layout.claimSeat('agent-extra');
       expect(result).toBeNull();
+    });
+
+    it('subagent falls back to boss seat if all sub seats are taken', () => {
+      for (let i = 0; i < 4; i++) {
+        layout.claimSeat(`agent-${i}`);
+      }
+      // Boss seat is still free, should fall back to it
+      const seat = layout.claimSeat('agent-overflow');
+      expect(seat).not.toBeNull();
+      expect(seat!.isBoss).toBe(true);
     });
 
     it('releases a seat by agent id', () => {
@@ -121,6 +146,13 @@ describe('OfficeLayout', () => {
         expect(item.spriteKey).toBeTypeOf('string');
         expect(item.blocksMovement).toBeTypeOf('boolean');
       }
+    });
+
+    it('has meeting area furniture (coffee and sofa)', () => {
+      const coffee = layout.furniture.find(f => f.type === 'coffee');
+      const sofa = layout.furniture.find(f => f.type === 'sofa');
+      expect(coffee).toBeDefined();
+      expect(sofa).toBeDefined();
     });
   });
 

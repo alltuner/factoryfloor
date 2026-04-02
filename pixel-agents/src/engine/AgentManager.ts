@@ -69,7 +69,7 @@ export class AgentManager {
     this.layout = layout ?? null;
   }
 
-  createAgent(id: string, name: string, palette?: number): Agent {
+  createAgent(id: string, name: string, palette?: number, isBoss = false): Agent {
     if (this.agents.has(id)) {
       return this.agents.get(id)!;
     }
@@ -95,7 +95,7 @@ export class AgentManager {
       pixelY = spawnPixel.y;
 
       // Claim a seat and compute path to it
-      const seat = this.layout.claimSeat(id);
+      const seat = this.layout.claimSeat(id, isBoss);
       if (seat) {
         targetSeat = seat.id;
         const computedPath = this.tileMap.findPath(spawn, seat.chairTile);
@@ -772,7 +772,8 @@ export class AgentManager {
             subAgent.parentAgentId = event.parentAgentId;
           }
         } else {
-          this.createAgent(event.agentId, event.name ?? 'Agent', event.palette);
+          // Main agent: reserve boss seat
+          this.createAgent(event.agentId, event.name ?? 'Agent', event.palette, true);
         }
         break;
       }
@@ -790,7 +791,8 @@ export class AgentManager {
         // Auto-create agent if it doesn't exist yet (hook events may arrive before agentCreated)
         let agent = this.agents.get(event.agentId);
         if (!agent) {
-          agent = this.createAgent(event.agentId, event.name ?? event.agentId, event.palette);
+          const bossTaken = this.layout?.getSeats().some(s => s.isBoss && s.occupied) ?? false;
+          agent = this.createAgent(event.agentId, event.name ?? event.agentId, event.palette, !bossTaken);
         }
 
         // Event buffering: non-interruptible states buffer events
@@ -845,7 +847,8 @@ export class AgentManager {
         // Auto-create agent if it doesn't exist yet (same pattern as agentToolStart)
         let agent = this.agents.get(event.agentId);
         if (!agent) {
-          agent = this.createAgent(event.agentId, event.name ?? event.agentId, event.palette);
+          const bossTaken = this.layout?.getSeats().some(s => s.isBoss && s.occupied) ?? false;
+          agent = this.createAgent(event.agentId, event.name ?? event.agentId, event.palette, !bossTaken);
         }
 
         if (this.isNonInterruptible(agent)) {

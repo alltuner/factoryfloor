@@ -334,16 +334,25 @@ export class OfficeRenderer {
     }
   }
 
-  private drawWallDecorations(w: number): void {
+  private drawWallDecorations(_w: number): void {
     const ctx = this.ctx;
     const clock = this.sprites.getFurniture('clock');
     if (clock) {
       this.sprites.drawFurniture(ctx, clock, 16, CONTENT_TOP - clock.height * ZOOM + 4, ZOOM);
     }
 
-    const smallPainting = this.sprites.getFurniture('small_painting');
-    if (smallPainting) {
-      this.sprites.drawFurniture(ctx, smallPainting, w / 2 - (smallPainting.width * ZOOM) / 2, CONTENT_TOP - smallPainting.height * ZOOM + 4, ZOOM);
+    // Large painting centered above boss desk area (col 7-8)
+    if (this.tileMap) {
+      const largePainting = this.sprites.getFurniture('large_painting');
+      if (largePainting) {
+        const bossX = this.tileMap.tileToPixel(7, 0).x;
+        this.sprites.drawFurniture(ctx, largePainting, bossX, CONTENT_TOP - largePainting.height * ZOOM + 4, ZOOM);
+      }
+    } else {
+      const smallPainting = this.sprites.getFurniture('small_painting');
+      if (smallPainting) {
+        this.sprites.drawFurniture(ctx, smallPainting, 400 - (smallPainting.width * ZOOM) / 2, CONTENT_TOP - smallPainting.height * ZOOM + 4, ZOOM);
+      }
     }
   }
 
