@@ -403,6 +403,7 @@ struct ProjectSidebar: View {
     }
 
     @EnvironmentObject private var surfaceCache: TerminalSurfaceCache
+    @EnvironmentObject private var pixelAgentsCache: PixelAgentsPanelCache
     @EnvironmentObject private var appEnv: AppEnvironment
     @EnvironmentObject private var updateChecker: UpdateChecker
     @EnvironmentObject private var updater: Updater
@@ -420,7 +421,7 @@ struct ProjectSidebar: View {
         guard let wsID = workstreamToArchive,
               let pi = projects.firstIndex(where: { $0.workstreams.contains(where: { $0.id == wsID }) }) else { return }
         let projectID = projects[pi].id
-        WorkstreamArchiver.archive(wsID, in: &projects[pi], surfaceCache: surfaceCache, tmuxPath: appEnv.toolStatus.tmux.path)
+        WorkstreamArchiver.archive(wsID, in: &projects[pi], surfaceCache: surfaceCache, pixelAgentsCache: pixelAgentsCache, tmuxPath: appEnv.toolStatus.tmux.path)
         rebuildIndices()
         if case let .workstream(id) = selection, id == wsID {
             selection = projects[pi].workstreams.first.map { .workstream($0.id) } ?? .project(projectID)
@@ -435,6 +436,8 @@ struct ProjectSidebar: View {
         if let project = projects.first(where: { $0.id == id }) {
             for ws in project.workstreams {
                 surfaceCache.removeWorkstreamSurfaces(for: ws.id)
+                let workDir = ws.workingDirectory(projectDirectory: project.directory)
+                pixelAgentsCache.removeEntry(for: workDir)
             }
         }
         projects.removeAll { $0.id == id }

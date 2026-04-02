@@ -11,18 +11,21 @@ enum WorkstreamArchiver {
     static let archivingDidComplete = Notification.Name("FFWorktreeArchivingComplete")
 
     /// Archives a workstream by running teardown, removing the git worktree, killing tmux sessions,
-    /// and evicting terminal surfaces from the cache. Removes the workstream from the project in place.
+    /// and evicting terminal surfaces and pixel agents from their caches.
+    /// Removes the workstream from the project in place.
     ///
     /// - Parameters:
     ///   - workstreamID: The UUID of the workstream to archive.
     ///   - project: The project containing the workstream (mutated in place to remove it).
     ///   - surfaceCache: The terminal surface cache to evict surfaces from.
+    ///   - pixelAgentsCache: The pixel agents cache to evict the WKWebView entry from.
     ///   - tmuxPath: Path to the tmux binary, if available.
     @MainActor
     static func archive(
         _ workstreamID: UUID,
         in project: inout Project,
         surfaceCache: TerminalSurfaceCache,
+        pixelAgentsCache: PixelAgentsPanelCache? = nil,
         tmuxPath: String?
     ) {
         if let ws = project.workstreams.first(where: { $0.id == workstreamID }) {
@@ -31,6 +34,8 @@ enum WorkstreamArchiver {
             let standardizedPath = URL(fileURLWithPath: worktreeDir).standardizedFileURL.path
             let wsName = ws.name
             let projName = project.name
+            // Evict pixel agents cache entry for this workstream's working directory
+            pixelAgentsCache?.removeEntry(for: worktreeDir)
             archivingPaths.insert(standardizedPath)
             Task.detached {
                 ScriptConfig.runTeardown(in: worktreeDir, projectDirectory: projectDir)

@@ -30,6 +30,7 @@ struct ContentView: View {
     }
 
     @StateObject private var surfaceCache = TerminalSurfaceCache()
+    @StateObject private var pixelAgentsCache = PixelAgentsPanelCache()
     @StateObject private var appEnvironment = AppEnvironment()
     @StateObject private var updateChecker = UpdateChecker()
     @EnvironmentObject private var updater: Updater
@@ -135,6 +136,7 @@ struct ContentView: View {
                         surfaceCache.removeWorkstreamSurfaces(for: ws.id)
                     }
                 }
+                pixelAgentsCache.removeAllEntries()
                 projects.removeAll()
                 selectionBeforeSettings = nil
                 selection = .settings
@@ -193,6 +195,7 @@ struct ContentView: View {
             detailView
         }
         .environmentObject(surfaceCache)
+        .environmentObject(pixelAgentsCache)
         .environmentObject(appEnvironment)
         .environmentObject(updateChecker)
         .environmentObject(updater)
@@ -274,6 +277,8 @@ struct ContentView: View {
                 if let project = projects.first(where: { $0.id == id }) {
                     for ws in project.workstreams {
                         surfaceCache.removeWorkstreamSurfaces(for: ws.id)
+                        let workDir = ws.workingDirectory(projectDirectory: project.directory)
+                        pixelAgentsCache.removeEntry(for: workDir)
                     }
                 }
             }
@@ -392,7 +397,7 @@ struct ContentView: View {
     private func performArchive() {
         guard let wsID = workstreamToArchive,
               let projectIndex = projects.firstIndex(where: { $0.workstreams.contains(where: { $0.id == wsID }) }) else { return }
-        WorkstreamArchiver.archive(wsID, in: &projects[projectIndex], surfaceCache: surfaceCache, tmuxPath: appEnvironment.toolStatus.tmux.path)
+        WorkstreamArchiver.archive(wsID, in: &projects[projectIndex], surfaceCache: surfaceCache, pixelAgentsCache: pixelAgentsCache, tmuxPath: appEnvironment.toolStatus.tmux.path)
         ProjectStore.save(projects)
         workstreamToArchive = nil
     }

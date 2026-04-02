@@ -1,6 +1,7 @@
 // ABOUTME: Collapsible bottom panel showing pixel art agent visualization.
-// ABOUTME: Uses WKWebView with WKScriptMessageHandler for Swift↔JS bridge.
+// ABOUTME: Uses cached WKWebView from PixelAgentsPanelCache for persistence across workstream switches.
 
+import Combine
 import os
 import SwiftUI
 import WebKit
@@ -13,6 +14,7 @@ extension Notification.Name {
 
 struct PixelAgentsPanelView: View {
     let projectDirectory: String
+    @EnvironmentObject private var pixelAgentsCache: PixelAgentsPanelCache
     @State private var isExpanded = true
     @State private var agentCount = 0
     @State private var lastActivity = ""
@@ -30,10 +32,8 @@ struct PixelAgentsPanelView: View {
             if isExpanded {
                 resizeHandle
                 Divider()
-                PixelAgentsWebView(
-                    projectDirectory: projectDirectory,
-                    agentCount: $agentCount,
-                    lastActivity: $lastActivity
+                CachedPixelAgentsWebView(
+                    cacheEntry: pixelAgentsCache.entry(for: projectDirectory)
                 )
                 .frame(height: max(minPanelHeight, min(maxPanelHeight, CGFloat(panelHeight) + dragOffset)))
             }
@@ -42,6 +42,12 @@ struct PixelAgentsPanelView: View {
             withAnimation(.easeInOut(duration: 0.2)) {
                 isExpanded.toggle()
             }
+        }
+        .onReceive(pixelAgentsCache.entry(for: projectDirectory).agentCount) { count in
+            agentCount = count
+        }
+        .onReceive(pixelAgentsCache.entry(for: projectDirectory).lastActivity) { activity in
+            lastActivity = activity
         }
     }
 
@@ -126,233 +132,224 @@ struct PixelAgentsPanelView: View {
     }
 }
 
-// MARK: - WKWebView with bidirectional messaging bridge
+// MARK: - Thin NSViewRepresentable that reparents the cached WKWebView
 
-struct PixelAgentsWebView: NSViewRepresentable {
-    let projectDirectory: String
-    @Binding var agentCount: Int
-    @Binding var lastActivity: String
+/// Displays a cached `WKWebView` by adding it as a subview of a plain `NSView` container.
+/// When SwiftUI destroys and recreates this representable (due to `.id(workstream.id)`),
+/// the cached web view is simply moved from its old container to the new one.
+struct CachedPixelAgentsWebView: NSViewRepresentable {
+    let cacheEntry: PixelAgentsPanelCache.CacheEntry
 
-    func makeNSView(context: Context) -> WKWebView {
-        let config = WKWebViewConfiguration()
-        config.preferences.setValue(true, forKey: "developerExtrasEnabled")
-
-        // Register JS→Swift message handler
-        let coordinator = context.coordinator
-        config.userContentController.add(coordinator, name: "vibefloor")
-
-        // Inject the bridge API so JS can call window.vibefloor.postMessage(...)
-        let bridgeScript = WKUserScript(
-            source: """
-            window.vibefloor = {
-                postMessage: function(msg) {
-                    window.webkit.messageHandlers.vibefloor.postMessage(msg);
-                }
-            };
-            """,
-            injectionTime: .atDocumentStart,
-            forMainFrameOnly: true
-        )
-        config.userContentController.addUserScript(bridgeScript)
-
-        let webView = WKWebView(frame: .zero, configuration: config)
-        webView.setValue(false, forKey: "drawsBackground")
-        coordinator.webView = webView
-
-        // Load index.html from the PixelAgents resource bundle
-        if let htmlURL = Bundle.main.url(forResource: "index", withExtension: "html", subdirectory: "PixelAgents") {
-            let accessDir = htmlURL.deletingLastPathComponent()
-            webView.loadFileURL(htmlURL, allowingReadAccessTo: accessDir)
-        } else {
-            logger.error("PixelAgents index.html not found in bundle")
-            webView.loadHTMLString("<h1 style='color:red;background:#1a1a2e;padding:20px'>PixelAgents resources not found in bundle</h1>", baseURL: nil)
-        }
-        return webView
+    func makeNSView(context _: Context) -> NSView {
+        let container = NSView()
+        container.wantsLayer = true
+        attachWebView(to: container)
+        return container
     }
 
-    func updateNSView(_: WKWebView, context _: Context) {}
-
-    func makeCoordinator() -> Coordinator {
-        Coordinator(projectDirectory: projectDirectory, agentCount: $agentCount, lastActivity: $lastActivity)
+    func updateNSView(_ container: NSView, context _: Context) {
+        // If the cached web view is not yet in this container, reparent it
+        if cacheEntry.webView.superview !== container {
+            attachWebView(to: container)
+        }
     }
 
-    // MARK: - Coordinator handles JS→Swift messages
+    private func attachWebView(to container: NSView) {
+        let webView = cacheEntry.webView
+        // Remove from previous container if reparenting
+        webView.removeFromSuperview()
+        webView.translatesAutoresizingMaskIntoConstraints = false
+        container.addSubview(webView)
+        NSLayoutConstraint.activate([
+            webView.leadingAnchor.constraint(equalTo: container.leadingAnchor),
+            webView.trailingAnchor.constraint(equalTo: container.trailingAnchor),
+            webView.topAnchor.constraint(equalTo: container.topAnchor),
+            webView.bottomAnchor.constraint(equalTo: container.bottomAnchor),
+        ])
+    }
+}
 
-    class Coordinator: NSObject, WKScriptMessageHandler {
-        var webView: WKWebView?
-        private var agentCount: Binding<Int>
-        private var lastActivity: Binding<String>
-        private let projectDirectory: String
-        private var webViewReady = false
-        private var pendingEvents: [AgentEvent] = []
-        private var pendingSetupState: AsyncSetupState?
-        private nonisolated(unsafe) var setupObserver: NSObjectProtocol?
+// MARK: - Coordinator (lives in the cache, not in the NSViewRepresentable)
 
-        init(projectDirectory: String, agentCount: Binding<Int>, lastActivity: Binding<String>) {
-            self.projectDirectory = projectDirectory
-            self.agentCount = agentCount
-            self.lastActivity = lastActivity
-            super.init()
-            // Register with hook router so HTTP hook events reach this coordinator
-            HookEventRouter.shared.register(projectDir: projectDirectory) { [weak self] event in
-                self?.handleAgentEvent(event)
-            }
-            setupObserver = NotificationCenter.default.addObserver(
-                forName: .asyncSetupStateChanged,
-                object: nil,
-                queue: .main
-            ) { [weak self] notification in
-                guard let self,
-                      let state = notification.userInfo?["state"] as? AsyncSetupState else { return }
-                self.sendSetupProgress(state: state)
-            }
+/// Handles JS->Swift messages and hook events for a pixel agents panel.
+/// Created by `PixelAgentsPanelCache` and lives as long as the cache entry.
+class PixelAgentsPanelCoordinator: NSObject, WKScriptMessageHandler {
+    var webView: WKWebView?
+    var agentCountSubject: CurrentValueSubject<Int, Never>
+    var lastActivitySubject: CurrentValueSubject<String, Never>
+    private let projectDirectory: String
+    private var webViewReady = false
+    private var pendingEvents: [AgentEvent] = []
+    private var pendingSetupState: AsyncSetupState?
+    private nonisolated(unsafe) var setupObserver: NSObjectProtocol?
+
+    init(
+        projectDirectory: String,
+        agentCountSubject: CurrentValueSubject<Int, Never>,
+        lastActivitySubject: CurrentValueSubject<String, Never>
+    ) {
+        self.projectDirectory = projectDirectory
+        self.agentCountSubject = agentCountSubject
+        self.lastActivitySubject = lastActivitySubject
+        super.init()
+        // Register with hook router so HTTP hook events reach this coordinator
+        HookEventRouter.shared.register(projectDir: projectDirectory) { [weak self] event in
+            self?.handleAgentEvent(event)
         }
-
-        deinit {
-            HookEventRouter.shared.unregister(projectDir: projectDirectory)
-            if let setupObserver {
-                NotificationCenter.default.removeObserver(setupObserver)
-            }
+        setupObserver = NotificationCenter.default.addObserver(
+            forName: .asyncSetupStateChanged,
+            object: nil,
+            queue: .main
+        ) { [weak self] notification in
+            guard let self,
+                  let state = notification.userInfo?["state"] as? AsyncSetupState else { return }
+            self.sendSetupProgress(state: state)
         }
+    }
 
-        /// Sends app config to the WebView so JS can adapt to theme, version, etc.
-        private func sendConfig() {
-            let payload: [String: Any] = [
-                "type": "config",
-                "theme": "dark",
-                "appName": AppConstants.appName,
-                "version": AppConstants.version,
-            ]
-
-            guard let jsonData = try? JSONSerialization.data(withJSONObject: payload),
-                  let jsonString = String(data: jsonData, encoding: .utf8) else { return }
-
-            let js = "window.dispatchEvent(new MessageEvent('message', { data: \(jsonString) }));"
-            webView?.evaluateJavaScript(js) { _, error in
-                if let error {
-                    logger.error("Failed to send config to WebView: \(error.localizedDescription)")
-                }
-            }
+    deinit {
+        HookEventRouter.shared.unregister(projectDir: projectDirectory)
+        if let setupObserver {
+            NotificationCenter.default.removeObserver(setupObserver)
         }
+    }
 
-        /// Translates an `AsyncSetupState` into a `setupProgress` WebView event.
-        private func sendSetupProgress(state: AsyncSetupState) {
-            guard webViewReady else {
-                // Store latest state so it can be flushed when WebView is ready
-                pendingSetupState = state
-                return
-            }
+    /// Sends app config to the WebView so JS can adapt to theme, version, etc.
+    private func sendConfig() {
+        let payload: [String: Any] = [
+            "type": "config",
+            "theme": "dark",
+            "appName": AppConstants.appName,
+            "version": AppConstants.version,
+        ]
 
-            let step: String
-            let progress: Double
-            let done: Bool
+        guard let jsonData = try? JSONSerialization.data(withJSONObject: payload),
+              let jsonString = String(data: jsonData, encoding: .utf8) else { return }
 
-            switch state {
-            case .idle:
-                return
-            case let .inProgress(currentStep, currentProgress):
-                step = currentStep
-                progress = currentProgress
-                done = false
-            case .completed:
-                step = "Done"
-                progress = 1.0
-                done = true
-            case let .failed(message):
-                step = "Setup failed: \(message)"
-                progress = 0
-                done = true
-            }
-
-            let payload: [String: Any] = [
-                "type": "setupProgress",
-                "step": step,
-                "progress": progress,
-                "done": done,
-            ]
-
-            guard let jsonData = try? JSONSerialization.data(withJSONObject: payload),
-                  let jsonString = String(data: jsonData, encoding: .utf8) else { return }
-
-            let js = "window.dispatchEvent(new MessageEvent('message', { data: \(jsonString) }));"
-            webView?.evaluateJavaScript(js) { _, error in
-                if let error {
-                    logger.error("Failed to send setupProgress to WebView: \(error.localizedDescription)")
-                }
-            }
-        }
-
-        private func handleAgentEvent(_ event: AgentEvent) {
-            guard webViewReady else {
-                pendingEvents.append(event)
-                return
-            }
-            sendAgentEvent(event)
-
-            // Update header strip info
-            if event.type == .agentToolStart, let tool = event.tool {
-                lastActivity.wrappedValue = "\(event.agentId): \(tool)"
-            }
-        }
-
-        private func sendAgentEvent(_ event: AgentEvent) {
-            guard let jsonData = try? JSONEncoder().encode(event),
-                  let jsonString = String(data: jsonData, encoding: .utf8) else { return }
-
-            let js = "window.dispatchEvent(new MessageEvent('message', { data: \(jsonString) }));"
-            webView?.evaluateJavaScript(js) { _, error in
-                if let error {
-                    logger.error("Failed to send to WebView: \(error.localizedDescription)")
-                }
-            }
-        }
-
-        /// Called when JS sends: window.vibefloor.postMessage({type: "...", ...})
-        @MainActor
-        func userContentController(_: WKUserContentController, didReceive message: WKScriptMessage) {
-            guard let body = message.body as? [String: Any],
-                  let type = body["type"] as? String else {
-                logger.warning("Invalid message from WebView: \(String(describing: message.body))")
-                return
-            }
-
-            switch type {
-            case "ready":
-                logger.info("Pixel Agents WebView ready")
-                webViewReady = true
-                // Create main agent (palette 0, name "Claude")
-                sendAgentEvent(AgentEvent.created(agentId: "main", name: "Claude", palette: 0))
-                // Send config so JS knows theme, app name, version
-                sendConfig()
-                // Flush any events that arrived before the WebView was ready
-                for event in pendingEvents {
-                    sendAgentEvent(event)
-                }
-                pendingEvents.removeAll()
-                // Flush pending setup progress (setup may have started before WebView loaded)
-                if let state = pendingSetupState {
-                    pendingSetupState = nil
-                    sendSetupProgress(state: state)
-                }
-
-            case "requestConfig":
-                logger.info("WebView requested config")
-                sendConfig()
-
-            case "agentCountUpdate":
-                if let count = body["count"] as? Int {
-                    agentCount.wrappedValue = count
-                }
-
-            case "activityUpdate":
-                if let activity = body["activity"] as? String {
-                    lastActivity.wrappedValue = activity
-                }
-
-            default:
-                logger.debug("Unknown message type from WebView: \(type)")
+        let js = "window.dispatchEvent(new MessageEvent('message', { data: \(jsonString) }));"
+        webView?.evaluateJavaScript(js) { _, error in
+            if let error {
+                logger.error("Failed to send config to WebView: \(error.localizedDescription)")
             }
         }
     }
 
+    /// Translates an `AsyncSetupState` into a `setupProgress` WebView event.
+    private func sendSetupProgress(state: AsyncSetupState) {
+        guard webViewReady else {
+            // Store latest state so it can be flushed when WebView is ready
+            pendingSetupState = state
+            return
+        }
+
+        let step: String
+        let progress: Double
+        let done: Bool
+
+        switch state {
+        case .idle:
+            return
+        case let .inProgress(currentStep, currentProgress):
+            step = currentStep
+            progress = currentProgress
+            done = false
+        case .completed:
+            step = "Done"
+            progress = 1.0
+            done = true
+        case let .failed(message):
+            step = "Setup failed: \(message)"
+            progress = 0
+            done = true
+        }
+
+        let payload: [String: Any] = [
+            "type": "setupProgress",
+            "step": step,
+            "progress": progress,
+            "done": done,
+        ]
+
+        guard let jsonData = try? JSONSerialization.data(withJSONObject: payload),
+              let jsonString = String(data: jsonData, encoding: .utf8) else { return }
+
+        let js = "window.dispatchEvent(new MessageEvent('message', { data: \(jsonString) }));"
+        webView?.evaluateJavaScript(js) { _, error in
+            if let error {
+                logger.error("Failed to send setupProgress to WebView: \(error.localizedDescription)")
+            }
+        }
+    }
+
+    private func handleAgentEvent(_ event: AgentEvent) {
+        guard webViewReady else {
+            pendingEvents.append(event)
+            return
+        }
+        sendAgentEvent(event)
+
+        // Update header strip info via subject
+        if event.type == .agentToolStart, let tool = event.tool {
+            lastActivitySubject.send("\(event.agentId): \(tool)")
+        }
+    }
+
+    private func sendAgentEvent(_ event: AgentEvent) {
+        guard let jsonData = try? JSONEncoder().encode(event),
+              let jsonString = String(data: jsonData, encoding: .utf8) else { return }
+
+        let js = "window.dispatchEvent(new MessageEvent('message', { data: \(jsonString) }));"
+        webView?.evaluateJavaScript(js) { _, error in
+            if let error {
+                logger.error("Failed to send to WebView: \(error.localizedDescription)")
+            }
+        }
+    }
+
+    /// Called when JS sends: window.vibefloor.postMessage({type: "...", ...})
+    @MainActor
+    func userContentController(_: WKUserContentController, didReceive message: WKScriptMessage) {
+        guard let body = message.body as? [String: Any],
+              let type = body["type"] as? String else {
+            logger.warning("Invalid message from WebView: \(String(describing: message.body))")
+            return
+        }
+
+        switch type {
+        case "ready":
+            logger.info("Pixel Agents WebView ready")
+            webViewReady = true
+            // Create main agent (palette 0, name "Claude")
+            sendAgentEvent(AgentEvent.created(agentId: "main", name: "Claude", palette: 0))
+            // Send config so JS knows theme, app name, version
+            sendConfig()
+            // Flush any events that arrived before the WebView was ready
+            for event in pendingEvents {
+                sendAgentEvent(event)
+            }
+            pendingEvents.removeAll()
+            // Flush pending setup progress (setup may have started before WebView loaded)
+            if let state = pendingSetupState {
+                pendingSetupState = nil
+                sendSetupProgress(state: state)
+            }
+
+        case "requestConfig":
+            logger.info("WebView requested config")
+            sendConfig()
+
+        case "agentCountUpdate":
+            if let count = body["count"] as? Int {
+                agentCountSubject.send(count)
+            }
+
+        case "activityUpdate":
+            if let activity = body["activity"] as? String {
+                lastActivitySubject.send(activity)
+            }
+
+        default:
+            logger.debug("Unknown message type from WebView: \(type)")
+        }
+    }
 }
