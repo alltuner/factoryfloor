@@ -9,7 +9,6 @@ private let logger = Logger(subsystem: "factoryfloor", category: "quick-action")
 enum QuickAction: String, CaseIterable, Identifiable {
     case createPR
     case commitAndPush
-    case summarize
 
     var id: String {
         rawValue
@@ -19,7 +18,6 @@ enum QuickAction: String, CaseIterable, Identifiable {
         switch self {
         case .createPR: return NSLocalizedString("Create PR", comment: "")
         case .commitAndPush: return NSLocalizedString("Commit & Push", comment: "")
-        case .summarize: return NSLocalizedString("Summarize Progress", comment: "")
         }
     }
 
@@ -27,14 +25,13 @@ enum QuickAction: String, CaseIterable, Identifiable {
         switch self {
         case .createPR: return "arrow.triangle.pull"
         case .commitAndPush: return "arrow.up.circle"
-        case .summarize: return "doc.text"
         }
     }
 
     var requiresGitHubRemote: Bool {
         switch self {
         case .createPR: return true
-        case .commitAndPush, .summarize: return false
+        case .commitAndPush: return false
         }
     }
 
@@ -44,8 +41,6 @@ enum QuickAction: String, CaseIterable, Identifiable {
             return "Create a pull request for the current changes. Write a clear title and description based on what we've been working on."
         case .commitAndPush:
             return "Commit all current changes with a good commit message based on what we've been working on, then push to the remote."
-        case .summarize:
-            return "Summarize what we've accomplished in this session. Be concise."
         }
     }
 }

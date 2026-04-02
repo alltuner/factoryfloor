@@ -255,7 +255,6 @@
 "Quick Actions" = "Acciones rápidas";
 "Create PR" = "Crear PR";
 "Commit & Push" = "Commit y Push";
-"Summarize Progress" = "Resumen del progreso";
 "Claude Code is not installed." = "Claude Code no está instalado.";
 "Enable \"Bypass permission prompts\" in Settings." = "Activa \"Omitir permisos\" en Configuración.";
 "No GitHub remote found for this project." = "No se encontró un remoto de GitHub para este proyecto.";

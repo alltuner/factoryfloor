@@ -329,17 +329,6 @@ struct TerminalContainerView: View {
 
             Spacer()
 
-            AddTabButton(label: NSLocalizedString("Terminal", comment: ""), icon: "terminal", shortcut: "T", action: addTerminal)
-            AddTabButton(label: NSLocalizedString("Browser", comment: ""), icon: "globe", shortcut: "B", action: addBrowser)
-
-            QuickActionButtons(
-                runner: quickActionRunner,
-                claudePath: appEnv.toolStatus.claude.path,
-                workingDirectory: workingDirectory,
-                bypassPermissions: bypassPermissions,
-                hasGitHubRemote: appEnv.githubRepo(for: projectDirectory) != nil
-            )
-
             if let pr = branchPR, let url = URL(string: pr.url) {
                 Button(action: { NSWorkspace.shared.open(url) }) {
                     HStack(spacing: 4) {
@@ -561,6 +550,29 @@ struct TerminalContainerView: View {
                 }
             }
             .navigationSubtitle(portSubtitle)
+            .toolbar {
+                ToolbarItemGroup(placement: .primaryAction) {
+                    Button(action: addTerminal) {
+                        Label(NSLocalizedString("New Terminal", comment: ""), systemImage: "terminal")
+                    }
+                    .help("New Terminal (\u{2318}T)")
+
+                    Button(action: addBrowser) {
+                        Label(NSLocalizedString("New Browser", comment: ""), systemImage: "globe")
+                    }
+                    .help("New Browser (\u{2318}B)")
+
+                    Divider()
+
+                    QuickActionButtons(
+                        runner: quickActionRunner,
+                        claudePath: appEnv.toolStatus.claude.path,
+                        workingDirectory: workingDirectory,
+                        bypassPermissions: bypassPermissions,
+                        hasGitHubRemote: appEnv.githubRepo(for: projectDirectory) != nil
+                    )
+                }
+            }
     }
 
     // MARK: - Tab management
