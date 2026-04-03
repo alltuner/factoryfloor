@@ -29,6 +29,8 @@ enum TmuxSession {
         set -g escape-time 0
         set -g allow-passthrough on
         set -g default-terminal "xterm-256color"
+        set -s extended-keys on
+        set -as terminal-features 'xterm*:extkeys'
         set -ga terminal-overrides ',*:smcup@:rmcup@'
         set -g alternate-screen off
         set -g aggressive-resize on
@@ -80,6 +82,33 @@ enum TmuxSession {
         let posixCmd = shellEscape("\(setup); exec \(tmuxCmd)")
         let shCmd = "exec sh -c \(posixCmd)"
         return "\(shell) -lic \(shellEscape(shCmd))"
+    }
+
+    /// Build a script that can be `source`d directly into an interactive shell (zsh).
+    /// No `sh -c` wrapping — commands run in the current shell to preserve terminal capabilities.
+    static func sourceableScript(tmuxPath: String, sessionName: String, command: String, environmentVars: [String: String] = [:]) -> String {
+        let socket = shellEscape(socketName)
+        let conf = shellEscape(configPath)
+        let escaped = shellEscape(sessionName)
+        let logFile = shellEscape(stderrLogPath)
+
+        let envFlags = environmentVars.map { "-e \"\($0.key)=\(doubleQuoteEscape($0.value))\"" }.joined(separator: " ")
+
+        var lines: [String] = []
+        lines.append("\(tmuxPath) -L \(socket) start-server 2>>\(logFile) || true")
+        lines.append("\(tmuxPath) -L \(socket) source-file \(conf) 2>>\(logFile)")
+        lines.append("\(tmuxPath) -L \(socket) set-hook -gu pane-died 2>>\(logFile) || true")
+
+        var tmuxCmd = "exec \(tmuxPath) -L \(socket) -f \(conf) new-session -A -s \(escaped)"
+        if !envFlags.isEmpty {
+            tmuxCmd += " \(envFlags)"
+        }
+        // tmux new-session doesn't interpret shell operators (||, 2>), so wrap in sh -c.
+        // This sh -c runs inside tmux's pseudo-terminal, not the outer interactive shell.
+        tmuxCmd += " sh -c \(shellEscape(command))"
+        lines.append(tmuxCmd)
+
+        return lines.joined(separator: "\n")
     }
 
     /// Kill a tmux session by name.
