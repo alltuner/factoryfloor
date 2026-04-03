@@ -9,6 +9,14 @@ extension Notification.Name {
     static let browserTitleChanged = Notification.Name("factoryfloor.browserTitleChanged")
 }
 
+/// Hides the "Open Link in New Window" context menu item since the app is single-window.
+class BrowserWebView: WKWebView {
+    override func willOpenMenu(_ menu: NSMenu, with event: NSEvent) {
+        menu.items.removeAll { $0.identifier?.rawValue == "WKMenuItemIdentifierOpenLinkInNewWindow" }
+        super.willOpenMenu(menu, with: event)
+    }
+}
+
 func shouldRetargetBrowser(currentURL: String?, displayedURL: String, previousDefaultURL: String, nextDefaultURL: String, connectionError: Bool) -> Bool {
     guard normalizedBrowserURL(previousDefaultURL) != normalizedBrowserURL(nextDefaultURL) else {
         return false
@@ -284,7 +292,37 @@ struct WebViewRepresentable: NSViewRepresentable {
             }
         }
 
+        func webView(
+            _ webView: WKWebView,
+            createWebViewWith _: WKWebViewConfiguration,
+            for navigationAction: WKNavigationAction,
+            windowFeatures _: WKWindowFeatures
+        ) -> WKWebView? {
+            // target="_blank" or JS window.open: load in the current view
+            if let url = navigationAction.request.url {
+                webView.load(URLRequest(url: url))
+            }
+            return nil
+        }
+
         // MARK: - WKNavigationDelegate
+
+        func webView(
+            _: WKWebView,
+            decidePolicyFor action: WKNavigationAction,
+            decisionHandler: @escaping @MainActor @Sendable (WKNavigationActionPolicy) -> Void
+        ) {
+            if action.navigationType == .linkActivated,
+               action.modifierFlags.contains(.command),
+               let url = action.request.url,
+               url.scheme == "https" || url.scheme == "http"
+            {
+                NSWorkspace.shared.open(url)
+                decisionHandler(.cancel)
+                return
+            }
+            decisionHandler(.allow)
+        }
 
         func webView(_ webView: WKWebView, didStartProvisionalNavigation _: WKNavigation!) {
             parent.isLoading = true

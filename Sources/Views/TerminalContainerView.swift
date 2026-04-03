@@ -1360,7 +1360,7 @@ final class TerminalSurfaceCache: ObservableObject {
 
     func webView(for id: UUID) -> WKWebView {
         if let existing = webViews[id] { return existing }
-        let view = WKWebView()
+        let view = BrowserWebView()
         webViews[id] = view
         return view
     }
