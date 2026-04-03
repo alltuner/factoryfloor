@@ -26,11 +26,31 @@ final class TerminalView: NSView {
     private var keyTextAccumulator: [String]?
     private var activityDebounceWork: DispatchWorkItem?
 
+    /// Characters that need backslash-escaping when dropping paths into a terminal.
+    private static let shellEscapeCharacters = "\\ ()[]{}<>\"'`!#$&;|*?\t"
+
+    /// Escape shell-sensitive characters so dropped paths are safe in a live terminal buffer.
+    private static func shellEscape(_ str: String) -> String {
+        var result = str
+        for char in shellEscapeCharacters {
+            result = result.replacingOccurrences(of: String(char), with: "\\\(char)")
+        }
+        return result
+    }
+
+    private static let dropTypes: Set<NSPasteboard.PasteboardType> = [
+        .string,
+        .fileURL,
+        .URL,
+    ]
+
     init(app: ghostty_app_t, workingDirectory: String? = nil, command: String? = nil, initialInput: String? = nil, environmentVars: [String: String] = [:]) {
         super.init(frame: NSRect(x: 0, y: 0, width: 800, height: 600))
 
         wantsLayer = true
         layer?.isOpaque = true
+
+        registerForDraggedTypes(Array(Self.dropTypes))
 
         var config = ghostty_surface_config_new()
         config.userdata = Unmanaged.passUnretained(self).toOpaque()
@@ -414,6 +434,37 @@ final class TerminalView: NSView {
 
     override func doCommand(by _: Selector) {
         // Let the input system handle commands we don't care about
+    }
+
+    // MARK: - Drag and drop
+
+    override func draggingEntered(_ sender: any NSDraggingInfo) -> NSDragOperation {
+        guard let types = sender.draggingPasteboard.types else { return [] }
+        guard types.contains(where: { Self.dropTypes.contains($0) }) else { return [] }
+        return .copy
+    }
+
+    override func performDragOperation(_ sender: any NSDraggingInfo) -> Bool {
+        let pb = sender.draggingPasteboard
+
+        let content: String?
+        if let url = pb.string(forType: .URL) {
+            content = Self.shellEscape(url)
+        } else if let urls = pb.readObjects(forClasses: [NSURL.self]) as? [URL], !urls.isEmpty {
+            content = urls
+                .map { Self.shellEscape($0.path) }
+                .joined(separator: " ")
+        } else if let str = pb.string(forType: .string) {
+            content = str
+        } else {
+            content = nil
+        }
+
+        guard let content, let surface else { return false }
+        content.withCString { ptr in
+            ghostty_surface_text(surface, ptr, UInt(content.utf8.count))
+        }
+        return true
     }
 
     // MARK: - Mouse
