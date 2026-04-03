@@ -165,6 +165,11 @@
 "Opens the current workstream directory" = "Öppnar det aktuella arbetsflödets katalog";
 "Open in external browser" = "Öppna i extern webbläsare";
 "Open in external terminal" = "Öppna i extern terminal";
+"Open in External Terminal" = "Öppna i extern terminal";
+"Reveal in Finder" = "Visa i Finder";
+"Copy project path" = "Kopiera projektsökväg";
+"Copy branch name" = "Kopiera grennamn";
+"Copy worktree path" = "Kopiera worktree-sökväg";
 
 /* Agent tab - Claude not installed */
 "Claude Code not found" = "Claude Code hittades inte";
