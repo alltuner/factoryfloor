@@ -173,7 +173,7 @@ struct TerminalContainerView: View {
     @State private var scriptConfig: ScriptConfig = .empty
     @State private var browserTitles: [UUID: String] = [:]
     @State private var terminalTitles: [UUID: String] = [:]
-    @State private var cachedClaudeCommand: String?
+    @State private var cachedAgentParams: AgentLaunchParams?
     @State private var draggedCustomTab: WorkspaceTab?
     @StateObject private var portDetector: PortDetector
     @State private var runStoppedManually = false
@@ -237,7 +237,7 @@ struct TerminalContainerView: View {
         return appEnv.githubPR(for: projectDirectory, branch: branch)
     }
 
-    private func buildClaudeCommand() -> String? {
+    private func buildClaudeCommand() -> AgentLaunchParams? {
         guard let basePath = appEnv.toolStatus.claude.path else { return nil }
         let sessionID = workstreamID.uuidString.lowercased()
 
@@ -263,16 +263,22 @@ struct TerminalContainerView: View {
             fresh.option("--append-system-prompt", SystemPrompts.autoRenameBranchPrompt)
         }
 
-        let cmd = CommandBuilder.withFallback(
-            resume.command, fresh.command,
-            message: "Starting new session..."
-        )
+        // Launch via initialInput so Claude runs inside an interactive shell.
+        // This preserves terminal capabilities (Shift+Return newlines, Cmd+click hyperlinks)
+        // that are lost when using ghostty's config.command directly.
+        // Commands are written to a script file so initialInput stays short.
+        let rawFallback = "\(resume.command) 2>/dev/null || \(fresh.command)"
 
+        let scriptContent: String
         if useTmux, let tmuxPath = appEnv.toolStatus.tmux.path {
             let session = TmuxSession.sessionName(project: projectName, workstream: workstreamName, role: "agent")
-            return TmuxSession.wrapCommand(tmuxPath: tmuxPath, sessionName: session, command: cmd, environmentVars: envVars)
+            scriptContent = "clear\n" + TmuxSession.sourceableScript(tmuxPath: tmuxPath, sessionName: session, command: rawFallback, environmentVars: envVars)
+        } else {
+            // `exit` after claude closes the shell, triggering surface respawn.
+            scriptContent = "clear\n\(rawFallback)\nexit"
         }
-        return cmd
+        let scriptPath = AgentLaunchParams.writeScript(scriptContent, for: workstreamID)
+        return AgentLaunchParams(command: nil, initialInput: "source \(CommandBuilder.shellQuote(scriptPath))\n")
     }
 
     private var tabBar: some View {
@@ -370,7 +376,8 @@ struct TerminalContainerView: View {
                 SingleTerminalView(
                     surfaceID: claudeID,
                     workingDirectory: workingDirectory,
-                    command: cachedClaudeCommand,
+                    command: cachedAgentParams?.command,
+                    initialInput: cachedAgentParams?.initialInput,
                     isFocused: true,
                     environmentVars: envVars
                 )
@@ -415,7 +422,7 @@ struct TerminalContainerView: View {
             PixelAgentsPanelView(projectDirectory: workingDirectory)
         }
         .onAppear {
-            cachedClaudeCommand = buildClaudeCommand()
+            cachedAgentParams = buildClaudeCommand()
             scriptConfig = ScriptConfig.load(from: projectDirectory)
             surfaceCache.respawnableIDs.insert(claudeID)
             if let snapshot = surfaceCache.restoreTabSnapshot(for: workstreamID) {
@@ -444,12 +451,18 @@ struct TerminalContainerView: View {
             surfaceCache.updateOcclusion(visibleSurfaceIDs: visibleSurfaceIDs)
             WorkspaceStateStore.save(RestorableWorkspaceTab(activeTab: activeTab), for: workstreamID)
         }
-        .onChange(of: tmuxMode) { cachedClaudeCommand = buildClaudeCommand() }
-        .onChange(of: bypassPermissions) { cachedClaudeCommand = buildClaudeCommand() }
-        .onChange(of: autoRenameBranch) { cachedClaudeCommand = buildClaudeCommand() }
-        .onChange(of: workstreamName) { cachedClaudeCommand = buildClaudeCommand() }
+        .onChange(of: tmuxMode) { cachedAgentParams = buildClaudeCommand() }
+        .onChange(of: bypassPermissions) { cachedAgentParams = buildClaudeCommand() }
+        .onChange(of: autoRenameBranch) { cachedAgentParams = buildClaudeCommand() }
+        .onChange(of: workstreamName) { cachedAgentParams = buildClaudeCommand() }
         .onChange(of: appEnv.isDetecting) {
-            cachedClaudeCommand = buildClaudeCommand()
+            let hadParams = cachedAgentParams != nil
+            cachedAgentParams = buildClaudeCommand()
+            // If the agent surface was created before params were ready (plain shell),
+            // destroy it so preloadSurfaces recreates it with the correct initialInput.
+            if !hadParams && cachedAgentParams != nil {
+                surfaceCache.removeSurface(for: claudeID)
+            }
             preloadSurfaces()
         }
         .onReceive(NotificationCenter.default.publisher(for: .toggleInfo)) { _ in activeTab = .info }
@@ -637,12 +650,13 @@ struct TerminalContainerView: View {
         guard let app = TerminalApp.shared.app else { return }
 
         // Agent surface
-        if let cmd = cachedClaudeCommand {
+        if let params = cachedAgentParams {
             _ = surfaceCache.surface(
                 for: claudeID,
                 app: app,
                 workingDirectory: workingDirectory,
-                command: cmd,
+                command: params.command,
+                initialInput: params.initialInput,
                 environmentVars: envVars
             )
         }
@@ -792,12 +806,32 @@ private struct AddTabButton: View {
     }
 }
 
+// MARK: - AgentLaunchParams
+
+/// Determines how the agent terminal is launched.
+/// Uses `initialInput` so Claude runs inside an interactive shell (needed for Shift+Return, Cmd+click).
+/// Commands are written to a script file so initialInput stays short.
+private struct AgentLaunchParams {
+    let command: String?
+    let initialInput: String?
+
+    /// Write a command to a temp script file, returning the path.
+    static func writeScript(_ command: String, for workstreamID: UUID) -> String {
+        let path = AppConstants.agentScriptPath(for: workstreamID)
+        let dir = (path as NSString).deletingLastPathComponent
+        try? FileManager.default.createDirectory(atPath: dir, withIntermediateDirectories: true)
+        try? command.write(toFile: path, atomically: true, encoding: .utf8)
+        return path
+    }
+}
+
 // MARK: - SingleTerminalView
 
 struct SingleTerminalView: View {
     let surfaceID: UUID
     let workingDirectory: String
     var command: String?
+    var initialInput: String?
     var isFocused: Bool = true
     var environmentVars: [String: String] = [:]
 
@@ -813,6 +847,7 @@ struct SingleTerminalView: View {
                 surfaceID: surfaceID,
                 workingDirectory: workingDirectory,
                 command: command,
+                initialInput: initialInput,
                 isFocused: isFocused,
                 environmentVars: environmentVars
             )
@@ -849,6 +884,7 @@ private struct TerminalSurfaceView: NSViewRepresentable {
     let surfaceID: UUID
     let workingDirectory: String
     var command: String?
+    var initialInput: String?
     var isFocused: Bool = true
     var environmentVars: [String: String] = [:]
 
@@ -868,6 +904,7 @@ private struct TerminalSurfaceView: NSViewRepresentable {
             app: app,
             workingDirectory: workingDirectory,
             command: command,
+            initialInput: initialInput,
             environmentVars: environmentVars
         )
 

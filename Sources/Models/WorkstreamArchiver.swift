@@ -43,6 +43,8 @@ enum WorkstreamArchiver {
                 if let tmuxPath {
                     TmuxSession.killWorkstreamSessions(tmuxPath: tmuxPath, project: projName, workstream: wsName)
                 }
+                // Clean up the agent launch script for this workstream.
+                try? FileManager.default.removeItem(atPath: AppConstants.agentScriptPath(for: workstreamID))
                 await MainActor.run {
                     archivingPaths.remove(standardizedPath)
                     NotificationCenter.default.post(name: archivingDidComplete, object: nil)

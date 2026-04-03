@@ -81,6 +81,14 @@ enum AppConstants {
         return base.appendingPathComponent(dirName)
     }
 
+    /// Path to the agent launch script for a given workstream.
+    static func agentScriptPath(for workstreamID: UUID) -> String {
+        cacheDirectory
+            .appendingPathComponent("agent-scripts")
+            .appendingPathComponent("\(workstreamID.uuidString.lowercased()).sh")
+            .path
+    }
+
     /// Worktrees are always shared between debug and release builds.
     static var worktreesDirectory: URL {
         FileManager.default.homeDirectoryForCurrentUser
