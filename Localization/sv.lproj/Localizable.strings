@@ -66,6 +66,7 @@
 "Terminal" = "Terminal";
 "None" = "Ingen";
 "Browser" = "Webbläsare";
+"GitHub" = "GitHub";
 "Coding Agent" = "Kodningsagent";
 "Bypass permission prompts" = "Hoppa över behörighetsförfrågningar";
 "When enabled, the coding agent will not ask for confirmation before making changes. Use with caution: the agent will be able to edit files, run commands, and make git commits without asking." = "När aktiverad kommer kodningsagenten inte att be om bekräftelse innan ändringar görs. Använd med försiktighet: agenten kan redigera filer, köra kommandon och göra commits utan att fråga.";
@@ -170,6 +171,7 @@
 "Open in external browser" = "Öppna i extern webbläsare";
 "Open in external terminal" = "Öppna i extern terminal";
 "Open in External Terminal" = "Öppna i extern terminal";
+"Open on GitHub" = "Öppna på GitHub";
 "Reveal in Finder" = "Visa i Finder";
 "Copy project path" = "Kopiera projektsökväg";
 "Copy branch name" = "Kopiera grennamn";

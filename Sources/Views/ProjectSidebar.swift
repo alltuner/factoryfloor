@@ -87,6 +87,7 @@ struct ProjectSidebar: View {
                     }
                 } : nil,
                 isGitRepo: appEnv.isGitRepo(project.directory),
+                githubURL: appEnv.githubURL(for: project.directory),
                 onAdd: { logger.warning("[FF] onAdd button tapped for project \(project.name, privacy: .public)"); addWorkstream(for: project.id) },
                 onAddWithPermissions: { addWorkstream(for: project.id, bypassPermissions: true) },
                 onAddWithoutPermissions: { addWorkstream(for: project.id, bypassPermissions: false) },
@@ -105,6 +106,7 @@ struct ProjectSidebar: View {
                         worktreePath: workstream.worktreePath,
                         isPathValid: appEnv.isPathValid(workstream.worktreePath),
                         hasActivePort: appEnv.hasActivePort(workstream.id),
+                        githubURL: appEnv.githubURL(for: project.directory),
                         prTitle: pr?.title,
                         prNumber: pr?.number,
                         prState: pr?.state,
@@ -606,6 +608,7 @@ private struct ProjectHeaderRow: View {
     let isExpanded: Bool
     let onToggle: (() -> Void)?
     let isGitRepo: Bool
+    var githubURL: URL?
     let onAdd: () -> Void
     let onAddWithPermissions: () -> Void
     let onAddWithoutPermissions: () -> Void
@@ -694,6 +697,13 @@ private struct ProjectHeaderRow: View {
             } label: {
                 Label("Open in External Terminal", systemImage: "terminal")
             }
+            if let githubURL {
+                Button {
+                    NSWorkspace.shared.open(githubURL)
+                } label: {
+                    Label("Open on GitHub", image: "github")
+                }
+            }
             Divider()
             Button {
                 copyTextToPasteboard(project.directory)
@@ -710,6 +720,7 @@ private struct WorkstreamRow: View {
     var worktreePath: String?
     let isPathValid: Bool
     var hasActivePort: Bool = false
+    var githubURL: URL?
     var prTitle: String?
     var prNumber: Int?
     var prState: String?
@@ -787,6 +798,15 @@ private struct WorkstreamRow: View {
                 } label: {
                     Label("Open in External Terminal", systemImage: "terminal")
                 }
+            }
+            if let githubURL {
+                Button {
+                    NSWorkspace.shared.open(githubURL)
+                } label: {
+                    Label("Open on GitHub", image: "github")
+                }
+            }
+            if worktreePath != nil || githubURL != nil {
                 Divider()
             }
             if let branchName {

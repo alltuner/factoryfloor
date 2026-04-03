@@ -570,6 +570,16 @@ struct TerminalContainerView: View {
             .navigationSubtitle(portSubtitle)
             .toolbar {
                 ToolbarItemGroup(placement: .primaryAction) {
+                    if let githubURL = appEnv.githubURL(for: projectDirectory) {
+                        Button {
+                            NSWorkspace.shared.open(githubURL)
+                        } label: {
+                            Label(NSLocalizedString("GitHub", comment: ""), image: "github")
+                                .labelStyle(.iconOnly)
+                        }
+                        .help("Open on GitHub")
+                    }
+
                     Button(action: addTerminal) {
                         Label(NSLocalizedString("Terminal", comment: ""), systemImage: "terminal")
                             .labelStyle(.titleAndIcon)

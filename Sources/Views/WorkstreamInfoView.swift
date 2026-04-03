@@ -53,7 +53,7 @@ struct WorkstreamInfoView: View {
                     }
                     .foregroundStyle(.secondary)
                 }
-                DirectoryRow(path: workingDirectory, defaultTerminal: defaultTerminal)
+                DirectoryRow(path: workingDirectory, defaultTerminal: defaultTerminal, githubURL: appEnv.githubURL(for: projectDirectory))
             }
             .frame(maxWidth: .infinity)
             .padding(.horizontal, 20)
@@ -243,6 +243,7 @@ struct WorkstreamInfoView: View {
 struct DirectoryRow: View {
     let path: String
     var defaultTerminal: String = ""
+    var githubURL: URL?
 
     @State private var copied = false
 
@@ -271,6 +272,15 @@ struct DirectoryRow: View {
             ) {
                 openInTerminal()
             }
+
+            if let githubURL {
+                DirectoryActionButton(
+                    assetIcon: "github",
+                    tooltip: "Open on GitHub"
+                ) {
+                    NSWorkspace.shared.open(githubURL)
+                }
+            }
         }
     }
 
@@ -288,7 +298,8 @@ struct DirectoryRow: View {
 }
 
 private struct DirectoryActionButton: View {
-    let icon: String
+    var icon: String = ""
+    var assetIcon: String?
     var color: Color? = nil
     let tooltip: String
     let action: () -> Void
@@ -297,7 +308,7 @@ private struct DirectoryActionButton: View {
 
     var body: some View {
         Button(action: action) {
-            Image(systemName: icon)
+            (assetIcon.map { Image($0) } ?? Image(systemName: icon))
                 .font(.system(size: 12))
                 .foregroundStyle(color ?? (isHovering ? Color.primary : Color.secondary))
                 .frame(width: 22, height: 22)

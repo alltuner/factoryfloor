@@ -30,7 +30,7 @@ struct ProjectOverviewView: View {
                     .multilineTextAlignment(.center)
                     .onChange(of: project.name) { _, _ in onProjectChanged() }
 
-                DirectoryRow(path: project.directory, defaultTerminal: defaultTerminal)
+                DirectoryRow(path: project.directory, defaultTerminal: defaultTerminal, githubURL: appEnv.githubURL(for: project.directory))
             }
             .frame(maxWidth: .infinity)
             .padding(.horizontal, 20)

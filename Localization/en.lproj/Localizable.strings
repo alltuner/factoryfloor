@@ -66,6 +66,7 @@
 "Terminal" = "Terminal";
 "None" = "None";
 "Browser" = "Browser";
+"GitHub" = "GitHub";
 "Coding Agent" = "Coding Agent";
 "Bypass permission prompts" = "Bypass permission prompts";
 "When enabled, the coding agent will not ask for confirmation before making changes. Use with caution: the agent will be able to edit files, run commands, and make git commits without asking." = "When enabled, the coding agent will not ask for confirmation before making changes. Use with caution: the agent will be able to edit files, run commands, and make git commits without asking.";
@@ -170,6 +171,7 @@
 "Open in external browser" = "Open in external browser";
 "Open in external terminal" = "Open in external terminal";
 "Open in External Terminal" = "Open in External Terminal";
+"Open on GitHub" = "Open on GitHub";
 "Reveal in Finder" = "Reveal in Finder";
 "Copy project path" = "Copy project path";
 "Copy branch name" = "Copy branch name";

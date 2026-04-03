@@ -66,6 +66,7 @@
 "Terminal" = "Terminal";
 "None" = "Cap";
 "Browser" = "Navegador";
+"GitHub" = "GitHub";
 "Coding Agent" = "Agent de codi";
 "Bypass permission prompts" = "Ometre les sol·licituds de permisos";
 "When enabled, the coding agent will not ask for confirmation before making changes. Use with caution: the agent will be able to edit files, run commands, and make git commits without asking." = "Quan està activat, l'agent de codi no demanarà confirmació abans de fer canvis. Utilitza amb precaució: l'agent podrà editar fitxers, executar ordres i fer commits sense preguntar.";
@@ -170,6 +171,7 @@
 "Open in external browser" = "Obre al navegador extern";
 "Open in external terminal" = "Obre al terminal extern";
 "Open in External Terminal" = "Obre al terminal extern";
+"Open on GitHub" = "Obre a GitHub";
 "Reveal in Finder" = "Mostra al Finder";
 "Copy project path" = "Copia la ruta del projecte";
 "Copy branch name" = "Copia el nom de la branca";

@@ -32,6 +32,41 @@ enum GitHubOperations {
         return remote.contains("github.com")
     }
 
+    /// Convert a git remote URL to a browser-openable HTTPS URL.
+    /// Handles SSH (`git@github.com:owner/repo.git`),
+    /// HTTPS (`https://github.com/owner/repo.git`),
+    /// and SSH protocol (`ssh://git@github.com/owner/repo.git`) formats.
+    static func browserURL(from remoteURL: String) -> URL? {
+        var cleaned = remoteURL.trimmingCharacters(in: .whitespacesAndNewlines)
+        if cleaned.hasSuffix(".git") {
+            cleaned = String(cleaned.dropLast(4))
+        }
+        // SSH shorthand: git@github.com:owner/repo
+        if let atIndex = cleaned.firstIndex(of: "@"),
+           let colonIndex = cleaned.firstIndex(of: ":"),
+           colonIndex > atIndex,
+           !cleaned.hasPrefix("https://"),
+           !cleaned.hasPrefix("ssh://")
+        {
+            let host = cleaned[cleaned.index(after: atIndex) ..< colonIndex]
+            let path = cleaned[cleaned.index(after: colonIndex)...]
+            return URL(string: "https://\(host)/\(path)")
+        }
+        // ssh://git@github.com/owner/repo
+        if cleaned.hasPrefix("ssh://") {
+            cleaned = cleaned.replacingOccurrences(of: "ssh://", with: "https://")
+            if let atIndex = cleaned.firstIndex(of: "@") {
+                cleaned = "https://" + cleaned[cleaned.index(after: atIndex)...]
+            }
+            return URL(string: cleaned)
+        }
+        // Already HTTPS
+        if cleaned.hasPrefix("https://") || cleaned.hasPrefix("http://") {
+            return URL(string: cleaned)
+        }
+        return nil
+    }
+
     /// Fetch repo info via gh CLI.
     static func repoInfo(ghPath: String, at path: String) -> GitHubRepoInfo? {
         guard let json = run(ghPath, args: ["repo", "view", "--json", "name,url,description,stargazerCount,forkCount,openIssueCount"], in: path) else { return nil }
