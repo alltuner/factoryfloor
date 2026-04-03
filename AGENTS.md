@@ -93,7 +93,7 @@ Breaking changes: add `!` after the type or include `BREAKING CHANGE:` in the fo
 - `Localization/` - lproj directories with Localizable.strings
 - `Resources/` - Entitlements, bridging header, Assets.xcassets, CLI script
 - `ghostty/` - Git submodule (do not modify, pinned to stable release tag)
-- `website/` - Hugo + Tailwind CSS site for factory-floor.com
+- `website/` - Hugo + Tailwind CSS site for factory-floor.com. **Do not use `.AllTranslations`** in Hugo templates; it returns duplicates because localized contentDirs are nested inside the English `content/` dir. Use a hardcoded language code list instead (see `footer.html` or `docs.html` for the pattern).
 - `scripts/` - Release and build automation
 - `docs/` - Distribution guide and reference docs
 
