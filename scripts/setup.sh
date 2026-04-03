@@ -1,15 +1,16 @@
 #!/usr/bin/env bash
 # ABOUTME: Workstream setup for Factory Floor development.
-# ABOUTME: Symlinks ghostty submodule from the main repo and runs a debug build.
+# ABOUTME: Initializes ghostty submodule, symlinks build artifacts, and runs a debug build.
 set -euo pipefail
 
 REPO_ROOT=$(git worktree list --porcelain | head -1 | sed 's/^worktree //')
 
 # Ghostty submodule (headers + xcframework)
 if [ -d "$REPO_ROOT/ghostty" ] && [ ! -e ghostty/include ]; then
-    rm -rf ghostty
-    ln -sfn "$REPO_ROOT/ghostty" ghostty
-    echo "✓ Symlinked ghostty from main repo"
+    git -c protocol.file.allow=always submodule update --init --reference "$REPO_ROOT/ghostty" ghostty
+    ln -sfn "$REPO_ROOT/ghostty/macos/GhosttyKit.xcframework" ghostty/macos/GhosttyKit.xcframework
+    ln -sfn "$REPO_ROOT/ghostty/zig-out" ghostty/zig-out
+    echo "✓ Initialized ghostty submodule with local reference"
 fi
 
 # Pre-commit hooks

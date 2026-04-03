@@ -1,25 +1,16 @@
 #!/usr/bin/env bash
 # ABOUTME: Claude Code worktree-create hook for Factory Floor.
-# ABOUTME: Symlinks build artifacts and runs a build so SourceKit resolves symbols.
+# ABOUTME: Initializes ghostty submodule, symlinks build artifacts, and runs a build so SourceKit resolves symbols.
 set -euo pipefail
 
 : "${WORKTREE_DIR:?WORKTREE_DIR must be set}"
 : "${CLAUDE_PROJECT_DIR:?CLAUDE_PROJECT_DIR must be set}"
 
-# Ghostty xcframework (built with zig, not in git)
-XCFW_SRC="$CLAUDE_PROJECT_DIR/ghostty/macos/GhosttyKit.xcframework"
-XCFW_DST="$WORKTREE_DIR/ghostty/macos/GhosttyKit.xcframework"
-
-if [ -d "$XCFW_SRC" ] && [ ! -e "$XCFW_DST" ]; then
-    ln -sfn "$XCFW_SRC" "$XCFW_DST"
-fi
-
-# Ghostty zig build output (resources, headers, etc.)
-ZIGOUT_SRC="$CLAUDE_PROJECT_DIR/ghostty/zig-out"
-ZIGOUT_DST="$WORKTREE_DIR/ghostty/zig-out"
-
-if [ -d "$ZIGOUT_SRC" ] && [ ! -e "$ZIGOUT_DST" ]; then
-    ln -sfn "$ZIGOUT_SRC" "$ZIGOUT_DST"
+# Ghostty submodule + build artifacts (built with zig, not in git)
+if [ -d "$CLAUDE_PROJECT_DIR/ghostty" ] && [ ! -e "$WORKTREE_DIR/ghostty/include" ]; then
+    git -C "$WORKTREE_DIR" -c protocol.file.allow=always submodule update --init --reference "$CLAUDE_PROJECT_DIR/ghostty" ghostty
+    ln -sfn "$CLAUDE_PROJECT_DIR/ghostty/macos/GhosttyKit.xcframework" "$WORKTREE_DIR/ghostty/macos/GhosttyKit.xcframework"
+    ln -sfn "$CLAUDE_PROJECT_DIR/ghostty/zig-out" "$WORKTREE_DIR/ghostty/zig-out"
 fi
 
 # Build so SourceKit can resolve symbols across files in the worktree.
