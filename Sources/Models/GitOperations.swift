@@ -155,18 +155,16 @@ enum GitOperations {
     }
 
     /// Remove a git worktree.
-    static func removeWorktree(projectPath: String, workstreamName: String, projectName: String) {
-        let worktreeDir = AppConstants.worktreesDirectory
-            .appendingPathComponent(sanitize(projectName))
-            .appendingPathComponent(sanitize(workstreamName))
+    static func removeWorktree(projectPath: String, worktreePath: String) {
+        let worktreeDir = URL(fileURLWithPath: worktreePath)
 
-        _ = run(args: ["worktree", "remove", "--force", worktreeDir.path], in: projectPath)
+        _ = run(args: ["worktree", "remove", "--force", worktreePath], in: projectPath)
 
         // Clean up empty directories
         try? FileManager.default.removeItem(at: worktreeDir)
-        let projectWorktreeDir = AppConstants.worktreesDirectory.appendingPathComponent(sanitize(projectName))
-        if let contents = try? FileManager.default.contentsOfDirectory(atPath: projectWorktreeDir.path), contents.isEmpty {
-            try? FileManager.default.removeItem(at: projectWorktreeDir)
+        let parentDir = worktreeDir.deletingLastPathComponent()
+        if let contents = try? FileManager.default.contentsOfDirectory(atPath: parentDir.path), contents.isEmpty {
+            try? FileManager.default.removeItem(at: parentDir)
         }
     }
 

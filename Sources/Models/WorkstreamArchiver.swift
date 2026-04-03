@@ -38,12 +38,12 @@ enum WorkstreamArchiver {
     ) {
         if let ws = project.workstreams.first(where: { $0.id == workstreamID }) {
             let projectDir = project.directory
-            let worktreeDir = ws.worktreePath ?? projectDir
+            let worktreePath = ws.worktreePath ?? projectDir
             let wsName = ws.name
             let projName = project.name
             Task.detached {
-                ScriptConfig.runTeardown(in: worktreeDir, projectDirectory: projectDir)
-                GitOperations.removeWorktree(projectPath: projectDir, workstreamName: wsName, projectName: projName)
+                ScriptConfig.runTeardown(in: worktreePath, projectDirectory: projectDir)
+                GitOperations.removeWorktree(projectPath: projectDir, worktreePath: worktreePath)
                 if let tmuxPath {
                     TmuxSession.killWorkstreamSessions(tmuxPath: tmuxPath, project: projName, workstream: wsName)
                 }
