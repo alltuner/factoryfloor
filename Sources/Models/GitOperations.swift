@@ -64,7 +64,7 @@ enum GitOperations {
             .trimmingCharacters(in: .whitespacesAndNewlines)
         let commitCount = countStr.flatMap(Int.init)
 
-        let status = run(args: ["status", "--porcelain"], in: path)?
+        let status = run(args: ["status", "--porcelain", "--ignore-submodules=dirty"], in: path)?
             .trimmingCharacters(in: .whitespacesAndNewlines)
         let isDirty = status.map { !$0.isEmpty } ?? false
 
@@ -172,7 +172,7 @@ enum GitOperations {
 
     /// Check if a worktree has uncommitted changes (staged, unstaged, or untracked files).
     static func hasUncommittedChanges(at path: String) -> Bool {
-        guard let status = run(args: ["status", "--porcelain"], in: path) else { return false }
+        guard let status = run(args: ["status", "--porcelain", "--ignore-submodules=dirty"], in: path) else { return false }
         return !status.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
     }
 
