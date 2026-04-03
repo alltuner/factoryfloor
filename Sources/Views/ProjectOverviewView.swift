@@ -361,13 +361,16 @@ private struct WorktreeInfoRow: View {
                 if !worktree.isMain {
                     HStack(spacing: 8) {
                         if let pr {
-                            HStack(spacing: 3) {
-                                Image(systemName: "arrow.triangle.pull")
-                                    .font(.system(size: 10))
-                                Text(verbatim: "#\(pr.number)")
-                                    .font(.caption)
+                            let prColor: Color = pr.state == "MERGED" ? .purple : .green
+                            Link(destination: URL(string: pr.url)!) {
+                                HStack(spacing: 3) {
+                                    Image(systemName: pr.state == "MERGED" ? "arrow.triangle.merge" : "arrow.triangle.pull")
+                                        .font(.system(size: 10))
+                                    Text(verbatim: "#\(pr.number)")
+                                        .font(.caption)
+                                }
+                                .foregroundStyle(prColor)
                             }
-                            .foregroundStyle(.purple)
                         }
                         if worktree.isDirty {
                             HStack(spacing: 4) {
