@@ -15,136 +15,183 @@ struct WorkstreamInfoView: View {
     @AppStorage("factoryfloor.defaultTerminal") private var defaultTerminal: String = ""
     @State private var branchName: String?
     @State private var copiedBranch = false
+    @State private var copiedPath = false
     @State private var docFiles: [DocFile] = []
     @State private var selectedDoc: String?
     @State private var projectIcon: NSImage?
 
     var body: some View {
         VStack(spacing: 0) {
-            // Pinned header
-            VStack(spacing: 4) {
-                if let icon = projectIcon {
-                    Image(nsImage: icon)
-                        .resizable()
-                        .interpolation(.high)
-                        .frame(width: 40, height: 40)
-                        .clipShape(RoundedRectangle(cornerRadius: 8))
-                }
-                Text(projectName)
-                    .font(.system(size: 13))
-                    .foregroundStyle(.secondary)
-                Text(workstreamName)
-                    .font(.system(size: 22, weight: .bold, design: .monospaced))
-                if let branch = branchName {
-                    HStack(spacing: 4) {
-                        Image(systemName: "arrow.triangle.branch")
-                            .font(.caption)
-                        Text(branch)
-                        DirectoryActionButton(
-                            icon: copiedBranch ? "checkmark" : "doc.on.doc",
-                            color: copiedBranch ? .green : nil,
-                            tooltip: "Copy branch name"
-                        ) {
-                            NSPasteboard.general.clearContents()
-                            NSPasteboard.general.setString(branch, forType: .string)
-                            copiedBranch = true
-                            DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) { copiedBranch = false }
+            Form {
+                // Hero header
+                Section {
+                    VStack(spacing: 4) {
+                        if let icon = projectIcon {
+                            Image(nsImage: icon)
+                                .resizable()
+                                .interpolation(.high)
+                                .frame(width: 48, height: 48)
+                                .clipShape(RoundedRectangle(cornerRadius: 10))
+                        }
+                        Text(projectName)
+                            .font(.system(size: 13))
+                            .foregroundStyle(.secondary)
+                        Text(workstreamName)
+                            .font(.system(size: 22, weight: .bold, design: .monospaced))
+                        if let desc = appEnv.taskDescription(for: workingDirectory), !desc.isEmpty {
+                            Text(desc)
+                                .font(.system(size: 13))
+                                .foregroundStyle(.secondary)
+                                .multilineTextAlignment(.center)
                         }
                     }
-                    .foregroundStyle(.secondary)
+                    .frame(maxWidth: .infinity)
+                    .padding(.vertical, 8)
                 }
-                DirectoryRow(path: workingDirectory, defaultTerminal: defaultTerminal, githubURL: appEnv.githubURL(for: projectDirectory))
-            }
-            .frame(maxWidth: .infinity)
-            .padding(.horizontal, 20)
-            .padding(.top, 12)
-            .padding(.bottom, 8)
-            .background(.bar)
+                .listRowBackground(Color.clear)
+                .listRowInsets(EdgeInsets())
 
-            // Pinned metadata (PR, scripts)
-            if appEnv.ghAvailable, let branch = branchName,
-               let pr = appEnv.githubPR(for: projectDirectory, branch: branch)
-            {
-                Divider()
-                let prColor: Color = pr.state == "MERGED" ? .purple : pr.state == "OPEN" ? .green : .secondary
-                HStack(spacing: 8) {
-                    Image(systemName: pr.state == "MERGED" ? "arrow.triangle.merge" : "arrow.triangle.pull")
-                        .font(.system(size: 10))
-                        .foregroundStyle(prColor)
-                    Text(verbatim: "#\(pr.number)")
-                        .font(.system(size: 11, weight: .medium, design: .monospaced))
-                    Text(pr.title)
-                        .font(.system(size: 11))
-                        .foregroundStyle(.secondary)
-                        .lineLimit(1)
-                    Spacer()
-                    Text(pr.state)
-                        .font(.system(size: 10))
-                        .foregroundStyle(prColor)
-                }
-                .padding(.horizontal, 16)
-                .padding(.vertical, 6)
-
-                if pr.state == "MERGED" {
-                    HStack(spacing: 8) {
-                        Image(systemName: "checkmark.circle.fill")
-                            .font(.system(size: 10))
-                            .foregroundStyle(.purple)
-                        Text("This branch has been merged.")
-                            .font(.system(size: 11))
-                            .foregroundStyle(.secondary)
-                        Spacer()
-                        Button(action: {
-                            NotificationCenter.default.post(name: .purgeWorkstream, object: workstreamID)
-                        }) {
-                            Text("Purge")
-                                .font(.system(size: 11, weight: .medium))
+                Section {
+                    if let branch = branchName {
+                        LabeledContent {
+                            HStack(spacing: 4) {
+                                Text(branch)
+                                    .font(.system(.body, design: .monospaced))
+                                    .foregroundStyle(.secondary)
+                                    .lineLimit(1)
+                                    .truncationMode(.middle)
+                                DirectoryActionButton(
+                                    icon: copiedBranch ? "checkmark" : "doc.on.doc",
+                                    color: copiedBranch ? .green : nil,
+                                    tooltip: "Copy branch name"
+                                ) {
+                                    NSPasteboard.general.clearContents()
+                                    NSPasteboard.general.setString(branch, forType: .string)
+                                    copiedBranch = true
+                                    DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) { copiedBranch = false }
+                                }
+                            }
+                        } label: {
+                            Text("Branch")
                         }
-                        .buttonStyle(.borderless)
-                        .foregroundStyle(.purple)
                     }
-                    .padding(.horizontal, 16)
-                    .padding(.vertical, 6)
-                    .background(Color.purple.opacity(0.06))
+
+                    LabeledContent {
+                        HStack(spacing: 4) {
+                            Text(workingDirectory.abbreviatedPath)
+                                .font(.system(.body, design: .monospaced))
+                                .foregroundStyle(.secondary)
+                                .lineLimit(1)
+                                .truncationMode(.middle)
+                            DirectoryActionButton(
+                                icon: copiedPath ? "checkmark" : "doc.on.doc",
+                                color: copiedPath ? .green : nil,
+                                tooltip: "Copy path"
+                            ) {
+                                NSPasteboard.general.clearContents()
+                                NSPasteboard.general.setString(workingDirectory, forType: .string)
+                                copiedPath = true
+                                DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) { copiedPath = false }
+                            }
+                            DirectoryActionButton(
+                                icon: "terminal",
+                                tooltip: "Open in external terminal"
+                            ) {
+                                openInTerminal(path: workingDirectory)
+                            }
+                            if let githubURL = appEnv.githubURL(for: projectDirectory) {
+                                DirectoryActionButton(
+                                    assetIcon: "github",
+                                    tooltip: "Open on GitHub"
+                                ) {
+                                    NSWorkspace.shared.open(githubURL)
+                                }
+                            }
+                        }
+                    } label: {
+                        Text("Directory")
+                    }
+                }
+
+                if appEnv.ghAvailable, let branch = branchName,
+                   let pr = appEnv.githubPR(for: projectDirectory, branch: branch)
+                {
+                    Section("Pull Request") {
+                        let prColor: Color = pr.state == "MERGED" ? .purple : pr.state == "OPEN" ? .green : .secondary
+                        LabeledContent {
+                            HStack(spacing: 6) {
+                                Image(systemName: pr.state == "MERGED" ? "arrow.triangle.merge" : "arrow.triangle.pull")
+                                    .foregroundStyle(prColor)
+                                Text(verbatim: "#\(pr.number)")
+                                    .font(.system(.body, design: .monospaced))
+                                Text(pr.title)
+                                    .foregroundStyle(.secondary)
+                                    .lineLimit(1)
+                            }
+                        } label: {
+                            Text(pr.state.capitalized)
+                                .foregroundStyle(prColor)
+                        }
+
+                        if pr.state == "MERGED" {
+                            HStack {
+                                Text("This branch has been merged.")
+                                    .foregroundStyle(.secondary)
+                                Spacer()
+                                Button("Purge") {
+                                    NotificationCenter.default.post(name: .purgeWorkstream, object: workstreamID)
+                                }
+                                .foregroundStyle(.purple)
+                            }
+                        }
+                    }
+                }
+
+                if scriptConfig.hasAnyScript {
+                    Section {
+                        if let setup = scriptConfig.setup {
+                            LabeledContent("Setup") {
+                                Text(setup)
+                                    .font(.system(.body, design: .monospaced))
+                                    .foregroundStyle(.secondary)
+                            }
+                        }
+                        if let run = scriptConfig.run {
+                            LabeledContent("Run") {
+                                Text(run)
+                                    .font(.system(.body, design: .monospaced))
+                                    .foregroundStyle(.secondary)
+                            }
+                        }
+                        if let teardown = scriptConfig.teardown {
+                            LabeledContent("Teardown") {
+                                Text(teardown)
+                                    .font(.system(.body, design: .monospaced))
+                                    .foregroundStyle(.secondary)
+                            }
+                        }
+                    } header: {
+                        HStack {
+                            Text("Scripts")
+                            Spacer()
+                            if let source = scriptConfig.source {
+                                Text(source)
+                                    .font(.caption2)
+                                    .foregroundStyle(.quaternary)
+                            }
+                        }
+                    }
                 }
             }
+            .formStyle(.grouped)
 
-            if scriptConfig.hasAnyScript {
-                Divider()
-                HStack(spacing: 12) {
-                    if let setup = scriptConfig.setup {
-                        Label(setup, systemImage: "hammer")
-                            .font(.system(size: 10, design: .monospaced))
-                            .foregroundStyle(.secondary)
-                            .lineLimit(1)
-                    }
-                    if let run = scriptConfig.run {
-                        Label(run, systemImage: "play")
-                            .font(.system(size: 10, design: .monospaced))
-                            .foregroundStyle(.secondary)
-                            .lineLimit(1)
-                    }
-                    Spacer()
-                    if let source = scriptConfig.source {
-                        Text(source)
-                            .font(.system(size: 9))
-                            .foregroundStyle(.quaternary)
-                    }
-                }
-                .padding(.horizontal, 16)
-                .padding(.vertical, 6)
-            }
-
-            Divider()
-
-            // Markdown content fills available space
+            // Markdown content fills remaining space when a doc is selected
             if let selected = selectedDoc,
                let doc = docFiles.first(where: { $0.name == selected })
             {
+                Divider()
                 MarkdownContentView(markdown: doc.content)
                     .id(selected)
-            } else {
-                Spacer()
             }
 
             // Doc tabs pinned to bottom
@@ -167,6 +214,18 @@ struct WorkstreamInfoView: View {
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .onAppear { loadInfo() }
     } // body
+
+    private func openInTerminal(path: String) {
+        if !defaultTerminal.isEmpty,
+           let appURL = NSWorkspace.shared.urlForApplication(withBundleIdentifier: defaultTerminal)
+        {
+            let config = NSWorkspace.OpenConfiguration()
+            NSWorkspace.shared.open([URL(fileURLWithPath: path)], withApplicationAt: appURL, configuration: config)
+        } else if let terminalURL = NSWorkspace.shared.urlForApplication(withBundleIdentifier: "com.apple.Terminal") {
+            let config = NSWorkspace.OpenConfiguration()
+            NSWorkspace.shared.open([URL(fileURLWithPath: path)], withApplicationAt: terminalURL, configuration: config)
+        }
+    }
 
     private nonisolated static let iconPaths = [
         "icon.svg", "icon.png",
