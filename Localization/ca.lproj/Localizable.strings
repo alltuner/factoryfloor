@@ -25,11 +25,13 @@
 
 /* Alerts */
 "Remove Project" = "Elimina projecte";
-"Archive Workstream" = "Arxiva flux de treball";
-"Archive" = "Arxiva";
-"Archive Anyway" = "Arxiva igualment";
+"Remove Workstream" = "Elimina flux de treball";
+"Ongoing terminals and Coding Agent sessions will be killed. The worktree and its files will remain on disk." = "Els terminals i les sessions de l'agent de codi en curs es tancaran. L'arbre de treball i els seus fitxers romandran al disc.";
+"Purge Workstream" = "Purga flux de treball";
+"Purge" = "Purga";
+"Purge Anyway" = "Purga igualment";
 "This workstream has uncommitted changes that will be lost." = "Aquest flux de treball té canvis sense confirmar que es perdran.";
-"The worktree and its branch will be removed." = "L'arbre de treball i la seva branca s'eliminaran.";
+"The worktree and its branch will be permanently deleted." = "L'arbre de treball i la seva branca s'eliminaran permanentment.";
 "Projects Not Found" = "Projectes no trobats";
 "The following projects were removed because their directories no longer exist on disk: %@" = "Els projectes següents s'han eliminat perquè els seus directoris ja no existeixen al disc: %@";
 "Cancel" = "Cancel·la";

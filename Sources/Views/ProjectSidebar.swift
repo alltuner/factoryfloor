@@ -23,8 +23,9 @@ struct ProjectSidebar: View {
     @State private var newProjectError = ""
     @State private var isDropTargeted = false
     @State private var projectToDelete: UUID?
-    @State private var workstreamToArchive: UUID?
-    @State private var archiveWarningDirty = false
+    @State private var workstreamToRemove: UUID?
+    @State private var workstreamToPurge: UUID?
+    @State private var purgeWarningDirty = false
     @State private var expandedProjects: Set<UUID> = SidebarState.loadExpanded()
     @State private var cachedSortedIDs: [UUID] = []
     @State private var cachedProjectIndex: [UUID: Int] = [:]
@@ -107,7 +108,8 @@ struct ProjectSidebar: View {
                         prTitle: pr?.title,
                         prNumber: pr?.number,
                         prState: pr?.state,
-                        onArchive: { confirmArchive(workstream) }
+                        onRemove: { workstreamToRemove = workstream.id },
+                        onPurge: { confirmPurge(workstream) }
                     )
                     .tag(SidebarSelection.workstream(workstream.id))
                     .padding(.leading, 34)
@@ -182,21 +184,35 @@ struct ProjectSidebar: View {
                 }
             }
             .alert(
-                "Archive Workstream",
+                "Remove Workstream",
                 isPresented: Binding(
-                    get: { workstreamToArchive != nil },
-                    set: { if !$0 { workstreamToArchive = nil } }
+                    get: { workstreamToRemove != nil },
+                    set: { if !$0 { workstreamToRemove = nil } }
                 )
             ) {
-                Button("Cancel", role: .cancel) { workstreamToArchive = nil }
-                Button(archiveWarningDirty ? "Archive Anyway" : "Archive", role: .destructive) {
-                    performArchive()
+                Button("Cancel", role: .cancel) { workstreamToRemove = nil }
+                Button("Remove", role: .destructive) {
+                    performRemove()
                 }
             } message: {
-                if archiveWarningDirty {
+                Text("Ongoing terminals and Coding Agent sessions will be killed. The worktree and its files will remain on disk.")
+            }
+            .alert(
+                "Purge Workstream",
+                isPresented: Binding(
+                    get: { workstreamToPurge != nil },
+                    set: { if !$0 { workstreamToPurge = nil } }
+                )
+            ) {
+                Button("Cancel", role: .cancel) { workstreamToPurge = nil }
+                Button(purgeWarningDirty ? "Purge Anyway" : "Purge", role: .destructive) {
+                    performPurge()
+                }
+            } message: {
+                if purgeWarningDirty {
                     Text("This workstream has uncommitted changes that will be lost.")
                 } else {
-                    Text("The worktree and its branch will be removed.")
+                    Text("The worktree and its branch will be permanently deleted.")
                 }
             }
             .alert(
@@ -413,26 +429,39 @@ struct ProjectSidebar: View {
     @EnvironmentObject private var updateChecker: UpdateChecker
     @EnvironmentObject private var updater: Updater
 
-    private func confirmArchive(_ workstream: Workstream) {
+    private func confirmPurge(_ workstream: Workstream) {
         if let path = workstream.worktreePath, GitOperations.hasUncommittedChanges(at: path) {
-            archiveWarningDirty = true
+            purgeWarningDirty = true
         } else {
-            archiveWarningDirty = false
+            purgeWarningDirty = false
         }
-        workstreamToArchive = workstream.id
+        workstreamToPurge = workstream.id
     }
 
-    private func performArchive() {
-        guard let wsID = workstreamToArchive,
+    private func performRemove() {
+        guard let wsID = workstreamToRemove,
               let pi = projects.firstIndex(where: { $0.workstreams.contains(where: { $0.id == wsID }) }) else { return }
         let projectID = projects[pi].id
-        WorkstreamArchiver.archive(wsID, in: &projects[pi], surfaceCache: surfaceCache, tmuxPath: appEnv.toolStatus.tmux.path)
+        WorkstreamArchiver.remove(wsID, in: &projects[pi], surfaceCache: surfaceCache, tmuxPath: appEnv.toolStatus.tmux.path)
         rebuildIndices()
         if case let .workstream(id) = selection, id == wsID {
             selection = projects[pi].workstreams.first.map { .workstream($0.id) } ?? .project(projectID)
         }
         onProjectsChanged()
-        workstreamToArchive = nil
+        workstreamToRemove = nil
+    }
+
+    private func performPurge() {
+        guard let wsID = workstreamToPurge,
+              let pi = projects.firstIndex(where: { $0.workstreams.contains(where: { $0.id == wsID }) }) else { return }
+        let projectID = projects[pi].id
+        WorkstreamArchiver.purge(wsID, in: &projects[pi], surfaceCache: surfaceCache, tmuxPath: appEnv.toolStatus.tmux.path)
+        rebuildIndices()
+        if case let .workstream(id) = selection, id == wsID {
+            selection = projects[pi].workstreams.first.map { .workstream($0.id) } ?? .project(projectID)
+        }
+        onProjectsChanged()
+        workstreamToPurge = nil
     }
 
     // MARK: - Project management
@@ -681,7 +710,8 @@ private struct WorkstreamRow: View {
     var prTitle: String?
     var prNumber: Int?
     var prState: String?
-    let onArchive: () -> Void
+    let onRemove: () -> Void
+    let onPurge: () -> Void
 
     @State private var isHovering = false
 
@@ -735,8 +765,8 @@ private struct WorkstreamRow: View {
 
             Spacer()
 
-            SidebarIconButton(icon: "archivebox", action: onArchive)
-                .accessibilityLabel("Archive workstream")
+            SidebarIconButton(icon: "xmark", action: onRemove)
+                .accessibilityLabel("Remove workstream")
                 .opacity(isHovering ? 1 : 0)
         }
         .frame(maxWidth: .infinity, alignment: .leading)
@@ -769,6 +799,13 @@ private struct WorkstreamRow: View {
                 } label: {
                     Label("Copy worktree path", systemImage: "doc.on.doc")
                 }
+            }
+            Divider()
+            Button(action: onRemove) {
+                Label("Remove", systemImage: "xmark")
+            }
+            Button(role: .destructive, action: onPurge) {
+                Label("Purge", systemImage: "trash")
             }
         }
     }

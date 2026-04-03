@@ -95,9 +95,9 @@ struct WorkstreamInfoView: View {
                             .foregroundStyle(.secondary)
                         Spacer()
                         Button(action: {
-                            NotificationCenter.default.post(name: .archiveWorkstream, object: workstreamID)
+                            NotificationCenter.default.post(name: .purgeWorkstream, object: workstreamID)
                         }) {
-                            Text("Archive")
+                            Text("Purge")
                                 .font(.system(size: 11, weight: .medium))
                         }
                         .buttonStyle(.borderless)

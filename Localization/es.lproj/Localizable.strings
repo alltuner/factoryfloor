@@ -25,11 +25,13 @@
 
 /* Alerts */
 "Remove Project" = "Eliminar proyecto";
-"Archive Workstream" = "Archivar flujo de trabajo";
-"Archive" = "Archivar";
-"Archive Anyway" = "Archivar de todos modos";
+"Remove Workstream" = "Eliminar flujo de trabajo";
+"Ongoing terminals and Coding Agent sessions will be killed. The worktree and its files will remain on disk." = "Los terminales y las sesiones del agente de código en curso se cerrarán. El árbol de trabajo y sus archivos permanecerán en el disco.";
+"Purge Workstream" = "Purgar flujo de trabajo";
+"Purge" = "Purgar";
+"Purge Anyway" = "Purgar de todos modos";
 "This workstream has uncommitted changes that will be lost." = "Este flujo de trabajo tiene cambios sin confirmar que se perderán.";
-"The worktree and its branch will be removed." = "El árbol de trabajo y su rama se eliminarán.";
+"The worktree and its branch will be permanently deleted." = "El árbol de trabajo y su rama se eliminarán permanentemente.";
 "Projects Not Found" = "Proyectos no encontrados";
 "The following projects were removed because their directories no longer exist on disk: %@" = "Los siguientes proyectos se eliminaron porque sus directorios ya no existen en el disco: %@";
 "Cancel" = "Cancelar";

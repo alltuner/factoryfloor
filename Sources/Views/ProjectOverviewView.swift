@@ -6,7 +6,8 @@ import SwiftUI
 struct ProjectOverviewView: View {
     @Binding var project: Project
     let onSelectWorkstream: (UUID) -> Void
-    let onArchiveWorkstream: (UUID) -> Void
+    let onRemoveWorkstream: (UUID) -> Void
+    let onPurgeWorkstream: (UUID) -> Void
     let onProjectChanged: () -> Void
 
     @EnvironmentObject var appEnv: AppEnvironment
@@ -149,7 +150,8 @@ struct ProjectOverviewView: View {
                                 workstream: workstream,
                                 shortcutNumber: index < 9 ? index + 1 : nil,
                                 onSelect: { onSelectWorkstream(workstream.id) },
-                                onArchive: { onArchiveWorkstream(workstream.id) }
+                                onRemove: { onRemoveWorkstream(workstream.id) },
+                                onPurge: { onPurgeWorkstream(workstream.id) }
                             )
                         }
                     }
@@ -424,7 +426,8 @@ private struct WorkstreamRow: View {
     let workstream: Workstream
     var shortcutNumber: Int?
     let onSelect: () -> Void
-    let onArchive: () -> Void
+    let onRemove: () -> Void
+    let onPurge: () -> Void
 
     @State private var isHovering = false
 
@@ -452,10 +455,9 @@ private struct WorkstreamRow: View {
                         .padding(.trailing, 4)
                 }
                 Button(action: {
-                    // Stop propagation to parent button
-                    onArchive()
+                    onRemove()
                 }) {
-                    Image(systemName: "archivebox")
+                    Image(systemName: "xmark")
                         .font(.system(size: 12))
                         .foregroundStyle(.secondary)
                         .frame(width: 24, height: 24)
@@ -469,5 +471,13 @@ private struct WorkstreamRow: View {
         .buttonStyle(.borderless)
         .contentShape(Rectangle())
         .onHover { isHovering = $0 }
+        .contextMenu {
+            Button(action: onRemove) {
+                Label("Remove", systemImage: "xmark")
+            }
+            Button(role: .destructive, action: onPurge) {
+                Label("Purge", systemImage: "trash")
+            }
+        }
     }
 }

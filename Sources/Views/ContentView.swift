@@ -11,7 +11,7 @@ extension Notification.Name {
     static let workstreamWorktreeReady = Notification.Name("factoryfloor.workstreamWorktreeReady")
     static let workstreamCreationFailed = Notification.Name("factoryfloor.workstreamCreationFailed")
     static let projectCreated = Notification.Name("factoryfloor.projectCreated")
-    static let archiveWorkstream = Notification.Name("factoryfloor.archiveWorkstream")
+    static let purgeWorkstream = Notification.Name("factoryfloor.purgeWorkstream")
 }
 
 final class ProjectList: ObservableObject {
@@ -37,8 +37,9 @@ struct ContentView: View {
     @StateObject private var updateChecker = UpdateChecker()
     @EnvironmentObject private var updater: Updater
     @State private var saveWork: DispatchWorkItem?
-    @State private var workstreamToArchive: UUID?
-    @State private var archiveWarningDirty = false
+    @State private var workstreamToRemove: UUID?
+    @State private var workstreamToPurge: UUID?
+    @State private var purgeWarningDirty = false
     @State private var removedProjectNames: [String] = []
     @State private var keyMonitorInstalled = false
 
@@ -113,7 +114,8 @@ struct ContentView: View {
             ProjectOverviewView(
                 project: $projectList.items[projectIndex],
                 onSelectWorkstream: { wsID in selection = .workstream(wsID) },
-                onArchiveWorkstream: { wsID in confirmArchive(wsID) },
+                onRemoveWorkstream: { wsID in workstreamToRemove = wsID },
+                onPurgeWorkstream: { wsID in confirmPurge(wsID) },
                 onProjectChanged: { ProjectStore.save(projects) }
             )
             .navigationTitle(project.name)
@@ -166,21 +168,35 @@ struct ContentView: View {
                 DispatchQueue.main.asyncAfter(deadline: .now() + 0.5, execute: work)
             }
             .alert(
-                "Archive Workstream",
+                "Remove Workstream",
                 isPresented: Binding(
-                    get: { workstreamToArchive != nil },
-                    set: { if !$0 { workstreamToArchive = nil } }
+                    get: { workstreamToRemove != nil },
+                    set: { if !$0 { workstreamToRemove = nil } }
                 )
             ) {
-                Button("Cancel", role: .cancel) { workstreamToArchive = nil }
-                Button(archiveWarningDirty ? "Archive Anyway" : "Archive", role: .destructive) {
-                    performArchive()
+                Button("Cancel", role: .cancel) { workstreamToRemove = nil }
+                Button("Remove", role: .destructive) {
+                    performRemove()
                 }
             } message: {
-                if archiveWarningDirty {
+                Text("Ongoing terminals and Coding Agent sessions will be killed. The worktree and its files will remain on disk.")
+            }
+            .alert(
+                "Purge Workstream",
+                isPresented: Binding(
+                    get: { workstreamToPurge != nil },
+                    set: { if !$0 { workstreamToPurge = nil } }
+                )
+            ) {
+                Button("Cancel", role: .cancel) { workstreamToPurge = nil }
+                Button(purgeWarningDirty ? "Purge Anyway" : "Purge", role: .destructive) {
+                    performPurge()
+                }
+            } message: {
+                if purgeWarningDirty {
                     Text("This workstream has uncommitted changes that will be lost.")
                 } else {
-                    Text("The worktree and its branch will be removed.")
+                    Text("The worktree and its branch will be permanently deleted.")
                 }
             }
             .alert(
@@ -352,9 +368,9 @@ struct ContentView: View {
             ProjectStore.save(projects)
             logger.warning("[FF] projectCreated notification handled: \(project.name, privacy: .public)")
         }
-        .onReceive(NotificationCenter.default.publisher(for: .archiveWorkstream)) { notification in
+        .onReceive(NotificationCenter.default.publisher(for: .purgeWorkstream)) { notification in
             if let wsID = notification.object as? UUID {
-                confirmArchive(wsID)
+                confirmPurge(wsID)
             }
         }
         .onReceive(Timer.publish(every: 15, on: .main, in: .common).autoconnect()) { _ in
@@ -429,22 +445,30 @@ struct ContentView: View {
         }
     }
 
-    private func confirmArchive(_ wsID: UUID) {
+    private func confirmPurge(_ wsID: UUID) {
         let ws = projects.flatMap(\.workstreams).first(where: { $0.id == wsID })
         if let path = ws?.worktreePath, GitOperations.hasUncommittedChanges(at: path) {
-            archiveWarningDirty = true
+            purgeWarningDirty = true
         } else {
-            archiveWarningDirty = false
+            purgeWarningDirty = false
         }
-        workstreamToArchive = wsID
+        workstreamToPurge = wsID
     }
 
-    private func performArchive() {
-        guard let wsID = workstreamToArchive,
+    private func performRemove() {
+        guard let wsID = workstreamToRemove,
               let projectIndex = projects.firstIndex(where: { $0.workstreams.contains(where: { $0.id == wsID }) }) else { return }
-        WorkstreamArchiver.archive(wsID, in: &projects[projectIndex], surfaceCache: surfaceCache, tmuxPath: appEnvironment.toolStatus.tmux.path)
+        WorkstreamArchiver.remove(wsID, in: &projects[projectIndex], surfaceCache: surfaceCache, tmuxPath: appEnvironment.toolStatus.tmux.path)
         ProjectStore.save(projects)
-        workstreamToArchive = nil
+        workstreamToRemove = nil
+    }
+
+    private func performPurge() {
+        guard let wsID = workstreamToPurge,
+              let projectIndex = projects.firstIndex(where: { $0.workstreams.contains(where: { $0.id == wsID }) }) else { return }
+        WorkstreamArchiver.purge(wsID, in: &projects[projectIndex], surfaceCache: surfaceCache, tmuxPath: appEnvironment.toolStatus.tmux.path)
+        ProjectStore.save(projects)
+        workstreamToPurge = nil
     }
 }
 

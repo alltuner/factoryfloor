@@ -25,11 +25,13 @@
 
 /* Alerts */
 "Remove Project" = "Remove Project";
-"Archive Workstream" = "Archive Workstream";
-"Archive" = "Archive";
-"Archive Anyway" = "Archive Anyway";
+"Remove Workstream" = "Remove Workstream";
+"Ongoing terminals and Coding Agent sessions will be killed. The worktree and its files will remain on disk." = "Ongoing terminals and Coding Agent sessions will be killed. The worktree and its files will remain on disk.";
+"Purge Workstream" = "Purge Workstream";
+"Purge" = "Purge";
+"Purge Anyway" = "Purge Anyway";
 "This workstream has uncommitted changes that will be lost." = "This workstream has uncommitted changes that will be lost.";
-"The worktree and its branch will be removed." = "The worktree and its branch will be removed.";
+"The worktree and its branch will be permanently deleted." = "The worktree and its branch will be permanently deleted.";
 "Projects Not Found" = "Projects Not Found";
 "The following projects were removed because their directories no longer exist on disk: %@" = "The following projects were removed because their directories no longer exist on disk: %@";
 "Cancel" = "Cancel";

@@ -25,11 +25,13 @@
 
 /* Alerts */
 "Remove Project" = "Ta bort projekt";
-"Archive Workstream" = "Arkivera arbetsflöde";
-"Archive" = "Arkivera";
-"Archive Anyway" = "Arkivera ändå";
+"Remove Workstream" = "Ta bort arbetsflöde";
+"Ongoing terminals and Coding Agent sessions will be killed. The worktree and its files will remain on disk." = "Pågående terminaler och kodningsagentsessioner kommer att avslutas. Arbetsträdet och dess filer förblir på disken.";
+"Purge Workstream" = "Rensa arbetsflöde";
+"Purge" = "Rensa";
+"Purge Anyway" = "Rensa ändå";
 "This workstream has uncommitted changes that will be lost." = "Detta arbetsflöde har osparade ändringar som kommer att gå förlorade.";
-"The worktree and its branch will be removed." = "Arbetsträdet och dess gren kommer att tas bort.";
+"The worktree and its branch will be permanently deleted." = "Arbetsträdet och dess gren kommer att raderas permanent.";
 "Projects Not Found" = "Projekt hittades inte";
 "The following projects were removed because their directories no longer exist on disk: %@" = "Följande projekt togs bort eftersom deras kataloger inte längre finns på disken: %@";
 "Cancel" = "Avbryt";
