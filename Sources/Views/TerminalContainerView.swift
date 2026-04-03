@@ -225,10 +225,11 @@ struct TerminalContainerView: View {
     }
 
     private var portSubtitle: String {
+        let label = appEnv.taskDescription(for: workingDirectory) ?? projectName
         if let port = portDetector.selectedPort {
-            return "localhost:\(port) · \u{2318}B for browser"
+            return "\(label) · localhost:\(port) · \u{2318}B for browser"
         }
-        return projectName
+        return label
     }
 
     private var browserDefaultURL: String {
