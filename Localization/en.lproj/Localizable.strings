@@ -248,6 +248,7 @@
 /* Help */
 "Sponsor" = "Sponsor";
 "Report a Bug" = "Report a Bug";
+"Documentation" = "Documentation";
 "Request a Feature" = "Request a Feature";
 "Rebuild" = "Rebuild";
 "Rerun" = "Rerun";

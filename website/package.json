@@ -4,7 +4,8 @@
   "scripts": {
     "css:build": "bunx @tailwindcss/cli -i css/input.css -o assets/css/style.css --minify",
     "css:watch": "bunx @tailwindcss/cli -i css/input.css -o assets/css/style.css --watch",
-    "assets": "bun run css:build",
+    "changelog": "cd .. && { echo '---'; echo 'title: Changelog'; echo 'layout: changelog'; echo 'hideInstall: true'; echo 'translationKey: changelog'; echo '---'; sed -e '1{/^# Changelog$/d;}' -e 's|compare/v[0-9.]*\\.\\.\\.v\\([0-9.]*\\)|releases/tag/v\\1|g' CHANGELOG.md; } > website/content/changelog.md && for lang in ca es sv; do cp website/content/changelog.md website/content/$lang/changelog.md; done",
+    "assets": "bun run css:build && bun run changelog",
     "build": "bun run assets && hugo",
     "dev": "bun run assets && hugo serve --disableFastRender --gc"
   },

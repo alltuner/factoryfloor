@@ -1,0 +1,29 @@
+name: "AI Fix Prompt"
+description: Describe the fix as a prompt we can hand to the coding agent
+labels: ["ai-prompt"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        **This is the fun one.** Instead of just describing a bug or feature, write the prompt you'd give to a coding agent to fix it. We'll literally paste it into a workstream and let the agent take a crack at it.
+  - type: textarea
+    id: prompt
+    attributes:
+      label: The prompt
+      description: Write it as if you're talking to Claude Code in a Factory Floor workstream. Be specific about files, behavior, and expected outcome.
+      placeholder: |
+        In Sources/Views/BrowserView.swift, the address bar doesn't auto-focus
+        when opening a new browser tab with ⌘B. The focus should move to the
+        URL text field so the user can immediately type a URL.
+
+        Look at how TerminalContainerView handles focus on new tab creation
+        for reference.
+    validations:
+      required: true
+  - type: textarea
+    id: context
+    attributes:
+      label: Context
+      description: Anything else the agent (or a human reviewer) should know. Version, screenshots, related issues.
+    validations:
+      required: false

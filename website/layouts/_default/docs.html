@@ -1,0 +1,73 @@
+{{ define "content" }}
+{{ partial "nav.html" . }}
+
+<section class="min-h-screen flex flex-col pt-20 pb-16">
+  <div class="max-w-[1100px] mx-auto px-8 w-full">
+    <div class="xl:flex xl:gap-12">
+      <!-- Sidebar TOC (sticky on wide screens, inline card grid on narrow) -->
+      <nav class="docs-toc mb-10 xl:mb-0 xl:w-56 xl:shrink-0 xl:order-first xl:sticky xl:top-24 xl:self-start xl:max-h-[calc(100vh-8rem)] xl:overflow-y-auto xl:pr-2
+        [&_#TableOfContents>ul]:xl:flex [&_#TableOfContents>ul]:xl:flex-col [&_#TableOfContents>ul]:xl:gap-4
+        [&_#TableOfContents>ul]:grid [&_#TableOfContents>ul]:grid-cols-2 [&_#TableOfContents>ul]:sm:grid-cols-3 [&_#TableOfContents>ul]:xl:grid-cols-1 [&_#TableOfContents>ul]:gap-3
+        [&_#TableOfContents>ul]:list-none [&_#TableOfContents>ul]:pl-0
+        [&_#TableOfContents>ul>li]:relative
+        [&_#TableOfContents>ul>li]:xl:border-none [&_#TableOfContents>ul>li]:xl:rounded-none [&_#TableOfContents>ul>li]:xl:p-0 [&_#TableOfContents>ul>li]:xl:bg-transparent
+        [&_#TableOfContents>ul>li]:border [&_#TableOfContents>ul>li]:border-fg-faint [&_#TableOfContents>ul>li]:rounded-lg [&_#TableOfContents>ul>li]:p-0 [&_#TableOfContents>ul>li]:bg-bg-surface/30
+        [&_#TableOfContents>ul>li]:transition-all [&_#TableOfContents>ul>li]:hover:border-wine/40 [&_#TableOfContents>ul>li]:hover:bg-bg-surface/60 [&_#TableOfContents>ul>li]:xl:hover:border-none [&_#TableOfContents>ul>li]:xl:hover:bg-transparent
+        [&_#TableOfContents>ul>li>a]:font-mono [&_#TableOfContents>ul>li>a]:text-xs [&_#TableOfContents>ul>li>a]:font-bold [&_#TableOfContents>ul>li>a]:uppercase [&_#TableOfContents>ul>li>a]:tracking-wider [&_#TableOfContents>ul>li>a]:text-fg [&_#TableOfContents>ul>li>a]:no-underline [&_#TableOfContents>ul>li>a]:block
+        [&_#TableOfContents>ul>li>a]:px-3 [&_#TableOfContents>ul>li>a]:py-2.5 [&_#TableOfContents>ul>li>a]:xl:px-0 [&_#TableOfContents>ul>li>a]:xl:py-0 [&_#TableOfContents>ul>li>a]:xl:mb-1.5
+        [&_#TableOfContents>ul>li>a]:xl:text-fg-muted [&_#TableOfContents>ul>li>a]:xl:hover:text-fg [&_#TableOfContents>ul>li>a]:xl:transition-colors
+        [&_#TableOfContents>ul>li>ul]:hidden [&_#TableOfContents>ul>li>ul]:xl:block
+        [&_#TableOfContents>ul>li>ul]:list-none [&_#TableOfContents>ul>li>ul]:pl-0 [&_#TableOfContents>ul>li>ul]:m-0
+        [&_#TableOfContents>ul>li>ul>li]:mb-0.5
+        [&_#TableOfContents>ul>li>ul>li>a]:font-mono [&_#TableOfContents>ul>li>ul>li>a]:text-xs [&_#TableOfContents>ul>li>ul>li>a]:text-wine-light [&_#TableOfContents>ul>li>ul>li>a]:no-underline [&_#TableOfContents>ul>li>ul>li>a]:hover:text-fg [&_#TableOfContents>ul>li>ul>li>a]:transition-colors
+        [&_#TableOfContents>ul>li>ul>li:empty]:hidden">
+        {{ .TableOfContents }}
+      </nav>
+
+      <!-- Main content -->
+      <div class="docs-content xl:flex-1 xl:min-w-0
+        [&>h1]:font-mono [&>h1]:!text-3xl [&>h1]:!font-bold [&>h1]:mb-2 [&>h1]:!text-fg
+        [&>h1+p]:text-fg-muted [&>h1+p]:!text-sm [&>h1+p]:!mb-10
+        [&>h2]:font-mono [&>h2]:text-xl [&>h2]:font-bold [&>h2]:mt-16 [&>h2]:mb-2
+        [&>h2]:pt-6 [&>h2]:border-t-2 [&>h2]:border-wine/30
+        [&>h2:first-of-type]:border-t-0 [&>h2:first-of-type]:mt-0 [&>h2:first-of-type]:pt-0
+        [&>h3]:font-mono [&>h3]:text-base [&>h3]:font-semibold [&>h3]:mt-10 [&>h3]:mb-3
+        [&>h3]:pl-3 [&>h3]:border-l-2 [&>h3]:border-wine/40
+        [&>h4]:font-mono [&>h4]:text-sm [&>h4]:font-semibold [&>h4]:mt-6 [&>h4]:mb-2 [&>h4]:text-fg-muted
+        [&>p]:text-sm [&>p]:text-fg-muted [&>p]:leading-relaxed [&>p]:mb-4
+        [&>p>a]:text-wine-light [&>p>a]:no-underline [&>p>a]:hover:underline
+        [&>p>code]:font-mono [&>p>code]:text-xs [&>p>code]:text-fg-dim [&>p>code]:bg-bg-surface [&>p>code]:px-1.5 [&>p>code]:py-0.5 [&>p>code]:rounded
+        [&>p>strong]:text-fg [&>p>strong]:font-medium
+        [&>p>em]:text-fg-dim
+        [&>ul]:mb-4 [&>ul]:pl-0 [&>ul]:list-none
+        [&>ul>li]:relative [&>ul>li]:pl-4 [&>ul>li]:mb-1.5 [&>ul>li]:text-sm [&>ul>li]:text-fg-muted [&>ul>li]:leading-relaxed
+        [&>ul>li]:before:content-['›'] [&>ul>li]:before:absolute [&>ul>li]:before:left-0 [&>ul>li]:before:text-wine-light [&>ul>li]:before:font-mono
+        [&>ul>li>code]:font-mono [&>ul>li>code]:text-xs [&>ul>li>code]:text-fg-dim [&>ul>li>code]:bg-bg-surface [&>ul>li>code]:px-1.5 [&>ul>li>code]:py-0.5 [&>ul>li>code]:rounded
+        [&>ul>li>strong]:text-fg [&>ul>li>strong]:font-medium
+        [&>ul>li>a]:text-wine-light [&>ul>li>a]:no-underline [&>ul>li>a]:hover:underline
+        [&>ol]:mb-4 [&>ol]:pl-0 [&>ol]:list-decimal [&>ol]:list-inside
+        [&>ol>li]:text-sm [&>ol>li]:text-fg-muted [&>ol>li]:leading-relaxed [&>ol>li]:mb-1.5 [&>ol>li]:marker:text-wine-light [&>ol>li]:marker:font-mono
+        [&>ol>li>code]:font-mono [&>ol>li>code]:text-xs [&>ol>li>code]:text-fg-dim [&>ol>li>code]:bg-bg-surface [&>ol>li>code]:px-1.5 [&>ol>li>code]:py-0.5 [&>ol>li>code]:rounded
+        [&>ol>li>strong]:text-fg [&>ol>li>strong]:font-medium
+        [&>pre]:mb-6 [&>pre]:bg-bg-surface [&>pre]:rounded-lg [&>pre]:p-4 [&>pre]:overflow-x-auto [&>pre]:border [&>pre]:border-fg-faint
+        [&>pre>code]:font-mono [&>pre>code]:text-xs [&>pre>code]:text-fg-dim
+        [&>.highlight]:mb-6 [&>.highlight>pre]:rounded-lg [&>.highlight>pre]:p-4 [&>.highlight>pre]:overflow-x-auto [&>.highlight>pre]:border [&>.highlight>pre]:border-fg-faint
+        [&>.highlight>pre>code]:font-mono [&>.highlight>pre>code]:text-xs
+        [&>table]:mb-4 [&>table]:w-full [&>table]:text-sm [&>table]:border-collapse
+        [&>table>thead>tr>th]:font-mono [&>table>thead>tr>th]:text-xs [&>table>thead>tr>th]:font-semibold [&>table>thead>tr>th]:uppercase [&>table>thead>tr>th]:tracking-wider [&>table>thead>tr>th]:text-fg-muted [&>table>thead>tr>th]:text-left [&>table>thead>tr>th]:pb-2 [&>table>thead>tr>th]:border-b [&>table>thead>tr>th]:border-fg-faint
+        [&>table>tbody>tr>td]:py-2 [&>table>tbody>tr>td]:text-fg-muted [&>table>tbody>tr>td]:border-b [&>table>tbody>tr>td]:border-fg-faint/30
+        [&>table>tbody>tr>td>code]:font-mono [&>table>tbody>tr>td>code]:text-xs [&>table>tbody>tr>td>code]:text-fg-dim [&>table>tbody>tr>td>code]:bg-bg-surface [&>table>tbody>tr>td>code]:px-1.5 [&>table>tbody>tr>td>code]:py-0.5 [&>table>tbody>tr>td>code]:rounded
+        [&>blockquote]:mb-4 [&>blockquote]:border-l-2 [&>blockquote]:border-wine/40 [&>blockquote]:pl-4 [&>blockquote]:italic
+        [&>blockquote>p]:text-fg-dim [&>blockquote>p]:text-sm
+        [&>hr]:my-10 [&>hr]:border-fg-faint/30
+        [&_.docs-download]:inline-flex [&_.docs-download]:items-center [&_.docs-download]:gap-1.5 [&_.docs-download]:bg-wine [&_.docs-download]:!text-[#F7F4F3] [&_.docs-download]:px-3 [&_.docs-download]:py-1.5 [&_.docs-download]:rounded-md [&_.docs-download]:text-xs [&_.docs-download]:no-underline [&_.docs-download]:transition-all [&_.docs-download]:hover:bg-wine-light [&_.docs-download]:hover:-translate-y-px [&_.docs-download]:font-mono">
+        <h1>{{ .Title }}</h1>
+        <p>{{ T "docs_subtitle" }}</p>
+        {{ .Content }}
+      </div>
+    </div>
+  </div>
+</section>
+
+{{ partial "footer.html" . }}
+{{ end }}

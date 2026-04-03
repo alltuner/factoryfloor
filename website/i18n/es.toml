@@ -11,7 +11,7 @@ other = "Cómo funciona"
 other = "Configuración"
 
 [hero_badge]
-other = "Gratis y open source · macOS nativo · Terminal Ghostty"
+other = "Open Source"
 [hero_title_1]
 other = "Tu"
 [hero_title_accent]
@@ -223,6 +223,12 @@ other = "Instalar"
 other = "Actualizar"
 [get_download]
 other = "Descargar desde GitHub Releases"
+
+# Docs
+[nav_docs]
+other = "Docs"
+[docs_subtitle]
+other = "Todo lo que necesitas saber, nada de lo que no."
 
 # Changelog
 [changelog_subtitle]

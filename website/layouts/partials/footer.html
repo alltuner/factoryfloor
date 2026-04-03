@@ -18,25 +18,25 @@
         <!-- Language switcher -->
         <div class="flex items-center gap-2 text-xs font-mono">
           {{ $currentLang := .Site.Language.Lang }}
-          {{/* Get the page path without the language prefix */}}
           {{ $pagePath := .RelPermalink }}
           {{ if ne $currentLang "en" }}
             {{ $pagePath = strings.TrimPrefix (printf "/%s" $currentLang) .RelPermalink }}
           {{ end }}
-          {{ $langs := sort .Site.Languages ".Weight" "asc" }}
-          {{ range $i, $lang := $langs }}
-            {{ if eq $lang.Lang $currentLang }}
-              <span class="text-fg uppercase font-semibold">{{ $lang.Lang }}</span>
+          {{ $codes := slice "en" "ca" "es" "sv" }}
+          {{ range $i, $code := $codes }}
+            {{ $href := $pagePath }}
+            {{ if ne $code "en" }}{{ $href = printf "/%s%s" $code $pagePath }}{{ end }}
+            {{ if eq $code $currentLang }}
+              <span class="text-fg uppercase font-semibold">{{ $code }}</span>
             {{ else }}
-              {{ $href := $pagePath }}
-              {{ if ne $lang.Lang "en" }}{{ $href = printf "/%s%s" $lang.Lang $pagePath }}{{ end }}
-              <a href="{{ $href }}" class="text-fg-muted no-underline hover:text-fg transition-colors uppercase">{{ $lang.Lang }}</a>
+              <a href="{{ $href }}" class="text-fg-muted no-underline hover:text-fg transition-colors uppercase">{{ $code }}</a>
             {{ end }}
-            {{ if lt $i (sub (len $langs) 1) }}<span class="text-fg-faint">|</span>{{ end }}
+            {{ if lt $i 3 }}<span class="text-fg-faint">|</span>{{ end }}
           {{ end }}
         </div>
         <span class="text-fg-faint">|</span>
-        <a href="/changelog" class="font-mono text-xs text-fg-muted no-underline transition-colors hover:text-fg">Changelog</a>
+        <a href="{{ "docs" | relLangURL }}" class="font-mono text-xs text-fg-muted no-underline transition-colors hover:text-fg">{{ T "nav_docs" }}</a>
+        <a href="{{ "changelog" | relLangURL }}" class="font-mono text-xs text-fg-muted no-underline transition-colors hover:text-fg">Changelog</a>
         <a href="{{ .Site.Params.githubURL }}" class="font-mono text-xs text-fg-muted no-underline transition-colors hover:text-fg">GitHub</a>
         <a href="https://davidpoblador.com" class="font-mono text-xs text-fg-muted no-underline transition-colors hover:text-fg">{{ T "footer_contact" }}</a>
         <a href="{{ $langPrefix }}/legal/privacy" class="font-mono text-xs text-fg-muted no-underline transition-colors hover:text-fg">{{ T "footer_privacy" }}</a>

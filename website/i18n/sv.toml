@@ -10,7 +10,7 @@ other = "Hur det funkar"
 other = "Config"
 
 [hero_badge]
-other = "Gratis och open source · macOS-native · Ghostty-terminal"
+other = "Open Source"
 [hero_title_1]
 other = "Din"
 [hero_title_accent]
@@ -222,6 +222,12 @@ other = "Installera"
 other = "Uppgradera"
 [get_download]
 other = "Ladda ner från GitHub Releases"
+
+# Docs
+[nav_docs]
+other = "Docs"
+[docs_subtitle]
+other = "Allt du behöver veta, inget du inte behöver."
 
 # Changelog
 [changelog_subtitle]

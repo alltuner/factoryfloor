@@ -1,0 +1,47 @@
+name: Bug Report
+description: Something isn't working right
+labels: ["bug"]
+body:
+  - type: textarea
+    id: what-happened
+    attributes:
+      label: What happened?
+      description: Tell us what went wrong. Be as specific as you can.
+      placeholder: "I clicked X, expected Y, but got Z instead."
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce
+      description: How can we make it happen again?
+      placeholder: |
+        1. Open Factory Floor
+        2. Create a workstream
+        3. ...
+    validations:
+      required: false
+  - type: input
+    id: version
+    attributes:
+      label: App version
+      description: "Check with ⌘/ in the app"
+      placeholder: "0.1.65"
+    validations:
+      required: false
+  - type: dropdown
+    id: install-method
+    attributes:
+      label: Install method
+      options:
+        - Homebrew
+        - DMG
+    validations:
+      required: false
+  - type: textarea
+    id: logs
+    attributes:
+      label: Logs or screenshots
+      description: Anything that helps. Enable Settings > Advanced > Detailed logging for script issues.
+    validations:
+      required: false

@@ -4,10 +4,12 @@
 import SwiftUI
 
 struct HelpView: View {
-    private var sponsorURL: URL {
-        let lang = Locale.current.language.languageCode?.identifier ?? "en"
-        let path = lang == "en" ? "/sponsor" : "/\(lang)/sponsor"
-        return URL(string: "https://factory-floor.com\(path)")!
+    private var localizedURL: (_ page: String) -> URL {
+        { page in
+            let lang = Locale.current.language.languageCode?.identifier ?? "en"
+            let path = lang == "en" ? "/\(page)" : "/\(lang)/\(page)"
+            return URL(string: "https://factory-floor.com\(path)")!
+        }
     }
 
     var body: some View {
@@ -40,7 +42,7 @@ struct HelpView: View {
                     HStack(spacing: 0) {
                         Text("Help ")
                             .foregroundStyle(.tertiary)
-                        Link("supporting", destination: URL(string: "https://factory-floor.com/sponsor")!)
+                        Link("supporting", destination: localizedURL("sponsor"))
                             .foregroundStyle(.secondary)
                         Text(" the development.")
                             .foregroundStyle(.tertiary)
@@ -53,13 +55,16 @@ struct HelpView: View {
                     .padding(.vertical, -4)
 
                 HStack(spacing: 16) {
-                    Link(destination: sponsorURL) {
+                    Link(destination: localizedURL("docs")) {
+                        Label("Documentation", systemImage: "book")
+                    }
+                    Link(destination: localizedURL("sponsor")) {
                         Label("Sponsor", systemImage: "heart")
                     }
-                    Link(destination: URL(string: "https://github.com/alltuner/factoryfloor/issues/new?template=bug_report.md")!) {
+                    Link(destination: URL(string: "https://github.com/alltuner/factoryfloor/issues/new?template=bug_report.yml")!) {
                         Label("Report a Bug", systemImage: "ladybug")
                     }
-                    Link(destination: URL(string: "https://github.com/alltuner/factoryfloor/issues/new?template=feature_request.md")!) {
+                    Link(destination: URL(string: "https://github.com/alltuner/factoryfloor/issues/new?template=feature_request.yml")!) {
                         Label("Request a Feature", systemImage: "lightbulb")
                     }
                 }

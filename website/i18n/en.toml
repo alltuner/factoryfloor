@@ -12,7 +12,7 @@ other = "Config"
 
 # Hero
 [hero_badge]
-other = "Free & open source · macOS native · Ghostty terminal"
+other = "Open Source"
 [hero_title_1]
 other = "Your"
 [hero_title_accent]
@@ -230,6 +230,12 @@ other = "Install"
 other = "Upgrade"
 [get_download]
 other = "Download from GitHub Releases"
+
+# Docs
+[nav_docs]
+other = "Docs"
+[docs_subtitle]
+other = "Everything you need to know, nothing you don't."
 
 # Changelog
 [changelog_subtitle]

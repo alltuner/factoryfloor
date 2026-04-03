@@ -1,0 +1,26 @@
+name: Feature Request
+description: Got an idea? We're listening.
+labels: ["enhancement"]
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: What problem does this solve?
+      description: What's annoying, missing, or could be better?
+      placeholder: "I keep having to do X manually when I really wish..."
+    validations:
+      required: true
+  - type: textarea
+    id: solution
+    attributes:
+      label: What would the ideal solution look like?
+      description: Describe how you'd want it to work. Dream big, we'll scope it down.
+    validations:
+      required: false
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives you've considered
+      description: Workarounds, other tools, or approaches you've tried.
+    validations:
+      required: false

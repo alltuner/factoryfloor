@@ -12,7 +12,7 @@ other = "Configuració"
 
 # Hero
 [hero_badge]
-other = "Gratuït i open source · macOS natiu · Terminal Ghostty"
+other = "Open Source"
 [hero_title_1]
 other = "El teu"
 [hero_title_accent]
@@ -230,6 +230,12 @@ other = "Instal·lar"
 other = "Actualitzar"
 [get_download]
 other = "Descarrega des de GitHub Releases"
+
+# Docs
+[nav_docs]
+other = "Docs"
+[docs_subtitle]
+other = "Tot el que necessites saber, res del que no."
 
 # Changelog
 [changelog_subtitle]
