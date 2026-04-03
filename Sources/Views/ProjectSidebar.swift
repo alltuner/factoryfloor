@@ -326,6 +326,9 @@ struct ProjectSidebar: View {
             projects[pi].lastAccessedAt = now
             projects[pi].workstreams[wi].lastAccessedAt = now
             onProjectsChanged()
+            if sortOrder == .recent {
+                cachedSortedIDs = recomputeSortedIDs()
+            }
         }
         .onAppear {
             cachedSortedIDs = recomputeSortedIDs()
