@@ -367,6 +367,8 @@ struct ContentView: View {
             projects.append(project)
             selection = .project(project.id)
             ProjectStore.save(projects)
+            appEnvironment.refreshPathValidity(projects: projects)
+            appEnvironment.refreshAllRepoInfo(projects: projects)
             logger.warning("[FF] projectCreated notification handled: \(project.name, privacy: .public)")
         }
         .onReceive(NotificationCenter.default.publisher(for: .purgeWorkstream)) { notification in
