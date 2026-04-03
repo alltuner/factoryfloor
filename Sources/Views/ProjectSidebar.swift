@@ -554,6 +554,20 @@ private func copyTextToPasteboard(_ text: String) {
     NSPasteboard.general.setString(text, forType: .string)
 }
 
+/// Opens a directory in the user's configured terminal, falling back to Apple Terminal.
+private func openDirectoryInTerminal(_ directory: String) {
+    let terminalBundleID = UserDefaults.standard.string(forKey: "factoryfloor.defaultTerminal") ?? ""
+    let appURL: URL?
+    if !terminalBundleID.isEmpty {
+        appURL = NSWorkspace.shared.urlForApplication(withBundleIdentifier: terminalBundleID)
+    } else {
+        appURL = NSWorkspace.shared.urlForApplication(withBundleIdentifier: "com.apple.Terminal")
+    }
+    guard let appURL else { return }
+    let config = NSWorkspace.OpenConfiguration()
+    NSWorkspace.shared.open([URL(fileURLWithPath: directory)], withApplicationAt: appURL, configuration: config)
+}
+
 private struct ProjectHeaderRow: View {
     let project: Project
     let isExpanded: Bool
@@ -638,6 +652,17 @@ private struct ProjectHeaderRow: View {
         .onHover { isHovering = $0 }
         .contextMenu {
             Button {
+                NSWorkspace.shared.selectFile(nil, inFileViewerRootedAtPath: project.directory)
+            } label: {
+                Label("Reveal in Finder", systemImage: "folder")
+            }
+            Button {
+                openDirectoryInTerminal(project.directory)
+            } label: {
+                Label("Open in External Terminal", systemImage: "terminal")
+            }
+            Divider()
+            Button {
                 copyTextToPasteboard(project.directory)
             } label: {
                 Label("Copy project path", systemImage: "doc.on.doc")
@@ -709,6 +734,19 @@ private struct WorkstreamRow: View {
         .contentShape(Rectangle())
         .onHover { isHovering = $0 }
         .contextMenu {
+            if let worktreePath {
+                Button {
+                    NSWorkspace.shared.selectFile(nil, inFileViewerRootedAtPath: worktreePath)
+                } label: {
+                    Label("Reveal in Finder", systemImage: "folder")
+                }
+                Button {
+                    openDirectoryInTerminal(worktreePath)
+                } label: {
+                    Label("Open in External Terminal", systemImage: "terminal")
+                }
+                Divider()
+            }
             if let branchName {
                 Button {
                     copyTextToPasteboard(branchName)

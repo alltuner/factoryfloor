@@ -165,6 +165,11 @@
 "Opens the current workstream directory" = "Abre el directorio del flujo de trabajo actual";
 "Open in external browser" = "Abrir en navegador externo";
 "Open in external terminal" = "Abrir en terminal externo";
+"Open in External Terminal" = "Abrir en terminal externo";
+"Reveal in Finder" = "Mostrar en Finder";
+"Copy project path" = "Copiar ruta del proyecto";
+"Copy branch name" = "Copiar nombre de la rama";
+"Copy worktree path" = "Copiar ruta del worktree";
 
 /* Agent tab - Claude not installed */
 "Claude Code not found" = "Claude Code no encontrado";
