@@ -133,6 +133,105 @@ final class CommandBuilderTests: XCTestCase {
         XCTAssertTrue(result.contains("--session-id"))
     }
 
+    // MARK: - shellQuote forShell (Fish-safe quoting)
+
+    func testShellQuoteForPosixShellUsesSingleQuotes() {
+        let result = CommandBuilder.shellQuote("it's a test", forShell: "/bin/zsh")
+        XCTAssertEqual(result, "'it'\\''s a test'")
+    }
+
+    func testShellQuoteForFishUsesDoubleQuotes() {
+        let result = CommandBuilder.shellQuote("it's a test", forShell: "/opt/homebrew/bin/fish")
+        XCTAssertTrue(result.hasPrefix("\""), "Fish quoting should use double quotes")
+        XCTAssertTrue(result.hasSuffix("\""), "Fish quoting should use double quotes")
+        XCTAssertTrue(result.contains("it's a test"), "Single quotes should pass through in double-quoted strings")
+    }
+
+    func testShellQuoteForFishEscapesDollarSign() {
+        let result = CommandBuilder.shellQuote("echo $HOME", forShell: "/usr/local/bin/fish")
+        XCTAssertTrue(result.contains("\\$HOME"), "Dollar signs must be escaped for Fish double quotes")
+    }
+
+    func testShellQuoteForFishEscapesBackslash() {
+        let result = CommandBuilder.shellQuote("path\\to", forShell: "/opt/homebrew/bin/fish")
+        XCTAssertTrue(result.contains("\\\\"), "Backslashes must be escaped for Fish double quotes")
+    }
+
+    func testShellQuoteForFishEscapesDoubleQuotes() {
+        let result = CommandBuilder.shellQuote("say \"hello\"", forShell: "/opt/homebrew/bin/fish")
+        XCTAssertTrue(result.contains("\\\"hello\\\""), "Double quotes must be escaped for Fish")
+    }
+
+    func testShellQuoteForFishEscapesBackticks() {
+        let result = CommandBuilder.shellQuote("run `cmd`", forShell: "/opt/homebrew/bin/fish")
+        XCTAssertTrue(result.contains("\\`cmd\\`"), "Backticks must be escaped for Fish")
+    }
+
+    func testShellQuoteForFishSimpleStringStaysUnquoted() {
+        let result = CommandBuilder.shellQuote("/usr/bin/test", forShell: "/opt/homebrew/bin/fish")
+        XCTAssertEqual(result, "/usr/bin/test", "Simple strings need no quoting even for Fish")
+    }
+
+    func testWithFallbackFish() {
+        let result = CommandBuilder.withFallback("cmd1", "cmd2", shell: "/opt/homebrew/bin/fish")
+        XCTAssertTrue(result.hasPrefix("/opt/homebrew/bin/fish -lic \""), "Fish withFallback should use double quotes")
+        XCTAssertTrue(result.contains("exec sh -c"), "Should still use sh for POSIX syntax")
+        XCTAssertTrue(result.contains("cmd1 || cmd2"))
+    }
+
+    // MARK: - Shell syntax validation (integration tests)
+
+    // These tests invoke real shell binaries to verify generated commands parse correctly.
+    // Ghostty passes commands to /bin/sh -c, so that's what we simulate here.
+
+    private func assertShellCanParse(_ command: String, file: StaticString = #filePath, line: UInt = #line) throws {
+        // Replace -lic with -nc: keeps -c (command string) but adds -n (no-execute/syntax-only)
+        let syntaxCheck = command.replacingOccurrences(of: " -lic ", with: " -nc ")
+
+        let process = Process()
+        process.executableURL = URL(fileURLWithPath: "/bin/sh")
+        process.arguments = ["-c", syntaxCheck]
+        let errPipe = Pipe()
+        process.standardError = errPipe
+        process.standardOutput = FileHandle.nullDevice
+        try process.run()
+        process.waitUntilExit()
+
+        if process.terminationStatus != 0 {
+            let errData = errPipe.fileHandleForReading.readDataToEndOfFile()
+            let errMsg = String(data: errData, encoding: .utf8) ?? "(no stderr)"
+            XCTFail("Shell failed to parse command (exit \(process.terminationStatus)): \(errMsg)", file: file, line: line)
+        }
+    }
+
+    private func fallbackCommand(shell: String) -> String {
+        var cmd1 = CommandBuilder("claude")
+        cmd1.option("--name", "my workstream")
+        var cmd2 = CommandBuilder("claude")
+        cmd2.option("--session-id", "abc-123")
+        return CommandBuilder.withFallback(
+            cmd1.command, cmd2.command,
+            message: "it's retrying",
+            shell: shell
+        )
+    }
+
+    func testWithFallbackParsesInZsh() throws {
+        try assertShellCanParse(fallbackCommand(shell: "/bin/zsh"))
+    }
+
+    func testWithFallbackParsesInBash() throws {
+        try assertShellCanParse(fallbackCommand(shell: "/bin/bash"))
+    }
+
+    func testWithFallbackParsesInFish() throws {
+        let fishPath = "/opt/homebrew/bin/fish"
+        guard FileManager.default.fileExists(atPath: fishPath) else {
+            throw XCTSkip("Fish not installed at \(fishPath)")
+        }
+        try assertShellCanParse(fallbackCommand(shell: fishPath))
+    }
+
     // MARK: - Real-world command patterns
 
     func testClaudeResumeCommand() {

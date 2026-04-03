@@ -76,6 +76,92 @@ final class TmuxSessionTests: XCTestCase {
         XCTAssertTrue(command.contains("\\$project"))
     }
 
+    func testWrapCommandFishUsesDoubleQuotes() {
+        let command = TmuxSession.wrapCommand(
+            tmuxPath: "/opt/homebrew/bin/tmux",
+            sessionName: "proj/ws/agent",
+            command: "claude",
+            respawnOnExit: true,
+            shell: "/opt/homebrew/bin/fish"
+        )
+        XCTAssertTrue(command.hasPrefix("/opt/homebrew/bin/fish -lic \""), "Fish should use double-quote wrapping")
+        XCTAssertTrue(command.contains("exec sh -c"), "Should still use sh for POSIX syntax")
+        XCTAssertTrue(command.contains("new-session -A -s"))
+        XCTAssertTrue(command.contains("claude"))
+    }
+
+    func testWrapCommandFishDoesNotContainPosixQuoteEscape() {
+        let command = TmuxSession.wrapCommand(
+            tmuxPath: "/opt/homebrew/bin/tmux",
+            sessionName: "proj/ws/agent",
+            command: "claude",
+            shell: "/opt/homebrew/bin/fish"
+        )
+        // The outermost layer should NOT contain '\'' which Fish can't parse
+        let outerQuoteEnd = command.index(command.startIndex, offsetBy: "/opt/homebrew/bin/fish -lic ".count)
+        let outerArg = String(command[outerQuoteEnd...])
+        XCTAssertTrue(outerArg.hasPrefix("\""), "Outer argument should start with double quote")
+        // Inner POSIX quoting (parsed by sh, not Fish) may still use '\'' and that's fine
+    }
+
+    // MARK: - Shell syntax validation (integration tests)
+
+    // Invoke real shell binaries to verify generated tmux commands parse correctly.
+    // Ghostty passes commands to /bin/sh -c, so that's what we simulate.
+
+    private func assertShellCanParse(_ command: String, file: StaticString = #filePath, line: UInt = #line) throws {
+        let syntaxCheck = command.replacingOccurrences(of: " -lic ", with: " -nc ")
+
+        let process = Process()
+        process.executableURL = URL(fileURLWithPath: "/bin/sh")
+        process.arguments = ["-c", syntaxCheck]
+        let errPipe = Pipe()
+        process.standardError = errPipe
+        process.standardOutput = FileHandle.nullDevice
+        try process.run()
+        process.waitUntilExit()
+
+        if process.terminationStatus != 0 {
+            let errData = errPipe.fileHandleForReading.readDataToEndOfFile()
+            let errMsg = String(data: errData, encoding: .utf8) ?? "(no stderr)"
+            XCTFail("Shell failed to parse command (exit \(process.terminationStatus)): \(errMsg)", file: file, line: line)
+        }
+    }
+
+    private func realisticTmuxCommand(shell: String) -> String {
+        TmuxSession.wrapCommand(
+            tmuxPath: "/opt/homebrew/bin/tmux",
+            sessionName: "factoryfloor/my-project/deploy-auth-fix/agent",
+            command: "/opt/homebrew/bin/claude --resume a1b2c3d4 --name 'deploy auth fix'",
+            environmentVars: [
+                "FF_PROJECT": "My Project",
+                "FF_WORKSTREAM": "deploy-auth-fix",
+                "FF_DIR": "/Users/test/repos/my project's dir",
+            ],
+            respawnOnExit: true,
+            shell: shell
+        )
+    }
+
+    func testTmuxCommandParsesInFish() throws {
+        let fishPath = "/opt/homebrew/bin/fish"
+        guard FileManager.default.fileExists(atPath: fishPath) else {
+            throw XCTSkip("Fish not installed at \(fishPath)")
+        }
+        let command = realisticTmuxCommand(shell: fishPath)
+        try assertShellCanParse(command)
+    }
+
+    func testTmuxCommandParsesInZsh() throws {
+        let command = realisticTmuxCommand(shell: "/bin/zsh")
+        try assertShellCanParse(command)
+    }
+
+    func testTmuxCommandParsesInBash() throws {
+        let command = realisticTmuxCommand(shell: "/bin/bash")
+        try assertShellCanParse(command)
+    }
+
     func testWrapCommandUsesLoginShellAndStartsServer() {
         let command = TmuxSession.wrapCommand(
             tmuxPath: "/opt/homebrew/bin/tmux",
