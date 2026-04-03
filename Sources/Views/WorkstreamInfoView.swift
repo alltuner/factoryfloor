@@ -4,6 +4,7 @@
 import SwiftUI
 
 struct WorkstreamInfoView: View {
+    let workstreamID: UUID
     let workstreamName: String
     let workingDirectory: String
     let projectName: String
@@ -65,10 +66,11 @@ struct WorkstreamInfoView: View {
                let pr = appEnv.githubPR(for: projectDirectory, branch: branch)
             {
                 Divider()
+                let prColor: Color = pr.state == "MERGED" ? .purple : pr.state == "OPEN" ? .green : .secondary
                 HStack(spacing: 8) {
-                    Image(systemName: "arrow.triangle.pull")
+                    Image(systemName: pr.state == "MERGED" ? "arrow.triangle.merge" : "arrow.triangle.pull")
                         .font(.system(size: 10))
-                        .foregroundStyle(.green)
+                        .foregroundStyle(prColor)
                     Text(verbatim: "#\(pr.number)")
                         .font(.system(size: 11, weight: .medium, design: .monospaced))
                     Text(pr.title)
@@ -78,10 +80,33 @@ struct WorkstreamInfoView: View {
                     Spacer()
                     Text(pr.state)
                         .font(.system(size: 10))
-                        .foregroundStyle(pr.state == "OPEN" ? .green : .secondary)
+                        .foregroundStyle(prColor)
                 }
                 .padding(.horizontal, 16)
                 .padding(.vertical, 6)
+
+                if pr.state == "MERGED" {
+                    HStack(spacing: 8) {
+                        Image(systemName: "checkmark.circle.fill")
+                            .font(.system(size: 10))
+                            .foregroundStyle(.purple)
+                        Text("This branch has been merged.")
+                            .font(.system(size: 11))
+                            .foregroundStyle(.secondary)
+                        Spacer()
+                        Button(action: {
+                            NotificationCenter.default.post(name: .archiveWorkstream, object: workstreamID)
+                        }) {
+                            Text("Archive")
+                                .font(.system(size: 11, weight: .medium))
+                        }
+                        .buttonStyle(.borderless)
+                        .foregroundStyle(.purple)
+                    }
+                    .padding(.horizontal, 16)
+                    .padding(.vertical, 6)
+                    .background(Color.purple.opacity(0.06))
+                }
             }
 
             if scriptConfig.hasAnyScript {

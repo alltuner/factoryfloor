@@ -262,6 +262,7 @@
 "Push" = "Push";
 "Create PR" = "Crear PR";
 "Abandon PR" = "Abandonar PR";
+"This branch has been merged." = "Aquesta branca s'ha fusionat.";
 "gh CLI is not installed." = "gh CLI no està instal·lat.";
 "Claude Code is not installed." = "Claude Code no està instal·lat.";
 "Enable \"Bypass permission prompts\" in Settings." = "Activa \"Ometre els permisos\" a Configuració.";

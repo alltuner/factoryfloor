@@ -106,6 +106,7 @@ struct ProjectSidebar: View {
                         hasActivePort: appEnv.hasActivePort(workstream.id),
                         prTitle: pr?.title,
                         prNumber: pr?.number,
+                        prState: pr?.state,
                         onArchive: { confirmArchive(workstream) }
                     )
                     .tag(SidebarSelection.workstream(workstream.id))
@@ -679,6 +680,7 @@ private struct WorkstreamRow: View {
     var hasActivePort: Bool = false
     var prTitle: String?
     var prNumber: Int?
+    var prState: String?
     let onArchive: () -> Void
 
     @State private var isHovering = false
@@ -717,10 +719,17 @@ private struct WorkstreamRow: View {
                     }
                 }
                 if let subtitle {
-                    Text(subtitle)
-                        .font(.system(size: 10))
-                        .foregroundStyle(.tertiary)
-                        .lineLimit(1)
+                    HStack(spacing: 3) {
+                        if prState == "MERGED" {
+                            Image(systemName: "arrow.triangle.merge")
+                                .font(.system(size: 8))
+                                .foregroundStyle(.purple)
+                        }
+                        Text(subtitle)
+                            .lineLimit(1)
+                    }
+                    .font(.system(size: 10))
+                    .foregroundStyle(prState == "MERGED" ? AnyShapeStyle(.purple) : AnyShapeStyle(.tertiary))
                 }
             }
 

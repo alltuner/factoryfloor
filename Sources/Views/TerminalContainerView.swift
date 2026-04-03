@@ -331,18 +331,19 @@ struct TerminalContainerView: View {
             Spacer()
 
             if let pr = branchPR, let url = URL(string: pr.url) {
+                let prColor: Color = pr.state == "MERGED" ? .purple : .green
                 Button(action: { NSWorkspace.shared.open(url) }) {
                     HStack(spacing: 4) {
-                        Image(systemName: "arrow.triangle.pull")
+                        Image(systemName: pr.state == "MERGED" ? "arrow.triangle.merge" : "arrow.triangle.pull")
                             .font(.system(size: 11))
                         Text(verbatim: "#\(pr.number)")
                             .font(.system(size: 11, weight: .medium, design: .monospaced))
                     }
                     .padding(.horizontal, 8)
                     .padding(.vertical, 4)
-                    .background(Color.green.opacity(0.12))
+                    .background(prColor.opacity(0.12))
                     .clipShape(RoundedRectangle(cornerRadius: 5))
-                    .foregroundStyle(.green)
+                    .foregroundStyle(prColor)
                 }
                 .buttonStyle(.borderless)
                 .help(pr.title)
@@ -387,6 +388,7 @@ struct TerminalContainerView: View {
         switch activeTab {
         case .info:
             WorkstreamInfoView(
+                workstreamID: workstreamID,
                 workstreamName: workstreamName,
                 workingDirectory: workingDirectory,
                 projectName: projectName,
@@ -595,7 +597,7 @@ struct TerminalContainerView: View {
                         bypassPermissions: bypassPermissions,
                         worktreeState: appEnv.worktreeState(for: workingDirectory),
                         hasGitHubRemote: appEnv.hasGitHubRemote(projectDirectory),
-                        hasPR: branchPR != nil
+                        prState: branchPR?.state
                     )
                 }
             }
@@ -869,7 +871,11 @@ private struct QuickActionButtons: View {
     let bypassPermissions: Bool
     let worktreeState: WorktreeState
     let hasGitHubRemote: Bool
-    let hasPR: Bool
+    let prState: String?
+
+    private var hasOpenPR: Bool {
+        prState == "OPEN"
+    }
 
     private func isVisible(_ action: QuickAction) -> Bool {
         switch action {
@@ -878,9 +884,9 @@ private struct QuickActionButtons: View {
         case .push:
             return worktreeState.hasUnpushedCommits && worktreeState.hasRemote
         case .createPR:
-            return hasGitHubRemote && worktreeState.hasBranchCommits && !hasPR
+            return hasGitHubRemote && worktreeState.hasBranchCommits && prState == nil
         case .abandonPR:
-            return hasPR
+            return hasOpenPR
         }
     }
 

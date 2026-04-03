@@ -11,6 +11,7 @@ extension Notification.Name {
     static let workstreamWorktreeReady = Notification.Name("factoryfloor.workstreamWorktreeReady")
     static let workstreamCreationFailed = Notification.Name("factoryfloor.workstreamCreationFailed")
     static let projectCreated = Notification.Name("factoryfloor.projectCreated")
+    static let archiveWorkstream = Notification.Name("factoryfloor.archiveWorkstream")
 }
 
 final class ProjectList: ObservableObject {
@@ -350,6 +351,11 @@ struct ContentView: View {
             selection = .project(project.id)
             ProjectStore.save(projects)
             logger.warning("[FF] projectCreated notification handled: \(project.name, privacy: .public)")
+        }
+        .onReceive(NotificationCenter.default.publisher(for: .archiveWorkstream)) { notification in
+            if let wsID = notification.object as? UUID {
+                confirmArchive(wsID)
+            }
         }
         .onReceive(Timer.publish(every: 15, on: .main, in: .common).autoconnect()) { _ in
             appEnvironment.refreshAllRepoInfo(projects: projects)

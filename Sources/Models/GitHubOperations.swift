@@ -3,7 +3,7 @@
 
 import Foundation
 
-struct GitHubRepoInfo: Sendable {
+struct GitHubRepoInfo {
     let name: String
     let url: String
     let description: String?
@@ -12,7 +12,7 @@ struct GitHubRepoInfo: Sendable {
     let openIssues: Int
 }
 
-struct GitHubPR: Sendable {
+struct GitHubPR {
     let number: Int
     let title: String
     let state: String
@@ -64,9 +64,24 @@ enum GitHubOperations {
         }
     }
 
-    /// Find a PR for a specific branch.
+    /// Find an open PR for a specific branch.
     static func prForBranch(ghPath: String, at path: String, branch: String) -> GitHubPR? {
         guard let json = run(ghPath, args: ["pr", "list", "--head", branch, "--json", "number,title,state,headRefName,url", "--limit", "1"], in: path) else { return nil }
+        guard let data = json.data(using: .utf8),
+              let array = try? JSONSerialization.jsonObject(with: data) as? [[String: Any]],
+              let dict = array.first else { return nil }
+
+        guard let number = dict["number"] as? Int,
+              let title = dict["title"] as? String,
+              let state = dict["state"] as? String,
+              let branch = dict["headRefName"] as? String,
+              let url = dict["url"] as? String else { return nil }
+        return GitHubPR(number: number, title: title, state: state, branch: branch, url: url)
+    }
+
+    /// Find a merged PR for a specific branch.
+    static func mergedPRForBranch(ghPath: String, at path: String, branch: String) -> GitHubPR? {
+        guard let json = run(ghPath, args: ["pr", "list", "--head", branch, "--state", "merged", "--json", "number,title,state,headRefName,url", "--limit", "1"], in: path) else { return nil }
         guard let data = json.data(using: .utf8),
               let array = try? JSONSerialization.jsonObject(with: data) as? [[String: Any]],
               let dict = array.first else { return nil }

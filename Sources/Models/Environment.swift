@@ -290,6 +290,9 @@ final class AppEnvironment: ObservableObject {
             var branchPR: GitHubPR?
             if let branch {
                 branchPR = GitHubOperations.prForBranch(ghPath: ghPath, at: directory, branch: branch)
+                if branchPR == nil {
+                    branchPR = GitHubOperations.mergedPRForBranch(ghPath: ghPath, at: directory, branch: branch)
+                }
             }
 
             await MainActor.run {
@@ -331,8 +334,20 @@ final class AppEnvironment: ObservableObject {
 
         guard !projectBranches.isEmpty else { return }
 
+        // Snapshot currently cached PR states to detect transitions
+        var cachedStates: [String: String] = [:]
+        for (dir, branches) in projectBranches {
+            for branch in branches {
+                let key = "\(dir)|\(branch)"
+                if let pr = githubBranchPRCache[key] {
+                    cachedStates[key] = pr.state
+                }
+            }
+        }
+
         Task.detached {
             // One gh call per project fetches all open PRs
+            var allOpenPRs: [(String, [GitHubPR])] = []
             await withTaskGroup(of: (String, [GitHubPR]).self) { group in
                 for (dir, _) in projectBranches {
                     group.addTask {
@@ -340,18 +355,48 @@ final class AppEnvironment: ObservableObject {
                         return (dir, prs)
                     }
                 }
-                for await (dir, prs) in group {
-                    let branches = projectBranches[dir] ?? []
-                    // Build a lookup from branch name to PR
-                    let prsByBranch = Dictionary(prs.map { ($0.branch, $0) }, uniquingKeysWith: { first, _ in first })
+                for await result in group {
+                    allOpenPRs.append(result)
+                }
+            }
 
-                    await MainActor.run {
-                        for branch in branches {
-                            let key = "\(dir)|\(branch)"
-                            if let pr = prsByBranch[branch] {
+            // Update cache with open PRs, collect branches needing merged lookup
+            var mergedLookups: [(dir: String, branch: String, key: String)] = []
+            for (dir, prs) in allOpenPRs {
+                let branches = projectBranches[dir] ?? []
+                let prsByBranch = Dictionary(prs.map { ($0.branch, $0) }, uniquingKeysWith: { first, _ in first })
+
+                await MainActor.run {
+                    for branch in branches {
+                        let key = "\(dir)|\(branch)"
+                        if let pr = prsByBranch[branch] {
+                            self.githubBranchPRCache[key] = pr
+                        } else if cachedStates[key] == "MERGED" {
+                            // Already cached as merged, no need to re-fetch
+                        } else if cachedStates[key] != nil {
+                            // Had an open PR that's no longer open, check if merged
+                            mergedLookups.append((dir: dir, branch: branch, key: key))
+                            self.githubBranchPRCache.removeValue(forKey: key)
+                        } else {
+                            // Never had a cached PR, nothing to do
+                        }
+                    }
+                }
+            }
+
+            // Targeted merged lookups for branches whose open PR disappeared
+            if !mergedLookups.isEmpty {
+                await withTaskGroup(of: (String, GitHubPR?).self) { group in
+                    for lookup in mergedLookups {
+                        group.addTask {
+                            let pr = GitHubOperations.mergedPRForBranch(ghPath: ghPath, at: lookup.dir, branch: lookup.branch)
+                            return (lookup.key, pr)
+                        }
+                    }
+                    for await (key, pr) in group {
+                        if let pr {
+                            await MainActor.run {
                                 self.githubBranchPRCache[key] = pr
-                            } else {
-                                self.githubBranchPRCache.removeValue(forKey: key)
                             }
                         }
                     }

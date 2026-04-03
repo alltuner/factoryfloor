@@ -262,6 +262,7 @@
 "Push" = "Push";
 "Create PR" = "Create PR";
 "Abandon PR" = "Abandon PR";
+"This branch has been merged." = "This branch has been merged.";
 "gh CLI is not installed." = "gh CLI is not installed.";
 "Claude Code is not installed." = "Claude Code is not installed.";
 "Enable \"Bypass permission prompts\" in Settings." = "Enable \"Bypass permission prompts\" in Settings.";

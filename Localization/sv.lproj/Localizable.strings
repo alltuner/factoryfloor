@@ -262,6 +262,7 @@
 "Push" = "Push";
 "Create PR" = "Skapa PR";
 "Abandon PR" = "Överge PR";
+"This branch has been merged." = "Denna gren har mergats.";
 "gh CLI is not installed." = "gh CLI är inte installerat.";
 "Claude Code is not installed." = "Claude Code är inte installerat.";
 "Enable \"Bypass permission prompts\" in Settings." = "Aktivera \"Hoppa över behörighetsfrågor\" i Inställningar.";
