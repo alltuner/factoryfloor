@@ -1,5 +1,34 @@
 # Changelog
 
+## [0.1.65](https://github.com/alltuner/factoryfloor/compare/v0.1.64...v0.1.65) (2026-04-03)
+
+
+### Features
+
+* add Open on GitHub button for projects with GitHub remotes ([#330](https://github.com/alltuner/factoryfloor/issues/330)) ([9c7c7f5](https://github.com/alltuner/factoryfloor/commit/9c7c7f5dcd28c12059c16018b6d0f483d4bc175c))
+* Cmd+Click opens links in external browser and fix HTTP redirects ([#331](https://github.com/alltuner/factoryfloor/issues/331)) ([599253a](https://github.com/alltuner/factoryfloor/commit/599253a66066cc1ae4b586a3d04392bc7d9f7db2))
+* display agent-generated task descriptions in sidebar ([#336](https://github.com/alltuner/factoryfloor/issues/336)) ([6bac1fe](https://github.com/alltuner/factoryfloor/commit/6bac1fe9d625cd9710dd58433f9b79a867cca8b8))
+* make run play icons clickable and style center start button ([#328](https://github.com/alltuner/factoryfloor/issues/328)) ([0007372](https://github.com/alltuner/factoryfloor/commit/0007372a18fb6e6a729ec39102602b2340fd8fe2))
+* show task description in workstream title subtitle ([#339](https://github.com/alltuner/factoryfloor/issues/339)) ([3b475a9](https://github.com/alltuner/factoryfloor/commit/3b475a9e1de70060033e9257b03c043662e83964))
+* **website:** add docs section, issue templates, and improve site navigation ([#342](https://github.com/alltuner/factoryfloor/issues/342)) ([a20d0f0](https://github.com/alltuner/factoryfloor/commit/a20d0f0ce7f38c995cdfed8374e0cba456bd536f)), closes [#338](https://github.com/alltuner/factoryfloor/issues/338)
+
+
+### Bug Fixes
+
+* re-sort sidebar projects when workstream activity updates lastAccessedAt ([#327](https://github.com/alltuner/factoryfloor/issues/327)) ([0005ed6](https://github.com/alltuner/factoryfloor/commit/0005ed624fc45ad87843a4960e6e59dadfe37c10))
+* refresh git repo cache immediately when project is added via drag-drop ([#325](https://github.com/alltuner/factoryfloor/issues/325)) ([6921180](https://github.com/alltuner/factoryfloor/commit/692118070cf0254143ab297151aca7afb2489399))
+
+
+### Miscellaneous
+
+* ignore dirty state in ghostty submodule ([#346](https://github.com/alltuner/factoryfloor/issues/346)) ([400dcc0](https://github.com/alltuner/factoryfloor/commit/400dcc0f09446047a79716c4dec0918d2ef38e69))
+
+
+### Documentation
+
+* document Hugo AllTranslations bug in AGENTS.md ([#345](https://github.com/alltuner/factoryfloor/issues/345)) ([abbc136](https://github.com/alltuner/factoryfloor/commit/abbc1365a6bcb9d57c6741f61e418b52e6df5954))
+* **website:** translate docs to Catalan, Spanish, and Swedish ([#344](https://github.com/alltuner/factoryfloor/issues/344)) ([b0794b6](https://github.com/alltuner/factoryfloor/commit/b0794b676a85abefbb431bff8a5a80485fb1b2d6)), closes [#340](https://github.com/alltuner/factoryfloor/issues/340)
+
 ## [0.1.64](https://github.com/alltuner/factoryfloor/compare/v0.1.63...v0.1.64) (2026-04-03)
 
 
