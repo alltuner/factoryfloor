@@ -3,43 +3,44 @@
 {{ $langPrefix := "" }}{{ if ne .Site.Language.Lang "en" }}{{ $langPrefix = printf "/%s" .Site.Language.Lang }}{{ end }}
 <footer class="py-12 border-t border-fg-faint">
   <div class="max-w-[1100px] mx-auto px-8">
-    <div class="flex flex-col md:flex-row justify-between items-center gap-6">
-      <div class="flex flex-col items-center md:items-start gap-1 text-sm text-fg-muted">
-        <div>
-          {{ T "footer_built_by" }} <a href="https://davidpoblador.com" class="text-wine-light no-underline hover:text-fg transition-colors">David Poblador i Garcia</a> · <a href="https://alltuner.com" class="text-wine-light no-underline hover:text-fg transition-colors">All Tuner Labs</a>
+    <div class="flex flex-col items-center gap-6">
+      <div class="flex flex-col md:flex-row justify-between items-center w-full gap-6">
+        <div class="flex flex-col items-center md:items-start gap-1 text-sm text-fg-muted">
+          <div>
+            {{ T "footer_built_by" }} <a href="https://davidpoblador.com" class="text-wine-light no-underline hover:text-fg transition-colors">David Poblador i Garcia</a> · <a href="https://alltuner.com" class="text-wine-light no-underline hover:text-fg transition-colors">All Tuner Labs</a>
+          </div>
+          <div class="text-xs text-fg-muted/60">
+            {{ T "footer_poblenou" }}
+          </div>
         </div>
-        <div class="text-xs text-fg-muted/60">
-          {{ T "footer_poblenou" }}
+        <div class="flex items-center gap-4">
+          <a href="{{ $langPrefix }}/sponsor" class="font-mono text-xs text-wine-light no-underline transition-colors hover:text-fg">♥ {{ T "footer_sponsor" }}</a>
+          <span class="text-fg-faint">|</span>
+          <a href="{{ "docs" | relLangURL }}" class="font-mono text-xs text-fg-muted no-underline transition-colors hover:text-fg">{{ T "nav_docs" }}</a>
+          <a href="{{ "changelog" | relLangURL }}" class="font-mono text-xs text-fg-muted no-underline transition-colors hover:text-fg">Changelog</a>
+          <a href="{{ .Site.Params.githubURL }}" class="font-mono text-xs text-fg-muted no-underline transition-colors hover:text-fg">GitHub</a>
+          <a href="https://davidpoblador.com" class="font-mono text-xs text-fg-muted no-underline transition-colors hover:text-fg">{{ T "footer_contact" }}</a>
+          <a href="{{ $langPrefix }}/legal/privacy" class="font-mono text-xs text-fg-muted no-underline transition-colors hover:text-fg">{{ T "footer_privacy" }}</a>
         </div>
       </div>
-      <div class="flex items-center gap-4">
-        <a href="{{ $langPrefix }}/sponsor" class="font-mono text-xs text-wine-light no-underline transition-colors hover:text-fg">♥ {{ T "footer_sponsor" }}</a>
-        <span class="text-fg-faint">|</span>
-        <!-- Language switcher -->
-        <div class="flex items-center gap-2 text-xs font-mono">
-          {{ $currentLang := .Site.Language.Lang }}
-          {{ $pagePath := .RelPermalink }}
-          {{ if ne $currentLang "en" }}
-            {{ $pagePath = strings.TrimPrefix (printf "/%s" $currentLang) .RelPermalink }}
+      <!-- Language switcher -->
+      <div class="flex items-center gap-2 text-xs font-mono">
+        {{ $currentLang := .Site.Language.Lang }}
+        {{ $pagePath := .RelPermalink }}
+        {{ if ne $currentLang "en" }}
+          {{ $pagePath = strings.TrimPrefix (printf "/%s" $currentLang) .RelPermalink }}
+        {{ end }}
+        {{ $codes := slice "en" "ca" "es" "sv" }}
+        {{ range $i, $code := $codes }}
+          {{ $href := $pagePath }}
+          {{ if ne $code "en" }}{{ $href = printf "/%s%s" $code $pagePath }}{{ end }}
+          {{ if eq $code $currentLang }}
+            <span class="text-fg uppercase font-semibold">{{ $code }}</span>
+          {{ else }}
+            <a href="{{ $href }}" class="text-fg-muted no-underline hover:text-fg transition-colors uppercase">{{ $code }}</a>
           {{ end }}
-          {{ $codes := slice "en" "ca" "es" "sv" }}
-          {{ range $i, $code := $codes }}
-            {{ $href := $pagePath }}
-            {{ if ne $code "en" }}{{ $href = printf "/%s%s" $code $pagePath }}{{ end }}
-            {{ if eq $code $currentLang }}
-              <span class="text-fg uppercase font-semibold">{{ $code }}</span>
-            {{ else }}
-              <a href="{{ $href }}" class="text-fg-muted no-underline hover:text-fg transition-colors uppercase">{{ $code }}</a>
-            {{ end }}
-            {{ if lt $i 3 }}<span class="text-fg-faint">|</span>{{ end }}
-          {{ end }}
-        </div>
-        <span class="text-fg-faint">|</span>
-        <a href="{{ "docs" | relLangURL }}" class="font-mono text-xs text-fg-muted no-underline transition-colors hover:text-fg">{{ T "nav_docs" }}</a>
-        <a href="{{ "changelog" | relLangURL }}" class="font-mono text-xs text-fg-muted no-underline transition-colors hover:text-fg">Changelog</a>
-        <a href="{{ .Site.Params.githubURL }}" class="font-mono text-xs text-fg-muted no-underline transition-colors hover:text-fg">GitHub</a>
-        <a href="https://davidpoblador.com" class="font-mono text-xs text-fg-muted no-underline transition-colors hover:text-fg">{{ T "footer_contact" }}</a>
-        <a href="{{ $langPrefix }}/legal/privacy" class="font-mono text-xs text-fg-muted no-underline transition-colors hover:text-fg">{{ T "footer_privacy" }}</a>
+          {{ if lt $i 3 }}<span class="text-fg-faint">|</span>{{ end }}
+        {{ end }}
       </div>
     </div>
   </div>
