@@ -149,9 +149,22 @@ struct EnvironmentTabView: View {
         let shortcut = "⌃⇧S"
         VStack(spacing: 0) {
             HStack {
-                Image(systemName: "play")
-                    .font(.system(size: 11))
-                    .foregroundStyle(.secondary)
+                if scriptConfig.run != nil, !runStarted {
+                    Button(action: {
+                        runStoppedManually = false
+                        runStarted = true
+                    }) {
+                        Image(systemName: "play.fill")
+                            .font(.system(size: 11))
+                            .foregroundStyle(.secondary)
+                    }
+                    .buttonStyle(.borderless)
+                    .help(NSLocalizedString("Start", comment: ""))
+                } else {
+                    Image(systemName: "play")
+                        .font(.system(size: 11))
+                        .foregroundStyle(.secondary)
+                }
                 Text(title)
                     .font(.system(size: 12, weight: .semibold))
 
@@ -206,8 +219,17 @@ struct EnvironmentTabView: View {
                             runStoppedManually = false
                             runStarted = true
                         }) {
-                            Image(systemName: "play.fill")
-                                .font(.system(size: 24))
+                            HStack(spacing: 6) {
+                                Image(systemName: "play.fill")
+                                    .font(.system(size: 14))
+                                Text("Start")
+                                    .font(.system(size: 13, weight: .medium))
+                            }
+                            .padding(.horizontal, 16)
+                            .padding(.vertical, 8)
+                            .background(Color.accentColor)
+                            .foregroundStyle(.white)
+                            .clipShape(RoundedRectangle(cornerRadius: 6))
                         }
                         .buttonStyle(.borderless)
                         Text(script)
