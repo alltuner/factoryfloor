@@ -189,7 +189,9 @@ other = "Fet amb ❤️ al Poblenou, Barcelona"
 
 # Sponsor
 [sponsor_intro]
-other = "Factory Floor és gratuït i open source. El teu suport ajuda a finançar el desenvolupament continuat i noves funcionalitats."
+other = "Factory Floor és gratuït i open source."
+[sponsor_intro_2]
+other = "El teu suport ajuda a finançar el desenvolupament continuat i noves funcionalitats."
 [sponsor_financial]
 other = "Suport financer"
 [sponsor_other]
@@ -213,7 +215,11 @@ other = "Els bug reports i feature requests ajuden a millorar l'app."
 [sponsor_contribute]
 other = "Contribueix codi"
 [sponsor_contribute_desc]
-other = "Els pull requests per correccions, funcionalitats i traduccions són benvinguts."
+other = "Els pull requests per correccions i funcionalitats són benvinguts."
+[sponsor_translate]
+other = "Tradueix l'app o el web"
+[sponsor_translate_desc]
+other = "Ajuda a fer Factory Floor accessible en més idiomes."
 [sponsor_ghostty]
 other = "Dona suport a Ghostty"
 [sponsor_ghostty_desc]

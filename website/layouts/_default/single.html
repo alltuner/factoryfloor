@@ -1,64 +1,70 @@
 {{ define "content" }}
 {{ partial "nav.html" . }}
 
-<section class="min-h-screen flex flex-col justify-center pt-20">
-  <div class="max-w-[600px] mx-auto px-8 text-center">
+<section class="min-h-screen flex flex-col justify-center pt-12">
+  <div class="max-w-[800px] mx-auto px-8 text-center">
     <h1 class="font-mono text-3xl font-bold mb-6">{{ .Title }}</h1>
 
-    <p class="text-fg-muted leading-relaxed mb-8">
-      {{ T "sponsor_intro" }}
-    </p>
+    <p class="text-lg text-fg-muted leading-relaxed mb-1">{{ T "sponsor_intro" }}</p>
+    <p class="text-lg text-fg-muted leading-relaxed mb-5">{{ T "sponsor_intro_2" }}</p>
 
     <h2 class="font-mono text-sm font-semibold text-fg-muted uppercase tracking-wider mb-4">{{ T "sponsor_financial" }}</h2>
 
-    <div class="flex flex-col gap-4 items-stretch text-left mb-12 max-w-[420px] mx-auto">
+    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-left mb-12">
       <a href="https://github.com/sponsors/alltuner" class="flex items-center gap-3 p-4 rounded-lg border border-fg-faint bg-bg-surface no-underline text-fg transition-colors hover:border-fg-muted/30">
         <svg class="w-5 h-5 text-wine-light shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
         <div>
-          <div class="font-medium text-sm">{{ T "sponsor_github" }}</div>
-          <div class="text-xs text-fg-muted">{{ T "sponsor_github_desc" }}</div>
+          <div class="font-medium text-base">{{ T "sponsor_github" }}</div>
+          <div class="text-sm text-fg-muted">{{ T "sponsor_github_desc" }}</div>
         </div>
       </a>
 
       <a href="https://buymeacoffee.com/alltuner" class="flex items-center gap-3 p-4 rounded-lg border border-fg-faint bg-bg-surface no-underline text-fg transition-colors hover:border-fg-muted/30">
         <svg class="w-5 h-5 text-wine-light shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8h1a4 4 0 0 1 0 8h-1"/><path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z"/><line x1="6" y1="1" x2="6" y2="4"/><line x1="10" y1="1" x2="10" y2="4"/><line x1="14" y1="1" x2="14" y2="4"/></svg>
         <div>
-          <div class="font-medium text-sm">{{ T "sponsor_coffee" }}</div>
-          <div class="text-xs text-fg-muted">{{ T "sponsor_coffee_desc" }}</div>
+          <div class="font-medium text-base">{{ T "sponsor_coffee" }}</div>
+          <div class="text-sm text-fg-muted">{{ T "sponsor_coffee_desc" }}</div>
         </div>
       </a>
-
     </div>
 
     <h2 class="font-mono text-sm font-semibold text-fg-muted uppercase tracking-wider mb-4 mt-2">{{ T "sponsor_other" }}</h2>
 
-    <div class="flex flex-col gap-4 items-stretch text-left mb-12 max-w-[420px] mx-auto">
-      <a href="{{ .Site.Params.githubURL }}" class="flex items-center gap-3 p-4 rounded-lg border border-fg-faint bg-bg-surface no-underline text-fg transition-colors hover:border-fg-muted/30">
-        <svg class="w-5 h-5 text-wine-light shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+    <div class="grid grid-cols-1 sm:grid-cols-2 sm:auto-rows-[1fr] gap-3 text-left mb-12">
+      <a href="{{ .Site.Params.githubURL }}" class="flex items-center gap-3 p-3 rounded-lg border border-fg-faint bg-bg-surface no-underline text-fg transition-colors hover:border-fg-muted/30">
+        <svg class="w-4 h-4 text-wine-light shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
         <div>
           <div class="font-medium text-sm">{{ T "sponsor_star" }}</div>
           <div class="text-xs text-fg-muted">{{ T "sponsor_star_desc" }}</div>
         </div>
       </a>
 
-      <a href="{{ .Site.Params.githubURL }}/issues" class="flex items-center gap-3 p-4 rounded-lg border border-fg-faint bg-bg-surface no-underline text-fg transition-colors hover:border-fg-muted/30">
-        <svg class="w-5 h-5 text-wine-light shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+      <a href="{{ .Site.Params.githubURL }}/issues" class="flex items-center gap-3 p-3 rounded-lg border border-fg-faint bg-bg-surface no-underline text-fg transition-colors hover:border-fg-muted/30">
+        <svg class="w-4 h-4 text-wine-light shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
         <div>
           <div class="font-medium text-sm">{{ T "sponsor_issues" }}</div>
           <div class="text-xs text-fg-muted">{{ T "sponsor_issues_desc" }}</div>
         </div>
       </a>
 
-      <a href="{{ .Site.Params.githubURL }}/pulls" class="flex items-center gap-3 p-4 rounded-lg border border-fg-faint bg-bg-surface no-underline text-fg transition-colors hover:border-fg-muted/30">
-        <svg class="w-5 h-5 text-wine-light shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="18" cy="18" r="3"/><circle cx="6" cy="6" r="3"/><path d="M13 6h3a2 2 0 0 1 2 2v7"/><line x1="6" y1="9" x2="6" y2="21"/></svg>
+      <a href="{{ .Site.Params.githubURL }}/pulls" class="flex items-center gap-3 p-3 rounded-lg border border-fg-faint bg-bg-surface no-underline text-fg transition-colors hover:border-fg-muted/30">
+        <svg class="w-4 h-4 text-wine-light shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="18" cy="18" r="3"/><circle cx="6" cy="6" r="3"/><path d="M13 6h3a2 2 0 0 1 2 2v7"/><line x1="6" y1="9" x2="6" y2="21"/></svg>
         <div>
           <div class="font-medium text-sm">{{ T "sponsor_contribute" }}</div>
           <div class="text-xs text-fg-muted">{{ T "sponsor_contribute_desc" }}</div>
         </div>
       </a>
 
-      <a href="https://ghostty.org/docs/sponsor" class="flex items-center gap-3 p-4 rounded-lg border border-fg-faint bg-bg-surface no-underline text-fg transition-colors hover:border-fg-muted/30">
-        <svg class="w-5 h-5 text-wine-light shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+      <a href="{{ .Site.Params.githubURL }}/blob/main/docs/TRANSLATING.md" class="flex items-center gap-3 p-3 rounded-lg border border-fg-faint bg-bg-surface no-underline text-fg transition-colors hover:border-fg-muted/30">
+        <svg class="w-4 h-4 text-wine-light shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+        <div>
+          <div class="font-medium text-sm">{{ T "sponsor_translate" }}</div>
+          <div class="text-xs text-fg-muted">{{ T "sponsor_translate_desc" }}</div>
+        </div>
+      </a>
+
+      <a href="https://ghostty.org/docs/sponsor" class="flex items-center gap-3 p-3 rounded-lg border border-fg-faint bg-bg-surface no-underline text-fg transition-colors hover:border-fg-muted/30 sm:col-span-2 sm:max-w-[calc(50%-0.375rem)]">
+        <svg class="w-4 h-4 text-wine-light shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
         <div>
           <div class="font-medium text-sm">{{ T "sponsor_ghostty" }}</div>
           <div class="text-xs text-fg-muted">{{ T "sponsor_ghostty_desc" }}</div>

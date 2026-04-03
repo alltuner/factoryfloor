@@ -55,11 +55,9 @@ Open an issue describing the use case, not just the solution. Context about *why
 
 ### Translations
 
-Factory Floor is localized in English, Catalan, Spanish, and Swedish. To improve translations or add a new language:
+Factory Floor is localized in English, Catalan, Spanish, and Swedish. You can contribute translations for both the app and the website.
 
-1. Translation files are in `Localization/<lang>.lproj/Localizable.strings`
-2. Website translations are in `website/content/<lang>/`
-3. New languages require adding an lproj directory and updating `project.yml`
+See [docs/TRANSLATING.md](docs/TRANSLATING.md) for the full guide, including how to improve existing translations, add new languages, and avoid common pitfalls.
 
 ### Website
 
