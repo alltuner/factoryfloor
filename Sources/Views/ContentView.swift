@@ -96,7 +96,7 @@ struct ContentView: View {
                 )
                 .id(workstream.id)
                 .navigationTitle(workstream.name)
-                .navigationSubtitle(project.name)
+                .navigationSubtitle(appEnvironment.taskDescription(for: workstream.worktreePath) ?? project.name)
             } else {
                 VStack(spacing: 12) {
                     ProgressView()
@@ -106,7 +106,7 @@ struct ContentView: View {
                 }
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
                 .navigationTitle(workstream.name)
-                .navigationSubtitle(project.name)
+                .navigationSubtitle(appEnvironment.taskDescription(for: workstream.worktreePath) ?? project.name)
             }
         } else if let project = activeProject,
                   let projectIndex = projects.firstIndex(where: { $0.id == project.id })
