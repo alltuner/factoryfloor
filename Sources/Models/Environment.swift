@@ -62,6 +62,30 @@ final class AppEnvironment: ObservableObject {
         }
     }
 
+    // MARK: - Origin Fetch
+
+    private var lastOriginFetch: [String: Date] = [:]
+    private static let originFetchInterval: TimeInterval = 120 // 2 minutes
+
+    /// Fetch the default branch from origin for each project directory.
+    /// Throttled to once every 2 minutes per project. Skips repos without
+    /// a remote and fails silently on network errors.
+    func fetchOrigin(projects: [Project]) {
+        let now = Date()
+        for project in projects {
+            let dir = project.directory
+            if let lastFetch = lastOriginFetch[dir],
+               now.timeIntervalSince(lastFetch) < Self.originFetchInterval
+            {
+                continue
+            }
+            lastOriginFetch[dir] = now
+            Task.detached {
+                GitOperations.fetchDefaultBranch(at: dir)
+            }
+        }
+    }
+
     // MARK: - Repo Info
 
     func repoInfo(for directory: String) -> GitRepoInfo? {

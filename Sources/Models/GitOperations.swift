@@ -109,7 +109,6 @@ enum GitOperations {
             ? workstreamName
             : "\(branchPrefix)/\(workstreamName)"
 
-        fetchDefaultBranch(at: projectPath)
         let baseBranch = defaultBranch(at: projectPath)
 
         // Create parent directories
@@ -306,7 +305,7 @@ enum GitOperations {
 
     /// Fetch the default branch from origin. Fails silently when there is no
     /// remote or the network is unreachable.
-    private static func fetchDefaultBranch(at path: String) {
+    static func fetchDefaultBranch(at path: String) {
         // Check if origin remote exists first (fast, no network)
         guard run(args: ["remote", "get-url", "origin"], in: path) != nil else { return }
 

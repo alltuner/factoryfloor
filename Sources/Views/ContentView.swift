@@ -286,6 +286,7 @@ struct ContentView: View {
             appEnvironment.refresh()
             appEnvironment.refreshAllRepoInfo(projects: projects)
             appEnvironment.refreshPathValidity(projects: projects)
+            appEnvironment.fetchOrigin(projects: projects)
             updateChecker.check()
             // Apply saved appearance
             switch UserDefaults.standard.string(forKey: "factoryfloor.appearance") ?? "system" {
@@ -377,6 +378,7 @@ struct ContentView: View {
             appEnvironment.refreshAllRepoInfo(projects: projects)
             appEnvironment.refreshPathValidity(projects: projects)
             appEnvironment.refreshAllBranchPRs(projects: projects)
+            appEnvironment.fetchOrigin(projects: projects)
             syncWorkstreamNamesFromBranches()
         }
         .onReceive(Timer.publish(every: 6 * 60 * 60, on: .main, in: .common).autoconnect()) { _ in
