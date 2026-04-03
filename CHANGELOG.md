@@ -1,5 +1,27 @@
 # Changelog
 
+## [0.1.64](https://github.com/alltuner/factoryfloor/compare/v0.1.63...v0.1.64) (2026-04-03)
+
+
+### Features
+
+* add Reveal in Finder and Open in External Terminal to sidebar context menus ([#310](https://github.com/alltuner/factoryfloor/issues/310)) ([775e188](https://github.com/alltuner/factoryfloor/commit/775e188b4b85706e59ed70e6782dca4e7b0aef1c))
+* adopt existing worktrees as workstreams and enrich worktree status ([#313](https://github.com/alltuner/factoryfloor/issues/313)) ([7f09a3f](https://github.com/alltuner/factoryfloor/commit/7f09a3f4074e802478e4a67be10e551456a179b6))
+* background fetch of origin default branch every 2 minutes ([#320](https://github.com/alltuner/factoryfloor/issues/320)) ([cd73dc5](https://github.com/alltuner/factoryfloor/commit/cd73dc5dd8b7ed722e420001834ed1ce8729ffed))
+* collapse doc tabs by default and pin to bottom of info views ([#315](https://github.com/alltuner/factoryfloor/issues/315)) ([7c38c6e](https://github.com/alltuner/factoryfloor/commit/7c38c6eb55c50c947a4b07143e35c0cff26e8974))
+* detect merged PRs and show archive prompt for completed workstreams ([#316](https://github.com/alltuner/factoryfloor/issues/316)) ([4c062ad](https://github.com/alltuner/factoryfloor/commit/4c062ad5f7b5d2b0a598058b7a6b1df1df346ddc))
+* support drag-and-drop of files and text onto embedded terminal ([#312](https://github.com/alltuner/factoryfloor/issues/312)) ([1d568a6](https://github.com/alltuner/factoryfloor/commit/1d568a6602e9368a34396e780a4054e57e5957ab))
+
+
+### Bug Fixes
+
+* differentiate merged vs open PRs and make PR badges clickable in worktree list ([#321](https://github.com/alltuner/factoryfloor/issues/321)) ([58d9c73](https://github.com/alltuner/factoryfloor/commit/58d9c7385156090d7a329c2c973b076e81735b97))
+* Fish 4.0 shell escaping breaks tmux and agent launch ([#324](https://github.com/alltuner/factoryfloor/issues/324)) ([323d136](https://github.com/alltuner/factoryfloor/commit/323d136350d1bd803f446d78031403765acb7b69))
+* init ghostty submodule properly instead of symlinking entire directory ([#323](https://github.com/alltuner/factoryfloor/issues/323)) ([702f786](https://github.com/alltuner/factoryfloor/commit/702f7867a634311eeff068e8674480add57da143)), closes [#322](https://github.com/alltuner/factoryfloor/issues/322)
+* persist quick action runner across workstream navigation ([#317](https://github.com/alltuner/factoryfloor/issues/317)) ([3c04488](https://github.com/alltuner/factoryfloor/commit/3c0448804f373d5d91d8339be1347b3453cd8940))
+* preserve active tab when cycling workstreams with Cmd+Shift+[/] ([#318](https://github.com/alltuner/factoryfloor/issues/318)) ([e4547be](https://github.com/alltuner/factoryfloor/commit/e4547be28a8d708996f2437450518b07588c075c))
+* skip submodule dirty checks in git status ([#314](https://github.com/alltuner/factoryfloor/issues/314)) ([8ae6395](https://github.com/alltuner/factoryfloor/commit/8ae6395a24ad4a096a7fc2be8ba95e8f02af2203))
+
 ## [0.1.63](https://github.com/alltuner/factoryfloor/compare/v0.1.62...v0.1.63) (2026-04-02)
 
 
