@@ -179,10 +179,14 @@ struct ProjectOverviewView: View {
                 if !worktrees.isEmpty {
                     Section {
                         ForEach(worktrees) { wt in
+                            let isArchiving = WorkstreamArchiver.archivingPaths.contains(
+                                URL(fileURLWithPath: wt.path).standardizedFileURL.path
+                            )
                             WorktreeInfoRow(
                                 worktree: wt,
                                 projectDirectory: project.directory,
                                 isWorkstream: workstreamPaths.contains(wt.path),
+                                isArchiving: isArchiving,
                                 onAdopt: { adoptWorktree(wt) }
                             )
                         }
@@ -247,6 +251,9 @@ struct ProjectOverviewView: View {
             refreshWorktrees()
             loadDocFiles()
         }
+        .onReceive(NotificationCenter.default.publisher(for: WorkstreamArchiver.archivingDidComplete)) { _ in
+            refreshWorktrees()
+        }
         .alert("Prune Worktrees", isPresented: $showingPruneConfirm) {
             Button("Cancel", role: .cancel) {}
             Button("Prune", role: .destructive) { pruneWorktrees() }
@@ -260,7 +267,10 @@ struct ProjectOverviewView: View {
     }
 
     private var prunableCount: Int {
-        worktrees.filter { !$0.isMain && !$0.isDirty && !$0.hasBranchCommits }.count
+        worktrees.filter { wt in
+            !wt.isMain && !wt.isDirty && !wt.hasBranchCommits
+                && !WorkstreamArchiver.archivingPaths.contains(URL(fileURLWithPath: wt.path).standardizedFileURL.path)
+        }.count
     }
 
     private func adoptWorktree(_ worktree: WorktreeInfo) {
@@ -339,6 +349,7 @@ private struct WorktreeInfoRow: View {
     let worktree: WorktreeInfo
     let projectDirectory: String
     let isWorkstream: Bool
+    var isArchiving: Bool = false
     let onAdopt: () -> Void
 
     @EnvironmentObject var appEnv: AppEnvironment
@@ -374,7 +385,15 @@ private struct WorktreeInfoRow: View {
                                 .foregroundStyle(prColor)
                             }
                         }
-                        if worktree.isDirty {
+                        if isArchiving {
+                            HStack(spacing: 4) {
+                                ProgressView()
+                                    .controlSize(.mini)
+                                Text("Archiving...")
+                                    .font(.caption)
+                                    .foregroundStyle(.secondary)
+                            }
+                        } else if worktree.isDirty {
                             HStack(spacing: 4) {
                                 Circle()
                                     .fill(.orange)
@@ -405,6 +424,9 @@ private struct WorktreeInfoRow: View {
                 Text("main")
                     .font(.caption)
                     .foregroundStyle(.secondary)
+            } else if isArchiving {
+                // No action button while archiving
+                EmptyView()
             } else if !isWorkstream {
                 Button(action: onAdopt) {
                     HStack(spacing: 4) {
