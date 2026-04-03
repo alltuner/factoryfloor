@@ -212,7 +212,16 @@ struct ProjectOverviewView: View {
             }
             .formStyle(.grouped)
 
-            // Doc tabs
+            // Markdown content
+            if let selected = selectedDoc,
+               let doc = docFiles.first(where: { $0.name == selected })
+            {
+                Divider()
+                MarkdownContentView(markdown: doc.content)
+                    .id(selected)
+            }
+
+            // Doc tabs pinned to bottom
             if !docFiles.isEmpty {
                 Divider()
                 HStack(spacing: 0) {
@@ -220,21 +229,13 @@ struct ProjectOverviewView: View {
                         DocTabButton(
                             name: doc.name,
                             isActive: selectedDoc == doc.name,
-                            action: { selectedDoc = doc.name }
+                            action: { selectedDoc = selectedDoc == doc.name ? nil : doc.name }
                         )
                     }
                     Spacer()
                 }
                 .padding(.horizontal, 16)
                 .padding(.vertical, 4)
-                Divider()
-
-                if let selected = selectedDoc,
-                   let doc = docFiles.first(where: { $0.name == selected })
-                {
-                    MarkdownContentView(markdown: doc.content)
-                        .id(selected)
-                }
             }
         } // VStack
         .frame(maxWidth: .infinity, maxHeight: .infinity)
@@ -318,7 +319,6 @@ struct ProjectOverviewView: View {
     @MainActor
     private func updateDocFiles(_ docFiles: [DocFile]) {
         self.docFiles = docFiles
-        selectedDoc = docFiles.first?.name
     }
 
     @MainActor
