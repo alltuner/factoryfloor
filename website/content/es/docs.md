@@ -312,7 +312,7 @@ Activa **Bleeding edge updates** en Settings > Advanced para builds pre-release.
 
 ---
 
-## Funcionalidades más avanzadas 😉 {#more-advanced-features-}
+## Funcionalidades Enterprise 😉 {#enterprise-features-}
 
 ### Editor de código {#code-editor}
 

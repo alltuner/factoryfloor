@@ -312,7 +312,7 @@ Aktivera **Bleeding edge updates** i Settings > Advanced för förhandsversioner
 
 ---
 
-## Mer avancerade funktioner 😉 {#more-advanced-features-}
+## Enterprise-funktioner 😉 {#enterprise-features-}
 
 ### Kodredigerare {#code-editor}
 

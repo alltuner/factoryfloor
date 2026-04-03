@@ -312,7 +312,7 @@ Enable **Bleeding edge updates** in Settings > Advanced for pre-release builds. 
 
 ---
 
-## More Advanced Features 😉
+## Enterprise Features 😉
 
 ### Code Editor
 
