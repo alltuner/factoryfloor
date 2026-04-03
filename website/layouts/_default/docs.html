@@ -63,6 +63,10 @@
         [&_.docs-download]:inline-flex [&_.docs-download]:items-center [&_.docs-download]:gap-1.5 [&_.docs-download]:bg-wine [&_.docs-download]:!text-[#F7F4F3] [&_.docs-download]:px-3 [&_.docs-download]:py-1.5 [&_.docs-download]:rounded-md [&_.docs-download]:text-xs [&_.docs-download]:no-underline [&_.docs-download]:transition-all [&_.docs-download]:hover:bg-wine-light [&_.docs-download]:hover:-translate-y-px [&_.docs-download]:font-mono">
         <h1>{{ .Title }}</h1>
         <p>{{ T "docs_subtitle" }}</p>
+        {{ $currentLang := .Site.Language.Lang }}
+        {{ $langs := dict "en" "English" "ca" "Català" "es" "Español" "sv" "Svenska" }}
+        {{ $codes := slice "en" "ca" "es" "sv" }}
+        <p class="docs-lang-switcher">{{ range $i, $code := $codes }}{{ if $i }} | {{ end }}{{ $href := "/docs" }}{{ if ne $code "en" }}{{ $href = printf "/%s/docs" $code }}{{ end }}{{ if eq $code $currentLang }}<strong>{{ index $langs $code }}</strong>{{ else }}<a href="{{ $href }}">{{ index $langs $code }}</a>{{ end }}{{ end }}</p>
         {{ .Content }}
       </div>
     </div>

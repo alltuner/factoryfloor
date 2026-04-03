@@ -42,6 +42,10 @@ defaultContentLanguage = "en"
     source = "assets"
     target = "assets"
 
+[markup.goldmark.parser.attribute]
+  block = true
+  title = true
+
 [markup.goldmark.renderer]
   unsafe = true
 

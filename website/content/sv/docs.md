@@ -5,188 +5,188 @@ hideInstall: true
 layout: docs
 ---
 
-## Getting Started
+## Komma igång {#getting-started}
 
-The year is 2026. We build on tmux (2007), git worktrees (2015), terminals (1978, the VT100 era, when even [David](https://davidpoblador.com) was only a future project), and GPU rendering (thanks [Mitchell](https://mitchellh.com) for [Ghostty](https://ghostty.org)). Old tools, new tricks.
+Vi skriver 2026. Vi bygger på tmux (2007), git worktrees (2015), terminals (1978, VT100-eran, när till och med [David](https://davidpoblador.com) bara var ett framtida projekt), och GPU-rendering (tack [Mitchell](https://mitchellh.com) för [Ghostty](https://ghostty.org)). Gamla verktyg, nya trick.
 
-You need two things: a Mac and a vague sense that your current workflow could be better.
+Du behöver två saker: en Mac och en vag känsla av att ditt nuvarande arbetsflöde kunde vara bättre.
 
 ```
 brew install --cask factory-floor
 ```
 
-<a href="https://github.com/alltuner/factoryfloor/releases/latest/download/FactoryFloor.dmg" class="docs-download"><svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg> Download DMG</a>
+<a href="https://github.com/alltuner/factoryfloor/releases/latest/download/FactoryFloor.dmg" class="docs-download"><svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg> Ladda ner DMG</a>
 
-Factory Floor works best when these are installed (it'll tell you if they're missing):
+Factory Floor fungerar bäst när dessa är installerade (appen berättar om något saknas):
 
-- **[Claude Code](https://docs.anthropic.com/en/docs/claude-code/overview)** — the whole point, really
-- **git** — you probably have this
-- **[gh](https://cli.github.com/)** — GitHub CLI, for PR status and quick actions
-- **[tmux](https://github.com/tmux/tmux)** — optional, enables session persistence
+- **[Claude Code](https://docs.anthropic.com/en/docs/claude-code/overview)** — hela poängen, egentligen
+- **git** — du har förmodligen redan detta
+- **[gh](https://cli.github.com/)** — GitHub CLI, för PR-status och quick actions
+- **[tmux](https://github.com/tmux/tmux)** — valfritt, möjliggör sessionspersistens
 
-#### Your first 30 seconds
+#### Dina första 30 sekunder {#your-first-30-seconds}
 
-1. Open Factory Floor
-2. Drop a git repository onto the sidebar (or click **+** to pick one)
-3. Hit **⌘N** to create a workstream
-4. That's it. You're coding with AI now.
+1. Öppna Factory Floor
+2. Dra ett git-repository till sidebar (eller klicka **+** för att välja ett)
+3. Tryck **⌘N** för att skapa en workstream
+4. Klart. Du kodar med AI nu.
 
-No config files required. Factory Floor detects your git setup, installed tools, and GitHub connections automatically.
-
----
-
-## Core Concepts
-
-The three things you'll interact with every day.
-
-### Projects
-
-A project is a git repository. Drop a directory on the sidebar or click the **+** button. Factory Floor checks if it's a git repo (and offers to initialize one if it's not).
-
-The project overview shows repository info, GitHub details (stars, forks, open issues), up to 5 recent PRs, and auto-discovered markdown documentation from your repo.
-
-Projects sort by **Recent** (last activity) by default. Toggle to **A-Z** if you're that kind of person.
-
-Right-click a project in the sidebar for quick access: **Reveal in Finder**, **Open in External Terminal**, **Open on GitHub**, or **Remove** (files stay on disk, we're not monsters).
-
-### Workstreams
-
-A workstream is where the work happens. Each one gets its own git worktree, branch, terminal, coding agent, and browser tab. They're completely isolated from each other.
-
-**⌘N** creates a new workstream. Behind the scenes:
-
-1. Fetches the latest default branch from origin
-2. Creates a git worktree with a fresh branch (prefixed with your branch prefix, default: `ff`)
-3. Symlinks `.env` and `.env.local` from the main repo (if enabled)
-4. Runs the setup script (if configured)
-5. Launches the coding agent
-
-The UI shows up instantly — worktree creation happens in the background.
-
-#### Workstream tabs
-
-- **Info** (⌘I) — branch name, PR status, project docs
-- **Agent** (⌘Return) — your Claude Code session
-- **Environment** (⌘E) — setup and run script controls
-- **Terminal** (⌘T) — additional terminal tabs, as many as you want
-- **Browser** (⌘B) — embedded browser with auto-port detection
-
-#### Branch auto-rename
-
-With **Auto-rename branch** enabled in settings, the coding agent renames your branch to match the task on the first prompt. So `ff/coral-tidal-reef` becomes `ff/fix-login-timeout`.
-
-#### Removing vs. purging
-
-- **Remove** — kills terminals and agent, but the worktree stays on disk
-- **Purge** — permanently deletes the worktree and branch (asks for confirmation if there are uncommitted changes)
-
-When a PR is merged, Factory Floor shows a "Purge" badge so you know it's safe to clean up.
-
-### The Coding Agent
-
-The coding agent tab runs [Claude Code](https://docs.anthropic.com/en/docs/claude-code/overview) in an embedded terminal. It sits right after the Info tab in every workstream.
-
-#### Agent settings
-
-- **Bypass permission prompts** — skips confirmation dialogs. Useful if you trust your agent (and live dangerously).
-- **Tmux mode** — wraps agent sessions in tmux so they survive app restarts. Requires tmux.
-- **Auto-rename branch** — lets the agent rename the branch to match the task.
-- **Agent Teams** — experimental multi-agent coordination, courtesy of Claude Code. We trust Anthropic, don't we?
-
-#### Quick actions
-
-Quick actions run one-shot Claude tasks from the sidebar:
-
-- **Commit** — stages and commits with an AI-generated message
-- **Push** — pushes the current branch to origin
-- **Create PR** — creates a pull request with AI-generated title and description
-- **Abandon PR** — closes the PR
-
-These run as background `claude -p` calls. Enable **Quick action debug mode** in settings if you want to know how the sausage is made. Trust us, [David](https://davidpoblador.com) spent more time than he can admit debugging weird behaviors in there.
+Inga konfigurationsfiler behövs. Factory Floor upptäcker din git-konfiguration, installerade verktyg och GitHub-anslutningar automatiskt.
 
 ---
 
-## Your Workspace
+## Grundläggande koncept {#core-concepts}
 
-Terminals, browsers, and shortcuts — the tools inside each workstream.
+De tre sakerna du kommer att interagera med varje dag.
 
-### Terminals
+### Projekt {#projects}
 
-Terminals are GPU-rendered via [Ghostty](https://ghostty.org). They're fast.
+Ett projekt är ett git-repository. Dra en katalog till sidebar eller klicka på **+**-knappen. Factory Floor kontrollerar om det är ett git-repo (och erbjuder att initiera ett om det inte är det).
 
-- **⌘T** — new terminal tab
-- **⌘W** — close tab (or Ctrl+D to exit the shell)
-- **⌘1-9** — switch between tabs
-- **⌘Shift+[** / **⌘Shift+]** — cycle through tabs
+Projektöversikten visar repository-info, GitHub-detaljer (stjärnor, forks, öppna issues), upp till 5 senaste PRs, och automatiskt upptäckt markdown-dokumentation från ditt repo.
 
-You can drag files and text onto the terminal. Because sometimes the mouse is fine, actually.
+Projekt sorteras efter **Senaste** (senaste aktivitet) som standard. Byt till **A-Ö** om du är en sån person.
 
-**⌘Shift+E** opens the workstream directory in your preferred external terminal app.
+Högerklicka på ett projekt i sidebar för snabb åtkomst: **Visa i Finder**, **Öppna i extern Terminal**, **Öppna på GitHub**, eller **Ta bort** (filerna finns kvar på disken, vi är inga monster).
 
-### The Browser
+### Workstreams {#workstreams}
 
-Every workstream can have browser tabs (⌘B). The browser is embedded — no window switching needed.
+En workstream är där arbetet sker. Varje workstream får sin egen git worktree, branch, terminal, coding agent och browser tab. De är helt isolerade från varandra.
 
-#### Port detection
+**⌘N** skapar en ny workstream. Bakom kulisserna:
 
-When your run script starts a dev server, Factory Floor detects the listening port automatically and navigates the browser to it. No configuration needed. The `ff-run` launcher monitors the process tree for TCP listeners.
+1. Hämtar senaste default branch från origin
+2. Skapar en git worktree med en ny branch (med ditt branch-prefix, standard: `ff`)
+3. Symlinks `.env` och `.env.local` från huvudrepot (om aktiverat)
+4. Kör setup-scriptet (om konfigurerat)
+5. Startar coding agent
 
-#### Navigation
+Gränssnittet dyker upp direkt, worktree-skapandet sker i bakgrunden.
 
-- **⌘L** — focus the address bar
-- **⌘Shift+O** — open current URL in your external browser
-- **⌘Click** — opens links in your external browser
+#### Workstream tabs {#workstream-tabs}
 
-The browser shows a connection error page with a retry button if the server isn't ready yet. It'll auto-navigate once the port is detected.
+- **Info** (⌘I) — branch-namn, PR-status, projektdokumentation
+- **Agent** (⌘Return) — din Claude Code-session
+- **Environment** (⌘E) — setup- och run-scriptkontroller
+- **Terminal** (⌘T) — ytterligare terminal tabs, så många du vill
+- **Browser** (⌘B) — inbäddad browser med automatisk port-detection
 
-### Keyboard Shortcuts
+#### Branch auto-rename {#branch-auto-rename}
 
-Factory Floor is keyboard-first. Here's everything.
+Med **Auto-rename branch** aktiverat i inställningarna byter coding agent namn på din branch för att matcha uppgiften vid första prompten. Så `ff/coral-tidal-reef` blir `ff/fix-login-timeout`.
 
-#### Global
+#### Ta bort vs. rensa {#removing-vs-purging}
 
-| Shortcut | Action |
+- **Remove** — stänger terminals och agent, men worktree finns kvar på disken
+- **Purge** — raderar permanent worktree och branch (frågar om bekräftelse om det finns uncommittade ändringar)
+
+När en PR är mergad visar Factory Floor en "Purge" badge så att du vet att det är säkert att städa upp.
+
+### Coding Agent {#the-coding-agent}
+
+Coding Agent-tabben kör [Claude Code](https://docs.anthropic.com/en/docs/claude-code/overview) i en inbäddad terminal. Den sitter direkt efter Info-tabben i varje workstream.
+
+#### Agent-inställningar {#agent-settings}
+
+- **Bypass permission prompts** — hoppar över bekräftelsedialoger. Användbart om du litar på din agent (och lever farligt).
+- **Tmux mode** — kapslar agent-sessioner i tmux så de överlever omstarter av appen. Kräver tmux.
+- **Auto-rename branch** — låter agenten byta namn på branch för att matcha uppgiften.
+- **Agent Teams** — experimentell multi-agent-koordinering, med vänlig hälsning från Claude Code. Vi litar på Anthropic, eller hur?
+
+#### Quick actions {#quick-actions}
+
+Quick actions kör engångs-Claude-uppgifter från sidebar:
+
+- **Commit** — stagear och committar med ett AI-genererat meddelande
+- **Push** — pushar nuvarande branch till origin
+- **Create PR** — skapar en pull request med AI-genererad titel och beskrivning
+- **Abandon PR** — stänger PRn
+
+Dessa körs som bakgrunds-`claude -p`-anrop. Aktivera **Quick action debug mode** i inställningarna om du vill veta hur korven görs. Lita på oss, [David](https://davidpoblador.com) lade ner mer tid än han vill erkänna på att debugga konstiga beteenden där inne.
+
+---
+
+## Din arbetsyta {#your-workspace}
+
+Terminals, browsers och kortkommandon, verktygen inuti varje workstream.
+
+### Terminals {#terminals}
+
+Terminals är GPU-renderade via [Ghostty](https://ghostty.org). De är snabba.
+
+- **⌘T** — ny terminal tab
+- **⌘W** — stäng tab (eller Ctrl+D för att avsluta shell)
+- **⌘1-9** — växla mellan tabs
+- **⌘Shift+[** / **⌘Shift+]** — bläddra genom tabs
+
+Du kan dra filer och text till terminal. För ibland är musen helt okej, faktiskt.
+
+**⌘Shift+E** öppnar workstream-katalogen i din föredragna externa terminal-app.
+
+### Browser {#the-browser}
+
+Varje workstream kan ha browser tabs (⌘B). Browser är inbäddad, inget fönsterbyte behövs.
+
+#### Port detection {#port-detection}
+
+När ditt run-script startar en dev-server upptäcker Factory Floor den lyssnande porten automatiskt och navigerar browser dit. Ingen konfiguration behövs. `ff-run`-launchern övervakar processträdet efter TCP-lyssnare.
+
+#### Navigering {#navigation}
+
+- **⌘L** — fokusera adressfältet
+- **⌘Shift+O** — öppna aktuell URL i din externa browser
+- **⌘Click** — öppnar länkar i din externa browser
+
+Browser visar en anslutningsfel-sida med en retry-knapp om servern inte är redo ännu. Den auto-navigerar när porten upptäcks.
+
+### Tangentbordsgenvägar {#keyboard-shortcuts}
+
+Factory Floor är tangentbord-först. Här är allt.
+
+#### Globala {#global}
+
+| Genväg | Åtgärd |
 |----------|--------|
-| ⌘N | New workstream (or project, if none exist) |
-| ⌘Shift+N | New project |
-| ⌘, | Settings |
-| ⌘/ | Help |
+| ⌘N | Ny workstream (eller projekt, om inga finns) |
+| ⌘Shift+N | Nytt projekt |
+| ⌘, | Inställningar |
+| ⌘/ | Hjälp |
 
-#### Workstream
+#### Workstream {#workstream}
 
-| Shortcut | Action |
+| Genväg | Åtgärd |
 |----------|--------|
-| ⌘Return | Focus Coding Agent |
-| ⌘I | Info panel |
+| ⌘Return | Fokusera Coding Agent |
+| ⌘I | Info-panel |
 | ⌘E | Environment |
-| ⌘T | New Terminal |
-| ⌘B | New Browser |
-| ⌘W | Close tab |
-| ⌘L | Address bar (browser) |
-| ⌘0 | Back to project |
-| ⌘1-9 | Switch tab |
-| ⌘Shift+[ | Previous tab |
-| ⌘Shift+] | Next tab |
-| Ctrl+Shift+R | Rebuild setup |
-| Ctrl+Shift+S | Start/restart run |
+| ⌘T | Ny Terminal |
+| ⌘B | Ny Browser |
+| ⌘W | Stäng tab |
+| ⌘L | Adressfält (browser) |
+| ⌘0 | Tillbaka till projekt |
+| ⌘1-9 | Byt tab |
+| ⌘Shift+[ | Föregående tab |
+| ⌘Shift+] | Nästa tab |
+| Ctrl+Shift+R | Bygg om setup |
+| Ctrl+Shift+S | Starta/starta om run |
 
-#### Navigation
+#### Navigering {#navigation-1}
 
-| Shortcut | Action |
+| Genväg | Åtgärd |
 |----------|--------|
-| Ctrl+1-9 | Switch workstream (from any view) |
-| ⌘Shift+O | Open in external browser |
-| ⌘Shift+E | Open in external terminal |
+| Ctrl+1-9 | Byt workstream (från valfri vy) |
+| ⌘Shift+O | Öppna i extern browser |
+| ⌘Shift+E | Öppna i extern terminal |
 
 ---
 
-## Configuration
+## Konfiguration {#configuration}
 
-How to automate the boring parts.
+Hur man automatiserar de tråkiga delarna.
 
-### Scripts & Lifecycle
+### Script och livscykel {#scripts--lifecycle}
 
-Drop a `.factoryfloor.json` in your project root to automate the workstream lifecycle.
+Lägg en `.factoryfloor.json` i projektets rotkatalog för att automatisera workstream-livscykeln.
 
 ```json
 {
@@ -196,156 +196,156 @@ Drop a `.factoryfloor.json` in your project root to automate the workstream life
 }
 ```
 
-| Hook | When it runs |
+| Hook | När det körs |
 |------|-------------|
-| `setup` | Once, when a workstream is created. Install dependencies, run migrations, whatever. |
-| `run` | On demand via the Environment tab (⌘E). Wrapped in `ff-run` for port detection. |
-| `teardown` | When a workstream is archived or purged. Stop containers, clean up. |
+| `setup` | En gång, när en workstream skapas. Installera beroenden, kör migreringar, vad som helst. |
+| `run` | På begäran via Environment-tabben (⌘E). Kapslad i `ff-run` för port detection. |
+| `teardown` | När en workstream arkiveras eller rensas. Stoppa containrar, städa upp. |
 
-All fields are optional. Scripts run in the workstream directory using your login shell. Yes, even [fish](https://github.com/alltuner/factoryfloor/pull/324). Don't ask how long that took.
+Alla fält är valfria. Script körs i workstream-katalogen med ditt login shell. Ja, även [fish](https://github.com/alltuner/factoryfloor/pull/324). Fråga inte hur lång tid det tog.
 
-Factory Floor also reads `conductor.json` and `.superset/config.json` if `.factoryfloor.json` doesn't exist. Because compatibility is polite. (Time for a [standard](https://xkcd.com/927/)?)
+Factory Floor läser också `conductor.json` och `.superset/config.json` om `.factoryfloor.json` inte finns. För kompatibilitet är artigt. (Dags för en [standard](https://xkcd.com/927/)?)
 
-#### The Environment tab
+#### Environment-tabben {#the-environment-tab}
 
-Split-pane layout: **Setup** on the left, **Run** on the right.
+Delad layout: **Setup** till vänster, **Run** till höger.
 
-- **Ctrl+Shift+R** — rebuild (reruns setup)
-- **Ctrl+Shift+S** — start/restart the run script
+- **Ctrl+Shift+R** — bygg om (kör om setup)
+- **Ctrl+Shift+S** — starta/starta om run-scriptet
 
-### Environment Variables
+### Miljövariabler {#environment-variables}
 
-Every terminal, setup script, and run command in a workstream has these variables:
+Varje terminal, setup-script och run-kommando i en workstream har dessa variabler:
 
-| Variable | What it is | Example |
+| Variabel | Vad det är | Exempel |
 |----------|-----------|---------|
-| `FF_PROJECT` | Project name | `my-app` |
-| `FF_WORKSTREAM` | Workstream name | `coral-tidal-reef` |
-| `FF_PROJECT_DIR` | Main repository path | `/Users/you/my-app` |
-| `FF_WORKTREE_DIR` | Worktree path | `~/.factoryfloor/worktrees/my-app/coral-tidal-reef` |
-| `FF_PORT` | Deterministic port (40001-49999) | `42847` |
+| `FF_PROJECT` | Projektnamn | `my-app` |
+| `FF_WORKSTREAM` | Workstream-namn | `coral-tidal-reef` |
+| `FF_PROJECT_DIR` | Huvudrepots sökväg | `/Users/you/my-app` |
+| `FF_WORKTREE_DIR` | Worktree-sökväg | `~/.factoryfloor/worktrees/my-app/coral-tidal-reef` |
+| `FF_PORT` | Deterministisk port (40001-49999) | `42847` |
 
-#### About FF_PORT
+#### Om FF_PORT {#about-ff_port}
 
-Each workstream gets a deterministic port based on a hash of the worktree path. Same workstream, same port, every time. No port conflicts between workstreams. Use it in your run script: `PORT=$FF_PORT npm run dev`. If your thing is running thousands of workstreams simultaneously, you might get a collision 🎲 but hopefully you run out of memory first.
+Varje workstream får en deterministisk port baserad på en hash av worktree-sökvägen. Samma workstream, samma port, varje gång. Inga portkonflikter mellan workstreams. Använd den i ditt run-script: `PORT=$FF_PORT npm run dev`. Om du kör tusentals workstreams samtidigt kanske du får en kollision 🎲 men förhoppningsvis tar minnet slut först.
 
-#### .env symlink
+#### .env symlink {#env-symlink}
 
-When enabled (Settings > General), Factory Floor symlinks `.env` and `.env.local` from your main repo into each worktree. So your secrets follow you without copy-pasting. Speaking of secrets, have we told you about [Vaultuner](https://vaultuner.alltuner.com)?
+När aktiverat (Settings > General) skapar Factory Floor symlinks för `.env` och `.env.local` från ditt huvudrepo till varje worktree. Så dina hemligheter följer med utan kopiera-klistra. På tal om hemligheter, har vi berättat om [Vaultuner](https://vaultuner.alltuner.com)?
 
-### Settings
+### Inställningar {#settings}
 
-Open with **⌘,** or click the gear icon.
+Öppna med **⌘,** eller klicka på kugghjulsikonen.
 
-#### General
+#### Allmänt {#general}
 
-- **Base directory** — default location for new projects
-- **Branch prefix** — prefix for workstream branches (default: `ff`)
-- **Symlink .env files** — auto-symlink `.env` and `.env.local` to worktrees
-- **Theme** — System, Light, or Dark
-- **Language** — System default, English, Catalan, Spanish, or Swedish
-- **Confirm before quitting** — asks before closing with active workstreams
-- **Launch at login** — starts Factory Floor on boot
+- **Base directory** — standardplats för nya projekt
+- **Branch prefix** — prefix för workstream-branches (standard: `ff`)
+- **Symlink .env files** — auto-symlink `.env` och `.env.local` till worktrees
+- **Theme** — System, Ljust eller Mörkt
+- **Language** — Systemstandard, English, Catalan, Spanish eller Swedish
+- **Confirm before quitting** — frågar innan stängning med aktiva workstreams
+- **Launch at login** — startar Factory Floor vid uppstart
 
-#### Coding Agent
+#### Coding Agent {#coding-agent}
 
-- **Bypass permission prompts** — disables confirmation for agent actions
-- **Agent Teams** — experimental multi-agent mode
-- **Auto-rename branch** — agent renames branch on first prompt
-- **Tmux mode** — session persistence via tmux
+- **Bypass permission prompts** — inaktiverar bekräftelse för agent-åtgärder
+- **Agent Teams** — experimentellt multi-agent-läge
+- **Auto-rename branch** — agenten byter namn på branch vid första prompten
+- **Tmux mode** — sessionspersistens via tmux
 
-#### Apps
+#### Appar {#apps}
 
-- **External Terminal** — which terminal app to open with ⌘Shift+E
-- **External Browser** — which browser for ⌘Shift+O and ⌘Click
+- **External Terminal** — vilken terminal-app som öppnas med ⌘Shift+E
+- **External Browser** — vilken browser för ⌘Shift+O och ⌘Click
 
-#### Advanced
+#### Avancerat {#advanced}
 
-- **Usage analytics** — privacy-friendly telemetry (app version, OS, locale only)
-- **Crash reports** — Sentry-based crash reporting
-- **Detailed logging** — logs script output for debugging
-- **Quick action debug mode** — shows raw output from quick actions
-- **Bleeding edge updates** — opt into pre-release builds
-- **Clear project list** — nuclear option, removes all projects from sidebar
+- **Usage analytics** — integritetsvänlig telemetry (bara appversion, OS, locale)
+- **Crash reports** — Sentry-baserad crash reporting
+- **Detailed logging** — loggar script-utdata för felsökning
+- **Quick action debug mode** — visar rå utdata från quick actions
+- **Bleeding edge updates** — välj att ta emot förhandsversioner
+- **Clear project list** — kärnvapenalternativet, tar bort alla projekt från sidebar
 
 ---
 
-## Integrations
+## Integrationer {#integrations}
 
-Connecting Factory Floor to everything else.
+Koppla Factory Floor till allt annat.
 
-### CLI
+### CLI {#cli}
 
-Install the `ff` command from Settings > Environment > Install CLI. Then:
+Installera `ff`-kommandot från Settings > Environment > Install CLI. Sedan:
 
 ```
 ff /path/to/your/project
 ```
 
-Opens the directory in Factory Floor. That's all it does, and that's all it needs to do.
+Öppnar katalogen i Factory Floor. Det är allt det gör, och det är allt det behöver göra.
 
-### GitHub
+### GitHub {#github}
 
-Requires the [gh CLI](https://cli.github.com/) with authentication (`gh auth login`).
+Kräver [gh CLI](https://cli.github.com/) med autentisering (`gh auth login`).
 
-- **Project view** — repo info, description, stars, forks, open issues, recent PRs
-- **Workstream sidebar** — PR number, title, and status (open/merged/closed) per branch
-- **Merged detection** — shows "Purge" badge when a branch's PR is merged
+- **Projektvy** — repo-info, beskrivning, stjärnor, forks, öppna issues, senaste PRs
+- **Workstream sidebar** — PR-nummer, titel och status (open/merged/closed) per branch
+- **Merge-detection** — visar "Purge" badge när en branchs PR är mergad
 
-#### Quick actions
+#### Quick actions {#quick-actions-1}
 
-From the sidebar, run one-click operations: **Create PR** (AI-generated title and description), **Push** (to origin with `-u`), or **Abandon PR** (closes with a comment). Because if you're tired of typing "now commit, push, and open a PR" into Claude for the hundredth time, you're not alone.
+Från sidebar, kör ett-klicks-operationer: **Create PR** (AI-genererad titel och beskrivning), **Push** (till origin med `-u`), eller **Abandon PR** (stänger med en kommentar). För om du är trött på att skriva "now commit, push, and open a PR" till Claude för hundrade gången, är du inte ensam.
 
-### Updates
+### Uppdateringar {#updates}
 
-Factory Floor shows a badge in the sidebar when a newer version is available. You can also check manually from **Factory Floor > Check for Updates...**
+Factory Floor visar en badge i sidebar när en nyare version finns tillgänglig. Du kan också kontrollera manuellt från **Factory Floor > Check for Updates...**
 
-**Homebrew users:**
+**Homebrew-användare:**
 
 ```
 brew upgrade factory-floor
 ```
 
-**DMG users:** updates are handled automatically via [Sparkle](https://sparkle-project.org). Check manually from the menu: **Factory Floor > Check for Updates...**
+**DMG-användare:** uppdateringar hanteras automatiskt via [Sparkle](https://sparkle-project.org). Kontrollera manuellt från menyn: **Factory Floor > Check for Updates...**
 
-Enable **Bleeding edge updates** in Settings > Advanced for pre-release builds. For those who like to live on the edge and file bug reports.
-
----
-
-## More Advanced Features 😉
-
-### Code Editor
-
-Nope. No syntax highlighting, no autocomplete, no minimap. Our nonexistent VCs have not been pushing any corporate agenda. We intend to have you using the tools you already love: [Zed](https://zed.dev), [VS Code](https://code.visualstudio.com), whatever. Factory Floor gives you a coding agent, a browser, and a worktree. Besides, who's writing code anymore?
-
-### Merge Viewer
-
-Also nope. Your git client already does this better than we ever would. We just make sure each workstream has a clean branch ready for review. You are keeping your PRs small and avoiding merge conflicts, right? ...Right?
+Aktivera **Bleeding edge updates** i Settings > Advanced för förhandsversioner. För dig som gillar att leva på kanten och skicka buggrapporter.
 
 ---
 
-## Troubleshooting
+## Mer avancerade funktioner 😉 {#more-advanced-features-}
 
-#### "Tools not found"
+### Kodredigerare {#code-editor}
 
-Factory Floor detects tools from your login shell. If `claude`, `gh`, `git`, or `tmux` aren't showing up:
+Nä. Ingen syntaxmarkering, ingen autocomplete, ingen minimap. Våra obefintliga riskkapitalister har inte drivit någon företagsagenda. Vi tänker att du ska använda verktygen du redan älskar: [Zed](https://zed.dev), [VS Code](https://code.visualstudio.com), vad som helst. Factory Floor ger dig en coding agent, en browser och en worktree. Dessutom, vem skriver kod längre?
 
-- Make sure they're in your shell's PATH
-- Fish 4.0 and Nix users: the app handles these environments, but if something's off, check Settings > Environment
+### Merge-visare {#merge-viewer}
 
-#### Tmux sessions not persisting
+Också nä. Din git-klient gör redan detta bättre än vi någonsin skulle kunna. Vi ser bara till att varje workstream har en ren branch redo för granskning. Du håller väl dina PRs små och undviker merge-konflikter, va? ...Va?
 
-- Verify tmux is installed and detected (Settings > Environment)
-- Factory Floor uses its own tmux socket (`-L factoryfloor`), so your personal tmux config won't interfere
+---
 
-#### Port not detected
+## Felsökning {#troubleshooting}
 
-- Make sure your run script uses `$FF_PORT` (or the port gets detected from the process tree)
-- The `ff-run` launcher wraps the run script — it monitors child processes for listening TCP ports
-- Check Settings > Advanced > Detailed logging for debug output
+#### "Tools not found" {#tools-not-found}
 
-#### Something else broken?
+Factory Floor upptäcker verktyg från ditt login shell. Om `claude`, `gh`, `git` eller `tmux` inte dyker upp:
 
-- [Report a bug](https://github.com/alltuner/factoryfloor/issues/new?template=bug_report.yml) — tell us what went wrong
-- [Submit a fix prompt](https://github.com/alltuner/factoryfloor/issues/new?template=fix_prompt.yml) — write the prompt, we'll let the agent take a crack at it
-- [Something else](https://github.com/alltuner/factoryfloor/issues/new) — ideas, questions, existential doubts
+- Se till att de finns i din shells PATH
+- Fish 4.0- och Nix-användare: appen hanterar dessa miljöer, men om något är fel, kolla Settings > Environment
+
+#### Tmux-sessioner som inte persisterar {#tmux-sessions-not-persisting}
+
+- Verifiera att tmux är installerat och upptäckt (Settings > Environment)
+- Factory Floor använder sin egen tmux socket (`-L factoryfloor`), så din personliga tmux-konfiguration stör inte
+
+#### Port inte upptäckt {#port-not-detected}
+
+- Se till att ditt run-script använder `$FF_PORT` (eller att porten upptäcks från processträdet)
+- `ff-run`-launchern kapslar run-scriptet, den övervakar barnprocesser efter lyssnande TCP-portar
+- Kolla Settings > Advanced > Detailed logging för debug-utdata
+
+#### Något annat som inte fungerar? {#something-else-broken}
+
+- [Rapportera en bugg](https://github.com/alltuner/factoryfloor/issues/new?template=bug_report.yml) — berätta vad som gick fel
+- [Skicka en fix-prompt](https://github.com/alltuner/factoryfloor/issues/new?template=fix_prompt.yml) — skriv prompten, vi låter agenten ta sig an det
+- [Något annat](https://github.com/alltuner/factoryfloor/issues/new) — idéer, frågor, existentiella tvivel

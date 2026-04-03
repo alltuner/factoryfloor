@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="{{ .Site.Language.Lang }}" class="scroll-smooth dark overflow-x-hidden">
+<html lang="{{ .Site.Language.Lang }}" class="scroll-smooth dark overflow-x-clip">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -59,7 +59,7 @@
 })();
 </script>
 </head>
-<body class="font-sans antialiased overflow-x-hidden bg-bg text-fg transition-colors duration-300">
+<body class="font-sans antialiased overflow-x-clip bg-bg text-fg transition-colors duration-300">
 {{ block "content" . }}{{ end }}
 
 <script>

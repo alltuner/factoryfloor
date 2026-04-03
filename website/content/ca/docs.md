@@ -5,11 +5,11 @@ hideInstall: true
 layout: docs
 ---
 
-## Getting Started
+## Primeres passes {#getting-started}
 
-The year is 2026. We build on tmux (2007), git worktrees (2015), terminals (1978, the VT100 era, when even [David](https://davidpoblador.com) was only a future project), and GPU rendering (thanks [Mitchell](https://mitchellh.com) for [Ghostty](https://ghostty.org)). Old tools, new tricks.
+Estem al 2026. Construïm sobre tmux (2007), git worktrees (2015), terminals (1978, l'era del VT100, quan fins i tot en [David](https://davidpoblador.com) era només un projecte de futur), i renderitzat per GPU (gràcies [Mitchell](https://mitchellh.com) per [Ghostty](https://ghostty.org)). Eines velles, trucs nous.
 
-You need two things: a Mac and a vague sense that your current workflow could be better.
+Necessites dues coses: un Mac i la vaga sensació que el teu flux de treball podria ser millor.
 
 ```
 brew install --cask factory-floor
@@ -17,176 +17,176 @@ brew install --cask factory-floor
 
 <a href="https://github.com/alltuner/factoryfloor/releases/latest/download/FactoryFloor.dmg" class="docs-download"><svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg> Download DMG</a>
 
-Factory Floor works best when these are installed (it'll tell you if they're missing):
+Factory Floor funciona millor quan tens instal·lat el següent (t'avisarà si falta alguna cosa):
 
-- **[Claude Code](https://docs.anthropic.com/en/docs/claude-code/overview)** — the whole point, really
-- **git** — you probably have this
-- **[gh](https://cli.github.com/)** — GitHub CLI, for PR status and quick actions
-- **[tmux](https://github.com/tmux/tmux)** — optional, enables session persistence
+- **[Claude Code](https://docs.anthropic.com/en/docs/claude-code/overview)** — la raó de ser, bàsicament
+- **git** — probablement ja el tens
+- **[gh](https://cli.github.com/)** — GitHub CLI, per a l'estat de PRs i quick actions
+- **[tmux](https://github.com/tmux/tmux)** — opcional, permet persistència de sessions
 
-#### Your first 30 seconds
+#### Els teus primers 30 segons {#your-first-30-seconds}
 
-1. Open Factory Floor
-2. Drop a git repository onto the sidebar (or click **+** to pick one)
-3. Hit **⌘N** to create a workstream
-4. That's it. You're coding with AI now.
+1. Obre Factory Floor
+2. Arrossega un repositori git cap al sidebar (o fes clic a **+** per triar-ne un)
+3. Prem **⌘N** per crear un workstream
+4. Ja està. Ja estàs programant amb IA.
 
-No config files required. Factory Floor detects your git setup, installed tools, and GitHub connections automatically.
-
----
-
-## Core Concepts
-
-The three things you'll interact with every day.
-
-### Projects
-
-A project is a git repository. Drop a directory on the sidebar or click the **+** button. Factory Floor checks if it's a git repo (and offers to initialize one if it's not).
-
-The project overview shows repository info, GitHub details (stars, forks, open issues), up to 5 recent PRs, and auto-discovered markdown documentation from your repo.
-
-Projects sort by **Recent** (last activity) by default. Toggle to **A-Z** if you're that kind of person.
-
-Right-click a project in the sidebar for quick access: **Reveal in Finder**, **Open in External Terminal**, **Open on GitHub**, or **Remove** (files stay on disk, we're not monsters).
-
-### Workstreams
-
-A workstream is where the work happens. Each one gets its own git worktree, branch, terminal, coding agent, and browser tab. They're completely isolated from each other.
-
-**⌘N** creates a new workstream. Behind the scenes:
-
-1. Fetches the latest default branch from origin
-2. Creates a git worktree with a fresh branch (prefixed with your branch prefix, default: `ff`)
-3. Symlinks `.env` and `.env.local` from the main repo (if enabled)
-4. Runs the setup script (if configured)
-5. Launches the coding agent
-
-The UI shows up instantly — worktree creation happens in the background.
-
-#### Workstream tabs
-
-- **Info** (⌘I) — branch name, PR status, project docs
-- **Agent** (⌘Return) — your Claude Code session
-- **Environment** (⌘E) — setup and run script controls
-- **Terminal** (⌘T) — additional terminal tabs, as many as you want
-- **Browser** (⌘B) — embedded browser with auto-port detection
-
-#### Branch auto-rename
-
-With **Auto-rename branch** enabled in settings, the coding agent renames your branch to match the task on the first prompt. So `ff/coral-tidal-reef` becomes `ff/fix-login-timeout`.
-
-#### Removing vs. purging
-
-- **Remove** — kills terminals and agent, but the worktree stays on disk
-- **Purge** — permanently deletes the worktree and branch (asks for confirmation if there are uncommitted changes)
-
-When a PR is merged, Factory Floor shows a "Purge" badge so you know it's safe to clean up.
-
-### The Coding Agent
-
-The coding agent tab runs [Claude Code](https://docs.anthropic.com/en/docs/claude-code/overview) in an embedded terminal. It sits right after the Info tab in every workstream.
-
-#### Agent settings
-
-- **Bypass permission prompts** — skips confirmation dialogs. Useful if you trust your agent (and live dangerously).
-- **Tmux mode** — wraps agent sessions in tmux so they survive app restarts. Requires tmux.
-- **Auto-rename branch** — lets the agent rename the branch to match the task.
-- **Agent Teams** — experimental multi-agent coordination, courtesy of Claude Code. We trust Anthropic, don't we?
-
-#### Quick actions
-
-Quick actions run one-shot Claude tasks from the sidebar:
-
-- **Commit** — stages and commits with an AI-generated message
-- **Push** — pushes the current branch to origin
-- **Create PR** — creates a pull request with AI-generated title and description
-- **Abandon PR** — closes the PR
-
-These run as background `claude -p` calls. Enable **Quick action debug mode** in settings if you want to know how the sausage is made. Trust us, [David](https://davidpoblador.com) spent more time than he can admit debugging weird behaviors in there.
+No cal cap fitxer de configuració. Factory Floor detecta automàticament la teva configuració de git, les eines instal·lades i les connexions amb GitHub.
 
 ---
 
-## Your Workspace
+## Conceptes clau {#core-concepts}
 
-Terminals, browsers, and shortcuts — the tools inside each workstream.
+Les tres coses amb les quals interactuaràs cada dia.
 
-### Terminals
+### Projectes {#projects}
 
-Terminals are GPU-rendered via [Ghostty](https://ghostty.org). They're fast.
+Un projecte és un repositori git. Arrossega un directori al sidebar o fes clic al botó **+**. Factory Floor comprova si és un repositori git (i t'ofereix inicialitzar-ne un si no ho és).
 
-- **⌘T** — new terminal tab
-- **⌘W** — close tab (or Ctrl+D to exit the shell)
-- **⌘1-9** — switch between tabs
-- **⌘Shift+[** / **⌘Shift+]** — cycle through tabs
+La vista general del projecte mostra informació del repositori, detalls de GitHub (estrelles, forks, issues obertes), fins a 5 PRs recents, i documentació markdown detectada automàticament del teu repositori.
 
-You can drag files and text onto the terminal. Because sometimes the mouse is fine, actually.
+Els projectes s'ordenen per **Recent** (última activitat) per defecte. Canvia a **A-Z** si ets d'aquest tipus de persona.
 
-**⌘Shift+E** opens the workstream directory in your preferred external terminal app.
+Fes clic dret sobre un projecte al sidebar per accés ràpid: **Reveal in Finder**, **Open in External Terminal**, **Open on GitHub**, o **Remove** (els fitxers es queden al disc, no som monstres).
 
-### The Browser
+### Workstreams {#workstreams}
 
-Every workstream can have browser tabs (⌘B). The browser is embedded — no window switching needed.
+Un workstream és on passa la feina. Cadascun té el seu propi git worktree, branch, terminal, coding agent, i navegador. Estan completament aïllats entre si.
 
-#### Port detection
+**⌘N** crea un workstream nou. Entre bastidors:
 
-When your run script starts a dev server, Factory Floor detects the listening port automatically and navigates the browser to it. No configuration needed. The `ff-run` launcher monitors the process tree for TCP listeners.
+1. Descarrega l'última branch per defecte des de l'origin
+2. Crea un git worktree amb una branch nova (amb el prefix de branch configurat, per defecte: `ff`)
+3. Fa symlink de `.env` i `.env.local` des del repositori principal (si està activat)
+4. Executa el setup script (si està configurat)
+5. Llança el coding agent
 
-#### Navigation
+La interfície apareix a l'instant, la creació del worktree passa en segon pla.
 
-- **⌘L** — focus the address bar
-- **⌘Shift+O** — open current URL in your external browser
-- **⌘Click** — opens links in your external browser
+#### Workstream tabs {#workstream-tabs}
 
-The browser shows a connection error page with a retry button if the server isn't ready yet. It'll auto-navigate once the port is detected.
+- **Info** (⌘I) — nom de branch, estat de PR, documentació del projecte
+- **Agent** (⌘Return) — la teva sessió de Claude Code
+- **Environment** (⌘E) — controls de setup i run script
+- **Terminal** (⌘T) — terminal tabs addicionals, tants com vulguis
+- **Navegador** (⌘B) — navegador integrat amb detecció automàtica de port
 
-### Keyboard Shortcuts
+#### Branch auto-rename {#branch-auto-rename}
 
-Factory Floor is keyboard-first. Here's everything.
+Amb **Auto-rename branch** activat a la configuració, el coding agent canvia el nom de la teva branch per coincidir amb la tasca al primer prompt. Així `ff/coral-tidal-reef` es converteix en `ff/fix-login-timeout`.
 
-#### Global
+#### Eliminar vs. purgar {#removing-vs-purging}
 
-| Shortcut | Action |
+- **Remove** — mata terminals i agent, però el worktree es queda al disc
+- **Purge** — elimina permanentment el worktree i la branch (demana confirmació si hi ha canvis sense commit)
+
+Quan un PR es fusiona, Factory Floor mostra un badge "Purge" perquè sàpigues que pots netejar tranquil·lament.
+
+### El Coding Agent {#the-coding-agent}
+
+El Coding Agent tab executa [Claude Code](https://docs.anthropic.com/en/docs/claude-code/overview) en un terminal integrat. Es situa just després del tab Info a cada workstream.
+
+#### Configuració de l'agent {#agent-settings}
+
+- **Bypass permission prompts** — salta els diàlegs de confirmació. Útil si confies en el teu agent (i vius perillosament).
+- **Tmux mode** — embolcalla les sessions de l'agent en tmux perquè sobrevisquin als reinicis de l'app. Requereix tmux.
+- **Auto-rename branch** — permet que l'agent canviï el nom de la branch per coincidir amb la tasca.
+- **Agent Teams** — coordinació multi-agent experimental, cortesia de Claude Code. Confiem en Anthropic, oi?
+
+#### Quick actions {#quick-actions}
+
+Les quick actions executen tasques puntuals de Claude des del sidebar:
+
+- **Commit** — prepara i fa commit amb un missatge generat per IA
+- **Push** — fa push de la branch actual a l'origin
+- **Create PR** — crea una pull request amb títol i descripció generats per IA
+- **Abandon PR** — tanca la PR
+
+S'executen com a crides `claude -p` en segon pla. Activa **Quick action debug mode** a la configuració si vols saber com es fa l'embotit. Confia en nosaltres, en [David](https://davidpoblador.com) va passar més temps del que pot admetre depurant comportaments estranys allà dins.
+
+---
+
+## El teu espai de treball {#your-workspace}
+
+Terminals, navegadors, i dreceres, les eines dins de cada workstream.
+
+### Terminals {#terminals}
+
+Els terminals es renderitzen per GPU via [Ghostty](https://ghostty.org). Són ràpids.
+
+- **⌘T** — nou terminal tab
+- **⌘W** — tanca tab (o Ctrl+D per sortir del shell)
+- **⌘1-9** — canvia entre tabs
+- **⌘Shift+[** / **⌘Shift+]** — cicla entre tabs
+
+Pots arrossegar fitxers i text sobre el terminal. Perquè de vegades el ratolí està bé, la veritat.
+
+**⌘Shift+E** obre el directori del workstream a la teva aplicació de terminal externa preferida.
+
+### El navegador {#the-browser}
+
+Cada workstream pot tenir pestanyes de navegador (⌘B). El navegador és integrat, no cal canviar de finestra.
+
+#### Port detection {#port-detection}
+
+Quan el teu run script inicia un servidor de desenvolupament, Factory Floor detecta automàticament el port en escolta i hi navega el navegador. No cal configurar res. El llançador `ff-run` monitoritza l'arbre de processos per trobar listeners TCP.
+
+#### Navegació {#navigation}
+
+- **⌘L** — focus a la barra d'adreces
+- **⌘Shift+O** — obre la URL actual al teu navegador extern
+- **⌘Click** — obre els enllaços al teu navegador extern
+
+El navegador mostra una pàgina d'error de connexió amb un botó de reintentar si el servidor encara no està llest. Navegarà automàticament quan es detecti el port.
+
+### Dreceres de teclat {#keyboard-shortcuts}
+
+Factory Floor prioritza el teclat. Aquí tens tot.
+
+#### Global {#global}
+
+| Drecera | Acció |
 |----------|--------|
-| ⌘N | New workstream (or project, if none exist) |
-| ⌘Shift+N | New project |
-| ⌘, | Settings |
-| ⌘/ | Help |
+| ⌘N | Nou workstream (o projecte, si no n'hi ha cap) |
+| ⌘Shift+N | Nou projecte |
+| ⌘, | Configuració |
+| ⌘/ | Ajuda |
 
-#### Workstream
+#### Workstream {#workstream}
 
-| Shortcut | Action |
+| Drecera | Acció |
 |----------|--------|
 | ⌘Return | Focus Coding Agent |
-| ⌘I | Info panel |
+| ⌘I | Panell Info |
 | ⌘E | Environment |
-| ⌘T | New Terminal |
-| ⌘B | New Browser |
-| ⌘W | Close tab |
-| ⌘L | Address bar (browser) |
-| ⌘0 | Back to project |
-| ⌘1-9 | Switch tab |
-| ⌘Shift+[ | Previous tab |
-| ⌘Shift+] | Next tab |
-| Ctrl+Shift+R | Rebuild setup |
-| Ctrl+Shift+S | Start/restart run |
+| ⌘T | Nou Terminal |
+| ⌘B | Nou navegador |
+| ⌘W | Tanca tab |
+| ⌘L | Barra d'adreces (navegador) |
+| ⌘0 | Torna al projecte |
+| ⌘1-9 | Canvia de tab |
+| ⌘Shift+[ | Tab anterior |
+| ⌘Shift+] | Tab següent |
+| Ctrl+Shift+R | Reconstrueix setup |
+| Ctrl+Shift+S | Inicia/reinicia run |
 
-#### Navigation
+#### Navegació {#navigation-1}
 
-| Shortcut | Action |
+| Drecera | Acció |
 |----------|--------|
-| Ctrl+1-9 | Switch workstream (from any view) |
-| ⌘Shift+O | Open in external browser |
-| ⌘Shift+E | Open in external terminal |
+| Ctrl+1-9 | Canvia de workstream (des de qualsevol vista) |
+| ⌘Shift+O | Obre al navegador extern |
+| ⌘Shift+E | Obre al terminal extern |
 
 ---
 
-## Configuration
+## Configuració {#configuration}
 
-How to automate the boring parts.
+Com automatitzar les parts avorrides.
 
-### Scripts & Lifecycle
+### Scripts i cicle de vida {#scripts--lifecycle}
 
-Drop a `.factoryfloor.json` in your project root to automate the workstream lifecycle.
+Posa un `.factoryfloor.json` a l'arrel del teu projecte per automatitzar el cicle de vida dels workstreams.
 
 ```json
 {
@@ -196,156 +196,156 @@ Drop a `.factoryfloor.json` in your project root to automate the workstream life
 }
 ```
 
-| Hook | When it runs |
+| Hook | Quan s'executa |
 |------|-------------|
-| `setup` | Once, when a workstream is created. Install dependencies, run migrations, whatever. |
-| `run` | On demand via the Environment tab (⌘E). Wrapped in `ff-run` for port detection. |
-| `teardown` | When a workstream is archived or purged. Stop containers, clean up. |
+| `setup` | Un cop, quan es crea un workstream. Instal·la dependències, executa migracions, el que sigui. |
+| `run` | Sota demanda des del tab Environment (⌘E). Embolcallat amb `ff-run` per a port detection. |
+| `teardown` | Quan un workstream s'arxiva o es purga. Atura contenidors, neteja. |
 
-All fields are optional. Scripts run in the workstream directory using your login shell. Yes, even [fish](https://github.com/alltuner/factoryfloor/pull/324). Don't ask how long that took.
+Tots els camps són opcionals. Els scripts s'executen al directori del workstream usant el teu shell de login. Sí, fins i tot [fish](https://github.com/alltuner/factoryfloor/pull/324). No preguntis quant de temps va costar.
 
-Factory Floor also reads `conductor.json` and `.superset/config.json` if `.factoryfloor.json` doesn't exist. Because compatibility is polite. (Time for a [standard](https://xkcd.com/927/)?)
+Factory Floor també llegeix `conductor.json` i `.superset/config.json` si `.factoryfloor.json` no existeix. Perquè la compatibilitat és de bona educació. (Hora d'un [estàndard](https://xkcd.com/927/)?)
 
-#### The Environment tab
+#### El tab Environment {#the-environment-tab}
 
-Split-pane layout: **Setup** on the left, **Run** on the right.
+Disposició en panell dividit: **Setup** a l'esquerra, **Run** a la dreta.
 
-- **Ctrl+Shift+R** — rebuild (reruns setup)
-- **Ctrl+Shift+S** — start/restart the run script
+- **Ctrl+Shift+R** — reconstrueix (reexecuta setup)
+- **Ctrl+Shift+S** — inicia/reinicia el run script
 
-### Environment Variables
+### Variables d'entorn {#environment-variables}
 
-Every terminal, setup script, and run command in a workstream has these variables:
+Cada terminal, setup script, i comanda run d'un workstream té aquestes variables:
 
-| Variable | What it is | Example |
+| Variable | Què és | Exemple |
 |----------|-----------|---------|
-| `FF_PROJECT` | Project name | `my-app` |
-| `FF_WORKSTREAM` | Workstream name | `coral-tidal-reef` |
-| `FF_PROJECT_DIR` | Main repository path | `/Users/you/my-app` |
-| `FF_WORKTREE_DIR` | Worktree path | `~/.factoryfloor/worktrees/my-app/coral-tidal-reef` |
-| `FF_PORT` | Deterministic port (40001-49999) | `42847` |
+| `FF_PROJECT` | Nom del projecte | `my-app` |
+| `FF_WORKSTREAM` | Nom del workstream | `coral-tidal-reef` |
+| `FF_PROJECT_DIR` | Ruta del repositori principal | `/Users/you/my-app` |
+| `FF_WORKTREE_DIR` | Ruta del worktree | `~/.factoryfloor/worktrees/my-app/coral-tidal-reef` |
+| `FF_PORT` | Port determinista (40001-49999) | `42847` |
 
-#### About FF_PORT
+#### Sobre FF_PORT {#about-ff_port}
 
-Each workstream gets a deterministic port based on a hash of the worktree path. Same workstream, same port, every time. No port conflicts between workstreams. Use it in your run script: `PORT=$FF_PORT npm run dev`. If your thing is running thousands of workstreams simultaneously, you might get a collision 🎲 but hopefully you run out of memory first.
+Cada workstream obté un port determinista basat en un hash de la ruta del worktree. Mateix workstream, mateix port, sempre. Sense conflictes de port entre workstreams. Usa'l al teu run script: `PORT=$FF_PORT npm run dev`. Si el teu rotllo és executar milers de workstreams simultàniament, potser et trobes una col·lisió 🎲 però amb sort et quedes sense memòria abans.
 
-#### .env symlink
+#### .env symlink {#env-symlink}
 
-When enabled (Settings > General), Factory Floor symlinks `.env` and `.env.local` from your main repo into each worktree. So your secrets follow you without copy-pasting. Speaking of secrets, have we told you about [Vaultuner](https://vaultuner.alltuner.com)?
+Quan està activat (Settings > General), Factory Floor fa symlink de `.env` i `.env.local` des del teu repositori principal a cada worktree. Així els teus secrets et segueixen sense haver de copiar i enganxar. Parlant de secrets, t'hem parlat de [Vaultuner](https://vaultuner.alltuner.com)?
 
-### Settings
+### Configuració {#settings}
 
-Open with **⌘,** or click the gear icon.
+Obre amb **⌘,** o fes clic a la icona d'engranatge.
 
-#### General
+#### General {#general}
 
-- **Base directory** — default location for new projects
-- **Branch prefix** — prefix for workstream branches (default: `ff`)
-- **Symlink .env files** — auto-symlink `.env` and `.env.local` to worktrees
-- **Theme** — System, Light, or Dark
-- **Language** — System default, English, Catalan, Spanish, or Swedish
-- **Confirm before quitting** — asks before closing with active workstreams
-- **Launch at login** — starts Factory Floor on boot
+- **Base directory** — ubicació per defecte per a nous projectes
+- **Branch prefix** — prefix per a les branches dels workstreams (per defecte: `ff`)
+- **Symlink .env files** — symlink automàtic de `.env` i `.env.local` als worktrees
+- **Theme** — Sistema, Clar, o Fosc
+- **Language** — Per defecte del sistema, anglès, català, castellà o suec
+- **Confirm before quitting** — pregunta abans de tancar amb workstreams actius
+- **Launch at login** — inicia Factory Floor en arrencar
 
-#### Coding Agent
+#### Coding Agent {#coding-agent}
 
-- **Bypass permission prompts** — disables confirmation for agent actions
-- **Agent Teams** — experimental multi-agent mode
-- **Auto-rename branch** — agent renames branch on first prompt
-- **Tmux mode** — session persistence via tmux
+- **Bypass permission prompts** — desactiva la confirmació per accions de l'agent
+- **Agent Teams** — mode multi-agent experimental
+- **Auto-rename branch** — l'agent canvia el nom de la branch al primer prompt
+- **Tmux mode** — persistència de sessions via tmux
 
-#### Apps
+#### Apps {#apps}
 
-- **External Terminal** — which terminal app to open with ⌘Shift+E
-- **External Browser** — which browser for ⌘Shift+O and ⌘Click
+- **External Terminal** — quina aplicació de terminal obrir amb ⌘Shift+E
+- **External Browser** — quin navegador per a ⌘Shift+O i ⌘Click
 
-#### Advanced
+#### Avançat {#advanced}
 
-- **Usage analytics** — privacy-friendly telemetry (app version, OS, locale only)
-- **Crash reports** — Sentry-based crash reporting
-- **Detailed logging** — logs script output for debugging
-- **Quick action debug mode** — shows raw output from quick actions
-- **Bleeding edge updates** — opt into pre-release builds
-- **Clear project list** — nuclear option, removes all projects from sidebar
+- **Usage analytics** — telemetry respectuosa amb la privacitat (només versió de l'app, SO, i locale)
+- **Crash reports** — informes d'errors basats en Sentry
+- **Detailed logging** — registra la sortida dels scripts per a depuració
+- **Quick action debug mode** — mostra la sortida en brut de les quick actions
+- **Bleeding edge updates** — opta per builds de pre-llançament
+- **Clear project list** — opció nuclear, elimina tots els projectes del sidebar
 
 ---
 
-## Integrations
+## Integracions {#integrations}
 
-Connecting Factory Floor to everything else.
+Connectant Factory Floor amb tot el demés.
 
-### CLI
+### CLI {#cli}
 
-Install the `ff` command from Settings > Environment > Install CLI. Then:
+Instal·la la comanda `ff` des de Settings > Environment > Install CLI. Després:
 
 ```
 ff /path/to/your/project
 ```
 
-Opens the directory in Factory Floor. That's all it does, and that's all it needs to do.
+Obre el directori a Factory Floor. Això és tot el que fa, i és tot el que necessita fer.
 
-### GitHub
+### GitHub {#github}
 
-Requires the [gh CLI](https://cli.github.com/) with authentication (`gh auth login`).
+Requereix el [gh CLI](https://cli.github.com/) amb autenticació (`gh auth login`).
 
-- **Project view** — repo info, description, stars, forks, open issues, recent PRs
-- **Workstream sidebar** — PR number, title, and status (open/merged/closed) per branch
-- **Merged detection** — shows "Purge" badge when a branch's PR is merged
+- **Vista de projecte** — info del repositori, descripció, estrelles, forks, issues obertes, PRs recents
+- **Workstream sidebar** — número de PR, títol, i estat (obert/fusionat/tancat) per branch
+- **Detecció de merge** — mostra el badge "Purge" quan la PR d'una branch s'ha fusionat
 
-#### Quick actions
+#### Quick actions {#quick-actions-1}
 
-From the sidebar, run one-click operations: **Create PR** (AI-generated title and description), **Push** (to origin with `-u`), or **Abandon PR** (closes with a comment). Because if you're tired of typing "now commit, push, and open a PR" into Claude for the hundredth time, you're not alone.
+Des del sidebar, executa operacions d'un sol clic: **Create PR** (títol i descripció generats per IA), **Push** (a l'origin amb `-u`), o **Abandon PR** (tanca amb un comentari). Perquè si estàs cansat d'escriure "ara fes commit, push, i obre una PR" a Claude per centèsima vegada, no ets l'únic.
 
-### Updates
+### Actualitzacions {#updates}
 
-Factory Floor shows a badge in the sidebar when a newer version is available. You can also check manually from **Factory Floor > Check for Updates...**
+Factory Floor mostra un badge al sidebar quan hi ha una versió més nova disponible. També pots comprovar-ho manualment des de **Factory Floor > Check for Updates...**
 
-**Homebrew users:**
+**Usuaris de Homebrew:**
 
 ```
 brew upgrade factory-floor
 ```
 
-**DMG users:** updates are handled automatically via [Sparkle](https://sparkle-project.org). Check manually from the menu: **Factory Floor > Check for Updates...**
+**Usuaris de DMG:** les actualitzacions es gestionen automàticament via [Sparkle](https://sparkle-project.org). Comprova manualment des del menú: **Factory Floor > Check for Updates...**
 
-Enable **Bleeding edge updates** in Settings > Advanced for pre-release builds. For those who like to live on the edge and file bug reports.
-
----
-
-## More Advanced Features 😉
-
-### Code Editor
-
-Nope. No syntax highlighting, no autocomplete, no minimap. Our nonexistent VCs have not been pushing any corporate agenda. We intend to have you using the tools you already love: [Zed](https://zed.dev), [VS Code](https://code.visualstudio.com), whatever. Factory Floor gives you a coding agent, a browser, and a worktree. Besides, who's writing code anymore?
-
-### Merge Viewer
-
-Also nope. Your git client already does this better than we ever would. We just make sure each workstream has a clean branch ready for review. You are keeping your PRs small and avoiding merge conflicts, right? ...Right?
+Activa **Bleeding edge updates** a Settings > Advanced per a builds de pre-llançament. Per als que els agrada viure al límit i enviar informes d'errors.
 
 ---
 
-## Troubleshooting
+## Funcionalitats més avançades 😉 {#more-advanced-features-}
 
-#### "Tools not found"
+### Editor de codi {#code-editor}
 
-Factory Floor detects tools from your login shell. If `claude`, `gh`, `git`, or `tmux` aren't showing up:
+No. Sense ressaltat de sintaxi, sense autocompletar, sense minimapa. Els nostres VCs inexistents no han estat imposant cap agenda corporativa. La intenció és que facis servir les eines que ja t'agraden: [Zed](https://zed.dev), [VS Code](https://code.visualstudio.com), el que sigui. Factory Floor et dóna un coding agent, un navegador, i un worktree. A més, qui escriu codi avui en dia?
 
-- Make sure they're in your shell's PATH
-- Fish 4.0 and Nix users: the app handles these environments, but if something's off, check Settings > Environment
+### Visor de merge {#merge-viewer}
 
-#### Tmux sessions not persisting
+Tampoc. El teu client de git ja ho fa millor del que nosaltres mai podríem. Nosaltres només ens assegurem que cada workstream tingui una branch neta llesta per a revisió. Estàs mantenint les teves PRs petites i evitant conflictes de merge, oi? ...Oi?
 
-- Verify tmux is installed and detected (Settings > Environment)
-- Factory Floor uses its own tmux socket (`-L factoryfloor`), so your personal tmux config won't interfere
+---
 
-#### Port not detected
+## Resolució de problemes {#troubleshooting}
 
-- Make sure your run script uses `$FF_PORT` (or the port gets detected from the process tree)
-- The `ff-run` launcher wraps the run script — it monitors child processes for listening TCP ports
-- Check Settings > Advanced > Detailed logging for debug output
+#### "Tools not found" {#tools-not-found}
 
-#### Something else broken?
+Factory Floor detecta les eines des del teu shell de login. Si `claude`, `gh`, `git`, o `tmux` no apareixen:
 
-- [Report a bug](https://github.com/alltuner/factoryfloor/issues/new?template=bug_report.yml) — tell us what went wrong
-- [Submit a fix prompt](https://github.com/alltuner/factoryfloor/issues/new?template=fix_prompt.yml) — write the prompt, we'll let the agent take a crack at it
-- [Something else](https://github.com/alltuner/factoryfloor/issues/new) — ideas, questions, existential doubts
+- Assegura't que estan al PATH del teu shell
+- Usuaris de Fish 4.0 i Nix: l'app gestiona aquests entorns, però si alguna cosa no va bé, comprova Settings > Environment
+
+#### Les sessions de tmux no persisteixen {#tmux-sessions-not-persisting}
+
+- Verifica que tmux està instal·lat i detectat (Settings > Environment)
+- Factory Floor utilitza el seu propi socket de tmux (`-L factoryfloor`), així que la teva configuració personal de tmux no interferirà
+
+#### Port no detectat {#port-not-detected}
+
+- Assegura't que el teu run script utilitza `$FF_PORT` (o que el port es detecta des de l'arbre de processos)
+- El llançador `ff-run` embolcalla el run script, monitoritza els processos fills per trobar listeners TCP
+- Comprova Settings > Advanced > Detailed logging per a sortida de depuració
+
+#### Alguna altra cosa no funciona? {#something-else-broken}
+
+- [Informa'ns d'un error](https://github.com/alltuner/factoryfloor/issues/new?template=bug_report.yml) — explica'ns què ha anat malament
+- [Envia un fix prompt](https://github.com/alltuner/factoryfloor/issues/new?template=fix_prompt.yml) — escriu el prompt, deixarem que l'agent ho intenti
+- [Alguna altra cosa](https://github.com/alltuner/factoryfloor/issues/new) — idees, preguntes, dubtes existencials
