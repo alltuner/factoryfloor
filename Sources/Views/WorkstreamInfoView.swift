@@ -110,7 +110,19 @@ struct WorkstreamInfoView: View {
                 .padding(.vertical, 6)
             }
 
-            // Pinned doc tabs
+            Divider()
+
+            // Markdown content fills available space
+            if let selected = selectedDoc,
+               let doc = docFiles.first(where: { $0.name == selected })
+            {
+                MarkdownContentView(markdown: doc.content)
+                    .id(selected)
+            } else {
+                Spacer()
+            }
+
+            // Doc tabs pinned to bottom
             if !docFiles.isEmpty {
                 Divider()
                 HStack(spacing: 0) {
@@ -118,25 +130,13 @@ struct WorkstreamInfoView: View {
                         DocTabButton(
                             name: doc.name,
                             isActive: selectedDoc == doc.name,
-                            action: { selectedDoc = doc.name }
+                            action: { selectedDoc = selectedDoc == doc.name ? nil : doc.name }
                         )
                     }
                     Spacer()
                 }
                 .padding(.horizontal, 16)
                 .padding(.vertical, 4)
-            }
-
-            Divider()
-
-            // Scrollable: only the markdown content
-            if let selected = selectedDoc,
-               let doc = docFiles.first(where: { $0.name == selected })
-            {
-                MarkdownContentView(markdown: doc.content)
-                    .id(selected)
-            } else if docFiles.isEmpty {
-                Spacer()
             }
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
@@ -210,7 +210,6 @@ struct WorkstreamInfoView: View {
     @MainActor
     private func updateDocFiles(_ docFiles: [DocFile]) {
         self.docFiles = docFiles
-        selectedDoc = docFiles.first?.name
     }
 }
 
@@ -330,7 +329,7 @@ struct DocTabButton: View {
                 .padding(.vertical, 3)
                 .background(isActive ? Color.primary.opacity(0.08) : (isHovering ? Color.primary.opacity(0.04) : .clear))
                 .clipShape(RoundedRectangle(cornerRadius: 4))
-                .foregroundStyle(isActive ? .primary : .tertiary)
+                .foregroundStyle(isActive ? .primary : .secondary)
         }
         .buttonStyle(.borderless)
         .onHover { isHovering = $0 }
