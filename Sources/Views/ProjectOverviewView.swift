@@ -177,7 +177,12 @@ struct ProjectOverviewView: View {
                 if !worktrees.isEmpty {
                     Section {
                         ForEach(worktrees) { wt in
-                            WorktreeInfoRow(worktree: wt)
+                            WorktreeInfoRow(
+                                worktree: wt,
+                                projectDirectory: project.directory,
+                                isWorkstream: workstreamPaths.contains(wt.path),
+                                onAdopt: { adoptWorktree(wt) }
+                            )
                         }
 
                         if prunableCount > 0 {
@@ -247,8 +252,22 @@ struct ProjectOverviewView: View {
         }
     }
 
+    private var workstreamPaths: Set<String> {
+        Set(project.workstreams.compactMap(\.worktreePath))
+    }
+
     private var prunableCount: Int {
-        worktrees.filter { !$0.isMain && !$0.isDirty }.count
+        worktrees.filter { !$0.isMain && !$0.isDirty && !$0.hasBranchCommits }.count
+    }
+
+    private func adoptWorktree(_ worktree: WorktreeInfo) {
+        let name = worktree.branch ?? worktree.path.components(separatedBy: "/").last ?? "workstream"
+        let workstream = Workstream(name: name, worktreePath: worktree.path)
+        NotificationCenter.default.post(
+            name: .workstreamCreated,
+            object: nil,
+            userInfo: ["projectID": project.id, "workstream": workstream]
+        )
     }
 
     private func refreshWorktrees() {
@@ -256,6 +275,11 @@ struct ProjectOverviewView: View {
         Task.detached {
             let wts = GitOperations.listWorktreesWithInfo(at: dir)
             await updateWorktrees(wts)
+            // Populate PR cache for worktree branches
+            let branches = Set(wts.compactMap(\.branch))
+            await MainActor.run {
+                appEnv.refreshBranchPRs(for: dir, branches: branches)
+            }
         }
     }
 
@@ -270,7 +294,7 @@ struct ProjectOverviewView: View {
     private func pruneWorktrees() {
         isPruning = true
         let dir = project.directory
-        let prunablePaths = Set(worktrees.filter { !$0.isMain && !$0.isDirty }.map(\.path))
+        let prunablePaths = Set(worktrees.filter { !$0.isMain && !$0.isDirty && !$0.hasBranchCommits }.map(\.path))
         Task.detached {
             GitOperations.pruneCleanWorktrees(at: dir)
             await applyPrunedWorktrees(prunablePaths)
@@ -311,37 +335,86 @@ struct ProjectOverviewView: View {
 
 private struct WorktreeInfoRow: View {
     let worktree: WorktreeInfo
+    let projectDirectory: String
+    let isWorkstream: Bool
+    let onAdopt: () -> Void
+
+    @EnvironmentObject var appEnv: AppEnvironment
+
+    private var pr: GitHubPR? {
+        guard let branch = worktree.branch else { return nil }
+        return appEnv.githubPR(for: projectDirectory, branch: branch)
+    }
 
     var body: some View {
         HStack {
             Image(systemName: worktree.isMain ? "folder.fill" : "arrow.triangle.branch")
                 .foregroundStyle(worktree.isMain ? .blue : .secondary)
-                .frame(width: 20)
+                .frame(width: 20, alignment: .top)
+                .padding(.top, 4)
             VStack(alignment: .leading, spacing: 2) {
                 Text(worktree.branch ?? "detached")
                     .font(.system(.body, design: .monospaced))
                 Text(worktree.path.abbreviatedPath)
                     .font(.caption)
                     .foregroundStyle(.tertiary)
+                if !worktree.isMain {
+                    HStack(spacing: 8) {
+                        if let pr {
+                            HStack(spacing: 3) {
+                                Image(systemName: "arrow.triangle.pull")
+                                    .font(.system(size: 10))
+                                Text(verbatim: "#\(pr.number)")
+                                    .font(.caption)
+                            }
+                            .foregroundStyle(.purple)
+                        }
+                        if worktree.isDirty {
+                            HStack(spacing: 4) {
+                                Circle()
+                                    .fill(.orange)
+                                    .frame(width: 6, height: 6)
+                                Text("Uncommitted changes")
+                                    .font(.caption)
+                                    .foregroundStyle(.orange)
+                            }
+                        } else if worktree.hasBranchCommits {
+                            HStack(spacing: 4) {
+                                Image(systemName: "arrow.up.circle.fill")
+                                    .font(.system(size: 10))
+                                Text("Commits ahead")
+                                    .font(.caption)
+                            }
+                            .foregroundStyle(.blue)
+                        } else {
+                            Text("Clean")
+                                .font(.caption)
+                                .foregroundStyle(.green)
+                        }
+                    }
+                }
             }
+            .frame(minHeight: 36, alignment: .leading)
             Spacer()
             if worktree.isMain {
                 Text("main")
                     .font(.caption)
                     .foregroundStyle(.secondary)
-            } else if worktree.isDirty {
-                HStack(spacing: 4) {
-                    Circle()
-                        .fill(.orange)
-                        .frame(width: 6, height: 6)
-                    Text("Uncommitted changes")
-                        .font(.caption)
-                        .foregroundStyle(.orange)
+            } else if !isWorkstream {
+                Button(action: onAdopt) {
+                    HStack(spacing: 4) {
+                        Image(systemName: "plus.rectangle.on.folder")
+                            .font(.system(size: 12))
+                        Text("Open")
+                            .font(.caption)
+                    }
+                    .foregroundStyle(.secondary)
+                    .padding(.horizontal, 8)
+                    .padding(.vertical, 4)
+                    .background(Color.primary.opacity(0.08))
+                    .clipShape(RoundedRectangle(cornerRadius: 4))
                 }
-            } else {
-                Text("Clean")
-                    .font(.caption)
-                    .foregroundStyle(.green)
+                .buttonStyle(.plain)
             }
         }
     }

@@ -77,6 +77,8 @@
 "Prune" = "Prune";
 "Clean" = "Clean";
 "Uncommitted changes" = "Uncommitted changes";
+"Commits ahead" = "Commits ahead";
+"Open as workstream" = "Open as workstream";
 "Worktrees on disk for this repository. Pruning removes clean worktrees and their associated workstreams." = "Worktrees on disk for this repository. Pruning removes clean worktrees and their associated workstreams.";
 "Prune %d clean worktree" = "Prune %d clean worktree";
 "Prune %d clean worktrees" = "Prune %d clean worktrees";

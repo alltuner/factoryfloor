@@ -307,6 +307,25 @@ final class AppEnvironment: ObservableObject {
     private var lastBranchPRRefresh: Date = .distantPast
 
     /// Refresh PRs for all workstream branches. One gh call per project.
+    /// Populate the branch PR cache for a set of branches in a single `gh` call.
+    func refreshBranchPRs(for directory: String, branches: Set<String>) {
+        guard ghAvailable, let ghPath = toolStatus.gh.path, !branches.isEmpty else { return }
+        Task.detached {
+            let prs = GitHubOperations.openPRs(ghPath: ghPath, at: directory, limit: 100)
+            let prsByBranch = Dictionary(prs.map { ($0.branch, $0) }, uniquingKeysWith: { first, _ in first })
+            await MainActor.run {
+                for branch in branches {
+                    let key = "\(directory)|\(branch)"
+                    if let pr = prsByBranch[branch] {
+                        self.githubBranchPRCache[key] = pr
+                    } else {
+                        self.githubBranchPRCache.removeValue(forKey: key)
+                    }
+                }
+            }
+        }
+    }
+
     /// Throttled to run at most every 30 seconds.
     func refreshAllBranchPRs(projects: [Project]) {
         let now = Date()

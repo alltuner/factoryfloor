@@ -19,6 +19,8 @@ struct WorktreeInfo: Identifiable {
     let branch: String?
     let isDirty: Bool
     let isMain: Bool
+    let hasUnpushedCommits: Bool
+    let hasBranchCommits: Bool
 
     var id: String {
         path
@@ -235,7 +237,9 @@ enum GitOperations {
                 if let path = currentPath {
                     let isMain = URL(fileURLWithPath: path).standardizedFileURL.path == mainPath
                     let dirty = !isMain && hasUncommittedChanges(at: path)
-                    results.append(WorktreeInfo(path: path, branch: currentBranch, isDirty: dirty, isMain: isMain))
+                    let unpushed = !isMain && hasUnpushedCommits(at: path)
+                    let branchCommits = !isMain && hasBranchCommits(at: path, projectPath: projectPath)
+                    results.append(WorktreeInfo(path: path, branch: currentBranch, isDirty: dirty, isMain: isMain, hasUnpushedCommits: unpushed, hasBranchCommits: branchCommits))
                 }
                 currentPath = String(line.dropFirst("worktree ".count))
                 currentBranch = nil
@@ -247,18 +251,20 @@ enum GitOperations {
         if let path = currentPath {
             let isMain = URL(fileURLWithPath: path).standardizedFileURL.path == mainPath
             let dirty = !isMain && hasUncommittedChanges(at: path)
-            results.append(WorktreeInfo(path: path, branch: currentBranch, isDirty: dirty, isMain: isMain))
+            let unpushed = !isMain && hasUnpushedCommits(at: path)
+            let branchCommits = !isMain && hasBranchCommits(at: path, projectPath: projectPath)
+            results.append(WorktreeInfo(path: path, branch: currentBranch, isDirty: dirty, isMain: isMain, hasUnpushedCommits: unpushed, hasBranchCommits: branchCommits))
         }
 
         return results
     }
 
-    /// Remove all worktrees that have no uncommitted changes. Returns count of pruned worktrees.
+    /// Remove all worktrees that have no uncommitted changes and no unmerged branch commits.
     @discardableResult
     static func pruneCleanWorktrees(at projectPath: String) -> Int {
         let worktrees = listWorktreesWithInfo(at: projectPath)
         var pruned = 0
-        for wt in worktrees where !wt.isMain && !wt.isDirty {
+        for wt in worktrees where !wt.isMain && !wt.isDirty && !wt.hasBranchCommits {
             let result = run(args: ["worktree", "remove", wt.path], in: projectPath)
             if result != nil {
                 pruned += 1

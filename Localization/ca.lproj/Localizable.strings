@@ -77,6 +77,8 @@
 "Prune" = "Neteja";
 "Clean" = "Net";
 "Uncommitted changes" = "Canvis sense confirmar";
+"Commits ahead" = "Commits per endavant";
+"Open as workstream" = "Obre com a flux de treball";
 "Worktrees on disk for this repository. Pruning removes clean worktrees and their associated workstreams." = "Arbres de treball al disc per a aquest repositori. La neteja elimina els arbres de treball nets i els seus fluxos de treball associats.";
 "Prune %d clean worktree" = "Neteja %d arbre de treball net";
 "Prune %d clean worktrees" = "Neteja %d arbres de treball nets";

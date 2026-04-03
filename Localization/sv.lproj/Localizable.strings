@@ -77,6 +77,8 @@
 "Prune" = "Rensa";
 "Clean" = "Rent";
 "Uncommitted changes" = "Osparade ändringar";
+"Commits ahead" = "Commits före";
+"Open as workstream" = "Öppna som arbetsflöde";
 "Worktrees on disk for this repository. Pruning removes clean worktrees and their associated workstreams." = "Arbetsträd på disk för detta repository. Rensning tar bort rena arbetsträd och deras associerade arbetsflöden.";
 "Prune %d clean worktree" = "Rensa %d rent arbetsträd";
 "Prune %d clean worktrees" = "Rensa %d rena arbetsträd";
