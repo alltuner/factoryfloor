@@ -179,8 +179,6 @@ struct TerminalContainerView: View {
     @StateObject private var portDetector: PortDetector
     @State private var runStoppedManually = false
     @State private var runStarted = false
-    @StateObject private var quickActionRunner = QuickActionRunner()
-
     init(workstreamID: UUID, workingDirectory: String, projectDirectory: String, projectName: String, workstreamName: String, bypassPermissions: Bool) {
         self.workstreamID = workstreamID
         self.workingDirectory = workingDirectory
@@ -193,6 +191,10 @@ struct TerminalContainerView: View {
 
     private var claudeID: UUID {
         workstreamID
+    }
+
+    private var quickActionRunner: QuickActionRunner {
+        surfaceCache.quickActionRunner(for: workstreamID)
     }
 
     /// Surface IDs that should be rendering for the active tab.
@@ -1283,6 +1285,7 @@ final class TerminalSurfaceCache: ObservableObject {
     private var surfaceParams: [UUID: SurfaceParams] = [:]
     private var tabSnapshots: [UUID: WorkspaceTabSnapshot] = [:]
     private var webViews: [UUID: WKWebView] = [:]
+    private var quickActionRunners: [UUID: QuickActionRunner] = [:]
     /// Surface IDs that should respawn when closed (e.g., the agent).
     var respawnableIDs: Set<UUID> = []
     /// Guards against concurrent respawns for the same surface ID.
@@ -1370,6 +1373,15 @@ final class TerminalSurfaceCache: ObservableObject {
         return view
     }
 
+    func quickActionRunner(for workstreamID: UUID) -> QuickActionRunner {
+        if let existing = quickActionRunners[workstreamID] {
+            return existing
+        }
+        let runner = QuickActionRunner()
+        quickActionRunners[workstreamID] = runner
+        return runner
+    }
+
     func removeWebView(for id: UUID) {
         webViews.removeValue(forKey: id)
     }
@@ -1385,6 +1397,9 @@ final class TerminalSurfaceCache: ObservableObject {
 
     func removeWorkstreamSurfaces(for workstreamID: UUID) {
         tabSnapshots.removeValue(forKey: workstreamID)
+        if let runner = quickActionRunners.removeValue(forKey: workstreamID) {
+            runner.cancel()
+        }
         // Remove agent surface
         removeSurface(for: workstreamID)
         // Build a set of all possible derived IDs and remove matches
