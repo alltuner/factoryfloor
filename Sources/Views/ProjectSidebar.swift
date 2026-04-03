@@ -107,6 +107,7 @@ struct ProjectSidebar: View {
                         isPathValid: appEnv.isPathValid(workstream.worktreePath),
                         hasActivePort: appEnv.hasActivePort(workstream.id),
                         githubURL: appEnv.githubURL(for: project.directory),
+                        taskDescription: appEnv.taskDescription(for: workstream.worktreePath),
                         prTitle: pr?.title,
                         prNumber: pr?.number,
                         prState: pr?.state,
@@ -721,6 +722,7 @@ private struct WorkstreamRow: View {
     let isPathValid: Bool
     var hasActivePort: Bool = false
     var githubURL: URL?
+    var taskDescription: String?
     var prTitle: String?
     var prNumber: Int?
     var prState: String?
@@ -735,6 +737,9 @@ private struct WorkstreamRow: View {
         guard isPathValid else { return nil }
         if let prTitle, let prNumber {
             return "\(prTitle) #\(prNumber)"
+        }
+        if let taskDescription {
+            return taskDescription
         }
         if let branchName, branchName != name {
             return branchName

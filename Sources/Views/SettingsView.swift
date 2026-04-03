@@ -198,7 +198,7 @@ struct SettingsView: View {
                 SettingToggle(
                     "Auto-rename branch",
                     isOn: $autoRenameBranch,
-                    description: "The agent will rename the worktree branch to match the task on the first request (e.g., fix-login-timeout)."
+                    description: "On the first request, the agent renames the branch to match the task and writes a short description visible in the sidebar."
                 )
 
                 SettingToggle(

@@ -126,7 +126,7 @@
 "Agent Teams" = "Equips d'agents";
 "Enables experimental multi-agent coordination. Agents can spawn teammates, delegate tasks, and collaborate across workstreams." = "Activa la coordinació experimental multi-agent. Els agents poden crear companys d'equip, delegar tasques i col·laborar entre fluxos de treball.";
 "Auto-rename branch" = "Canvia el nom de la branca automàticament";
-"The agent will rename the worktree branch to match the task on the first request (e.g., fix-login-timeout)." = "L'agent canviarà el nom de la branca de l'arbre de treball per coincidir amb la tasca a la primera sol·licitud (p. ex., fix-login-timeout).";
+"On the first request, the agent renames the branch to match the task and writes a short description visible in the sidebar." = "A la primera sol·licitud, l'agent canvia el nom de la branca per coincidir amb la tasca i escriu una breu descripció visible a la barra lateral.";
 "External Browser" = "Navegador extern";
 
 /* Settings - Advanced */

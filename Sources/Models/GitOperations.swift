@@ -130,6 +130,8 @@ enum GitOperations {
             symlinkEnvFiles(from: projectPath, to: worktreeDir.path)
         }
 
+        addExcludeEntry(at: projectPath, pattern: ".factoryfloor-state/")
+
         return worktreeDir.path
     }
 
@@ -150,6 +152,29 @@ enum GitOperations {
             }
             guard !fm.fileExists(atPath: destination.path) else { continue }
             try? fm.createSymbolicLink(at: destination, withDestinationURL: source)
+        }
+    }
+
+    /// Append a pattern to .git/info/exclude if not already present.
+    private static func addExcludeEntry(at repoPath: String, pattern: String) {
+        let excludeURL = URL(fileURLWithPath: repoPath).appendingPathComponent(".git/info/exclude")
+        let fm = FileManager.default
+
+        // Ensure the info directory exists
+        let infoDir = excludeURL.deletingLastPathComponent()
+        try? fm.createDirectory(at: infoDir, withIntermediateDirectories: true)
+
+        let existing = (try? String(contentsOf: excludeURL, encoding: .utf8)) ?? ""
+        let lines = existing.components(separatedBy: .newlines)
+        if lines.contains(pattern) { return }
+
+        let entry = existing.hasSuffix("\n") || existing.isEmpty ? pattern + "\n" : "\n" + pattern + "\n"
+        if let data = entry.data(using: .utf8), let handle = try? FileHandle(forWritingTo: excludeURL) {
+            handle.seekToEndOfFile()
+            handle.write(data)
+            handle.closeFile()
+        } else {
+            try? (existing + entry).write(to: excludeURL, atomically: true, encoding: .utf8)
         }
     }
 

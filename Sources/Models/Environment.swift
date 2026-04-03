@@ -39,6 +39,9 @@ final class AppEnvironment: ObservableObject {
     /// Active port cache per workstream ID
     @Published private var activePortCache: Set<UUID> = []
 
+    /// Task description cache per worktree path
+    @Published private var taskDescriptionCache: [String: String] = [:]
+
     /// GitHub remote detection cache per project directory (lightweight git check)
     @Published private var githubRemoteCache: [String: Bool] = [:]
 
@@ -191,6 +194,11 @@ final class AppEnvironment: ObservableObject {
         activePortCache.contains(workstreamID)
     }
 
+    func taskDescription(for worktreePath: String?) -> String? {
+        guard let path = worktreePath else { return nil }
+        return taskDescriptionCache[path]
+    }
+
     /// Returns IDs of projects whose directories no longer exist.
     @Published var missingProjectIDs: Set<UUID> = []
 
@@ -201,6 +209,7 @@ final class AppEnvironment: ObservableObject {
             var gitRepoResults: [String: Bool] = [:]
             var githubRemoteResults: [String: Bool] = [:]
             var portResults: Set<UUID> = []
+            var descriptionResults: [String: String] = [:]
 
             // Collect valid worktree paths that need git info
             var validPaths: [String] = []
@@ -220,13 +229,22 @@ final class AppEnvironment: ObservableObject {
                     if RunStateStore.loadValidated(for: ws.id)?.detectedPorts.isEmpty == false {
                         portResults.insert(ws.id)
                     }
-
                     guard let path = ws.worktreePath else { continue }
                     var wsIsDir: ObjCBool = false
                     let valid = FileManager.default.fileExists(atPath: path, isDirectory: &wsIsDir) && wsIsDir.boolValue
                     results[path] = valid
                     if valid {
                         validPaths.append(path)
+                        let descURL = URL(fileURLWithPath: path)
+                            .appendingPathComponent(".factoryfloor-state/description")
+                        if let data = try? Data(contentsOf: descURL),
+                           let text = String(data: data, encoding: .utf8)
+                        {
+                            let trimmed = text.trimmingCharacters(in: .whitespacesAndNewlines)
+                            if !trimmed.isEmpty {
+                                descriptionResults[path] = trimmed
+                            }
+                        }
                     }
                 }
             }
@@ -290,6 +308,7 @@ final class AppEnvironment: ObservableObject {
                 self.githubRemoteCache.merge(githubRemoteResults) { _, new in new }
                 self.worktreeStateCache.merge(worktreeStates) { _, new in new }
                 self.activePortCache = portResults
+                self.taskDescriptionCache = descriptionResults
             }
         }
     }

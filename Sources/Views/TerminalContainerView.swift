@@ -783,6 +783,7 @@ struct TerminalContainerView: View {
 
     private var envVars: [String: String] {
         WorkstreamEnvironment.variables(
+            workstreamID: workstreamID,
             projectName: projectName,
             workstreamName: workstreamName,
             projectDirectory: projectDirectory,

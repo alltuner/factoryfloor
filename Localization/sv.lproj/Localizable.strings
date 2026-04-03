@@ -126,7 +126,7 @@
 "Agent Teams" = "Agentteam";
 "Enables experimental multi-agent coordination. Agents can spawn teammates, delegate tasks, and collaborate across workstreams." = "Aktiverar experimentell multi-agentkoordinering. Agenter kan skapa teammedlemmar, delegera uppgifter och samarbeta mellan arbetsflöden.";
 "Auto-rename branch" = "Byt namn på gren automatiskt";
-"The agent will rename the worktree branch to match the task on the first request (e.g., fix-login-timeout)." = "Agenten byter namn på arbetsträdsgrenen för att matcha uppgiften vid den första förfrågan (t.ex. fix-login-timeout).";
+"On the first request, the agent renames the branch to match the task and writes a short description visible in the sidebar." = "Vid den första förfrågan byter agenten namn på grenen för att matcha uppgiften och skriver en kort beskrivning synlig i sidofältet.";
 "External Browser" = "Extern webbläsare";
 
 /* Settings - Advanced */

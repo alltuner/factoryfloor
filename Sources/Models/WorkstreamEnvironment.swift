@@ -6,6 +6,7 @@ import Foundation
 enum WorkstreamEnvironment {
     /// Build the environment variables for a workstream's terminal sessions.
     static func variables(
+        workstreamID: UUID,
         projectName: String,
         workstreamName: String,
         projectDirectory: String,
@@ -14,6 +15,7 @@ enum WorkstreamEnvironment {
         agentTeams: Bool
     ) -> [String: String] {
         var vars = [
+            "FF_WORKSTREAM_ID": workstreamID.uuidString.lowercased(),
             "FF_PROJECT": projectName,
             "FF_WORKSTREAM": workstreamName,
             "FF_PROJECT_DIR": projectDirectory,

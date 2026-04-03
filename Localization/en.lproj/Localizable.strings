@@ -126,7 +126,7 @@
 "Agent Teams" = "Agent Teams";
 "Enables experimental multi-agent coordination. Agents can spawn teammates, delegate tasks, and collaborate across workstreams." = "Enables experimental multi-agent coordination. Agents can spawn teammates, delegate tasks, and collaborate across workstreams.";
 "Auto-rename branch" = "Auto-rename branch";
-"The agent will rename the worktree branch to match the task on the first request (e.g., fix-login-timeout)." = "The agent will rename the worktree branch to match the task on the first request (e.g., fix-login-timeout).";
+"On the first request, the agent renames the branch to match the task and writes a short description visible in the sidebar." = "On the first request, the agent renames the branch to match the task and writes a short description visible in the sidebar.";
 "External Browser" = "External Browser";
 
 /* Settings - Advanced */
