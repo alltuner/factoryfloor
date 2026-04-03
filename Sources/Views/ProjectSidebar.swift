@@ -790,6 +790,7 @@ private struct WorkstreamRow: View {
         }
         .frame(maxWidth: .infinity, alignment: .leading)
         .contentShape(Rectangle())
+        .help(taskDescription ?? "")
         .onHover { isHovering = $0 }
         .contextMenu {
             if let worktreePath {
