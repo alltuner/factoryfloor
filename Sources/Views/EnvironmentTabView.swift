@@ -14,7 +14,7 @@ func scriptCommand(script: String, role: String, shell: String = CommandBuilder.
     } else {
         inner = script
     }
-    return "\(shell) -lic \(CommandBuilder.shellQuote(inner))"
+    return "\(shell) -lic \(CommandBuilder.shellQuote(inner, forShell: shell))"
 }
 
 struct EnvironmentTabView: View {

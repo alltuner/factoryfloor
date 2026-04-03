@@ -39,7 +39,8 @@ struct CommandBuilder {
             fallbackCmd = fallback
         }
         let posixCmd = "\(primary) || \(fallbackCmd)"
-        let shCmd = "exec sh -c \(shellQuote(posixCmd))"
+        let shArgQuote = isFish(shell) ? fishQuote(posixCmd) : shellQuote(posixCmd)
+        let shCmd = "exec sh -c \(shArgQuote)"
         return "\(shell) -lic \(shellQuote(shCmd, forShell: shell))"
     }
 
@@ -78,6 +79,8 @@ struct CommandBuilder {
             .replacingOccurrences(of: "\"", with: "\\\"")
             .replacingOccurrences(of: "$", with: "\\$")
             .replacingOccurrences(of: "`", with: "\\`")
+            .replacingOccurrences(of: "(", with: "\\(")
+            .replacingOccurrences(of: ")", with: "\\)")
         return "\"\(escaped)\""
     }
 }
