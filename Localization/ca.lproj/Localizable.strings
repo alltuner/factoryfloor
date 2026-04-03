@@ -70,6 +70,8 @@
 "Coding Agent" = "Agent de codi";
 "Bypass permission prompts" = "Ometre les sol·licituds de permisos";
 "When enabled, the coding agent will not ask for confirmation before making changes. Use with caution: the agent will be able to edit files, run commands, and make git commits without asking." = "Quan està activat, l'agent de codi no demanarà confirmació abans de fer canvis. Utilitza amb precaució: l'agent podrà editar fitxers, executar ordres i fer commits sense preguntar.";
+"Allow writes outside worktree" = "Permetre escriptures fora del worktree";
+"When enabled, the coding agent can modify files anywhere on disk. When disabled, writes are restricted to the worktree directory." = "Quan està activat, l'agent de codi pot modificar fitxers a qualsevol lloc del disc. Quan està desactivat, les escriptures es restringeixen al directori del worktree.";
 "External Terminal" = "Terminal extern";
 "Requires tmux to be installed." = "Requereix tmux instal·lat.";
 "URL" = "URL";

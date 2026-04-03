@@ -34,7 +34,7 @@ final class LaunchLoggerTests: XCTestCase {
             environmentVariables: ["FF_PROJECT": "myproject"],
             workingDirectory: "/tmp/test",
             toolPaths: LaunchLogEntry.ToolPaths(claude: "/usr/local/bin/claude", tmux: "/usr/bin/tmux", ffRun: nil),
-            settings: LaunchLogEntry.Settings(tmuxMode: true, bypassPermissions: false, agentTeams: false, autoRenameBranch: true),
+            settings: LaunchLogEntry.Settings(tmuxMode: true, bypassPermissions: false, agentTeams: false, autoRenameBranch: true, allowOutsideWorktree: false),
             shell: "/bin/zsh"
         )
 
@@ -128,7 +128,7 @@ final class LaunchLoggerTests: XCTestCase {
             environmentVariables: [:],
             workingDirectory: "/tmp",
             toolPaths: LaunchLogEntry.ToolPaths(claude: nil, tmux: nil, ffRun: nil),
-            settings: LaunchLogEntry.Settings(tmuxMode: false, bypassPermissions: false, agentTeams: false, autoRenameBranch: false),
+            settings: LaunchLogEntry.Settings(tmuxMode: false, bypassPermissions: false, agentTeams: false, autoRenameBranch: false, allowOutsideWorktree: false),
             shell: "/bin/zsh"
         )
 
@@ -180,7 +180,7 @@ final class LaunchLoggerTests: XCTestCase {
             environmentVariables: ["FF_PROJECT": "test"],
             workingDirectory: "/tmp/test",
             toolPaths: LaunchLogEntry.ToolPaths(claude: "/usr/local/bin/claude", tmux: nil, ffRun: nil),
-            settings: LaunchLogEntry.Settings(tmuxMode: false, bypassPermissions: false, agentTeams: false, autoRenameBranch: false),
+            settings: LaunchLogEntry.Settings(tmuxMode: false, bypassPermissions: false, agentTeams: false, autoRenameBranch: false, allowOutsideWorktree: false),
             shell: "/bin/zsh"
         )
     }

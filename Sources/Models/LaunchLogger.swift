@@ -15,6 +15,7 @@ struct LaunchLogEntry: Codable {
         let bypassPermissions: Bool
         let agentTeams: Bool
         let autoRenameBranch: Bool
+        let allowOutsideWorktree: Bool
     }
 
     let timestamp: String

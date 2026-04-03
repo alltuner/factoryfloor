@@ -4,6 +4,17 @@
 import Foundation
 
 enum SystemPrompts {
+    static func restrictToWorktreePrompt(worktreePath: String) -> String {
+        """
+        CRITICAL FILESYSTEM CONSTRAINT: You MUST NOT create, edit, delete, or modify any files \
+        outside of the following directory: \(worktreePath)
+        This includes temporary files, configuration files, and any other filesystem writes. \
+        All file operations MUST target paths within \(worktreePath). \
+        If a task requires modifying files outside this path, explain what needs to change and \
+        ask the user to do it manually or to enable unrestricted filesystem access in Settings.
+        """
+    }
+
     static let autoRenameBranchPrompt = """
     You are working inside Factory Floor, a Mac app that runs coding agents in parallel worktrees. \
     When the user presents their first request: \

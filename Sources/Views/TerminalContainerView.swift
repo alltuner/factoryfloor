@@ -166,6 +166,7 @@ struct TerminalContainerView: View {
     @AppStorage("factoryfloor.tmuxMode") private var tmuxMode: Bool = false
     @AppStorage("factoryfloor.agentTeams") private var agentTeams: Bool = false
     @AppStorage("factoryfloor.autoRenameBranch") private var autoRenameBranch: Bool = false
+    @AppStorage("factoryfloor.allowOutsideWorktree") private var allowOutsideWorktree: Bool = false
     @AppStorage("factoryfloor.quickActionDebug") private var quickActionDebug: Bool = false
     @State private var activeTab: WorkspaceTab = .info
     @State private var tabs: [WorkspaceTab] = [.info, .agent]
@@ -246,6 +247,15 @@ struct TerminalContainerView: View {
         guard let basePath = appEnv.toolStatus.claude.path else { return nil }
         let sessionID = workstreamID.uuidString.lowercased()
 
+        var systemPromptParts: [String] = []
+        if !allowOutsideWorktree {
+            systemPromptParts.append(SystemPrompts.restrictToWorktreePrompt(worktreePath: workingDirectory))
+        }
+        if autoRenameBranch {
+            systemPromptParts.append(SystemPrompts.autoRenameBranchPrompt)
+        }
+        let combinedSystemPrompt = systemPromptParts.isEmpty ? nil : systemPromptParts.joined(separator: "\n\n")
+
         var resume = CommandBuilder(basePath)
         resume.option("--resume", sessionID)
         if appEnv.toolStatus.claudeSupportsSessionName {
@@ -253,8 +263,8 @@ struct TerminalContainerView: View {
         }
         if useTmux { resume.flag("--teammate-mode"); resume.arg("tmux") }
         if bypassPermissions { resume.flag("--dangerously-skip-permissions") }
-        if autoRenameBranch {
-            resume.option("--append-system-prompt", SystemPrompts.autoRenameBranchPrompt)
+        if let combinedSystemPrompt {
+            resume.option("--append-system-prompt", combinedSystemPrompt)
         }
 
         var fresh = CommandBuilder(basePath)
@@ -264,8 +274,8 @@ struct TerminalContainerView: View {
         }
         if useTmux { fresh.flag("--teammate-mode"); fresh.arg("tmux") }
         if bypassPermissions { fresh.flag("--dangerously-skip-permissions") }
-        if autoRenameBranch {
-            fresh.option("--append-system-prompt", SystemPrompts.autoRenameBranchPrompt)
+        if let combinedSystemPrompt {
+            fresh.option("--append-system-prompt", combinedSystemPrompt)
         }
 
         let cmd = CommandBuilder.withFallback(
@@ -299,12 +309,17 @@ struct TerminalContainerView: View {
                 tmuxMode: tmuxMode,
                 bypassPermissions: bypassPermissions,
                 agentTeams: agentTeams,
-                autoRenameBranch: autoRenameBranch
+                autoRenameBranch: autoRenameBranch,
+                allowOutsideWorktree: allowOutsideWorktree
             ),
             shell: CommandBuilder.userShell
         ))
 
         return finalCommand
+    }
+
+    private func rebuildClaudeCommand() {
+        cachedClaudeCommand = buildClaudeCommand()
     }
 
     private var fixedTabs: [WorkspaceTab] {
@@ -456,6 +471,29 @@ struct TerminalContainerView: View {
     }
 
     private var mainContent: some View {
+        mainLayout
+            .onChange(of: tmuxMode) { rebuildClaudeCommand() }
+            .onChange(of: bypassPermissions) { rebuildClaudeCommand() }
+            .onChange(of: autoRenameBranch) { rebuildClaudeCommand() }
+            .onChange(of: allowOutsideWorktree) { rebuildClaudeCommand() }
+            .onChange(of: workstreamName) { rebuildClaudeCommand() }
+            .onChange(of: appEnv.isDetecting) {
+                rebuildClaudeCommand()
+                preloadSurfaces()
+            }
+            .onReceive(NotificationCenter.default.publisher(for: .toggleInfo)) { _ in activeTab = .info }
+            .onReceive(NotificationCenter.default.publisher(for: .focusAgent)) { _ in activeTab = .agent }
+            .onReceive(NotificationCenter.default.publisher(for: .toggleEnvironment)) { _ in
+                if tabs.contains(.environment) { activeTab = .environment }
+            }
+            .onReceive(NotificationCenter.default.publisher(for: .toggleTerminal)) { _ in addTerminal() }
+            .onReceive(NotificationCenter.default.publisher(for: .toggleBrowser)) { _ in addBrowser() }
+            .onReceive(NotificationCenter.default.publisher(for: .closeTerminal)) { _ in
+                if activeTab.isCloseable { closeTab(activeTab) }
+            }
+    }
+
+    private var mainLayout: some View {
         VStack(spacing: 0) {
             tabBar
             Divider()
@@ -511,24 +549,6 @@ struct TerminalContainerView: View {
         .onReceive(NotificationCenter.default.publisher(for: .terminalActivity)) { notification in
             guard let wsID = notification.object as? UUID, wsID == workstreamID else { return }
             appEnv.refreshWorktreeState(for: workingDirectory, projectDirectory: projectDirectory)
-        }
-        .onChange(of: tmuxMode) { cachedClaudeCommand = buildClaudeCommand() }
-        .onChange(of: bypassPermissions) { cachedClaudeCommand = buildClaudeCommand() }
-        .onChange(of: autoRenameBranch) { cachedClaudeCommand = buildClaudeCommand() }
-        .onChange(of: workstreamName) { cachedClaudeCommand = buildClaudeCommand() }
-        .onChange(of: appEnv.isDetecting) {
-            cachedClaudeCommand = buildClaudeCommand()
-            preloadSurfaces()
-        }
-        .onReceive(NotificationCenter.default.publisher(for: .toggleInfo)) { _ in activeTab = .info }
-        .onReceive(NotificationCenter.default.publisher(for: .focusAgent)) { _ in activeTab = .agent }
-        .onReceive(NotificationCenter.default.publisher(for: .toggleEnvironment)) { _ in
-            if tabs.contains(.environment) { activeTab = .environment }
-        }
-        .onReceive(NotificationCenter.default.publisher(for: .toggleTerminal)) { _ in addTerminal() }
-        .onReceive(NotificationCenter.default.publisher(for: .toggleBrowser)) { _ in addBrowser() }
-        .onReceive(NotificationCenter.default.publisher(for: .closeTerminal)) { _ in
-            if activeTab.isCloseable { closeTab(activeTab) }
         }
     }
 

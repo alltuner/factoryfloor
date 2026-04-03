@@ -7,6 +7,7 @@ struct SettingsView: View {
     @AppStorage("factoryfloor.languageOverride") private var languageOverride: String = ""
     @AppStorage("factoryfloor.tmuxMode") private var tmuxMode: Bool = false
     @AppStorage("factoryfloor.bypassPermissions") private var bypassPermissions: Bool = false
+    @AppStorage("factoryfloor.allowOutsideWorktree") private var allowOutsideWorktree: Bool = false
     @AppStorage("factoryfloor.agentTeams") private var agentTeams: Bool = false
     @AppStorage("factoryfloor.autoRenameBranch") private var autoRenameBranch: Bool = false
     @AppStorage("factoryfloor.defaultTerminal") private var defaultTerminal: String = ""
@@ -187,6 +188,13 @@ struct SettingsView: View {
                     isOn: $bypassPermissions,
                     description: "When enabled, the coding agent will not ask for confirmation before making changes. Use with caution: the agent will be able to edit files, run commands, and make git commits without asking.",
                     descriptionStyle: bypassPermissions ? .warning : .secondary
+                )
+
+                SettingToggle(
+                    "Allow writes outside worktree",
+                    isOn: $allowOutsideWorktree,
+                    description: "When enabled, the coding agent can modify files anywhere on disk. When disabled, writes are restricted to the worktree directory.",
+                    descriptionStyle: allowOutsideWorktree ? .warning : .secondary
                 )
 
                 SettingToggle(

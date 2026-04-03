@@ -333,7 +333,8 @@ struct EnvironmentTabView: View {
                 tmuxMode: useTmux,
                 bypassPermissions: false,
                 agentTeams: false,
-                autoRenameBranch: false
+                autoRenameBranch: false,
+                allowOutsideWorktree: false
             ),
             shell: CommandBuilder.userShell
         ))

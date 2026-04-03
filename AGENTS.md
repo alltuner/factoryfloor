@@ -131,6 +131,20 @@ via FSEvents and retargets the embedded browser when a port is detected.
 - URL scheme: `factoryfloor://`
 - Bundle ID: `com.alltuner.factoryfloor`
 
+### System prompts
+
+The Coding Agent receives additional system prompts via `--append-system-prompt` based on
+user settings. Prompts are defined in `Sources/Models/SystemPrompts.swift` and assembled in
+`TerminalContainerView.buildClaudeCommand()`.
+
+**Important**: Claude Code only accepts a single `--append-system-prompt` flag per invocation.
+Multiple flags do not stack; the last one wins. When multiple prompts are active, they must be
+concatenated into a single string before passing to the CLI.
+
+Active prompts (combined when multiple are enabled):
+- **Restrict to worktree** (default: on, setting: `factoryfloor.allowOutsideWorktree`): constrains file writes to the worktree directory.
+- **Auto-rename branch** (setting: `factoryfloor.autoRenameBranch`): renames the git branch to match the task on first request.
+
 ## Localization
 
 All user-facing strings MUST use localization. Never hardcode strings directly in SwiftUI views or code.

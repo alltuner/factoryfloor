@@ -70,6 +70,8 @@
 "Coding Agent" = "Kodningsagent";
 "Bypass permission prompts" = "Hoppa över behörighetsförfrågningar";
 "When enabled, the coding agent will not ask for confirmation before making changes. Use with caution: the agent will be able to edit files, run commands, and make git commits without asking." = "När aktiverad kommer kodningsagenten inte att be om bekräftelse innan ändringar görs. Använd med försiktighet: agenten kan redigera filer, köra kommandon och göra commits utan att fråga.";
+"Allow writes outside worktree" = "Tillåt skrivningar utanför worktree";
+"When enabled, the coding agent can modify files anywhere on disk. When disabled, writes are restricted to the worktree directory." = "När aktiverad kan kodningsagenten ändra filer var som helst på disken. När inaktiverad begränsas skrivningar till worktree-katalogen.";
 "External Terminal" = "Extern terminal";
 "Requires tmux to be installed." = "Kräver att tmux är installerat.";
 "URL" = "URL";
