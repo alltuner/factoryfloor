@@ -40,7 +40,7 @@ struct CommandBuilder {
         }
         let posixCmd = "\(primary) || \(fallbackCmd)"
         let shCmd = "exec sh -c \(shellQuote(posixCmd))"
-        return "\(shell) -lic \(shellQuote(shCmd))"
+        return "\(shell) -lic \(shellQuote(shCmd, forShell: shell))"
     }
 
     static var userShell: String {
@@ -53,5 +53,31 @@ struct CommandBuilder {
         }
         if simple { return s }
         return "'\(s.replacingOccurrences(of: "'", with: "'\\''"))'"
+    }
+
+    /// Quote a string for the given shell. Fish 4.0 can't parse POSIX '\'' escaping,
+    /// so we use double quotes when Fish is the outer shell.
+    static func shellQuote(_ s: String, forShell shell: String) -> String {
+        let simple = !s.isEmpty && s.allSatisfy {
+            $0.isLetter || $0.isNumber || $0 == "-" || $0 == "_" || $0 == "." || $0 == "/" || $0 == ":" || $0 == "~" || $0 == "@" || $0 == "+" || $0 == "="
+        }
+        if simple { return s }
+        if isFish(shell) {
+            return fishQuote(s)
+        }
+        return shellQuote(s)
+    }
+
+    static func isFish(_ shell: String) -> Bool {
+        shell.hasSuffix("/fish") || shell == "fish"
+    }
+
+    private static func fishQuote(_ s: String) -> String {
+        let escaped = s
+            .replacingOccurrences(of: "\\", with: "\\\\")
+            .replacingOccurrences(of: "\"", with: "\\\"")
+            .replacingOccurrences(of: "$", with: "\\$")
+            .replacingOccurrences(of: "`", with: "\\`")
+        return "\"\(escaped)\""
     }
 }

@@ -79,10 +79,12 @@ enum TmuxSession {
         }
 
         // Use login shell for proper PATH, with inner sh for POSIX syntax.
+        // The inner layer uses POSIX single-quote escaping (parsed by sh).
+        // The outer layer uses Fish-aware quoting when needed.
         let setup = serverSetupCommand(tmuxPath: tmuxPath, configPath: configPath)
         let posixCmd = shellEscape("\(setup); exec \(tmuxCmd)")
         let shCmd = "exec sh -c \(posixCmd)"
-        return "\(shell) -lic \(shellEscape(shCmd))"
+        return "\(shell) -lic \(CommandBuilder.shellQuote(shCmd, forShell: shell))"
     }
 
     /// Kill a tmux session by name.

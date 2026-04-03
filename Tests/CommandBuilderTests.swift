@@ -133,6 +133,52 @@ final class CommandBuilderTests: XCTestCase {
         XCTAssertTrue(result.contains("--session-id"))
     }
 
+    // MARK: - shellQuote forShell (Fish-safe quoting)
+
+    func testShellQuoteForPosixShellUsesSingleQuotes() {
+        let result = CommandBuilder.shellQuote("it's a test", forShell: "/bin/zsh")
+        XCTAssertEqual(result, "'it'\\''s a test'")
+    }
+
+    func testShellQuoteForFishUsesDoubleQuotes() {
+        let result = CommandBuilder.shellQuote("it's a test", forShell: "/opt/homebrew/bin/fish")
+        XCTAssertTrue(result.hasPrefix("\""), "Fish quoting should use double quotes")
+        XCTAssertTrue(result.hasSuffix("\""), "Fish quoting should use double quotes")
+        XCTAssertTrue(result.contains("it's a test"), "Single quotes should pass through in double-quoted strings")
+    }
+
+    func testShellQuoteForFishEscapesDollarSign() {
+        let result = CommandBuilder.shellQuote("echo $HOME", forShell: "/usr/local/bin/fish")
+        XCTAssertTrue(result.contains("\\$HOME"), "Dollar signs must be escaped for Fish double quotes")
+    }
+
+    func testShellQuoteForFishEscapesBackslash() {
+        let result = CommandBuilder.shellQuote("path\\to", forShell: "/opt/homebrew/bin/fish")
+        XCTAssertTrue(result.contains("\\\\"), "Backslashes must be escaped for Fish double quotes")
+    }
+
+    func testShellQuoteForFishEscapesDoubleQuotes() {
+        let result = CommandBuilder.shellQuote("say \"hello\"", forShell: "/opt/homebrew/bin/fish")
+        XCTAssertTrue(result.contains("\\\"hello\\\""), "Double quotes must be escaped for Fish")
+    }
+
+    func testShellQuoteForFishEscapesBackticks() {
+        let result = CommandBuilder.shellQuote("run `cmd`", forShell: "/opt/homebrew/bin/fish")
+        XCTAssertTrue(result.contains("\\`cmd\\`"), "Backticks must be escaped for Fish")
+    }
+
+    func testShellQuoteForFishSimpleStringStaysUnquoted() {
+        let result = CommandBuilder.shellQuote("/usr/bin/test", forShell: "/opt/homebrew/bin/fish")
+        XCTAssertEqual(result, "/usr/bin/test", "Simple strings need no quoting even for Fish")
+    }
+
+    func testWithFallbackFish() {
+        let result = CommandBuilder.withFallback("cmd1", "cmd2", shell: "/opt/homebrew/bin/fish")
+        XCTAssertTrue(result.hasPrefix("/opt/homebrew/bin/fish -lic \""), "Fish withFallback should use double quotes")
+        XCTAssertTrue(result.contains("exec sh -c"), "Should still use sh for POSIX syntax")
+        XCTAssertTrue(result.contains("cmd1 || cmd2"))
+    }
+
     // MARK: - Real-world command patterns
 
     func testClaudeResumeCommand() {

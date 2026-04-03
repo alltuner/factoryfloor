@@ -76,6 +76,34 @@ final class TmuxSessionTests: XCTestCase {
         XCTAssertTrue(command.contains("\\$project"))
     }
 
+    func testWrapCommandFishUsesDoubleQuotes() {
+        let command = TmuxSession.wrapCommand(
+            tmuxPath: "/opt/homebrew/bin/tmux",
+            sessionName: "proj/ws/agent",
+            command: "claude",
+            respawnOnExit: true,
+            shell: "/opt/homebrew/bin/fish"
+        )
+        XCTAssertTrue(command.hasPrefix("/opt/homebrew/bin/fish -lic \""), "Fish should use double-quote wrapping")
+        XCTAssertTrue(command.contains("exec sh -c"), "Should still use sh for POSIX syntax")
+        XCTAssertTrue(command.contains("new-session -A -s"))
+        XCTAssertTrue(command.contains("claude"))
+    }
+
+    func testWrapCommandFishDoesNotContainPosixQuoteEscape() {
+        let command = TmuxSession.wrapCommand(
+            tmuxPath: "/opt/homebrew/bin/tmux",
+            sessionName: "proj/ws/agent",
+            command: "claude",
+            shell: "/opt/homebrew/bin/fish"
+        )
+        // The outermost layer should NOT contain '\'' which Fish can't parse
+        let outerQuoteEnd = command.index(command.startIndex, offsetBy: "/opt/homebrew/bin/fish -lic ".count)
+        let outerArg = String(command[outerQuoteEnd...])
+        XCTAssertTrue(outerArg.hasPrefix("\""), "Outer argument should start with double quote")
+        // Inner POSIX quoting (parsed by sh, not Fish) may still use '\'' and that's fine
+    }
+
     func testWrapCommandUsesLoginShellAndStartsServer() {
         let command = TmuxSession.wrapCommand(
             tmuxPath: "/opt/homebrew/bin/tmux",
