@@ -1,5 +1,27 @@
 # Changelog
 
+## [0.1.66](https://github.com/alltuner/factoryfloor/compare/v0.1.65...v0.1.66) (2026-04-04)
+
+
+### Features
+
+* add setting to restrict agent filesystem writes to worktree ([#358](https://github.com/alltuner/factoryfloor/issues/358)) ([188d1ec](https://github.com/alltuner/factoryfloor/commit/188d1ecc1bf80fe6f7b201dcb2b6a66a7b204a13))
+* redesign workstream info page with native macOS grouped form ([#360](https://github.com/alltuner/factoryfloor/issues/360)) ([6ed3ac9](https://github.com/alltuner/factoryfloor/commit/6ed3ac951944ec612e6afaeb21b7f7c3d97cda2f))
+* show workstream description tooltip on sidebar hover ([#350](https://github.com/alltuner/factoryfloor/issues/350)) ([a89d090](https://github.com/alltuner/factoryfloor/commit/a89d090e42d35786840de2d211693dddbb47a71a))
+* sync terminal color scheme with system dark/light mode ([#362](https://github.com/alltuner/factoryfloor/issues/362)) ([a6dd299](https://github.com/alltuner/factoryfloor/commit/a6dd299c2fc3280d95847df51846fbd8447bae57)), closes [#359](https://github.com/alltuner/factoryfloor/issues/359)
+
+
+### Bug Fixes
+
+* **website:** improve footer and nav responsiveness ([#357](https://github.com/alltuner/factoryfloor/issues/357)) ([d96557f](https://github.com/alltuner/factoryfloor/commit/d96557f2e839722a33b8e18f2d96f7591852f929))
+
+
+### Documentation
+
+* add architecture and security review, updated for v0.1.65 ([#355](https://github.com/alltuner/factoryfloor/issues/355)) ([46013da](https://github.com/alltuner/factoryfloor/commit/46013da22f1782587ff8fb1544a3b428d7b40051))
+* add Corner Office and mobile app design docs ([#361](https://github.com/alltuner/factoryfloor/issues/361)) ([e6285a9](https://github.com/alltuner/factoryfloor/commit/e6285a9790442c3b8ec5eb8a7ddf80103d345c5e))
+* add translation contribution guide and sponsor page updates ([#356](https://github.com/alltuner/factoryfloor/issues/356)) ([67e4add](https://github.com/alltuner/factoryfloor/commit/67e4addc4faefd733b7d0dba4b25aa6952afc043))
+
 ## [0.1.65](https://github.com/alltuner/factoryfloor/compare/v0.1.64...v0.1.65) (2026-04-03)
 
 
