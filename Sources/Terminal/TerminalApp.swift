@@ -31,6 +31,29 @@ private func handleTerminalAction(
     _ target: ghostty_target_s,
     _ action: ghostty_action_s
 ) -> Bool {
+    switch action.tag {
+    case GHOSTTY_ACTION_RELOAD_CONFIG:
+        let soft = action.action.reload_config.soft
+        if soft {
+            if target.tag == GHOSTTY_TARGET_APP {
+                DispatchQueue.main.async {
+                    guard let app = TerminalApp.shared.app,
+                          let config = TerminalApp.shared.config else { return }
+                    ghostty_app_update_config(app, config)
+                }
+            } else if target.tag == GHOSTTY_TARGET_SURFACE {
+                let surface = target.target.surface!
+                DispatchQueue.main.async {
+                    guard let config = TerminalApp.shared.config else { return }
+                    ghostty_surface_update_config(surface, config)
+                }
+            }
+        }
+        return true
+    default:
+        break
+    }
+
     guard target.tag == GHOSTTY_TARGET_SURFACE else { return false }
     switch action.tag {
     case GHOSTTY_ACTION_SET_TITLE:
@@ -176,6 +199,8 @@ final class TerminalApp {
     static let shared = TerminalApp()
 
     private(set) nonisolated(unsafe) var app: ghostty_app_t?
+    private(set) nonisolated(unsafe) var config: ghostty_config_t?
+    private var appearanceObserver: NSKeyValueObservation?
 
     private init() {
         // Create config
@@ -204,13 +229,31 @@ final class TerminalApp {
             return
         }
         self.app = app
-        ghostty_config_free(config)
+        self.config = config
 
         // Defer focus setup until NSApp exists
         DispatchQueue.main.async { [weak self] in
             guard let self, let app = self.app else { return }
             if let nsApp = NSApp {
                 ghostty_app_set_focus(app, nsApp.isActive)
+            }
+        }
+
+        // Sync terminal color scheme with system appearance so conditional
+        // themes (e.g. "light:X,dark:Y") switch automatically.
+        appearanceObserver = NSApplication.shared.observe(
+            \.effectiveAppearance,
+            options: [.new, .initial]
+        ) { [weak self] nsApp, _ in
+            let scheme: ghostty_color_scheme_e = nsApp.effectiveAppearance.isDark
+                ? GHOSTTY_COLOR_SCHEME_DARK
+                : GHOSTTY_COLOR_SCHEME_LIGHT
+            DispatchQueue.main.async {
+                guard let app = self?.app else { return }
+                ghostty_app_set_color_scheme(app, scheme)
+                for (ptr, _) in TerminalView.surfaceRegistry {
+                    ghostty_surface_set_color_scheme(ptr, scheme)
+                }
             }
         }
 
@@ -240,6 +283,9 @@ final class TerminalApp {
     deinit {
         if let app {
             ghostty_app_free(app)
+        }
+        if let config {
+            ghostty_config_free(config)
         }
     }
 }
