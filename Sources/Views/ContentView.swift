@@ -86,35 +86,29 @@ struct ContentView: View {
                 .navigationTitle("Help")
                 .navigationSubtitle(AppConstants.appName)
         } else if let workstream = activeWorkstream, let project = activeProject {
-            ZStack {
-                // Keep all ready workstream views alive to survive rapid switching
-                ForEach(projects) { proj in
-                    ForEach(proj.workstreams.filter { $0.worktreePath != nil }) { ws in
-                        TerminalContainerView(
-                            workstreamID: ws.id,
-                            workingDirectory: ws.workingDirectory(projectDirectory: proj.directory),
-                            projectDirectory: proj.directory,
-                            projectName: proj.name,
-                            workstreamName: ws.name,
-                            bypassPermissions: ws.bypassPermissions,
-                            isActive: ws.id == workstream.id
-                        )
-                        .opacity(ws.id == workstream.id ? 1 : 0)
-                        .allowsHitTesting(ws.id == workstream.id)
-                    }
+            if workstream.worktreePath != nil {
+                TerminalContainerView(
+                    workstreamID: workstream.id,
+                    workingDirectory: workstream.workingDirectory(projectDirectory: project.directory),
+                    projectDirectory: project.directory,
+                    projectName: project.name,
+                    workstreamName: workstream.name,
+                    bypassPermissions: workstream.bypassPermissions
+                )
+                .id(workstream.id)
+                .navigationTitle(workstream.name)
+                .navigationSubtitle(appEnvironment.taskDescription(for: workstream.worktreePath) ?? project.name)
+            } else {
+                VStack(spacing: 12) {
+                    ProgressView()
+                        .controlSize(.large)
+                    Text("Preparing workstream...")
+                        .foregroundStyle(.secondary)
                 }
-                if workstream.worktreePath == nil {
-                    VStack(spacing: 12) {
-                        ProgressView()
-                            .controlSize(.large)
-                        Text("Preparing workstream...")
-                            .foregroundStyle(.secondary)
-                    }
-                    .frame(maxWidth: .infinity, maxHeight: .infinity)
-                }
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
+                .navigationTitle(workstream.name)
+                .navigationSubtitle(appEnvironment.taskDescription(for: workstream.worktreePath) ?? project.name)
             }
-            .navigationTitle(workstream.name)
-            .navigationSubtitle(appEnvironment.taskDescription(for: workstream.worktreePath) ?? project.name)
         } else if let project = activeProject,
                   let projectIndex = projects.firstIndex(where: { $0.id == project.id })
         {

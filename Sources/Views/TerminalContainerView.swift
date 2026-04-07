@@ -159,7 +159,6 @@ struct TerminalContainerView: View {
     let projectName: String
     let workstreamName: String
     let bypassPermissions: Bool
-    let isActive: Bool
 
     @EnvironmentObject var surfaceCache: TerminalSurfaceCache
     @EnvironmentObject var appEnv: AppEnvironment
@@ -181,14 +180,13 @@ struct TerminalContainerView: View {
     @StateObject private var portDetector: PortDetector
     @State private var runStoppedManually = false
     @State private var runStarted = false
-    init(workstreamID: UUID, workingDirectory: String, projectDirectory: String, projectName: String, workstreamName: String, bypassPermissions: Bool, isActive: Bool) {
+    init(workstreamID: UUID, workingDirectory: String, projectDirectory: String, projectName: String, workstreamName: String, bypassPermissions: Bool) {
         self.workstreamID = workstreamID
         self.workingDirectory = workingDirectory
         self.projectDirectory = projectDirectory
         self.projectName = projectName
         self.workstreamName = workstreamName
         self.bypassPermissions = bypassPermissions
-        self.isActive = isActive
         _portDetector = StateObject(wrappedValue: PortDetector(workstreamID: workstreamID))
     }
 
@@ -483,16 +481,14 @@ struct TerminalContainerView: View {
                 rebuildClaudeCommand()
                 preloadSurfaces()
             }
-            .onReceive(NotificationCenter.default.publisher(for: .toggleInfo)) { _ in guard isActive else { return }; activeTab = .info }
-            .onReceive(NotificationCenter.default.publisher(for: .focusAgent)) { _ in guard isActive else { return }; activeTab = .agent }
+            .onReceive(NotificationCenter.default.publisher(for: .toggleInfo)) { _ in activeTab = .info }
+            .onReceive(NotificationCenter.default.publisher(for: .focusAgent)) { _ in activeTab = .agent }
             .onReceive(NotificationCenter.default.publisher(for: .toggleEnvironment)) { _ in
-                guard isActive else { return }
                 if tabs.contains(.environment) { activeTab = .environment }
             }
-            .onReceive(NotificationCenter.default.publisher(for: .toggleTerminal)) { _ in guard isActive else { return }; addTerminal() }
-            .onReceive(NotificationCenter.default.publisher(for: .toggleBrowser)) { _ in guard isActive else { return }; addBrowser() }
+            .onReceive(NotificationCenter.default.publisher(for: .toggleTerminal)) { _ in addTerminal() }
+            .onReceive(NotificationCenter.default.publisher(for: .toggleBrowser)) { _ in addBrowser() }
             .onReceive(NotificationCenter.default.publisher(for: .closeTerminal)) { _ in
-                guard isActive else { return }
                 if activeTab.isCloseable { closeTab(activeTab) }
             }
     }
@@ -540,20 +536,12 @@ struct TerminalContainerView: View {
                 activeTab = restoredActiveTab()
             }
             preloadSurfaces()
-            if isActive {
-                surfaceCache.updateOcclusion(visibleSurfaceIDs: visibleSurfaceIDs)
-            }
+            surfaceCache.updateOcclusion(visibleSurfaceIDs: visibleSurfaceIDs)
         }
         .onDisappear {
             surfaceCache.saveTabSnapshot(for: workstreamID, snapshot: currentTabSnapshot())
         }
-        .onChange(of: isActive) {
-            if isActive {
-                surfaceCache.updateOcclusion(visibleSurfaceIDs: visibleSurfaceIDs)
-            }
-        }
         .onChange(of: activeTab) {
-            guard isActive else { return }
             surfaceCache.updateOcclusion(visibleSurfaceIDs: visibleSurfaceIDs)
             WorkspaceStateStore.save(RestorableWorkspaceTab(activeTab: activeTab), for: workstreamID)
             appEnv.refreshWorktreeState(for: workingDirectory, projectDirectory: projectDirectory)
@@ -567,19 +555,16 @@ struct TerminalContainerView: View {
     var body: some View {
         mainContent
             .onReceive(NotificationCenter.default.publisher(for: .switchByNumber)) { notification in
-                guard isActive else { return }
                 guard let n = notification.object as? Int, n >= 1 else { return }
                 // Cmd+1-9 maps to all tabs in display order
                 guard n <= tabs.count else { return }
                 activeTab = tabs[n - 1]
             }
             .onReceive(NotificationCenter.default.publisher(for: .nextTab)) { _ in
-                guard isActive else { return }
                 guard let currentIndex = tabs.firstIndex(of: activeTab) else { return }
                 activeTab = tabs[(currentIndex + 1) % tabs.count]
             }
             .onReceive(NotificationCenter.default.publisher(for: .prevTab)) { _ in
-                guard isActive else { return }
                 guard let currentIndex = tabs.firstIndex(of: activeTab) else { return }
                 activeTab = tabs[(currentIndex - 1 + tabs.count) % tabs.count]
             }
@@ -601,7 +586,6 @@ struct TerminalContainerView: View {
                 terminalTitles[surfaceID] = notification.userInfo?["title"] as? String
             }
             .onReceive(NotificationCenter.default.publisher(for: .openExternalBrowser)) { _ in
-                guard isActive else { return }
                 guard let url = URL(string: browserDefaultURL) else { return }
                 if defaultBrowser.isEmpty {
                     NSWorkspace.shared.open(url)
@@ -613,42 +597,40 @@ struct TerminalContainerView: View {
             }
             .navigationSubtitle(portSubtitle)
             .toolbar {
-                if isActive {
-                    ToolbarItemGroup(placement: .primaryAction) {
-                        if let githubURL = appEnv.githubURL(for: projectDirectory) {
-                            Button {
-                                NSWorkspace.shared.open(githubURL)
-                            } label: {
-                                Label(NSLocalizedString("GitHub", comment: ""), image: "github")
-                                    .labelStyle(.iconOnly)
-                            }
-                            .help("Open on GitHub")
+                ToolbarItemGroup(placement: .primaryAction) {
+                    if let githubURL = appEnv.githubURL(for: projectDirectory) {
+                        Button {
+                            NSWorkspace.shared.open(githubURL)
+                        } label: {
+                            Label(NSLocalizedString("GitHub", comment: ""), image: "github")
+                                .labelStyle(.iconOnly)
                         }
-
-                        Button(action: addTerminal) {
-                            Label(NSLocalizedString("Terminal", comment: ""), systemImage: "terminal")
-                                .labelStyle(.titleAndIcon)
-                        }
-                        .help("New Terminal (\u{2318}T)")
-
-                        Button(action: addBrowser) {
-                            Label(NSLocalizedString("Browser", comment: ""), systemImage: "globe")
-                                .labelStyle(.titleAndIcon)
-                        }
-                        .help("New Browser (\u{2318}B)")
-
-                        QuickActionButtons(
-                            runner: quickActionRunner,
-                            claudePath: appEnv.toolStatus.claude.path,
-                            ghPath: appEnv.toolStatus.gh.path,
-                            workingDirectory: workingDirectory,
-                            branchName: appEnv.branchName(for: workingDirectory),
-                            bypassPermissions: bypassPermissions,
-                            worktreeState: appEnv.worktreeState(for: workingDirectory),
-                            hasGitHubRemote: appEnv.hasGitHubRemote(projectDirectory),
-                            prState: branchPR?.state
-                        )
+                        .help("Open on GitHub")
                     }
+
+                    Button(action: addTerminal) {
+                        Label(NSLocalizedString("Terminal", comment: ""), systemImage: "terminal")
+                            .labelStyle(.titleAndIcon)
+                    }
+                    .help("New Terminal (\u{2318}T)")
+
+                    Button(action: addBrowser) {
+                        Label(NSLocalizedString("Browser", comment: ""), systemImage: "globe")
+                            .labelStyle(.titleAndIcon)
+                    }
+                    .help("New Browser (\u{2318}B)")
+
+                    QuickActionButtons(
+                        runner: quickActionRunner,
+                        claudePath: appEnv.toolStatus.claude.path,
+                        ghPath: appEnv.toolStatus.gh.path,
+                        workingDirectory: workingDirectory,
+                        branchName: appEnv.branchName(for: workingDirectory),
+                        bypassPermissions: bypassPermissions,
+                        worktreeState: appEnv.worktreeState(for: workingDirectory),
+                        hasGitHubRemote: appEnv.hasGitHubRemote(projectDirectory),
+                        prState: branchPR?.state
+                    )
                 }
             }
     }
