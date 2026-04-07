@@ -263,29 +263,14 @@ struct FF2App: App {
                 Button("Toggle Sidebar") {
                     NotificationCenter.default.post(name: .toggleSidebar, object: nil)
                 }
-                .keyboardShortcut("s", modifiers: [.command, .control])
+                .keyboardShortcut("s", modifiers: [.command, .option])
 
                 Divider()
-
-                Button("Toggle Info") {
-                    NotificationCenter.default.post(name: .toggleInfo, object: nil)
-                }
-                .keyboardShortcut("i", modifiers: .command)
-
-                Button("Environment") {
-                    NotificationCenter.default.post(name: .toggleEnvironment, object: nil)
-                }
-                .keyboardShortcut("e", modifiers: .command)
-
-                Button("Rebuild Setup") {
-                    NotificationCenter.default.post(name: .rebuildSetup, object: nil)
-                }
-                .keyboardShortcut("r", modifiers: [.control, .shift])
 
                 Button("Start/Rerun") {
                     NotificationCenter.default.post(name: .rerunScript, object: nil)
                 }
-                .keyboardShortcut("s", modifiers: [.control, .shift])
+                .keyboardShortcut(.return, modifiers: [.command, .shift])
 
                 Divider()
 
@@ -322,12 +307,12 @@ struct FF2App: App {
                 Button("Open in External Browser") {
                     NotificationCenter.default.post(name: .openExternalBrowser, object: nil)
                 }
-                .keyboardShortcut("o", modifiers: [.command, .shift])
+                .keyboardShortcut("b", modifiers: [.command, .option])
 
                 Button("Open in External Terminal") {
                     NotificationCenter.default.post(name: .openExternalTerminal, object: nil)
                 }
-                .keyboardShortcut("e", modifiers: [.command, .shift])
+                .keyboardShortcut("t", modifiers: [.command, .option])
             }
             // Contextual shortcuts (in menu but minimal labels)
             CommandGroup(after: .toolbar) {

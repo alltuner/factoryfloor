@@ -144,9 +144,7 @@ other = "Abrir workstream por posición"
 [sc_back]
 other = "Volver al proyecto"
 [sc_tabs]
-other = "Info / Agent / Terminal / Browser"
-[sc_script_tabs]
-other = "Setup / Run"
+other = "Cambiar tab"
 [sc_cycle]
 other = "Recorrer tabs"
 [sc_ext_browser]

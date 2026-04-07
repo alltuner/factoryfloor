@@ -151,32 +151,30 @@ Factory Floor är tangentbord-först. Här är allt.
 | ⌘Shift+N | Nytt projekt |
 | ⌘, | Inställningar |
 | ⌘/ | Hjälp |
+| ⌘Option+S | Visa/dölj sidopanel |
 
 #### Workstream {#workstream}
 
 | Genväg | Åtgärd |
 |----------|--------|
+| ⌘1-9 | Byt tab |
 | ⌘Return | Fokusera Coding Agent |
-| ⌘I | Info-panel |
-| ⌘E | Environment |
 | ⌘T | Ny Terminal |
 | ⌘B | Ny Browser |
 | ⌘W | Stäng tab |
 | ⌘L | Adressfält (browser) |
 | ⌘0 | Tillbaka till projekt |
-| ⌘1-9 | Byt tab |
 | ⌘Shift+[ | Föregående tab |
 | ⌘Shift+] | Nästa tab |
-| Ctrl+Shift+R | Bygg om setup |
-| Ctrl+Shift+S | Starta/starta om run |
+| ⌘Shift+Return | Starta/starta om run |
 
 #### Navigering {#navigation-1}
 
 | Genväg | Åtgärd |
 |----------|--------|
 | Ctrl+1-9 | Byt workstream (från valfri vy) |
-| ⌘Shift+O | Öppna i extern browser |
-| ⌘Shift+E | Öppna i extern terminal |
+| ⌘Option+B | Öppna i extern browser |
+| ⌘Option+T | Öppna i extern terminal |
 
 ---
 

@@ -56,7 +56,7 @@ Factory Floor is a native macOS app built on [Ghostty](https://ghostty.org)'s GP
 - **GitHub Integration** &mdash; Repo info, open PRs, and branch PR status via the `gh` CLI.
 - **Dynamic Tabs** &mdash; Open as many terminals and browsers as you need. Close with Cmd+W or Ctrl+D.
 - **Update Notifications** &mdash; Checks for new versions and shows a badge in the sidebar.
-- **Keyboard-first** &mdash; Every action has a shortcut. Cmd+Return for agent, Cmd+I for info, Cmd+E for environment, Cmd+T for terminal, Cmd+B for browser.
+- **Keyboard-first** &mdash; Every action has a shortcut. Cmd+1-9 for tabs, Cmd+Return for agent, Cmd+T for terminal, Cmd+B for browser.
 
 ### Script Configuration
 

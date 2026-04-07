@@ -150,9 +150,7 @@ other = "Obre workstream per posició"
 [sc_back]
 other = "Torna al projecte"
 [sc_tabs]
-other = "Info / Agent / Terminal / Browser"
-[sc_script_tabs]
-other = "Setup / Run"
+other = "Canvia de tab"
 [sc_cycle]
 other = "Cicla tabs"
 [sc_ext_browser]

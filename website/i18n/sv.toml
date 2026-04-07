@@ -143,9 +143,7 @@ other = "Öppna workstream efter position"
 [sc_back]
 other = "Tillbaka till projektet"
 [sc_tabs]
-other = "Info / Agent / Terminal / Browser"
-[sc_script_tabs]
-other = "Setup / Run"
+other = "Byt tab"
 [sc_cycle]
 other = "Växla tabs"
 [sc_ext_browser]
