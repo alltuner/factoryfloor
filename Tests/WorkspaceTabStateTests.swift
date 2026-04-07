@@ -17,7 +17,9 @@ final class WorkspaceTabSnapshotTests: XCTestCase {
             browserCount: 1,
             activeTab: .terminal(terminalID),
             browserTitles: [browserID: "localhost"],
-            terminalTitles: [terminalID: "zsh"]
+            terminalTitles: [terminalID: "zsh"],
+            runStarted: false,
+            runStoppedManually: false
         )
 
         XCTAssertEqual(snapshot.tabs, tabs)
@@ -40,7 +42,9 @@ final class WorkspaceTabSnapshotTests: XCTestCase {
             browserCount: 1,
             activeTab: .terminal(deadTerminalID),
             browserTitles: [:],
-            terminalTitles: [:]
+            terminalTitles: [:],
+            runStarted: false,
+            runStoppedManually: false
         )
 
         let reconciled = snapshot.reconciled(liveSurfaceIDs: [liveTerminalID])
@@ -60,13 +64,33 @@ final class WorkspaceTabSnapshotTests: XCTestCase {
             browserCount: 0,
             activeTab: .terminal(terminalID),
             browserTitles: [:],
-            terminalTitles: [:]
+            terminalTitles: [:],
+            runStarted: false,
+            runStoppedManually: false
         )
 
         let reconciled = snapshot.reconciled(liveSurfaceIDs: [terminalID])
 
         XCTAssertEqual(reconciled.tabs, [.info, .agent, .terminal(terminalID)])
         XCTAssertEqual(reconciled.activeTab, .terminal(terminalID))
+    }
+
+    func testReconciledPreservesRunState() {
+        let snapshot = WorkspaceTabSnapshot(
+            tabs: [.info, .agent],
+            terminalCount: 0,
+            browserCount: 0,
+            activeTab: .agent,
+            browserTitles: [:],
+            terminalTitles: [:],
+            runStarted: true,
+            runStoppedManually: false
+        )
+
+        let reconciled = snapshot.reconciled(liveSurfaceIDs: [])
+
+        XCTAssertTrue(reconciled.runStarted)
+        XCTAssertFalse(reconciled.runStoppedManually)
     }
 
     func testReconcileKeepsBrowserTabsRegardlessOfSurfaces() {
@@ -78,7 +102,9 @@ final class WorkspaceTabSnapshotTests: XCTestCase {
             browserCount: 1,
             activeTab: .browser(browserID),
             browserTitles: [:],
-            terminalTitles: [:]
+            terminalTitles: [:],
+            runStarted: false,
+            runStoppedManually: false
         )
 
         // Empty live surfaces - browser should still survive
