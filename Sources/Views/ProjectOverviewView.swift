@@ -423,7 +423,6 @@ private struct WorktreeInfoRow: View {
                     .font(.caption)
                     .foregroundStyle(.secondary)
             } else if isArchiving {
-                // No action button while archiving
                 EmptyView()
             } else if !isWorkstream {
                 Button(action: onAdopt) {
