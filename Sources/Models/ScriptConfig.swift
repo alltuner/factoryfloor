@@ -1,5 +1,5 @@
 // ABOUTME: Loads setup/run/teardown script configuration from project config files.
-// ABOUTME: Resolves from .factoryfloor.json, conductor.json, or .superset/config.json.
+// ABOUTME: Resolves from .factoryfloor.json, .emdash.json, conductor.json, or .superset/config.json.
 
 import Foundation
 import os
@@ -16,12 +16,13 @@ struct ScriptConfig {
     static let empty = ScriptConfig(setup: nil, run: nil, teardown: nil, source: nil, loadError: nil)
 
     /// Load script config for a project directory.
-    /// Checks .factoryfloor.json first, then conductor.json, then .superset/config.json.
+    /// Checks .factoryfloor.json first, then .emdash.json, conductor.json, then .superset/config.json.
     static func load(from directory: String) -> ScriptConfig {
         let dir = URL(fileURLWithPath: directory)
 
         let candidates: [(path: String, source: String, loader: (String) throws -> ScriptConfig)] = [
             (dir.appendingPathComponent(".factoryfloor.json").path, ".factoryfloor.json", loadFF2),
+            (dir.appendingPathComponent(".emdash.json").path, ".emdash.json", loadEmdash),
             (dir.appendingPathComponent("conductor.json").path, "conductor.json", loadConductor),
             (dir.appendingPathComponent(".superset/config.json").path, ".superset/config.json", loadSuperset),
         ]
@@ -83,6 +84,17 @@ struct ScriptConfig {
             return .empty
         }
         return ScriptConfig(setup: nonEmpty(setup), run: nonEmpty(run), teardown: nonEmpty(teardown), source: URL(fileURLWithPath: path).lastPathComponent, loadError: nil)
+    }
+
+    /// .emdash.json: { "scripts": { "setup": "cmd", "run": "cmd", "teardown": "cmd" } }
+    private static func loadEmdash(_ path: String) throws -> ScriptConfig {
+        let dict = try loadJSON(path)
+        guard let scripts = dict["scripts"] as? [String: Any] else { return .empty }
+        let setup = scripts["setup"] as? String
+        let run = scripts["run"] as? String
+        let teardown = scripts["teardown"] as? String
+        guard setup != nil || run != nil || teardown != nil else { return .empty }
+        return ScriptConfig(setup: nonEmpty(setup), run: nonEmpty(run), teardown: nonEmpty(teardown), source: ".emdash.json", loadError: nil)
     }
 
     /// conductor.json: { "scripts": { "setup": "cmd", "run": "cmd", "archive": "cmd" } }

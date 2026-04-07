@@ -206,7 +206,7 @@ Lägg en `.factoryfloor.json` i projektets rotkatalog för att automatisera work
 
 Alla fält är valfria. Script körs i workstream-katalogen med ditt login shell. Ja, även [fish](https://github.com/alltuner/factoryfloor/pull/324). Fråga inte hur lång tid det tog.
 
-Factory Floor läser också `conductor.json` och `.superset/config.json` om `.factoryfloor.json` inte finns. För kompatibilitet är artigt. (Dags för en [standard](https://xkcd.com/927/)?)
+Factory Floor läser också `.emdash.json`, `conductor.json` och `.superset/config.json` om `.factoryfloor.json` inte finns. För kompatibilitet är artigt. (Dags för en [standard](https://xkcd.com/927/)?) Vid fallback-konfiguration injicerar Factory Floor kompatibla miljövariabler så att script fungerar utan ändring (t.ex. `CONDUCTOR_PORT`, `EMDASH_PORT`, `SUPERSET_PORT_BASE`).
 
 #### Environment-tabben {#the-environment-tab}
 
@@ -226,6 +226,7 @@ Varje terminal, setup-script och run-kommando i en workstream har dessa variable
 | `FF_PROJECT_DIR` | Huvudrepots sökväg | `/Users/you/my-app` |
 | `FF_WORKTREE_DIR` | Worktree-sökväg | `~/.factoryfloor/worktrees/my-app/coral-tidal-reef` |
 | `FF_PORT` | Deterministisk port (40001-49999) | `42847` |
+| `FF_DEFAULT_BRANCH` | Standardgren (main, master, etc.) | `main` |
 
 #### Om FF_PORT {#about-ff_port}
 

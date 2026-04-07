@@ -206,7 +206,7 @@ Posa un `.factoryfloor.json` a l'arrel del teu projecte per automatitzar el cicl
 
 Tots els camps són opcionals. Els scripts s'executen al directori del workstream usant el teu shell de login. Sí, fins i tot [fish](https://github.com/alltuner/factoryfloor/pull/324). No preguntis quant de temps va costar.
 
-Factory Floor també llegeix `conductor.json` i `.superset/config.json` si `.factoryfloor.json` no existeix. Perquè la compatibilitat és de bona educació. (Hora d'un [estàndard](https://xkcd.com/927/)?)
+Factory Floor també llegeix `.emdash.json`, `conductor.json` i `.superset/config.json` si `.factoryfloor.json` no existeix. Perquè la compatibilitat és de bona educació. (Hora d'un [estàndard](https://xkcd.com/927/)?) Quan s'usa una configuració de compatibilitat, Factory Floor injecta variables d'entorn de compatibilitat perquè els scripts funcionin sense modificació (p. ex. `CONDUCTOR_PORT`, `EMDASH_PORT`, `SUPERSET_PORT_BASE`).
 
 #### El tab Environment {#the-environment-tab}
 
@@ -226,6 +226,7 @@ Cada terminal, setup script, i comanda run d'un workstream té aquestes variable
 | `FF_PROJECT_DIR` | Ruta del repositori principal | `/Users/you/my-app` |
 | `FF_WORKTREE_DIR` | Ruta del worktree | `~/.factoryfloor/worktrees/my-app/coral-tidal-reef` |
 | `FF_PORT` | Port determinista (40001-49999) | `42847` |
+| `FF_DEFAULT_BRANCH` | Branca per defecte (main, master, etc.) | `main` |
 
 #### Sobre FF_PORT {#about-ff_port}
 

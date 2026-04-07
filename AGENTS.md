@@ -117,6 +117,8 @@ Scripts are loaded from `.factoryfloor.json` in the project directory:
 ```json
 { "setup": "cmd", "run": "cmd", "teardown": "cmd" }
 ```
+Falls back to `.emdash.json`, `conductor.json`, or `.superset/config.json` if not found.
+When using a fallback config, compatibility env vars are injected (e.g. `CONDUCTOR_*`, `EMDASH_*`, `SUPERSET_*`).
 
 ### Port detection
 Run scripts are wrapped in the `ff-run` launcher binary (bundled at `Contents/Helpers/ff-run`).
