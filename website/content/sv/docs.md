@@ -65,9 +65,9 @@ Gränssnittet dyker upp direkt, worktree-skapandet sker i bakgrunden.
 
 #### Workstream tabs {#workstream-tabs}
 
-- **Info** (⌘I) — branch-namn, PR-status, projektdokumentation
+- **Info** — branch-namn, PR-status, projektdokumentation
 - **Agent** (⌘Return) — din Claude Code-session
-- **Environment** (⌘E) — setup- och run-scriptkontroller
+- **Environment** — setup- och run-scriptkontroller
 - **Terminal** (⌘T) — ytterligare terminal tabs, så många du vill
 - **Browser** (⌘B) — inbäddad browser med automatisk port-detection
 
@@ -201,7 +201,7 @@ Lägg en `.factoryfloor.json` i projektets rotkatalog för att automatisera work
 | Hook | När det körs |
 |------|-------------|
 | `setup` | En gång, när en workstream skapas. Installera beroenden, kör migreringar, vad som helst. |
-| `run` | På begäran via Environment-tabben (⌘E). Kapslad i `ff-run` för port detection. |
+| `run` | På begäran via Environment-tabben. Kapslad i `ff-run` för port detection. |
 | `teardown` | När en workstream arkiveras eller rensas. Stoppa containrar, städa upp. |
 
 Alla fält är valfria. Script körs i workstream-katalogen med ditt login shell. Ja, även [fish](https://github.com/alltuner/factoryfloor/pull/324). Fråga inte hur lång tid det tog.
@@ -212,8 +212,7 @@ Factory Floor läser också `.emdash.json`, `conductor.json` och `.superset/conf
 
 Delad layout: **Setup** till vänster, **Run** till höger.
 
-- **Ctrl+Shift+R** — bygg om (kör om setup)
-- **Ctrl+Shift+S** — starta/starta om run-scriptet
+- **⌘Shift+Return** — starta/starta om run-scriptet
 
 ### Miljövariabler {#environment-variables}
 

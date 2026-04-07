@@ -65,9 +65,9 @@ The UI shows up instantly — worktree creation happens in the background.
 
 #### Workstream tabs
 
-- **Info** (⌘I) — branch name, PR status, project docs
+- **Info** — branch name, PR status, project docs
 - **Agent** (⌘Return) — your Claude Code session
-- **Environment** (⌘E) — setup and run script controls
+- **Environment** — setup and run script controls
 - **Terminal** (⌘T) — additional terminal tabs, as many as you want
 - **Browser** (⌘B) — embedded browser with auto-port detection
 
@@ -201,7 +201,7 @@ Drop a `.factoryfloor.json` in your project root to automate the workstream life
 | Hook | When it runs |
 |------|-------------|
 | `setup` | Once, when a workstream is created. Install dependencies, run migrations, whatever. |
-| `run` | On demand via the Environment tab (⌘E). Wrapped in `ff-run` for port detection. |
+| `run` | On demand via the Environment tab. Wrapped in `ff-run` for port detection. |
 | `teardown` | When a workstream is archived or purged. Stop containers, clean up. |
 
 All fields are optional. Scripts run in the workstream directory using your login shell. Yes, even [fish](https://github.com/alltuner/factoryfloor/pull/324). Don't ask how long that took.
@@ -212,8 +212,7 @@ Factory Floor also reads `.emdash.json`, `conductor.json`, and `.superset/config
 
 Split-pane layout: **Setup** on the left, **Run** on the right.
 
-- **Ctrl+Shift+R** — rebuild (reruns setup)
-- **Ctrl+Shift+S** — start/restart the run script
+- **⌘Shift+Return** — start/restart the run script
 
 ### Environment Variables
 

@@ -65,9 +65,9 @@ La interfície apareix a l'instant, la creació del worktree passa en segon pla.
 
 #### Workstream tabs {#workstream-tabs}
 
-- **Info** (⌘I) — nom de branch, estat de PR, documentació del projecte
+- **Info** — nom de branch, estat de PR, documentació del projecte
 - **Agent** (⌘Return) — la teva sessió de Claude Code
-- **Environment** (⌘E) — controls de setup i run script
+- **Environment** — controls de setup i run script
 - **Terminal** (⌘T) — terminal tabs addicionals, tants com vulguis
 - **Navegador** (⌘B) — navegador integrat amb detecció automàtica de port
 
@@ -201,7 +201,7 @@ Posa un `.factoryfloor.json` a l'arrel del teu projecte per automatitzar el cicl
 | Hook | Quan s'executa |
 |------|-------------|
 | `setup` | Un cop, quan es crea un workstream. Instal·la dependències, executa migracions, el que sigui. |
-| `run` | Sota demanda des del tab Environment (⌘E). Embolcallat amb `ff-run` per a port detection. |
+| `run` | Sota demanda des del tab Environment. Embolcallat amb `ff-run` per a port detection. |
 | `teardown` | Quan un workstream s'arxiva o es purga. Atura contenidors, neteja. |
 
 Tots els camps són opcionals. Els scripts s'executen al directori del workstream usant el teu shell de login. Sí, fins i tot [fish](https://github.com/alltuner/factoryfloor/pull/324). No preguntis quant de temps va costar.
@@ -212,8 +212,7 @@ Factory Floor també llegeix `.emdash.json`, `conductor.json` i `.superset/confi
 
 Disposició en panell dividit: **Setup** a l'esquerra, **Run** a la dreta.
 
-- **Ctrl+Shift+R** — reconstrueix (reexecuta setup)
-- **Ctrl+Shift+S** — inicia/reinicia el run script
+- **⌘Shift+Return** — inicia/reinicia el run script
 
 ### Variables d'entorn {#environment-variables}
 

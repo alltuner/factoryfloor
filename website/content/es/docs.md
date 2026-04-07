@@ -65,9 +65,9 @@ La interfaz aparece al instante, la creación del worktree ocurre en segundo pla
 
 #### Workstream tabs {#workstream-tabs}
 
-- **Info** (⌘I) — nombre de branch, estado del PR, documentación del proyecto
+- **Info** — nombre de branch, estado del PR, documentación del proyecto
 - **Agent** (⌘Return) — tu sesión de Claude Code
-- **Environment** (⌘E) — controles de setup y run script
+- **Environment** — controles de setup y run script
 - **Terminal** (⌘T) — terminal tabs adicionales, tantos como quieras
 - **Navegador** (⌘B) — navegador integrado con detección automática de port
 
@@ -201,7 +201,7 @@ Coloca un `.factoryfloor.json` en la raíz de tu proyecto para automatizar el ci
 | Hook | Cuándo se ejecuta |
 |------|-------------|
 | `setup` | Una vez, cuando se crea un workstream. Instalar dependencias, ejecutar migraciones, lo que sea. |
-| `run` | Bajo demanda desde el tab Environment (⌘E). Envuelto en `ff-run` para detección de port. |
+| `run` | Bajo demanda desde el tab Environment. Envuelto en `ff-run` para detección de port. |
 | `teardown` | Cuando se archiva o purga un workstream. Parar contenedores, limpiar. |
 
 Todos los campos son opcionales. Los scripts se ejecutan en el directorio del workstream usando tu login shell. Sí, incluso [fish](https://github.com/alltuner/factoryfloor/pull/324). No preguntes cuánto tardó eso.
@@ -212,8 +212,7 @@ Factory Floor también lee `.emdash.json`, `conductor.json` y `.superset/config.
 
 Diseño en dos paneles: **Setup** a la izquierda, **Run** a la derecha.
 
-- **Ctrl+Shift+R** — reconstruir (re-ejecuta setup)
-- **Ctrl+Shift+S** — iniciar/reiniciar el run script
+- **⌘Shift+Return** — iniciar/reiniciar el run script
 
 ### Variables de entorno {#environment-variables}
 

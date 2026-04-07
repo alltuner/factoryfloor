@@ -63,7 +63,7 @@ struct EnvironmentTabView: View {
                 title: NSLocalizedString("Setup", comment: ""),
                 icon: "hammer",
                 restartLabel: NSLocalizedString("Rebuild", comment: ""),
-                shortcut: "⌃⇧R",
+                shortcut: "",
                 script: scriptConfig.setup,
                 surfaceID: setupID,
                 tmuxRole: "setup",
@@ -146,7 +146,7 @@ struct EnvironmentTabView: View {
     @ViewBuilder
     private func runPane() -> some View {
         let title = NSLocalizedString("Run", comment: "")
-        let shortcut = "⌃⇧S"
+        let shortcut = "⌘⇧⏎"
         VStack(spacing: 0) {
             HStack {
                 if scriptConfig.run != nil, !runStarted {

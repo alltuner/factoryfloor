@@ -51,7 +51,7 @@ Factory Floor is a native macOS app built on [Ghostty](https://ghostty.org)'s GP
 - **Git Worktrees** &mdash; Each workstream gets its own branch and worktree. Switch between tasks without stashing.
 - **Claude Code** &mdash; Integrated AI agent with session persistence. Resume conversations across app restarts.
 - **Tmux Persistence** &mdash; Agent sessions survive app restarts via tmux on a dedicated socket.
-- **Setup & Run Scripts** &mdash; Configure setup, run, and teardown scripts per project via `.factoryfloor.json`. Environment tab with split-pane terminals, Rebuild (⌃⇧R) and Start/Rerun (⌃⇧S).
+- **Setup & Run Scripts** &mdash; Configure setup, run, and teardown scripts per project via `.factoryfloor.json`. Environment tab with split-pane terminals, Start/Rerun (⌘⇧⏎).
 - **Embedded Browser** &mdash; WKWebView tab with automatic port detection. The browser navigates to the port your run script opens.
 - **GitHub Integration** &mdash; Repo info, open PRs, and branch PR status via the `gh` CLI.
 - **Dynamic Tabs** &mdash; Open as many terminals and browsers as you need. Close with Cmd+W or Ctrl+D.
@@ -100,26 +100,36 @@ Every workstream terminal has access to:
 | `Cmd+Shift+N` | New project |
 | `Cmd+,` | Settings |
 | `Cmd+/` | Help |
+| `Cmd+Option+S` | Toggle sidebar |
 
 #### Workstream
 
 | Shortcut | Action |
 |---|---|
+| `Cmd+1-9` | Switch tab |
+| `Cmd+Shift+[` / `]` | Cycle tabs |
 | `Cmd+Return` | Focus Coding Agent |
-| `Cmd+I` | Info panel |
-| `Cmd+E` | Environment |
 | `Cmd+T` | New Terminal |
 | `Cmd+B` | New Browser |
 | `Cmd+W` | Close tab |
+| `Cmd+Shift+W` | Archive workstream |
 | `Cmd+L` | Address bar (browser) |
+| `Cmd+Shift+Return` | Start/Rerun |
+
+#### Navigation
+
+| Shortcut | Action |
+|---|---|
+| `Cmd+[` / `]` | Cycle workstreams |
+| `Cmd+Up` / `Down` | Cycle projects |
 | `Cmd+0` | Back to project |
-| `Cmd+1-9` | Switch tab |
-| `Ctrl+1-9` | Switch workstream |
-| `Cmd+Shift+[` / `]` | Cycle tabs |
-| `Cmd+Shift+O` | External browser |
-| `Cmd+Shift+E` | External terminal |
-| `Ctrl+Shift+R` | Rebuild setup |
-| `Ctrl+Shift+S` | Start/Rerun |
+
+#### External Apps
+
+| Shortcut | Action |
+|---|---|
+| `Cmd+Option+B` | Open in external browser |
+| `Cmd+Option+T` | Open in external terminal |
 
 ### Supported Languages
 
