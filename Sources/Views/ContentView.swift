@@ -39,7 +39,7 @@ struct ContentView: View {
     @State private var saveWork: DispatchWorkItem?
     @State private var workstreamToRemove: UUID?
     @State private var workstreamToPurge: UUID?
-    @State private var purgeWarningDirty = false
+    @State private var purgeWarningMessage: String?
     @State private var removedProjectNames: [String] = []
     @AppStorage("factoryfloor.sortOrder") private var sortOrder: ProjectSortOrder = .recent
     @State private var keyMonitorInstalled = false
@@ -190,12 +190,12 @@ struct ContentView: View {
                 )
             ) {
                 Button("Cancel", role: .cancel) { workstreamToPurge = nil }
-                Button(purgeWarningDirty ? "Purge Anyway" : "Purge", role: .destructive) {
+                Button(purgeWarningMessage != nil ? "Purge Anyway" : "Purge", role: .destructive) {
                     performPurge()
                 }
             } message: {
-                if purgeWarningDirty {
-                    Text("This workstream has uncommitted changes that will be lost.")
+                if let warning = purgeWarningMessage {
+                    Text(warning)
                 } else {
                     Text("The worktree and its branch will be permanently deleted.")
                 }
@@ -468,11 +468,7 @@ struct ContentView: View {
 
     private func confirmPurge(_ wsID: UUID) {
         let ws = projects.flatMap(\.workstreams).first(where: { $0.id == wsID })
-        if let path = ws?.worktreePath, GitOperations.hasUncommittedChanges(at: path) {
-            purgeWarningDirty = true
-        } else {
-            purgeWarningDirty = false
-        }
+        purgeWarningMessage = ws.flatMap { WorkstreamArchiver.purgeWarning(for: $0) }
         workstreamToPurge = wsID
     }
 

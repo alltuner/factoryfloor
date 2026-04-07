@@ -152,6 +152,123 @@ final class GitOperationsTests: XCTestCase {
         GitOperations.fetchDefaultBranch(at: repoDir.path)
     }
 
+    // MARK: - currentBranch
+
+    func testCurrentBranchReturnsActiveBranch() throws {
+        let repoDir = tempDir.appendingPathComponent("branch-test")
+        try FileManager.default.createDirectory(at: repoDir, withIntermediateDirectories: true)
+        git(["init", "-b", "main"], in: repoDir)
+        git(["-c", "user.email=test@test.com", "-c", "user.name=Test",
+             "commit", "--allow-empty", "-m", "init"], in: repoDir)
+
+        XCTAssertEqual(GitOperations.currentBranch(at: repoDir.path), "main")
+    }
+
+    func testCurrentBranchReturnsNilForNonGitDirectory() throws {
+        let plainDir = tempDir.appendingPathComponent("not-a-repo")
+        try FileManager.default.createDirectory(at: plainDir, withIntermediateDirectories: true)
+
+        XCTAssertNil(GitOperations.currentBranch(at: plainDir.path))
+    }
+
+    func testCurrentBranchReturnsWorktreeBranch() throws {
+        let repoDir = tempDir.appendingPathComponent("main-repo")
+        try FileManager.default.createDirectory(at: repoDir, withIntermediateDirectories: true)
+        git(["init", "-b", "main"], in: repoDir)
+        git(["-c", "user.email=test@test.com", "-c", "user.name=Test",
+             "commit", "--allow-empty", "-m", "init"], in: repoDir)
+
+        let worktreeDir = tempDir.appendingPathComponent("wt")
+        git(["worktree", "add", "-b", "ff/my-feature", worktreeDir.path], in: repoDir)
+
+        XCTAssertEqual(GitOperations.currentBranch(at: worktreeDir.path), "ff/my-feature")
+    }
+
+    // MARK: - deleteLocalBranch
+
+    func testDeleteLocalBranchRemovesBranch() throws {
+        let repoDir = tempDir.appendingPathComponent("delete-branch")
+        try FileManager.default.createDirectory(at: repoDir, withIntermediateDirectories: true)
+        git(["init", "-b", "main"], in: repoDir)
+        git(["-c", "user.email=test@test.com", "-c", "user.name=Test",
+             "commit", "--allow-empty", "-m", "init"], in: repoDir)
+        git(["branch", "feature"], in: repoDir)
+
+        GitOperations.deleteLocalBranch(at: repoDir.path, branchName: "feature")
+
+        // Verify branch no longer exists
+        let result = git(["rev-parse", "--verify", "refs/heads/feature"], in: repoDir)
+        XCTAssertFalse(result, "Branch should have been deleted")
+    }
+
+    // MARK: - updateDefaultBranch
+
+    func testUpdateDefaultBranchSkipsWithoutRemote() throws {
+        let repoDir = tempDir.appendingPathComponent("no-remote-update")
+        try FileManager.default.createDirectory(at: repoDir, withIntermediateDirectories: true)
+        git(["init", "-b", "main"], in: repoDir)
+        git(["-c", "user.email=test@test.com", "-c", "user.name=Test",
+             "commit", "--allow-empty", "-m", "init"], in: repoDir)
+
+        // Should return silently without crashing
+        GitOperations.updateDefaultBranch(at: repoDir.path)
+    }
+
+    func testUpdateDefaultBranchFastForwardsMain() throws {
+        // Create a "remote" repo
+        let remoteDir = tempDir.appendingPathComponent("remote")
+        try FileManager.default.createDirectory(at: remoteDir, withIntermediateDirectories: true)
+        git(["init", "-b", "main"], in: remoteDir)
+        git(["-c", "user.email=test@test.com", "-c", "user.name=Test",
+             "commit", "--allow-empty", "-m", "init"], in: remoteDir)
+
+        // Clone it
+        let repoDir = tempDir.appendingPathComponent("local")
+        git(["clone", remoteDir.path, repoDir.path], in: tempDir)
+
+        // Record the initial commit
+        let beforeSHA = gitOutput(["rev-parse", "HEAD"], in: repoDir)
+
+        // Add a new commit to remote
+        git(["-c", "user.email=test@test.com", "-c", "user.name=Test",
+             "commit", "--allow-empty", "-m", "second"], in: remoteDir)
+
+        // Update should fast-forward
+        GitOperations.updateDefaultBranch(at: repoDir.path)
+
+        let afterSHA = gitOutput(["rev-parse", "HEAD"], in: repoDir)
+        XCTAssertNotEqual(beforeSHA, afterSHA, "main should have advanced")
+    }
+
+    func testUpdateDefaultBranchSkipsResetWhenDirty() throws {
+        // Create a "remote" repo
+        let remoteDir = tempDir.appendingPathComponent("remote")
+        try FileManager.default.createDirectory(at: remoteDir, withIntermediateDirectories: true)
+        git(["init", "-b", "main"], in: remoteDir)
+        git(["-c", "user.email=test@test.com", "-c", "user.name=Test",
+             "commit", "--allow-empty", "-m", "init"], in: remoteDir)
+
+        // Clone it
+        let repoDir = tempDir.appendingPathComponent("local")
+        git(["clone", remoteDir.path, repoDir.path], in: tempDir)
+
+        // Make a local uncommitted change
+        let dirtyFile = repoDir.appendingPathComponent("dirty.txt")
+        try "local work".write(to: dirtyFile, atomically: true, encoding: .utf8)
+
+        // Add a new commit to remote
+        git(["-c", "user.email=test@test.com", "-c", "user.name=Test",
+             "commit", "--allow-empty", "-m", "second"], in: remoteDir)
+
+        GitOperations.updateDefaultBranch(at: repoDir.path)
+
+        // The dirty file should still be there
+        XCTAssertTrue(FileManager.default.fileExists(atPath: dirtyFile.path),
+                      "Local changes should be preserved")
+        XCTAssertTrue(GitOperations.hasUncommittedChanges(at: repoDir.path),
+                      "Working tree should still be dirty")
+    }
+
     // MARK: - Helpers
 
     @discardableResult
@@ -165,5 +282,19 @@ final class GitOperationsTests: XCTestCase {
         try? process.run()
         process.waitUntilExit()
         return process.terminationStatus == 0
+    }
+
+    private func gitOutput(_ args: [String], in dir: URL) -> String {
+        let process = Process()
+        let pipe = Pipe()
+        process.executableURL = URL(fileURLWithPath: "/usr/bin/git")
+        process.arguments = args
+        process.currentDirectoryURL = dir
+        process.standardOutput = pipe
+        process.standardError = FileHandle.nullDevice
+        try? process.run()
+        process.waitUntilExit()
+        let data = pipe.fileHandleForReading.readDataToEndOfFile()
+        return (String(data: data, encoding: .utf8) ?? "").trimmingCharacters(in: .whitespacesAndNewlines)
     }
 }

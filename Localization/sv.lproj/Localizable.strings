@@ -30,7 +30,10 @@
 "Purge Workstream" = "Rensa arbetsflöde";
 "Purge" = "Rensa";
 "Purge Anyway" = "Rensa ändå";
-"This workstream has uncommitted changes that will be lost." = "Detta arbetsflöde har osparade ändringar som kommer att gå förlorade.";
+"uncommitted changes" = "osparade ändringar";
+"unpushed commits" = "opublicerade commits";
+" and " = " och ";
+"This workstream has %@ that will be lost." = "Detta arbetsflöde har %@ som kommer att gå förlorade.";
 "The worktree and its branch will be permanently deleted." = "Arbetsträdet och dess gren kommer att raderas permanent.";
 "Projects Not Found" = "Projekt hittades inte";
 "The following projects were removed because their directories no longer exist on disk: %@" = "Följande projekt togs bort eftersom deras kataloger inte längre finns på disken: %@";

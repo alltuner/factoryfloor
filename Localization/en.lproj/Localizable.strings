@@ -30,7 +30,10 @@
 "Purge Workstream" = "Purge Workstream";
 "Purge" = "Purge";
 "Purge Anyway" = "Purge Anyway";
-"This workstream has uncommitted changes that will be lost." = "This workstream has uncommitted changes that will be lost.";
+"uncommitted changes" = "uncommitted changes";
+"unpushed commits" = "unpushed commits";
+" and " = " and ";
+"This workstream has %@ that will be lost." = "This workstream has %@ that will be lost.";
 "The worktree and its branch will be permanently deleted." = "The worktree and its branch will be permanently deleted.";
 "Projects Not Found" = "Projects Not Found";
 "The following projects were removed because their directories no longer exist on disk: %@" = "The following projects were removed because their directories no longer exist on disk: %@";

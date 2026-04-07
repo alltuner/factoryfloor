@@ -30,7 +30,10 @@
 "Purge Workstream" = "Purgar flujo de trabajo";
 "Purge" = "Purgar";
 "Purge Anyway" = "Purgar de todos modos";
-"This workstream has uncommitted changes that will be lost." = "Este flujo de trabajo tiene cambios sin confirmar que se perderán.";
+"uncommitted changes" = "cambios sin confirmar";
+"unpushed commits" = "commits sin subir";
+" and " = " y ";
+"This workstream has %@ that will be lost." = "Este flujo de trabajo tiene %@ que se perderán.";
 "The worktree and its branch will be permanently deleted." = "El árbol de trabajo y su rama se eliminarán permanentemente.";
 "Projects Not Found" = "Proyectos no encontrados";
 "The following projects were removed because their directories no longer exist on disk: %@" = "Los siguientes proyectos se eliminaron porque sus directorios ya no existen en el disco: %@";
