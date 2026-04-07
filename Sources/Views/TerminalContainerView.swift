@@ -112,6 +112,8 @@ struct WorkspaceTabSnapshot {
     var activeTab: WorkspaceTab
     var browserTitles: [UUID: String]
     var terminalTitles: [UUID: String]
+    var runStarted: Bool
+    var runStoppedManually: Bool
 
     /// Returns a copy with dead terminal tabs removed.
     /// Browser tabs are kept regardless (they don't use terminal surfaces).
@@ -129,7 +131,9 @@ struct WorkspaceTabSnapshot {
             browserCount: browserCount,
             activeTab: resolvedActiveTab,
             browserTitles: browserTitles,
-            terminalTitles: terminalTitles
+            terminalTitles: terminalTitles,
+            runStarted: runStarted,
+            runStoppedManually: runStoppedManually
         )
     }
 }
@@ -526,6 +530,8 @@ struct TerminalContainerView: View {
                 activeTab = snapshot.activeTab
                 browserTitles = snapshot.browserTitles
                 terminalTitles = snapshot.terminalTitles
+                runStarted = snapshot.runStarted
+                runStoppedManually = snapshot.runStoppedManually
                 if scriptConfig.hasAnyScript && !tabs.contains(.environment) {
                     tabs.insert(.environment, at: 2)
                 }
@@ -740,7 +746,9 @@ struct TerminalContainerView: View {
             browserCount: browserCount,
             activeTab: activeTab,
             browserTitles: browserTitles,
-            terminalTitles: terminalTitles
+            terminalTitles: terminalTitles,
+            runStarted: runStarted,
+            runStoppedManually: runStoppedManually
         )
     }
 
