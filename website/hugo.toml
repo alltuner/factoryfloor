@@ -30,7 +30,7 @@ defaultContentLanguage = "en"
   contentDir = "content/sv"
 
 [params]
-  description = "A native macOS app that manages git worktrees, Claude Code sessions, and dev servers from a single window."
+  description = "A native macOS app that manages git worktrees, coding agent sessions, and dev servers from a single window."
   ogImage = "/img/og-image.png"
   githubURL = "https://github.com/alltuner/factoryfloor"
   downloadURL = "https://github.com/alltuner/factoryfloor/releases/latest/download/FactoryFloor.dmg"

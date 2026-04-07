@@ -44,6 +44,7 @@ Kraschdata bearbetas av Sentry inom EU (Frankfurt). Du kan läsa [Sentrys integr
 Factory Floor integrerar med verktyg som du själv installerar och konfigurerar:
 
 - **Claude Code** (Anthropic) - när du använder kodningsagenten skickas din kod och konversationskontext till Anthropics API. Det är en direkt anslutning mellan din dator och Anthropic, som omfattas av [Anthropics integritetspolicy](https://www.anthropic.com/privacy). Factory Floor fångar inte upp, lagrar eller vidarebefordrar dessa data.
+- **Codex** (OpenAI) - när du använder Codex i kodningsagentfliken skickas din kod och konversationskontext till OpenAI:s API. Det är en direkt anslutning mellan din dator och OpenAI, som omfattas av [OpenAI:s integritetspolicy](https://openai.com/policies/privacy-policy/). Factory Floor fångar inte upp, lagrar eller vidarebefordrar dessa data.
 - **GitHub CLI** - omfattas av [GitHubs integritetspolicy](https://docs.github.com/en/site-policy/privacy-policies/github-general-privacy-statement)
 - **Ghostty** - den inbyggda terminalmotorn körs lokalt utan nätverksaktivitet
 

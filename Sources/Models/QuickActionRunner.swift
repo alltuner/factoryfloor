@@ -1,5 +1,5 @@
-// ABOUTME: Spawns one-shot claude -p subprocesses or git/gh commands for quick actions.
-// ABOUTME: Forks from the active session for context-aware tasks like PR creation.
+// ABOUTME: Spawns one-shot coding CLI subprocesses or git/gh commands for quick actions.
+// ABOUTME: Uses the selected CLI for context-aware tasks like commit message and PR creation.
 
 import Foundation
 import os
@@ -34,7 +34,7 @@ enum QuickAction: String, CaseIterable, Identifiable {
         }
     }
 
-    /// Whether this action requires claude -p (vs direct git/gh command).
+    /// Whether this action requires the selected coding CLI (vs direct git/gh command).
     var usesLLM: Bool {
         switch self {
         case .commit, .createPR: return true
@@ -87,7 +87,8 @@ final class QuickActionRunner: ObservableObject {
 
     func run(
         action: QuickAction,
-        claudePath: String?,
+        codingCLI: CodingCLI,
+        codingCLIPath: String?,
         ghPath: String?,
         workingDirectory: String,
         branchName: String? = nil
@@ -99,33 +100,38 @@ final class QuickActionRunner: ObservableObject {
 
         switch action {
         case .commit, .createPR:
-            guard let claudePath else { return }
-            runClaudeAction(action: action, claudePath: claudePath, workingDirectory: workingDirectory)
+            guard let codingCLIPath else {
+                state = .idle
+                return
+            }
+            runLLMAction(action: action, codingCLI: codingCLI, codingCLIPath: codingCLIPath, workingDirectory: workingDirectory)
         case .push:
             runPush(workingDirectory: workingDirectory)
         case .abandonPR:
-            guard let ghPath, let branchName else { return }
+            guard let ghPath, let branchName else {
+                state = .idle
+                return
+            }
             runAbandonPR(ghPath: ghPath, branchName: branchName, workingDirectory: workingDirectory)
         }
     }
 
-    private func runClaudeAction(action: QuickAction, claudePath: String, workingDirectory: String) {
+    private func runLLMAction(action: QuickAction, codingCLI: CodingCLI, codingCLIPath: String, workingDirectory: String) {
         guard let prompt = action.prompt else { return }
 
-        var args: [String] = []
-        args.append(claudePath)
-        args.append("-p")
-        args.append(CommandBuilder.shellQuote(prompt))
-        args.append("--output-format")
-        args.append("json")
-        args.append("--continue")
-        args.append("--fork-session")
-        args.append("--no-session-persistence")
-        args.append("--dangerously-skip-permissions")
-
-        let innerCommand = args.joined(separator: " ")
-        let shell = CommandBuilder.userShell
-        runShellCommand(action: action, shell: shell, arguments: ["-lic", innerCommand], workingDirectory: workingDirectory, parseJSON: true)
+        let command = CodingCLICommandBuilder.buildQuickActionCommand(
+            cli: codingCLI,
+            cliPath: codingCLIPath,
+            prompt: prompt,
+            workingDirectory: workingDirectory
+        )
+        runShellCommand(
+            action: action,
+            shell: command.shell,
+            arguments: command.arguments,
+            workingDirectory: workingDirectory,
+            parseJSON: command.parseJSON
+        )
     }
 
     private func runPush(workingDirectory: String) {

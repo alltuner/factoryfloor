@@ -19,7 +19,7 @@ other = "entorno de desarrollo"
 [hero_title_2]
 other = "con IA."
 [hero_desc]
-other = "App nativa de macOS sobre el terminal GPU de <a href=\"https://ghostty.org\" class=\"text-wine-light hover:underline\">Ghostty</a>. Gestiona git worktrees, sesiones de <a href=\"https://docs.anthropic.com/en/docs/claude-code/overview\" class=\"text-wine-light hover:underline\">Claude Code</a> y servidores dev desde una sola ventana. Cada workstream tiene su branch, terminal y agent, todo en paralelo, todo a velocidad nativa."
+other = "App nativa de macOS sobre el terminal GPU de <a href=\"https://ghostty.org\" class=\"text-wine-light hover:underline\">Ghostty</a>. Gestiona git worktrees, sesiones de agente de código y servidores dev desde una sola ventana. Cada workstream tiene su branch, terminal y agent, todo en paralelo, todo a velocidad nativa."
 [hero_demo_tab]
 other = "Demo"
 [hero_download]
@@ -38,9 +38,9 @@ other = "Git Worktrees"
 [feat_worktrees_desc]
 other = "Cada workstream tiene su branch y worktree. Cambia de tarea sin stash, con archivos .env enlazados automáticamente."
 [feat_claude_title]
-other = "Claude Code"
+other = "Claude Code o Codex"
 [feat_claude_desc]
-other = "Agent <a href='https://docs.anthropic.com/en/docs/claude-code/overview' class='text-wine-light no-underline hover:underline'>Claude Code</a> integrado con persistencia de sesión. Retoma conversaciones entre reinicios con session IDs automáticos."
+other = "Elige <a href='https://docs.anthropic.com/en/docs/claude-code/overview' class='text-wine-light no-underline hover:underline'>Claude Code</a> o <a href='https://developers.openai.com/codex' class='text-wine-light no-underline hover:underline'>Codex</a> para la pestaña de agente integrada, con reanudación de sesión entre reinicios."
 [feat_tmux_title]
 other = "Persistencia tmux"
 [feat_tmux_desc]
@@ -71,11 +71,11 @@ other = "Arrastra un directorio al sidebar o crea uno nuevo. Factory Floor detec
 [step2_title]
 other = "Crea un workstream"
 [step2_desc]
-other = "Un worktree nuevo con branch, sesión de Claude Code, terminal y tab de browser. La detección de puerto es automática — el browser abre tu servidor dev en cuanto empieza a escuchar."
+other = "Un worktree nuevo con branch, el CLI de código que hayas elegido, terminal y tab de browser. La detección de puerto es automática — el browser abre tu servidor dev en cuanto empieza a escuchar."
 [step3_title]
 other = "Programa con IA"
 [step3_desc]
-other = "El agent renombra tu branch para la tarea. Los setup scripts instalan dependencias. Cambia entre workstreams sin perder estado."
+other = "El agente se pone a trabajar de inmediato. Los setup scripts instalan dependencias. Cambia entre workstreams sin perder estado."
 
 [config_label]
 other = "Configuración"

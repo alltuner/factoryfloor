@@ -1,13 +1,13 @@
 # Factory Floor
 
-> Factory Floor is a free, open-source native macOS app for AI-powered software development. It manages multiple parallel development tasks (called workstreams), each in its own git worktree with a dedicated Claude Code agent, terminal, and embedded browser. Built on Ghostty's GPU-rendered terminal engine.
+> Factory Floor is a free, open-source native macOS app for AI-powered software development. It manages multiple parallel development tasks (called workstreams), each in its own git worktree with a dedicated coding agent, terminal, and embedded browser. Built on Ghostty's GPU-rendered terminal engine.
 
-Factory Floor lets developers run several AI coding agents in parallel on the same codebase without branch conflicts. Each workstream gets its own git worktree, Claude Code session, terminals, and a browser that auto-detects the dev server port.
+Factory Floor lets developers run several AI coding agents in parallel on the same codebase without branch conflicts. Each workstream gets its own git worktree, coding CLI session, terminals, and a browser that auto-detects the dev server port.
 
 Key capabilities:
 
 - Git worktrees: each workstream operates on its own branch and worktree, no stashing needed
-- Claude Code integration: embedded AI agent with session persistence via tmux
+- Selectable Claude Code or Codex integration: embedded AI agent with session persistence via tmux
 - Setup/run/teardown scripts: configured per project via `.factoryfloor.json`
 - Embedded browser: WKWebView with automatic port detection from run scripts
 - GitHub integration: repo info, open PRs, and branch PR status via the `gh` CLI

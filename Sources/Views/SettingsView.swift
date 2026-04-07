@@ -5,6 +5,7 @@ import SwiftUI
 
 struct SettingsView: View {
     @AppStorage("factoryfloor.languageOverride") private var languageOverride: String = ""
+    @AppStorage("factoryfloor.codingCLI") private var codingCLIRaw: String = ""
     @AppStorage("factoryfloor.tmuxMode") private var tmuxMode: Bool = false
     @AppStorage("factoryfloor.bypassPermissions") private var bypassPermissions: Bool = false
     @AppStorage("factoryfloor.allowOutsideWorktree") private var allowOutsideWorktree: Bool = false
@@ -34,6 +35,17 @@ struct SettingsView: View {
     #endif
     @State private var cliInstalled = Self.isCliCorrectlyInstalled()
 
+    private var selectedCodingCLI: CodingCLI {
+        appEnv.toolStatus.resolvedCodingCLI(storedValue: codingCLIRaw)
+    }
+
+    private var codingCLIBinding: Binding<String> {
+        Binding(
+            get: { selectedCodingCLI.rawValue },
+            set: { codingCLIRaw = $0 }
+        )
+    }
+
     var body: some View {
         Form {
             // MARK: - Environment
@@ -43,6 +55,11 @@ struct SettingsView: View {
                     name: "claude",
                     status: appEnv.toolStatus.claude,
                     version: appEnv.toolStatus.claudeVersion
+                )
+                ToolRow(
+                    name: "codex",
+                    status: appEnv.toolStatus.codex,
+                    version: appEnv.toolStatus.codexVersion
                 )
                 ToolRow(
                     name: "gh",
@@ -183,6 +200,12 @@ struct SettingsView: View {
             // MARK: - Coding Agent
 
             Section("Coding Agent") {
+                Picker("Coding CLI", selection: codingCLIBinding) {
+                    ForEach(CodingCLI.allCases) { cli in
+                        Text(cli.displayName).tag(cli.rawValue)
+                    }
+                }
+
                 SettingToggle(
                     "Bypass permission prompts",
                     isOn: $bypassPermissions,
@@ -202,12 +225,26 @@ struct SettingsView: View {
                     isOn: $agentTeams,
                     description: "Enables experimental multi-agent coordination. Agents can spawn teammates, delegate tasks, and collaborate across workstreams."
                 )
+                .disabled(!selectedCodingCLI.supportsAgentTeams)
+
+                if !selectedCodingCLI.supportsAgentTeams {
+                    Text("Agent Teams is only available with Claude Code.")
+                        .font(.caption)
+                        .foregroundStyle(.orange)
+                }
 
                 SettingToggle(
                     "Auto-rename branch",
                     isOn: $autoRenameBranch,
                     description: "On the first request, the agent renames the branch to match the task and writes a short description visible in the sidebar."
                 )
+                .disabled(!selectedCodingCLI.supportsAutoRenameBranch)
+
+                if !selectedCodingCLI.supportsAutoRenameBranch {
+                    Text("Auto-rename branch is only available with Claude Code.")
+                        .font(.caption)
+                        .foregroundStyle(.orange)
+                }
 
                 SettingToggle(
                     "Tmux Mode",
@@ -461,6 +498,8 @@ struct ToolStatus {
     var claude: BinaryStatus = .notFound
     var claudeVersion: String?
     var claudeSupportsSessionName: Bool = false
+    var codex: BinaryStatus = .notFound
+    var codexVersion: String?
     var gh: BinaryStatus = .notFound
     var ghVersion: String?
     var ghAuthDetail: String?
@@ -479,6 +518,11 @@ struct ToolStatus {
         if let path = status.claude.path {
             status.claudeVersion = runForVersion(path, args: ["--version"])
             status.claudeSupportsSessionName = helpContainsFlag(path, flag: "--name")
+        }
+
+        status.codex = findBinary("codex")
+        if let path = status.codex.path {
+            status.codexVersion = runForVersion(path, args: ["--version"])
         }
 
         status.gh = findBinary("gh")
@@ -505,6 +549,7 @@ struct ToolStatus {
         let trimmed = output
             .replacingOccurrences(of: "tmux ", with: "")
             .replacingOccurrences(of: "gh version ", with: "")
+            .replacingOccurrences(of: "codex-cli ", with: "")
         return trimmed.components(separatedBy: .newlines).first?.trimmingCharacters(in: .whitespaces)
     }
 

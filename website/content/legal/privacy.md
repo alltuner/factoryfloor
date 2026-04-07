@@ -44,6 +44,7 @@ Crash data is processed by Sentry in the EU (Frankfurt). You can review [Sentry'
 Factory Floor integrates with tools you install and configure yourself:
 
 - **Claude Code** (Anthropic) - when using the Coding Agent, your code and conversation context are sent to Anthropic's API. This is a direct connection between your machine and Anthropic, subject to [Anthropic's privacy policy](https://www.anthropic.com/privacy). Factory Floor does not intercept, store, or relay this data.
+- **Codex** (OpenAI) - when using Codex in the Coding Agent tab, your code and conversation context are sent to OpenAI's API. This is a direct connection between your machine and OpenAI, subject to [OpenAI's privacy policy](https://openai.com/policies/privacy-policy/). Factory Floor does not intercept, store, or relay this data.
 - **GitHub CLI** - subject to [GitHub's privacy policy](https://docs.github.com/en/site-policy/privacy-policies/github-general-privacy-statement)
 - **Ghostty** - the embedded terminal engine runs locally with no network activity
 

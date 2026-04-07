@@ -19,7 +19,7 @@ brew install --cask factory-floor
 
 Factory Floor funciona mejor cuando tienes esto instalado (te avisará si falta algo):
 
-- **[Claude Code](https://docs.anthropic.com/en/docs/claude-code/overview)** — la razón de ser, básicamente
+- **[Claude Code](https://docs.anthropic.com/en/docs/claude-code/overview)** o **[Codex](https://developers.openai.com/codex)** — elige el CLI de código que quieres en la pestaña Agent
 - **git** — probablemente ya lo tienes
 - **[gh](https://cli.github.com/)** — GitHub CLI, para estado de PR y quick actions
 - **[tmux](https://github.com/tmux/tmux)** — opcional, permite persistencia de sesión
@@ -66,7 +66,7 @@ La interfaz aparece al instante, la creación del worktree ocurre en segundo pla
 #### Workstream tabs {#workstream-tabs}
 
 - **Info** (⌘I) — nombre de branch, estado del PR, documentación del proyecto
-- **Agent** (⌘Return) — tu sesión de Claude Code
+- **Agent** (⌘Return) — la sesión del CLI de código que hayas elegido
 - **Environment** (⌘E) — controles de setup y run script
 - **Terminal** (⌘T) — terminal tabs adicionales, tantos como quieras
 - **Navegador** (⌘B) — navegador integrado con detección automática de port
@@ -84,25 +84,26 @@ Cuando un PR se fusiona, Factory Floor muestra un badge "Purge" para que sepas q
 
 ### El Coding Agent {#the-coding-agent}
 
-El tab de coding agent ejecuta [Claude Code](https://docs.anthropic.com/en/docs/claude-code/overview) en un terminal integrado. Aparece justo después del tab Info en cada workstream.
+La pestaña de coding agent ejecuta [Claude Code](https://docs.anthropic.com/en/docs/claude-code/overview) o [Codex](https://developers.openai.com/codex) en un terminal integrado. Elige el CLI en Ajustes y usa la misma pestaña Agent en cada workstream.
 
 #### Ajustes del agent {#agent-settings}
 
 - **Bypass permission prompts** — salta los diálogos de confirmación. Útil si confías en tu agent (y te gusta vivir peligrosamente).
 - **Tmux mode** — envuelve las sesiones del agent en tmux para que sobrevivan a reinicios de la app. Requiere tmux.
-- **Auto-rename branch** — permite al agent renombrar la branch para que coincida con la tarea.
-- **Agent Teams** — coordinación multi-agente experimental, cortesía de Claude Code. Confiamos en Anthropic, ¿no?
+- **Auto-rename branch** — permite a Claude Code renombrar la branch para que coincida con la tarea.
+- **Coding CLI** — cambia la pestaña Agent entre Claude Code y Codex.
+- **Agent Teams** — coordinación multi-agente experimental, disponible ahora mismo con Claude Code.
 
 #### Quick actions {#quick-actions}
 
-Las quick actions ejecutan tareas puntuales de Claude desde el sidebar:
+Las quick actions ejecutan tareas puntuales del CLI de código desde el sidebar:
 
 - **Commit** — hace stage y commit con un mensaje generado por IA
 - **Push** — hace push de la branch actual al origin
 - **Create PR** — crea un pull request con título y descripción generados por IA
 - **Abandon PR** — cierra el PR
 
-Se ejecutan como llamadas `claude -p` en segundo plano. Activa **Quick action debug mode** en ajustes si quieres saber cómo se hace la salchicha. Confía en nosotros, [David](https://davidpoblador.com) pasó más tiempo del que puede admitir depurando comportamientos extraños ahí dentro.
+Se ejecutan como comandos en segundo plano de Claude Code o Codex, según el CLI seleccionado. Activa **Quick action debug mode** en ajustes si quieres saber cómo se hace la salchicha. Confía en nosotros, [David](https://davidpoblador.com) pasó más tiempo del que puede admitir depurando comportamientos extraños ahí dentro.
 
 ---
 
@@ -294,7 +295,7 @@ Requiere el [gh CLI](https://cli.github.com/) con autenticación (`gh auth login
 
 #### Quick actions {#quick-actions-1}
 
-Desde el sidebar, ejecuta operaciones con un clic: **Create PR** (título y descripción generados por IA), **Push** (al origin con `-u`), o **Abandon PR** (cierra con un comentario). Porque si estás cansado de escribir "ahora haz commit, push y abre un PR" en Claude por centésima vez, no estás solo.
+Desde el sidebar, ejecuta operaciones con un clic: **Create PR** (título y descripción generados por IA), **Push** (al origin con `-u`), o **Abandon PR** (cierra con un comentario). Porque si estás cansado de escribir "ahora haz commit, push y abre un PR" a tu agent por centésima vez, no estás solo.
 
 ### Actualizaciones {#updates}
 
@@ -328,7 +329,7 @@ Tampoco. Tu cliente de git ya lo hace mejor de lo que nosotros haríamos nunca. 
 
 #### "Tools not found" {#tools-not-found}
 
-Factory Floor detecta herramientas desde tu login shell. Si `claude`, `gh`, `git` o `tmux` no aparecen:
+Factory Floor detecta herramientas desde tu login shell. Si `claude`, `codex`, `gh`, `git` o `tmux` no aparecen:
 
 - Asegúrate de que están en el PATH de tu shell
 - Usuarios de Fish 4.0 y Nix: la app gestiona estos entornos, pero si algo falla, revisa Settings > Environment

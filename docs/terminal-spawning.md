@@ -28,7 +28,7 @@ builds the environment injected into every workstream terminal:
 | `FF_PROJECT_DIR` | Project root directory |
 | `FF_WORKTREE_DIR` | Worktree / working directory |
 | `FF_PORT` | Port number derived from working directory |
-| `CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS` | `1` if agent teams flag is on |
+| `CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS` | `1` if Agent Teams is on and Claude Code is selected |
 
 For non-tmux terminal tabs, `TMUX` and `TMUX_PANE` are explicitly cleared to
 prevent session inheritance from a parent tmux.
@@ -37,12 +37,19 @@ prevent session inheritance from a parent tmux.
 
 ### 1. Coding Agent (`.agent` tab)
 
-`buildClaudeCommand()` in TerminalContainerView constructs the command:
+`buildAgentCommand()` in TerminalContainerView constructs the command for the
+selected CLI:
 
-- `claude --resume <sessionID>` (or `--session-id` for a fresh session)
-- `--teammate-mode tmux` if tmux mode is enabled
-- `--dangerously-skip-permissions` if bypass flag is set
-- `CommandBuilder.withFallback()` provides graceful fallback from resume to fresh
+- **Claude Code**
+  - `claude --resume <sessionID>` (or `--session-id` for a fresh session)
+  - `--teammate-mode tmux` if tmux mode is enabled
+  - `--dangerously-skip-permissions` if bypass flag is set
+  - `--append-system-prompt` carries the worktree restriction and auto-rename prompts
+- **Codex**
+  - `codex resume --last` scoped to the worktree via `-C <path>`
+  - `--sandbox workspace-write` by default, or `danger-full-access` when unrestricted writes are enabled
+  - `--ask-for-approval on-request` by default, or `never` when bypass is enabled
+- `CommandBuilder.withFallback()` provides graceful fallback from resume to a fresh session
 
 ### 2. Setup Script
 
@@ -133,7 +140,7 @@ surfaces auto-respawn on close; terminal tabs close and remove themselves.
    generates name, creates `Workstream` model.
 2. `ContentView` sets selection to the new workstream, renders
    `TerminalContainerView`.
-3. `TerminalContainerView.onAppear` loads `ScriptConfig`, builds the claude
+3. `TerminalContainerView.onAppear` loads `ScriptConfig`, builds the agent
    command, computes env vars, restores or initializes tabs.
 4. `preloadSurfaces()` creates `TerminalView` instances for agent and setup
    (if configured) before the UI is visible.

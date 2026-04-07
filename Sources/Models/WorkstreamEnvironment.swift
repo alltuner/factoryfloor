@@ -12,6 +12,7 @@ enum WorkstreamEnvironment {
         projectDirectory: String,
         workingDirectory: String,
         port: Int,
+        codingCLI: CodingCLI,
         agentTeams: Bool
     ) -> [String: String] {
         var vars = [
@@ -22,7 +23,7 @@ enum WorkstreamEnvironment {
             "FF_WORKTREE_DIR": workingDirectory,
             "FF_PORT": "\(port)",
         ]
-        if agentTeams {
+        if codingCLI == .claude, agentTeams {
             vars["CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS"] = "1"
         }
         return vars

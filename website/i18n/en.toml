@@ -20,7 +20,7 @@ other = "AI‑powered"
 [hero_title_2]
 other = "dev workspace."
 [hero_desc]
-other = "A native macOS app built on <a href=\"https://ghostty.org\" class=\"text-wine-light hover:underline\">Ghostty</a>'s GPU-rendered terminal. Manages git worktrees, <a href=\"https://docs.anthropic.com/en/docs/claude-code/overview\" class=\"text-wine-light hover:underline\">Claude Code</a> sessions, and dev servers from a single window. Each workstream gets its own branch, terminal, and AI agent — all running in parallel, all at native speed."
+other = "A native macOS app built on <a href=\"https://ghostty.org\" class=\"text-wine-light hover:underline\">Ghostty</a>'s GPU-rendered terminal. Manages git worktrees, coding agent sessions, and dev servers from a single window. Each workstream gets its own branch, terminal, and AI agent — all running in parallel, all at native speed."
 [hero_demo_tab]
 other = "Demo"
 [hero_download]
@@ -40,9 +40,9 @@ other = "Git Worktrees"
 [feat_worktrees_desc]
 other = "Each workstream gets its own branch and worktree. Switch between tasks without stashing, with .env files automatically symlinked."
 [feat_claude_title]
-other = "Claude Code"
+other = "Claude Code or Codex"
 [feat_claude_desc]
-other = "Integrated <a href='https://docs.anthropic.com/en/docs/claude-code/overview' class='text-wine-light no-underline hover:underline'>Claude Code</a> agent with session persistence. Resume conversations across app restarts with automatic session IDs."
+other = "Choose <a href='https://docs.anthropic.com/en/docs/claude-code/overview' class='text-wine-light no-underline hover:underline'>Claude Code</a> or <a href='https://developers.openai.com/codex' class='text-wine-light no-underline hover:underline'>Codex</a> for the integrated agent tab, with resume support across app restarts."
 [feat_tmux_title]
 other = "Tmux Persistence"
 [feat_tmux_desc]
@@ -74,11 +74,11 @@ other = "Drop a directory on the sidebar, or create a new one. Factory Floor det
 [step2_title]
 other = "Create a workstream"
 [step2_desc]
-other = "A new git worktree with a fresh branch, a Claude Code session, a terminal, and a browser tab. Port detection is automatic — the browser opens your dev server as soon as it starts listening."
+other = "A new git worktree with a fresh branch, your selected coding CLI, a terminal, and a browser tab. Port detection is automatic — the browser opens your dev server as soon as it starts listening."
 [step3_title]
 other = "Code with AI"
 [step3_desc]
-other = "The coding agent renames your branch to match the task. Setup scripts install dependencies. Switch between workstreams without losing state."
+other = "The coding agent gets to work immediately. Setup scripts install dependencies. Switch between workstreams without losing state."
 
 # Config
 [config_label]

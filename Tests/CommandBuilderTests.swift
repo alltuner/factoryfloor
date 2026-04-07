@@ -250,4 +250,65 @@ final class CommandBuilderTests: XCTestCase {
         // Backticks and angle brackets should be quoted
         XCTAssertTrue(result.contains("'"))
     }
+
+    func testResolvedCodingCLIPrefersStoredValue() {
+        var status = ToolStatus()
+        status.claude = .found("/usr/local/bin/claude")
+        status.codex = .found("/usr/local/bin/codex")
+
+        XCTAssertEqual(status.resolvedCodingCLI(storedValue: "codex"), .codex)
+    }
+
+    func testResolvedCodingCLIAutoSelectsCodexWhenClaudeMissing() {
+        var status = ToolStatus()
+        status.codex = .found("/usr/local/bin/codex")
+
+        XCTAssertEqual(status.resolvedCodingCLI(storedValue: ""), .codex)
+    }
+
+    func testBuildCodexAgentCommandUsesResumeLastAndSandbox() {
+        let workstreamID = UUID(uuidString: "12345678-1234-1234-1234-123456789abc")!
+        let command = CodingCLICommandBuilder.buildAgentCommand(
+            cli: .codex,
+            cliPath: "/usr/local/bin/codex",
+            workingDirectory: "/tmp/worktree",
+            projectName: "factoryfloor",
+            workstreamName: "switch-cli",
+            workstreamID: workstreamID,
+            tmuxPath: nil,
+            useTmux: false,
+            bypassPermissions: true,
+            allowOutsideWorktree: false,
+            autoRenameBranch: true,
+            envVars: [:],
+            supportsSessionName: false
+        )
+
+        XCTAssertEqual(
+            command.intermediateCommands[0],
+            "/usr/local/bin/codex resume --last -C /tmp/worktree --sandbox workspace-write --ask-for-approval never"
+        )
+        XCTAssertEqual(
+            command.intermediateCommands[1],
+            "/usr/local/bin/codex -C /tmp/worktree --sandbox workspace-write --ask-for-approval never"
+        )
+        XCTAssertTrue(command.finalCommand.contains("codex resume --last"))
+        XCTAssertTrue(command.finalCommand.contains("Starting new session..."))
+    }
+
+    func testBuildCodexQuickActionCommandUsesExec() {
+        let command = CodingCLICommandBuilder.buildQuickActionCommand(
+            cli: .codex,
+            cliPath: "/usr/local/bin/codex",
+            prompt: "do thing",
+            workingDirectory: "/tmp/worktree"
+        )
+
+        XCTAssertEqual(command.shell, CommandBuilder.userShell)
+        XCTAssertEqual(
+            command.arguments,
+            ["-lic", "/usr/local/bin/codex exec --json --dangerously-bypass-approvals-and-sandbox -C /tmp/worktree 'do thing'"]
+        )
+        XCTAssertFalse(command.parseJSON)
+    }
 }
