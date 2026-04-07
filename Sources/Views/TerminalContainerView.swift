@@ -817,7 +817,9 @@ struct TerminalContainerView: View {
             projectDirectory: projectDirectory,
             workingDirectory: workingDirectory,
             port: workstreamPort,
-            agentTeams: agentTeams
+            agentTeams: agentTeams,
+            defaultBranch: GitOperations.defaultBranch(at: projectDirectory),
+            scriptSource: scriptConfig.source
         )
     }
 

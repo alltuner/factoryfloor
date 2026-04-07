@@ -206,7 +206,7 @@ Coloca un `.factoryfloor.json` en la raíz de tu proyecto para automatizar el ci
 
 Todos los campos son opcionales. Los scripts se ejecutan en el directorio del workstream usando tu login shell. Sí, incluso [fish](https://github.com/alltuner/factoryfloor/pull/324). No preguntes cuánto tardó eso.
 
-Factory Floor también lee `conductor.json` y `.superset/config.json` si `.factoryfloor.json` no existe. Porque la compatibilidad es de buena educación. (¿Es hora de un [estándar](https://xkcd.com/927/)?)
+Factory Floor también lee `.emdash.json`, `conductor.json` y `.superset/config.json` si `.factoryfloor.json` no existe. Porque la compatibilidad es de buena educación. (¿Es hora de un [estándar](https://xkcd.com/927/)?) Cuando se usa una configuración de compatibilidad, Factory Floor inyecta variables de entorno de compatibilidad para que los scripts funcionen sin modificación (p. ej. `CONDUCTOR_PORT`, `EMDASH_PORT`, `SUPERSET_PORT_BASE`).
 
 #### El tab Environment {#the-environment-tab}
 
@@ -226,6 +226,7 @@ Cada terminal, setup script y comando run en un workstream tiene estas variables
 | `FF_PROJECT_DIR` | Ruta del repositorio principal | `/Users/you/my-app` |
 | `FF_WORKTREE_DIR` | Ruta del worktree | `~/.factoryfloor/worktrees/my-app/coral-tidal-reef` |
 | `FF_PORT` | Port determinista (40001-49999) | `42847` |
+| `FF_DEFAULT_BRANCH` | Rama por defecto (main, master, etc.) | `main` |
 
 #### Sobre FF_PORT {#about-ff_port}
 

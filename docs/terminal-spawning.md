@@ -28,6 +28,7 @@ builds the environment injected into every workstream terminal:
 | `FF_PROJECT_DIR` | Project root directory |
 | `FF_WORKTREE_DIR` | Worktree / working directory |
 | `FF_PORT` | Port number derived from working directory |
+| `FF_DEFAULT_BRANCH` | Default branch (main, master, etc.) |
 | `CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS` | `1` if agent teams flag is on |
 
 For non-tmux terminal tabs, `TMUX` and `TMUX_PANE` are explicitly cleared to

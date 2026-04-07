@@ -1,5 +1,5 @@
 // ABOUTME: Tests for ScriptConfig loading from multiple config file formats.
-// ABOUTME: Validates priority order and parsing of factoryfloor, conductor, and superset configs.
+// ABOUTME: Validates priority order and parsing of factoryfloor, emdash, conductor, and superset configs.
 
 @testable import FactoryFloor
 import XCTest
@@ -120,6 +120,47 @@ final class ScriptConfigTests: XCTestCase {
         writeJSON(".superset/config.json", ["run": "npm start"])
         let config = ScriptConfig.load(from: tmpDir.path)
         XCTAssertEqual(config.run, "npm start")
+    }
+
+    // MARK: - .emdash.json (fallback)
+
+    func testEmdashJSON() {
+        writeJSON(".emdash.json", ["scripts": ["setup": "npm install", "run": "npm start", "teardown": "npm run clean"]])
+        let config = ScriptConfig.load(from: tmpDir.path)
+        XCTAssertEqual(config.setup, "npm install")
+        XCTAssertEqual(config.run, "npm start")
+        XCTAssertEqual(config.teardown, "npm run clean")
+        XCTAssertEqual(config.source, ".emdash.json")
+    }
+
+    func testEmdashWithoutScriptsKeyReturnsEmpty() {
+        writeJSON(".emdash.json", ["setup": "npm install"])
+        let config = ScriptConfig.load(from: tmpDir.path)
+        XCTAssertFalse(config.hasAnyScript)
+    }
+
+    func testFactoryFloorTakesPriorityOverEmdash() {
+        writeJSON(".factoryfloor.json", ["run": "ff-run"])
+        writeJSON(".emdash.json", ["scripts": ["run": "emdash-run"]])
+        let config = ScriptConfig.load(from: tmpDir.path)
+        XCTAssertEqual(config.run, "ff-run")
+        XCTAssertEqual(config.source, ".factoryfloor.json")
+    }
+
+    func testEmdashTakesPriorityOverConductor() {
+        writeJSON(".emdash.json", ["scripts": ["run": "emdash-run"]])
+        writeJSON("conductor.json", ["scripts": ["run": "conductor-run"]])
+        let config = ScriptConfig.load(from: tmpDir.path)
+        XCTAssertEqual(config.run, "emdash-run")
+        XCTAssertEqual(config.source, ".emdash.json")
+    }
+
+    func testInvalidEmdashJSONReportsError() {
+        let path = tmpDir.appendingPathComponent(".emdash.json").path
+        FileManager.default.createFile(atPath: path, contents: "not json".data(using: .utf8))
+        let config = ScriptConfig.load(from: tmpDir.path)
+        XCTAssertNotNil(config.loadError)
+        XCTAssertEqual(config.source, ".emdash.json")
     }
 
     // MARK: - Error handling
