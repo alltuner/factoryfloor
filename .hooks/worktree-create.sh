@@ -19,6 +19,8 @@ fi
 
 # Build so SourceKit can resolve symbols across files in the worktree.
 # dev.sh runs xcodegen + xcodebuild with the shared SPM cache.
+# After the build, generate buildServer.json so SourceKit-LSP can use the
+# Xcode build index for cross-file type resolution.
 # Runs in background to avoid blocking worktree creation.
 cd "$WORKTREE_DIR"
-nohup ./scripts/dev.sh build >/dev/null 2>&1 &
+nohup bash -c './scripts/dev.sh build && command -v xcode-build-server >/dev/null && xcode-build-server config -project FactoryFloor.xcodeproj -scheme FactoryFloor --build_root build/debug/derived' >/dev/null 2>&1 &

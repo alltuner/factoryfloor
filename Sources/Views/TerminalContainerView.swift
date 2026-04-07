@@ -613,40 +613,42 @@ struct TerminalContainerView: View {
             }
             .navigationSubtitle(portSubtitle)
             .toolbar {
-                ToolbarItemGroup(placement: .primaryAction) {
-                    if let githubURL = appEnv.githubURL(for: projectDirectory) {
-                        Button {
-                            NSWorkspace.shared.open(githubURL)
-                        } label: {
-                            Label(NSLocalizedString("GitHub", comment: ""), image: "github")
-                                .labelStyle(.iconOnly)
+                if isActive {
+                    ToolbarItemGroup(placement: .primaryAction) {
+                        if let githubURL = appEnv.githubURL(for: projectDirectory) {
+                            Button {
+                                NSWorkspace.shared.open(githubURL)
+                            } label: {
+                                Label(NSLocalizedString("GitHub", comment: ""), image: "github")
+                                    .labelStyle(.iconOnly)
+                            }
+                            .help("Open on GitHub")
                         }
-                        .help("Open on GitHub")
-                    }
 
-                    Button(action: addTerminal) {
-                        Label(NSLocalizedString("Terminal", comment: ""), systemImage: "terminal")
-                            .labelStyle(.titleAndIcon)
-                    }
-                    .help("New Terminal (\u{2318}T)")
+                        Button(action: addTerminal) {
+                            Label(NSLocalizedString("Terminal", comment: ""), systemImage: "terminal")
+                                .labelStyle(.titleAndIcon)
+                        }
+                        .help("New Terminal (\u{2318}T)")
 
-                    Button(action: addBrowser) {
-                        Label(NSLocalizedString("Browser", comment: ""), systemImage: "globe")
-                            .labelStyle(.titleAndIcon)
-                    }
-                    .help("New Browser (\u{2318}B)")
+                        Button(action: addBrowser) {
+                            Label(NSLocalizedString("Browser", comment: ""), systemImage: "globe")
+                                .labelStyle(.titleAndIcon)
+                        }
+                        .help("New Browser (\u{2318}B)")
 
-                    QuickActionButtons(
-                        runner: quickActionRunner,
-                        claudePath: appEnv.toolStatus.claude.path,
-                        ghPath: appEnv.toolStatus.gh.path,
-                        workingDirectory: workingDirectory,
-                        branchName: appEnv.branchName(for: workingDirectory),
-                        bypassPermissions: bypassPermissions,
-                        worktreeState: appEnv.worktreeState(for: workingDirectory),
-                        hasGitHubRemote: appEnv.hasGitHubRemote(projectDirectory),
-                        prState: branchPR?.state
-                    )
+                        QuickActionButtons(
+                            runner: quickActionRunner,
+                            claudePath: appEnv.toolStatus.claude.path,
+                            ghPath: appEnv.toolStatus.gh.path,
+                            workingDirectory: workingDirectory,
+                            branchName: appEnv.branchName(for: workingDirectory),
+                            bypassPermissions: bypassPermissions,
+                            worktreeState: appEnv.worktreeState(for: workingDirectory),
+                            hasGitHubRemote: appEnv.hasGitHubRemote(projectDirectory),
+                            prState: branchPR?.state
+                        )
+                    }
                 }
             }
     }

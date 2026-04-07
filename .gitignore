@@ -3,6 +3,9 @@
 *.xcworkspace
 FactoryFloor/Info.plist
 
+# SourceKit-LSP build server config (generated per-worktree with absolute paths)
+buildServer.json
+
 # Xcode build artifacts
 build/
 DerivedData/
