@@ -41,6 +41,7 @@ struct ContentView: View {
     @State private var workstreamToPurge: UUID?
     @State private var purgeWarningDirty = false
     @State private var removedProjectNames: [String] = []
+    @AppStorage("factoryfloor.sortOrder") private var sortOrder: ProjectSortOrder = .recent
     @State private var keyMonitorInstalled = false
 
     private static func initialSelection() -> SidebarSelection? {
@@ -295,23 +296,6 @@ struct ContentView: View {
             default: NSApp.appearance = nil
             }
         }
-        .onReceive(NotificationCenter.default.publisher(for: .switchToWorkstream)) { notification in
-            guard let n = notification.object as? Int else { return }
-            // Find the active project (from project view or workstream view)
-            let project: Project?
-            if case let .project(pid) = selection {
-                project = projects.first(where: { $0.id == pid })
-            } else if let wsID = selection?.workstreamID {
-                project = projects.first(where: { $0.workstreams.contains(where: { $0.id == wsID }) })
-            } else {
-                project = nil
-            }
-            guard let project else { return }
-            let sorted = project.workstreams.sorted { $0.lastAccessedAt > $1.lastAccessedAt }
-            if n >= 1 && n <= sorted.count {
-                selection = .workstream(sorted[n - 1].id)
-            }
-        }
         .onReceive(NotificationCenter.default.publisher(for: .switchToProject)) { _ in
             // Go back to project view from any workstream
             if let wsID = selection?.workstreamID,
@@ -320,11 +304,22 @@ struct ContentView: View {
                 selection = .project(project.id)
             }
         }
-        .onReceive(NotificationCenter.default.publisher(for: .nextTab)) { _ in
+        .onReceive(NotificationCenter.default.publisher(for: .nextWorkstream)) { _ in
             cycleWorkstream(direction: 1)
         }
-        .onReceive(NotificationCenter.default.publisher(for: .prevTab)) { _ in
+        .onReceive(NotificationCenter.default.publisher(for: .prevWorkstream)) { _ in
             cycleWorkstream(direction: -1)
+        }
+        .onReceive(NotificationCenter.default.publisher(for: .nextProject)) { _ in
+            cycleProject(direction: 1)
+        }
+        .onReceive(NotificationCenter.default.publisher(for: .prevProject)) { _ in
+            cycleProject(direction: -1)
+        }
+        .onReceive(NotificationCenter.default.publisher(for: .archiveWorkstream)) { _ in
+            if let wsID = selection?.workstreamID {
+                workstreamToRemove = wsID
+            }
         }
         .onReceive(NotificationCenter.default.publisher(for: .workstreamCreated)) { notification in
             guard let info = notification.userInfo,
@@ -447,6 +442,28 @@ struct ContentView: View {
             // In project view: jump to first/last workstream
             selection = .workstream(direction > 0 ? sorted.first!.id : sorted.last!.id)
         }
+    }
+
+    /// Cycle through projects in sidebar display order.
+    private func cycleProject(direction: Int) {
+        let sorted: [Project]
+        switch sortOrder {
+        case .recent:
+            sorted = projects.sorted { $0.lastAccessedAt > $1.lastAccessedAt }
+        case .alphabetical:
+            sorted = projects.sorted { $0.name.localizedCaseInsensitiveCompare($1.name) == .orderedAscending }
+        }
+        guard !sorted.isEmpty else { return }
+
+        guard let current = activeProject,
+              let currentIndex = sorted.firstIndex(where: { $0.id == current.id })
+        else {
+            // No active project: jump to first
+            selection = .project(sorted.first!.id)
+            return
+        }
+        let next = (currentIndex + direction + sorted.count) % sorted.count
+        selection = .project(sorted[next].id)
     }
 
     private func confirmPurge(_ wsID: UUID) {

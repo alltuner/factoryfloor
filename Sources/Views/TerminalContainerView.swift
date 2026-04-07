@@ -560,6 +560,14 @@ struct TerminalContainerView: View {
                 guard n <= tabs.count else { return }
                 activeTab = tabs[n - 1]
             }
+            .onReceive(NotificationCenter.default.publisher(for: .nextTab)) { _ in
+                guard let currentIndex = tabs.firstIndex(of: activeTab) else { return }
+                activeTab = tabs[(currentIndex + 1) % tabs.count]
+            }
+            .onReceive(NotificationCenter.default.publisher(for: .prevTab)) { _ in
+                guard let currentIndex = tabs.firstIndex(of: activeTab) else { return }
+                activeTab = tabs[(currentIndex - 1 + tabs.count) % tabs.count]
+            }
             .onReceive(NotificationCenter.default.publisher(for: .terminalTabExited)) { notification in
                 guard let surfaceID = notification.object as? UUID else { return }
                 if let tab = tabs.first(where: {

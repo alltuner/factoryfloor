@@ -158,21 +158,25 @@ Factory Floor prioritza el teclat. Aquí tens tot.
 | Drecera | Acció |
 |----------|--------|
 | ⌘1-9 | Canvia de tab |
+| ⌘Shift+[ | Tab anterior |
+| ⌘Shift+] | Tab següent |
 | ⌘Return | Focus Coding Agent |
 | ⌘T | Nou Terminal |
 | ⌘B | Nou navegador |
 | ⌘W | Tanca tab |
+| ⌘Shift+W | Arxiva workstream |
 | ⌘L | Barra d'adreces (navegador) |
-| ⌘0 | Torna al projecte |
-| ⌘Shift+[ | Tab anterior |
-| ⌘Shift+] | Tab següent |
 | ⌘Shift+Return | Inicia/reinicia run |
 
 #### Navegació {#navigation-1}
 
 | Drecera | Acció |
 |----------|--------|
-| Ctrl+1-9 | Canvia de workstream (des de qualsevol vista) |
+| ⌘[ | Workstream anterior |
+| ⌘] | Workstream següent |
+| ⌘↑ | Projecte anterior |
+| ⌘↓ | Projecte següent |
+| ⌘0 | Torna al projecte |
 | ⌘Option+B | Obre al navegador extern |
 | ⌘Option+T | Obre al terminal extern |
 

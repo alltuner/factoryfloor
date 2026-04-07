@@ -137,22 +137,26 @@ other = "Navigate without the mouse."
 other = "Context-sensitive shortcuts that adapt to whether you're in a project view or a workstream."
 [shortcuts_global]
 other = "Global"
-[shortcuts_project]
-other = "Project view"
 [shortcuts_workstream]
-other = "Workstream view"
+other = "Workstream"
+[shortcuts_navigation]
+other = "Navigation"
 [sc_new]
 other = "New workstream or project"
 [sc_settings]
 other = "Settings"
-[sc_open_ws]
-other = "Open workstream by position"
 [sc_back]
 other = "Back to project"
 [sc_tabs]
 other = "Switch tab"
 [sc_cycle]
 other = "Cycle tabs"
+[sc_archive]
+other = "Archive workstream"
+[sc_cycle_ws]
+other = "Cycle workstreams"
+[sc_cycle_project]
+other = "Cycle projects"
 [sc_ext_browser]
 other = "External browser"
 [sc_ext_terminal]

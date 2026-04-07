@@ -18,20 +18,22 @@
       </div>
 
       <div class="mt-8">
-        <h3 class="font-mono text-xs font-semibold uppercase tracking-wide text-wine-light mb-2 pl-2">{{ T "shortcuts_project" }}</h3>
-        <div class="grid grid-cols-1 gap-px rounded-xl overflow-hidden border border-fg-faint bg-fg-faint">
-          <div class="{{ $row }}"><span class="text-sm text-fg-dim">{{ T "sc_open_ws" }}</span><span class="flex gap-1"><kbd class="{{ $kbd }}">Ctrl</kbd><kbd class="{{ $kbd }}">1-9</kbd></span></div>
+        <h3 class="font-mono text-xs font-semibold uppercase tracking-wide text-wine-light mb-2 pl-2">{{ T "shortcuts_workstream" }}</h3>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-px rounded-xl overflow-hidden border border-fg-faint bg-fg-faint">
+          <div class="{{ $row }}"><span class="text-sm text-fg-dim">{{ T "sc_tabs" }}</span><span class="flex gap-1"><kbd class="{{ $kbd }}">&#8984;</kbd><kbd class="{{ $kbd }}">1-9</kbd></span></div>
+          <div class="{{ $row }}"><span class="text-sm text-fg-dim">{{ T "sc_cycle" }}</span><span class="flex gap-1"><kbd class="{{ $kbd }}">&#8984;</kbd><kbd class="{{ $kbd }}">&#8679;</kbd><kbd class="{{ $kbd }}">[ ]</kbd></span></div>
+          <div class="{{ $row }}"><span class="text-sm text-fg-dim">{{ T "sc_archive" }}</span><span class="flex gap-1"><kbd class="{{ $kbd }}">&#8984;</kbd><kbd class="{{ $kbd }}">&#8679;</kbd><kbd class="{{ $kbd }}">W</kbd></span></div>
+          <div class="{{ $row }}"><span class="text-sm text-fg-dim">{{ T "sc_ext_browser" }}</span><span class="flex gap-1"><kbd class="{{ $kbd }}">&#8984;</kbd><kbd class="{{ $kbd }}">&#8997;</kbd><kbd class="{{ $kbd }}">B</kbd></span></div>
+          <div class="{{ $row }}"><span class="text-sm text-fg-dim">{{ T "sc_ext_terminal" }}</span><span class="flex gap-1"><kbd class="{{ $kbd }}">&#8984;</kbd><kbd class="{{ $kbd }}">&#8997;</kbd><kbd class="{{ $kbd }}">T</kbd></span></div>
         </div>
       </div>
 
       <div class="mt-8">
-        <h3 class="font-mono text-xs font-semibold uppercase tracking-wide text-wine-light mb-2 pl-2">{{ T "shortcuts_workstream" }}</h3>
+        <h3 class="font-mono text-xs font-semibold uppercase tracking-wide text-wine-light mb-2 pl-2">{{ T "shortcuts_navigation" }}</h3>
         <div class="grid grid-cols-1 md:grid-cols-2 gap-px rounded-xl overflow-hidden border border-fg-faint bg-fg-faint">
+          <div class="{{ $row }}"><span class="text-sm text-fg-dim">{{ T "sc_cycle_ws" }}</span><span class="flex gap-1"><kbd class="{{ $kbd }}">&#8984;</kbd><kbd class="{{ $kbd }}">[ ]</kbd></span></div>
+          <div class="{{ $row }}"><span class="text-sm text-fg-dim">{{ T "sc_cycle_project" }}</span><span class="flex gap-1"><kbd class="{{ $kbd }}">&#8984;</kbd><kbd class="{{ $kbd }}">↑ ↓</kbd></span></div>
           <div class="{{ $row }}"><span class="text-sm text-fg-dim">{{ T "sc_back" }}</span><span class="flex gap-1"><kbd class="{{ $kbd }}">&#8984;</kbd><kbd class="{{ $kbd }}">0</kbd></span></div>
-          <div class="{{ $row }}"><span class="text-sm text-fg-dim">{{ T "sc_tabs" }}</span><span class="flex gap-1"><kbd class="{{ $kbd }}">&#8984;</kbd><kbd class="{{ $kbd }}">1-9</kbd></span></div>
-          <div class="{{ $row }}"><span class="text-sm text-fg-dim">{{ T "sc_cycle" }}</span><span class="flex gap-1"><kbd class="{{ $kbd }}">&#8984;</kbd><kbd class="{{ $kbd }}">&#8679;</kbd><kbd class="{{ $kbd }}">[ ]</kbd></span></div>
-          <div class="{{ $row }}"><span class="text-sm text-fg-dim">{{ T "sc_ext_browser" }}</span><span class="flex gap-1"><kbd class="{{ $kbd }}">&#8984;</kbd><kbd class="{{ $kbd }}">&#8997;</kbd><kbd class="{{ $kbd }}">B</kbd></span></div>
-          <div class="{{ $row }}"><span class="text-sm text-fg-dim">{{ T "sc_ext_terminal" }}</span><span class="flex gap-1"><kbd class="{{ $kbd }}">&#8984;</kbd><kbd class="{{ $kbd }}">&#8997;</kbd><kbd class="{{ $kbd }}">T</kbd></span></div>
         </div>
       </div>
     </div>

@@ -137,22 +137,26 @@ other = "Navega sense ratolí."
 other = "Dreceres contextuals que s'adapten segons si ets a la vista de projecte o de workstream."
 [shortcuts_global]
 other = "Global"
-[shortcuts_project]
-other = "Vista de projecte"
 [shortcuts_workstream]
-other = "Vista de workstream"
+other = "Workstream"
+[shortcuts_navigation]
+other = "Navegació"
 [sc_new]
 other = "Nou workstream o projecte"
 [sc_settings]
 other = "Configuració"
-[sc_open_ws]
-other = "Obre workstream per posició"
 [sc_back]
 other = "Torna al projecte"
 [sc_tabs]
 other = "Canvia de tab"
 [sc_cycle]
 other = "Cicla tabs"
+[sc_archive]
+other = "Arxiva workstream"
+[sc_cycle_ws]
+other = "Cicla workstreams"
+[sc_cycle_project]
+other = "Cicla projectes"
 [sc_ext_browser]
 other = "Browser extern"
 [sc_ext_terminal]

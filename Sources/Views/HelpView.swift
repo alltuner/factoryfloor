@@ -87,23 +87,27 @@ struct HelpView: View {
 
                     Section {
                         ShortcutRow(keys: "1-9", description: "Switch tab")
+                        ShortcutRow(keys: "[", shift: true, description: "Previous tab")
+                        ShortcutRow(keys: "]", shift: true, description: "Next tab")
                         ShortcutRow(keys: "Return", description: "Focus Coding Agent")
                         ShortcutRow(keys: "T", description: "New Terminal")
                         ShortcutRow(keys: "B", description: "New Browser")
                         ShortcutRow(keys: "W", description: "Close tab")
+                        ShortcutRow(keys: "W", shift: true, description: "Archive workstream")
                         ShortcutRow(keys: "L", description: "Address bar")
-                        ShortcutRow(keys: "0", description: "Back to project")
-                        ShortcutRow(keys: "[", shift: true, description: "Previous tab")
-                        ShortcutRow(keys: "]", shift: true, description: "Next tab")
                         ShortcutRow(keys: "Return", shift: true, description: "Start/Rerun")
                     } header: {
                         ShortcutSectionHeader(title: "Workstream", description: "When a workstream is active")
                     }
 
                     Section {
-                        ShortcutRow(keys: "1-9", ctrl: true, cmd: false, description: "Switch workstream")
+                        ShortcutRow(keys: "[", description: "Previous workstream")
+                        ShortcutRow(keys: "]", description: "Next workstream")
+                        ShortcutRow(keys: "↑", description: "Previous project")
+                        ShortcutRow(keys: "↓", description: "Next project")
+                        ShortcutRow(keys: "0", description: "Back to project")
                     } header: {
-                        ShortcutSectionHeader(title: "Navigation", description: "Works from any view in a project")
+                        ShortcutSectionHeader(title: "Navigation", description: "Move between workstreams and projects")
                     }
 
                     Section {

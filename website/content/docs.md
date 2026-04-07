@@ -158,21 +158,25 @@ Factory Floor is keyboard-first. Here's everything.
 | Shortcut | Action |
 |----------|--------|
 | ⌘1-9 | Switch tab |
+| ⌘Shift+[ | Previous tab |
+| ⌘Shift+] | Next tab |
 | ⌘Return | Focus Coding Agent |
 | ⌘T | New Terminal |
 | ⌘B | New Browser |
 | ⌘W | Close tab |
+| ⌘Shift+W | Archive workstream |
 | ⌘L | Address bar (browser) |
-| ⌘0 | Back to project |
-| ⌘Shift+[ | Previous tab |
-| ⌘Shift+] | Next tab |
 | ⌘Shift+Return | Start/Rerun |
 
 #### Navigation
 
 | Shortcut | Action |
 |----------|--------|
-| Ctrl+1-9 | Switch workstream (from any view) |
+| ⌘[ | Previous workstream |
+| ⌘] | Next workstream |
+| ⌘↑ | Previous project |
+| ⌘↓ | Next project |
+| ⌘0 | Back to project |
 | ⌘Option+B | Open in external browser |
 | ⌘Option+T | Open in external terminal |
 

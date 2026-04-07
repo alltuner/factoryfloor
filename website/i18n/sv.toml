@@ -130,22 +130,26 @@ other = "Navigera utan mus."
 other = "Kontextkänsliga shortcuts som anpassas efter om du är i projektvy eller workstream."
 [shortcuts_global]
 other = "Globalt"
-[shortcuts_project]
-other = "Projektvy"
 [shortcuts_workstream]
-other = "Workstream-vy"
+other = "Workstream"
+[shortcuts_navigation]
+other = "Navigering"
 [sc_new]
 other = "Ny workstream eller projekt"
 [sc_settings]
 other = "Inställningar"
-[sc_open_ws]
-other = "Öppna workstream efter position"
 [sc_back]
 other = "Tillbaka till projektet"
 [sc_tabs]
 other = "Byt tab"
 [sc_cycle]
 other = "Växla tabs"
+[sc_archive]
+other = "Arkivera workstream"
+[sc_cycle_ws]
+other = "Växla workstreams"
+[sc_cycle_project]
+other = "Växla projekt"
 [sc_ext_browser]
 other = "Extern browser"
 [sc_ext_terminal]

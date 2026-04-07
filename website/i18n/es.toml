@@ -131,22 +131,26 @@ other = "Navega sin ratón."
 other = "Atajos contextuales que se adaptan según estés en vista de proyecto o de workstream."
 [shortcuts_global]
 other = "Global"
-[shortcuts_project]
-other = "Vista de proyecto"
 [shortcuts_workstream]
-other = "Vista de workstream"
+other = "Workstream"
+[shortcuts_navigation]
+other = "Navegación"
 [sc_new]
 other = "Nuevo workstream o proyecto"
 [sc_settings]
 other = "Ajustes"
-[sc_open_ws]
-other = "Abrir workstream por posición"
 [sc_back]
 other = "Volver al proyecto"
 [sc_tabs]
 other = "Cambiar tab"
 [sc_cycle]
 other = "Recorrer tabs"
+[sc_archive]
+other = "Archivar workstream"
+[sc_cycle_ws]
+other = "Recorrer workstreams"
+[sc_cycle_project]
+other = "Recorrer proyectos"
 [sc_ext_browser]
 other = "Browser externo"
 [sc_ext_terminal]

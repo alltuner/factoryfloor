@@ -158,21 +158,25 @@ Factory Floor prioriza el teclado. Aquí está todo.
 | Atajo | Acción |
 |----------|--------|
 | ⌘1-9 | Cambiar tab |
+| ⌘Shift+[ | Tab anterior |
+| ⌘Shift+] | Tab siguiente |
 | ⌘Return | Foco en Coding Agent |
 | ⌘T | Nuevo Terminal |
 | ⌘B | Nuevo navegador |
 | ⌘W | Cerrar tab |
+| ⌘Shift+W | Archivar workstream |
 | ⌘L | Barra de direcciones (navegador) |
-| ⌘0 | Volver al proyecto |
-| ⌘Shift+[ | Tab anterior |
-| ⌘Shift+] | Tab siguiente |
 | ⌘Shift+Return | Iniciar/reiniciar run |
 
 #### Navegación {#navigation-1}
 
 | Atajo | Acción |
 |----------|--------|
-| Ctrl+1-9 | Cambiar workstream (desde cualquier vista) |
+| ⌘[ | Workstream anterior |
+| ⌘] | Workstream siguiente |
+| ⌘↑ | Proyecto anterior |
+| ⌘↓ | Proyecto siguiente |
+| ⌘0 | Volver al proyecto |
 | ⌘Option+B | Abrir en navegador externo |
 | ⌘Option+T | Abrir en terminal externo |
 
