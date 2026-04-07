@@ -179,6 +179,33 @@ final class CommandBuilderTests: XCTestCase {
         XCTAssertTrue(result.contains("cmd1 || cmd2"))
     }
 
+    func testResolvedUserShellPrefersExecutableEnvironmentShell() {
+        let shell = CommandBuilder.resolvedUserShell(
+            environment: ["SHELL": "/opt/homebrew/bin/fish"],
+            isExecutable: { $0 == "/opt/homebrew/bin/fish" }
+        )
+
+        XCTAssertEqual(shell, "/opt/homebrew/bin/fish")
+    }
+
+    func testResolvedUserShellFallsBackWhenEnvironmentShellIsInvalid() {
+        let shell = CommandBuilder.resolvedUserShell(
+            environment: ["SHELL": "/usr/bin/zsh"],
+            isExecutable: { $0 == "/bin/zsh" }
+        )
+
+        XCTAssertEqual(shell, "/bin/zsh")
+    }
+
+    func testResolvedUserShellFallsBackToBashWhenZshUnavailable() {
+        let shell = CommandBuilder.resolvedUserShell(
+            environment: [:],
+            isExecutable: { $0 == "/bin/bash" }
+        )
+
+        XCTAssertEqual(shell, "/bin/bash")
+    }
+
     // MARK: - Shell syntax validation (integration tests)
 
     // These tests invoke real shell binaries to verify generated commands parse correctly.

@@ -45,7 +45,22 @@ struct CommandBuilder {
     }
 
     static var userShell: String {
-        ProcessInfo.processInfo.environment["SHELL"] ?? "/bin/zsh"
+        resolvedUserShell()
+    }
+
+    static func resolvedUserShell(
+        environment: [String: String] = ProcessInfo.processInfo.environment,
+        isExecutable: (String) -> Bool = { FileManager.default.isExecutableFile(atPath: $0) }
+    ) -> String {
+        if let shell = environment["SHELL"], !shell.isEmpty, isExecutable(shell) {
+            return shell
+        }
+
+        for fallback in ["/bin/zsh", "/bin/bash", "/bin/sh"] where isExecutable(fallback) {
+            return fallback
+        }
+
+        return "/bin/sh"
     }
 
     static func shellQuote(_ s: String) -> String {
