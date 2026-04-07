@@ -44,6 +44,7 @@ Los datos de error se procesan por Sentry en la UE (Frankfurt). Puedes consultar
 Factory Floor se integra con herramientas que tú instalas y configuras:
 
 - **Claude Code** (Anthropic) - al usar el agente de código, tu código y el contexto de la conversación se envían a la API de Anthropic. Es una conexión directa entre tu ordenador y Anthropic, sujeta a la [política de privacidad de Anthropic](https://www.anthropic.com/privacy). Factory Floor no intercepta, almacena ni retransmite estos datos.
+- **Codex** (OpenAI) - al usar Codex en la pestaña del agente de código, tu código y el contexto de la conversación se envían a la API de OpenAI. Es una conexión directa entre tu ordenador y OpenAI, sujeta a la [política de privacidad de OpenAI](https://openai.com/policies/privacy-policy/). Factory Floor no intercepta, almacena ni retransmite estos datos.
 - **GitHub CLI** - sujeto a la [política de privacidad de GitHub](https://docs.github.com/en/site-policy/privacy-policies/github-general-privacy-statement)
 - **Ghostty** - el motor de terminal integrado se ejecuta localmente sin actividad de red
 

@@ -138,10 +138,15 @@
 "Dark" = "Oscuro";
 
 /* Settings - Coding Agent */
+"Claude Code" = "Claude Code";
+"Codex" = "Codex";
+"Coding CLI" = "CLI de código";
 "Agent Teams" = "Equipos de agentes";
 "Enables experimental multi-agent coordination. Agents can spawn teammates, delegate tasks, and collaborate across workstreams." = "Activa la coordinación experimental multi-agente. Los agentes pueden crear compañeros, delegar tareas y colaborar entre flujos de trabajo.";
+"Agent Teams is only available with Claude Code." = "Los equipos de agentes solo están disponibles con Claude Code.";
 "Auto-rename branch" = "Renombrar rama automáticamente";
 "On the first request, the agent renames the branch to match the task and writes a short description visible in the sidebar." = "En la primera solicitud, el agente renombra la rama para coincidir con la tarea y escribe una breve descripción visible en la barra lateral.";
+"Auto-rename branch is only available with Claude Code." = "El renombrado automático de la rama solo está disponible con Claude Code.";
 "External Browser" = "Navegador externo";
 
 /* Settings - Advanced */
@@ -196,6 +201,9 @@
 "Claude Code not found" = "Claude Code no encontrado";
 "Install Claude Code to use the Coding Agent." = "Instala Claude Code para usar el agente de código.";
 "Install Claude Code" = "Instalar Claude Code";
+"Codex not found" = "Codex no encontrado";
+"Install Codex to use the Coding Agent." = "Instala Codex para usar el agente de código.";
+"Install Codex" = "Instalar Codex";
 
 /* BrowserView */
 "Server not responding" = "El servidor no responde";
@@ -291,6 +299,8 @@
 "This branch has been merged." = "Esta rama ha sido fusionada.";
 "gh CLI is not installed." = "gh CLI no está instalado.";
 "Claude Code is not installed." = "Claude Code no está instalado.";
+"Codex is not installed." = "Codex no está instalado.";
+"Install Claude Code or Codex to use the Coding Agent." = "Instala Claude Code o Codex para usar el agente de código.";
 "Enable \"Bypass permission prompts\" in Settings." = "Activa \"Omitir permisos\" en Configuración.";
 "No GitHub remote found for this project." = "No se encontró un remoto de GitHub para este proyecto.";
 "Quick action debug" = "Depuración de acciones rápidas";

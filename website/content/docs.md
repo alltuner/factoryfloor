@@ -19,7 +19,7 @@ brew install --cask factory-floor
 
 Factory Floor works best when these are installed (it'll tell you if they're missing):
 
-- **[Claude Code](https://docs.anthropic.com/en/docs/claude-code/overview)** — the whole point, really
+- **[Claude Code](https://docs.anthropic.com/en/docs/claude-code/overview)** or **[Codex](https://developers.openai.com/codex)** — pick the coding CLI you want in the Agent tab
 - **git** — you probably have this
 - **[gh](https://cli.github.com/)** — GitHub CLI, for PR status and quick actions
 - **[tmux](https://github.com/tmux/tmux)** — optional, enables session persistence
@@ -66,7 +66,7 @@ The UI shows up instantly — worktree creation happens in the background.
 #### Workstream tabs
 
 - **Info** — branch name, PR status, project docs
-- **Agent** (⌘Return) — your Claude Code session
+- **Agent** (⌘Return) — your selected coding CLI session
 - **Environment** — setup and run script controls
 - **Terminal** (⌘T) — additional terminal tabs, as many as you want
 - **Browser** (⌘B) — embedded browser with auto-port detection
@@ -85,25 +85,26 @@ When a PR is merged, Factory Floor shows a "Purge" badge so you know it's safe t
 
 ### The Coding Agent
 
-The coding agent tab runs [Claude Code](https://docs.anthropic.com/en/docs/claude-code/overview) in an embedded terminal. It sits right after the Info tab in every workstream.
+The coding agent tab runs either [Claude Code](https://docs.anthropic.com/en/docs/claude-code/overview) or [Codex](https://developers.openai.com/codex) in an embedded terminal. Choose the CLI in Settings, then use the same Agent tab in every workstream.
 
 #### Agent settings
 
 - **Bypass permission prompts** — skips confirmation dialogs. Useful if you trust your agent (and live dangerously).
 - **Tmux mode** — wraps agent sessions in tmux so they survive app restarts. Requires tmux.
-- **Auto-rename branch** — lets the agent rename the branch to match the task.
-- **Agent Teams** — experimental multi-agent coordination, courtesy of Claude Code. We trust Anthropic, don't we?
+- **Auto-rename branch** — lets Claude Code rename the branch to match the task.
+- **Coding CLI** — switches the Agent tab between Claude Code and Codex.
+- **Agent Teams** — experimental multi-agent coordination, currently available with Claude Code.
 
 #### Quick actions
 
-Quick actions run one-shot Claude tasks from the sidebar:
+Quick actions run one-shot coding CLI tasks from the sidebar:
 
 - **Commit** — stages and commits with an AI-generated message
 - **Push** — pushes the current branch to origin
 - **Create PR** — creates a pull request with AI-generated title and description
 - **Close PR** — closes the PR
 
-These run as background `claude -p` calls. Enable **Quick action debug mode** in settings if you want to know how the sausage is made. Trust us, [David](https://davidpoblador.com) spent more time than he can admit debugging weird behaviors in there.
+These run as background Claude Code or Codex commands, depending on the selected CLI. Enable **Quick action debug mode** in settings if you want to know how the sausage is made. Trust us, [David](https://davidpoblador.com) spent more time than he can admit debugging weird behaviors in there.
 
 ---
 
@@ -307,7 +308,7 @@ Requires the [gh CLI](https://cli.github.com/) with authentication (`gh auth log
 
 #### Quick actions
 
-From the sidebar, run one-click operations: **Create PR** (AI-generated title and description), **Push** (to origin with `-u`), or **Close PR** (closes with a comment). Because if you're tired of typing "now commit, push, and open a PR" into Claude for the hundredth time, you're not alone.
+From the sidebar, run one-click operations: **Create PR** (AI-generated title and description), **Push** (to origin with `-u`), or **Close PR** (closes with a comment). Because if you're tired of typing "now commit, push, and open a PR" into your agent for the hundredth time, you're not alone.
 
 ### Updates
 
@@ -341,7 +342,7 @@ Also nope. Your git client already does this better than we ever would. We just 
 
 #### "Tools not found"
 
-Factory Floor detects tools from your login shell. If `claude`, `gh`, `git`, or `tmux` aren't showing up:
+Factory Floor detects tools from your login shell. If `claude`, `codex`, `gh`, `git`, or `tmux` aren't showing up:
 
 - Make sure they're in your shell's PATH
 - Fish 4.0 and Nix users: the app handles these environments, but if something's off, check Settings > Environment

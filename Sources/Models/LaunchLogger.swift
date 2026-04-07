@@ -5,7 +5,9 @@ import Foundation
 
 struct LaunchLogEntry: Codable {
     struct ToolPaths: Codable {
+        let agentCLI: String?
         let claude: String?
+        let codex: String?
         let tmux: String?
         let ffRun: String?
     }

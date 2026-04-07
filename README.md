@@ -6,7 +6,7 @@
 
 <p align="center">
   <strong>AI-powered development workspace for macOS</strong><br>
-  Git worktrees, Claude Code sessions, and dev servers in a single native app.
+  Git worktrees, coding agent sessions, and dev servers in a single native app.
 </p>
 
 <p align="center">
@@ -35,21 +35,21 @@ Or [download the latest release](https://factory-floor.com/get/).
 Then:
 
 1. **Open Factory Floor** and add a project by clicking the `+` button in the sidebar, then selecting a repository directory.
-2. **Create a workstream** with `Cmd+N`. Factory Floor sets up a git worktree and launches a Claude Code agent automatically.
+2. **Create a workstream** with `Cmd+N`. Factory Floor sets up a git worktree and launches your selected coding CLI automatically.
 3. **Start building.** Add terminals (`Cmd+T`), browsers (`Cmd+B`), editors (`Cmd+O`), or configure [run scripts](#script-configuration) to auto-detect your dev server.
 
 ---
 
 ## What is Factory Floor?
 
-Factory Floor is a native macOS app built on [Ghostty](https://ghostty.org)'s GPU-rendered terminal. It manages multiple parallel development tasks, each in its own git worktree with a dedicated Claude Code agent, terminal, and browser.
+Factory Floor is a native macOS app built on [Ghostty](https://ghostty.org)'s GPU-rendered terminal. It manages multiple parallel development tasks, each in its own git worktree with a dedicated coding agent, terminal, and browser.
 
 **One project, many workstreams, all at native speed.**
 
 ### Features
 
 - **Git Worktrees** &mdash; Each workstream gets its own branch and worktree. Switch between tasks without stashing.
-- **Claude Code** &mdash; Integrated AI agent with session persistence. Resume conversations across app restarts.
+- **Selectable Coding CLI** &mdash; Run Claude Code or Codex in the Agent tab, with session resume support.
 - **Tmux Persistence** &mdash; Agent sessions survive app restarts via tmux on a dedicated socket.
 - **Setup & Run Scripts** &mdash; Configure setup, run, and teardown scripts per project via `.factoryfloor.json`. Environment tab with split-pane terminals, Start/Rerun (⌘⇧⏎).
 - **Embedded Browser** &mdash; WKWebView tab with automatic port detection. The browser navigates to the port your run script opens.
@@ -233,6 +233,7 @@ Factory Floor is built on the shoulders of these projects:
 
 - **[Ghostty](https://ghostty.org)** — GPU-accelerated terminal engine (Metal-rendered via libghostty)
 - **[Claude Code](https://docs.anthropic.com/en/docs/claude-code/overview)** — AI coding agent by Anthropic
+- **[Codex CLI](https://developers.openai.com/codex)** — AI coding agent by OpenAI
 - **[tmux](https://github.com/tmux/tmux/wiki)** — Terminal multiplexer for session persistence
 - **[XcodeGen](https://github.com/yonaskolb/XcodeGen)** — Xcode project generation from `project.yml`
 - **[cmark-gfm](https://github.com/github/cmark-gfm)** — GitHub Flavored Markdown rendering (via [swift-cmark](https://github.com/swiftlang/swift-cmark))

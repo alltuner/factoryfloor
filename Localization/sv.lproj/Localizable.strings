@@ -138,10 +138,15 @@
 "Dark" = "Mörkt";
 
 /* Settings - Coding Agent */
+"Claude Code" = "Claude Code";
+"Codex" = "Codex";
+"Coding CLI" = "Kod-CLI";
 "Agent Teams" = "Agentteam";
 "Enables experimental multi-agent coordination. Agents can spawn teammates, delegate tasks, and collaborate across workstreams." = "Aktiverar experimentell multi-agentkoordinering. Agenter kan skapa teammedlemmar, delegera uppgifter och samarbeta mellan arbetsflöden.";
+"Agent Teams is only available with Claude Code." = "Agentteam är bara tillgängligt med Claude Code.";
 "Auto-rename branch" = "Byt namn på gren automatiskt";
 "On the first request, the agent renames the branch to match the task and writes a short description visible in the sidebar." = "Vid den första förfrågan byter agenten namn på grenen för att matcha uppgiften och skriver en kort beskrivning synlig i sidofältet.";
+"Auto-rename branch is only available with Claude Code." = "Automatiskt namnbyte av gren är bara tillgängligt med Claude Code.";
 "External Browser" = "Extern webbläsare";
 
 /* Settings - Advanced */
@@ -196,6 +201,9 @@
 "Claude Code not found" = "Claude Code hittades inte";
 "Install Claude Code to use the Coding Agent." = "Installera Claude Code för att använda kodningsagenten.";
 "Install Claude Code" = "Installera Claude Code";
+"Codex not found" = "Codex hittades inte";
+"Install Codex to use the Coding Agent." = "Installera Codex för att använda kodningsagenten.";
+"Install Codex" = "Installera Codex";
 
 /* BrowserView */
 "Server not responding" = "Servern svarar inte";
@@ -291,6 +299,8 @@
 "This branch has been merged." = "Denna gren har mergats.";
 "gh CLI is not installed." = "gh CLI är inte installerat.";
 "Claude Code is not installed." = "Claude Code är inte installerat.";
+"Codex is not installed." = "Codex är inte installerat.";
+"Install Claude Code or Codex to use the Coding Agent." = "Installera Claude Code eller Codex för att använda kodningsagenten.";
 "Enable \"Bypass permission prompts\" in Settings." = "Aktivera \"Hoppa över behörighetsfrågor\" i Inställningar.";
 "No GitHub remote found for this project." = "Ingen GitHub-fjärrserver hittades för detta projekt.";
 "Quick action debug" = "Felsökning av snabbåtgärder";

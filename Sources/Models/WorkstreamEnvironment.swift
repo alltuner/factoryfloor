@@ -14,6 +14,7 @@ enum WorkstreamEnvironment {
         projectDirectory: String,
         workingDirectory: String,
         port: Int,
+        codingCLI: CodingCLI,
         agentTeams: Bool,
         defaultBranch: String = "main",
         scriptSource: String? = nil
@@ -30,7 +31,7 @@ enum WorkstreamEnvironment {
             "FF_PORT": portString,
             "FF_DEFAULT_BRANCH": defaultBranch,
         ]
-        if agentTeams {
+        if codingCLI == .claude, agentTeams {
             vars["CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS"] = "1"
         }
 

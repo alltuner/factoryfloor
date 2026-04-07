@@ -265,6 +265,7 @@ struct TerminalContainerView: View {
 
     @EnvironmentObject var surfaceCache: TerminalSurfaceCache
     @EnvironmentObject var appEnv: AppEnvironment
+    @AppStorage("factoryfloor.codingCLI") private var codingCLIRaw: String = ""
     @AppStorage("factoryfloor.defaultBrowser") private var defaultBrowser: String = ""
     @AppStorage("factoryfloor.tmuxMode") private var tmuxMode: Bool = false
     @AppStorage("factoryfloor.agentTeams") private var agentTeams: Bool = false
@@ -289,7 +290,7 @@ struct TerminalContainerView: View {
     @State private var directoryWatcher: DirectoryWatcher?
     @State private var refreshGeneration = 0
     @State private var refreshDebounceTask: Task<Void, Never>?
-    @State private var cachedClaudeCommand: String?
+    @State private var cachedAgentCommand: String?
     @State private var draggedCustomTab: WorkspaceTab?
     @StateObject private var portDetector: PortDetector
     @State private var runStoppedManually = false
@@ -329,7 +330,15 @@ struct TerminalContainerView: View {
         _portDetector = StateObject(wrappedValue: PortDetector(workstreamID: workstreamID))
     }
 
-    private var claudeID: UUID {
+    private var selectedCodingCLI: CodingCLI {
+        appEnv.toolStatus.resolvedCodingCLI(storedValue: codingCLIRaw)
+    }
+
+    private var selectedCodingCLIPath: String? {
+        appEnv.toolStatus.path(for: selectedCodingCLI)
+    }
+
+    private var agentID: UUID {
         workstreamID
     }
 
@@ -358,7 +367,7 @@ struct TerminalContainerView: View {
             if setupGateState == .running || setupGateState == .failed {
                 return [setupGateID]
             }
-            return [claudeID]
+            return [agentID]
         case let .terminal(id): return [id]
         case .info, .browser, .editor: return []
         }
@@ -398,65 +407,36 @@ struct TerminalContainerView: View {
         return appEnv.githubPR(for: projectDirectory, branch: branch)
     }
 
-    private func buildClaudeCommand() -> String? {
-        guard let basePath = appEnv.toolStatus.claude.path else { return nil }
-        let sessionID = workstreamID.uuidString.lowercased()
+    private func buildAgentCommand() -> String? {
+        guard let cliPath = selectedCodingCLIPath else { return nil }
 
-        var systemPromptParts: [String] = []
-        if !allowOutsideWorktree {
-            systemPromptParts.append(SystemPrompts.restrictToWorktreePrompt(worktreePath: workingDirectory))
-        }
-        if autoRenameBranch {
-            systemPromptParts.append(SystemPrompts.autoRenameBranchPrompt)
-        }
-        let combinedSystemPrompt = systemPromptParts.isEmpty ? nil : systemPromptParts.joined(separator: "\n\n")
-
-        var resume = CommandBuilder(basePath)
-        resume.option("--resume", sessionID)
-        if appEnv.toolStatus.claudeSupportsSessionName {
-            resume.option("--name", workstreamName)
-        }
-        if useTmux { resume.flag("--teammate-mode"); resume.arg("tmux") }
-        if bypassPermissions { resume.flag("--dangerously-skip-permissions") }
-        if let combinedSystemPrompt {
-            resume.option("--append-system-prompt", combinedSystemPrompt)
-        }
-
-        var fresh = CommandBuilder(basePath)
-        fresh.option("--session-id", sessionID)
-        if appEnv.toolStatus.claudeSupportsSessionName {
-            fresh.option("--name", workstreamName)
-        }
-        if useTmux { fresh.flag("--teammate-mode"); fresh.arg("tmux") }
-        if bypassPermissions { fresh.flag("--dangerously-skip-permissions") }
-        if let combinedSystemPrompt {
-            fresh.option("--append-system-prompt", combinedSystemPrompt)
-        }
-
-        let cmd = CommandBuilder.withFallback(
-            resume.command, fresh.command,
-            message: "Starting new session..."
+        let command = CodingCLICommandBuilder.buildAgentCommand(
+            cli: selectedCodingCLI,
+            cliPath: cliPath,
+            workingDirectory: workingDirectory,
+            projectName: projectName,
+            workstreamName: workstreamName,
+            workstreamID: workstreamID,
+            tmuxPath: appEnv.toolStatus.tmux.path,
+            useTmux: useTmux,
+            bypassPermissions: bypassPermissions,
+            allowOutsideWorktree: allowOutsideWorktree,
+            autoRenameBranch: autoRenameBranch,
+            envVars: envVars,
+            supportsSessionName: appEnv.toolStatus.supportsSessionName(for: selectedCodingCLI)
         )
-
-        let finalCommand: String
-        var intermediates = [resume.command, fresh.command, cmd]
-        if useTmux, let tmuxPath = appEnv.toolStatus.tmux.path {
-            let session = TmuxSession.sessionName(project: projectName, workstream: workstreamName, role: "agent")
-            finalCommand = TmuxSession.wrapCommand(tmuxPath: tmuxPath, sessionName: session, command: cmd, environmentVars: envVars, respawnOnExit: true)
-            intermediates.append(finalCommand)
-        } else {
-            finalCommand = cmd
-        }
 
         LaunchLogger.log(LaunchLogEntry(
             workstreamID: workstreamID,
             event: "agent-start",
-            finalCommand: finalCommand,
-            intermediateCommands: intermediates,
+            finalCommand: command.finalCommand,
+            intermediateCommands: command.intermediateCommands,
             environmentVariables: envVars,
             workingDirectory: workingDirectory,
             toolPaths: LaunchLogEntry.ToolPaths(
+                agentCLI: selectedCodingCLI.rawValue,
                 claude: appEnv.toolStatus.claude.path,
+                codex: appEnv.toolStatus.codex.path,
                 tmux: appEnv.toolStatus.tmux.path,
                 ffRun: RunLauncher.executableURL()?.path
             ),
@@ -470,11 +450,11 @@ struct TerminalContainerView: View {
             shell: CommandBuilder.userShell
         ))
 
-        return finalCommand
+        return command.finalCommand
     }
 
-    private func rebuildClaudeCommand() {
-        cachedClaudeCommand = buildClaudeCommand()
+    private func rebuildAgentCommand() {
+        cachedAgentCommand = buildAgentCommand()
     }
 
     private var fixedTabs: [WorkspaceTab] {
@@ -595,25 +575,25 @@ struct TerminalContainerView: View {
                 setupGateFailedView
             } else if sessionMode == .waitingForTools || appEnv.isDetecting {
                 terminalLoadingView(message: "Checking terminal tools...")
-            } else if appEnv.toolStatus.claude.path == nil {
+            } else if selectedCodingCLIPath == nil {
                 VStack(spacing: 16) {
                     Image(systemName: "sparkle")
                         .font(.system(size: 40))
                         .foregroundStyle(.tertiary)
-                    Text("Claude Code not found")
+                    Text(selectedCodingCLI.missingTitle)
                         .font(.title3)
                         .foregroundStyle(.secondary)
-                    Text("Install Claude Code to use the Coding Agent.")
+                    Text(selectedCodingCLI.missingDescription)
                         .foregroundStyle(.tertiary)
-                    Link("Install Claude Code", destination: URL(string: "https://docs.anthropic.com/en/docs/claude-code/overview")!)
+                    Link(selectedCodingCLI.installLabel, destination: selectedCodingCLI.installURL)
                         .buttonStyle(.bordered)
                 }
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
-            } else if let claudeCommand = cachedClaudeCommand {
+            } else if let agentCommand = cachedAgentCommand {
                 SingleTerminalView(
-                    surfaceID: claudeID,
+                    surfaceID: agentID,
                     workingDirectory: workingDirectory,
-                    command: claudeCommand,
+                    command: agentCommand,
                     isFocused: true,
                     environmentVars: envVars
                 )
@@ -665,13 +645,18 @@ struct TerminalContainerView: View {
 
     private var mainContent: some View {
         mainLayout
-            .onChange(of: tmuxMode) { rebuildClaudeCommand() }
-            .onChange(of: bypassPermissions) { rebuildClaudeCommand() }
-            .onChange(of: autoRenameBranch) { rebuildClaudeCommand() }
-            .onChange(of: allowOutsideWorktree) { rebuildClaudeCommand() }
-            .onChange(of: workstreamName) { rebuildClaudeCommand() }
+            .onChange(of: tmuxMode) { rebuildAgentCommand() }
+            .onChange(of: bypassPermissions) { rebuildAgentCommand() }
+            .onChange(of: autoRenameBranch) { rebuildAgentCommand() }
+            .onChange(of: allowOutsideWorktree) { rebuildAgentCommand() }
+            .onChange(of: workstreamName) { rebuildAgentCommand() }
+            .onChange(of: codingCLIRaw) {
+                surfaceCache.removeSurface(for: agentID)
+                rebuildAgentCommand()
+                preloadSurfaces()
+            }
             .onChange(of: appEnv.isDetecting) {
-                rebuildClaudeCommand()
+                rebuildAgentCommand()
                 if isActive { preloadSurfaces() }
             }
             .onReceive(NotificationCenter.default.publisher(for: .toggleInfo)) { _ in
@@ -729,6 +714,26 @@ struct TerminalContainerView: View {
             if isActive {
                 editorTabActive = isEditorTabActive
                 editorFileDirty = isActiveEditorDirty
+            }
+            appEnv.refreshWorktreeState(for: workingDirectory, projectDirectory: projectDirectory)
+            cachedAgentCommand = buildAgentCommand()
+            scriptConfig = ScriptConfig.load(from: projectDirectory)
+            surfaceCache.respawnableIDs.insert(agentID)
+            if let snapshot = surfaceCache.restoreTabSnapshot(for: workstreamID) {
+                tabs = snapshot.tabs
+                terminalCount = snapshot.terminalCount
+                browserCount = snapshot.browserCount
+                activeTab = snapshot.activeTab
+                browserTitles = snapshot.browserTitles
+                terminalTitles = snapshot.terminalTitles
+                if scriptConfig.hasAnyScript && !tabs.contains(.info) {
+                    tabs.insert(.info, at: 0)
+                }
+            } else {
+                if scriptConfig.hasAnyScript && !tabs.contains(.info) {
+                    tabs.insert(.info, at: 0)
+                }
+                activeTab = initialTabState.activeTab
             }
             if tabs.contains(where: { if case .editor = $0 { return true } else { return false } }) {
                 startFileTreeWatcherIfNeeded()
@@ -848,6 +853,8 @@ struct TerminalContainerView: View {
                     surfaceCache.updateOcclusion(visibleSurfaceIDs: visibleSurfaceIDs)
                 } else {
                     surfaceCache.saveTabSnapshot(for: workstreamID, snapshot: currentTabSnapshot())
+                }
+            }
                 }
             }
     }
@@ -1180,6 +1187,18 @@ struct TerminalContainerView: View {
             }
         } else {
             // Agent surface
+            if let cmd = cachedAgentCommand {
+                _ = surfaceCache.surface(
+                    for: agentID,
+                    app: app,
+                    workingDirectory: workingDirectory,
+                    command: cmd,
+                    environmentVars: envVars
+                )
+            }
+        }
+        } else {
+            // Agent surface
             if let cmd = cachedClaudeCommand {
                 _ = surfaceCache.surface(
                     for: claudeID,
@@ -1189,6 +1208,30 @@ struct TerminalContainerView: View {
                     environmentVars: envVars
                 )
             }
+=======
+        // Agent surface
+        if let cmd = cachedAgentCommand {
+            _ = surfaceCache.surface(
+                for: agentID,
+                app: app,
+                workingDirectory: workingDirectory,
+                command: cmd,
+                environmentVars: envVars
+            )
+        }
+
+        // Environment script surfaces
+        if let setup = scriptConfig.setup {
+            let setupID = derivedUUID(from: workstreamID, salt: "env-setup-0")
+            let cmd = buildEnvironmentCommand(script: setup, role: "setup")
+            _ = surfaceCache.surface(
+                for: setupID,
+                app: app,
+                workingDirectory: workingDirectory,
+                command: cmd,
+                environmentVars: terminalEnvVars
+            )
+>>>>>>> ba1d090 (feat: add selectable coding CLI support)
         }
     }
 
@@ -1213,9 +1256,14 @@ struct TerminalContainerView: View {
             projectDirectory: projectDirectory,
             workingDirectory: workingDirectory,
             port: workstreamPort,
+<<<<<<< HEAD
             agentTeams: agentTeams,
             defaultBranch: defaultBranch,
             scriptSource: scriptConfig.source
+=======
+            codingCLI: selectedCodingCLI,
+            agentTeams: agentTeams
+>>>>>>> ba1d090 (feat: add selectable coding CLI support)
         )
     }
 
@@ -1400,7 +1448,8 @@ private struct WorkspaceTabDropDelegate: DropDelegate {
 
 private struct GitHubActionMenu: View {
     @ObservedObject var runner: QuickActionRunner
-    let claudePath: String?
+    let codingCLI: CodingCLI
+    let codingCLIPath: String?
     let ghPath: String?
     let workingDirectory: String
     let branchName: String?
@@ -1508,7 +1557,8 @@ private struct GitHubActionMenu: View {
         guard disabledReason(for: action) == nil else { return }
         runner.run(
             action: action,
-            claudePath: claudePath,
+            codingCLI: codingCLI,
+            codingCLIPath: codingCLIPath,
             ghPath: ghPath,
             workingDirectory: workingDirectory,
             branchName: branchName

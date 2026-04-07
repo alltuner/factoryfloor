@@ -18,7 +18,7 @@ other = "AI-drivna"
 [hero_title_2]
 other = "dev workspace."
 [hero_desc]
-other = "Nativ macOS-app byggd på <a href=\"https://ghostty.org\" class=\"text-wine-light hover:underline\">Ghosttys</a> GPU-renderade terminal. Hanterar git worktrees, <a href=\"https://docs.anthropic.com/en/docs/claude-code/overview\" class=\"text-wine-light hover:underline\">Claude Code</a>-sessions och dev servers i ett fönster. Varje workstream får egen branch, terminal och agent, allt parallellt, allt native."
+other = "Nativ macOS-app byggd på <a href=\"https://ghostty.org\" class=\"text-wine-light hover:underline\">Ghosttys</a> GPU-renderade terminal. Hanterar git worktrees, kodagent-sessioner och dev servers i ett fönster. Varje workstream får egen branch, terminal och agent, allt parallellt, allt native."
 [hero_demo_tab]
 other = "Demo"
 [hero_download]
@@ -37,9 +37,9 @@ other = "Git Worktrees"
 [feat_worktrees_desc]
 other = "Varje workstream får egen branch och worktree. Byt task utan stash. .env-filer symlänkas automatiskt."
 [feat_claude_title]
-other = "Claude Code"
+other = "Claude Code eller Codex"
 [feat_claude_desc]
-other = "Integrerad <a href='https://docs.anthropic.com/en/docs/claude-code/overview' class='text-wine-light no-underline hover:underline'>Claude Code</a>-agent med session persistence. Återuppta konversationer efter restart med automatiska session IDs."
+other = "Välj <a href='https://docs.anthropic.com/en/docs/claude-code/overview' class='text-wine-light no-underline hover:underline'>Claude Code</a> eller <a href='https://developers.openai.com/codex' class='text-wine-light no-underline hover:underline'>Codex</a> för den integrerade agentfliken, med möjlighet att återuppta sessioner efter omstart."
 [feat_tmux_title]
 other = "Tmux persistence"
 [feat_tmux_desc]
@@ -70,11 +70,11 @@ other = "Dra en directory till sidebaren eller skapa en ny. Factory Floor detekt
 [step2_title]
 other = "Skapa en workstream"
 [step2_desc]
-other = "En ny worktree med fresh branch, Claude Code session, terminal och browser tab. Portdetektering är automatisk — browsern öppnar din dev server så fort den börjar lyssna."
+other = "En ny worktree med fresh branch, din valda kod-CLI, terminal och browser tab. Portdetektering är automatisk — browsern öppnar din dev server så fort den börjar lyssna."
 [step3_title]
 other = "Koda med AI"
 [step3_desc]
-other = "Agenten namnger din branch efter tasken. Setup scripts installerar dependencies. Byt workstream utan att tappa state."
+other = "Agenten börjar jobba direkt. Setup scripts installerar dependencies. Byt workstream utan att tappa state."
 
 [config_label]
 other = "Config"

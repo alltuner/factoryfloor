@@ -138,10 +138,15 @@
 "Dark" = "Dark";
 
 /* Settings - Coding Agent */
+"Claude Code" = "Claude Code";
+"Codex" = "Codex";
+"Coding CLI" = "Coding CLI";
 "Agent Teams" = "Agent Teams";
 "Enables experimental multi-agent coordination. Agents can spawn teammates, delegate tasks, and collaborate across workstreams." = "Enables experimental multi-agent coordination. Agents can spawn teammates, delegate tasks, and collaborate across workstreams.";
+"Agent Teams is only available with Claude Code." = "Agent Teams is only available with Claude Code.";
 "Auto-rename branch" = "Auto-rename branch";
 "On the first request, the agent renames the branch to match the task and writes a short description visible in the sidebar." = "On the first request, the agent renames the branch to match the task and writes a short description visible in the sidebar.";
+"Auto-rename branch is only available with Claude Code." = "Auto-rename branch is only available with Claude Code.";
 "External Browser" = "External Browser";
 
 /* Settings - Advanced */
@@ -196,6 +201,9 @@
 "Claude Code not found" = "Claude Code not found";
 "Install Claude Code to use the Coding Agent." = "Install Claude Code to use the Coding Agent.";
 "Install Claude Code" = "Install Claude Code";
+"Codex not found" = "Codex not found";
+"Install Codex to use the Coding Agent." = "Install Codex to use the Coding Agent.";
+"Install Codex" = "Install Codex";
 
 /* BrowserView */
 "Server not responding" = "Server not responding";
@@ -291,6 +299,8 @@
 "This branch has been merged." = "This branch has been merged.";
 "gh CLI is not installed." = "gh CLI is not installed.";
 "Claude Code is not installed." = "Claude Code is not installed.";
+"Codex is not installed." = "Codex is not installed.";
+"Install Claude Code or Codex to use the Coding Agent." = "Install Claude Code or Codex to use the Coding Agent.";
 "Enable \"Bypass permission prompts\" in Settings." = "Enable \"Bypass permission prompts\" in Settings.";
 "No GitHub remote found for this project." = "No GitHub remote found for this project.";
 "Quick action debug" = "Quick action debug";

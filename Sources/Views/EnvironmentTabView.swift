@@ -250,7 +250,9 @@ struct EnvironmentTabView: View {
             environmentVariables: environmentVars,
             workingDirectory: workingDirectory,
             toolPaths: LaunchLogEntry.ToolPaths(
+                agentCLI: nil,
                 claude: nil,
+                codex: nil,
                 tmux: useTmux ? appEnv.toolStatus.tmux.path : nil,
                 ffRun: ffRunPath
             ),
