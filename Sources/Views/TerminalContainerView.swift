@@ -48,6 +48,38 @@ enum RestorableWorkspaceTab: String, Codable {
     }
 }
 
+enum SetupStateStore {
+    private static let userDefaultsKey = "factoryfloor.setupCompleted"
+
+    static func isCompleted(for workstreamID: UUID) -> Bool {
+        guard let data = UserDefaults.standard.data(forKey: userDefaultsKey),
+              let saved = try? JSONDecoder().decode(Set<String>.self, from: data)
+        else { return false }
+        return saved.contains(workstreamID.uuidString)
+    }
+
+    static func markCompleted(for workstreamID: UUID) {
+        var saved: Set<String> = []
+        if let data = UserDefaults.standard.data(forKey: userDefaultsKey),
+           let existing = try? JSONDecoder().decode(Set<String>.self, from: data)
+        {
+            saved = existing
+        }
+        saved.insert(workstreamID.uuidString)
+        guard let data = try? JSONEncoder().encode(saved) else { return }
+        UserDefaults.standard.set(data, forKey: userDefaultsKey)
+    }
+
+    static func remove(for workstreamID: UUID) {
+        guard let data = UserDefaults.standard.data(forKey: userDefaultsKey),
+              var saved = try? JSONDecoder().decode(Set<String>.self, from: data)
+        else { return }
+        saved.remove(workstreamID.uuidString)
+        guard let encoded = try? JSONEncoder().encode(saved) else { return }
+        UserDefaults.standard.set(encoded, forKey: userDefaultsKey)
+    }
+}
+
 enum WorkspaceStateStore {
     private static let userDefaultsKey = "factoryfloor.workspaceTabs"
 
@@ -883,7 +915,7 @@ struct TerminalContainerView: View {
         }
         appEnv.refreshWorktreeState(for: workingDirectory, projectDirectory: projectDirectory)
         cachedClaudeCommand = buildClaudeCommand()
-        if scriptConfig.setup != nil {
+        if scriptConfig.setup != nil, !SetupStateStore.isCompleted(for: workstreamID) {
             setupGateState = .running
         } else {
             setupGateState = .notNeeded
@@ -1023,6 +1055,7 @@ struct TerminalContainerView: View {
     }
 
     private func launchAgentAfterSetup() {
+        SetupStateStore.markCompleted(for: workstreamID)
         surfaceCache.removeSurface(for: setupGateID)
         setupGateState = .completed
         surfaceCache.respawnableIDs.insert(claudeID)
