@@ -52,6 +52,22 @@ final class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCent
         let center = UNUserNotificationCenter.current()
         center.delegate = self
         Self.requestNotificationAuthorization(using: center)
+
+        // Contextual shortcuts via key monitor (avoids cluttering the menu bar)
+        NSEvent.addLocalMonitorForEvents(matching: .keyDown) { event in
+            guard event.modifierFlags.intersection(.deviceIndependentFlagsMask) == .command,
+                  let chars = event.charactersIgnoringModifiers
+            else { return event }
+            if let digit = chars.first?.wholeNumberValue, (1 ... 9).contains(digit) {
+                NotificationCenter.default.post(name: .switchByNumber, object: digit)
+                return nil
+            }
+            if chars == "l" {
+                NotificationCenter.default.post(name: .focusAddressBar, object: nil)
+                return nil
+            }
+            return event
+        }
     }
 
     nonisolated static func handleNotificationAuthorizationResult(
@@ -273,8 +289,23 @@ struct FF2App: App {
                     NotificationCenter.default.post(name: .toggleSidebar, object: nil)
                 }
                 .keyboardShortcut("s", modifiers: [.command, .option])
+            }
+            // Tabs
+            CommandGroup(after: .toolbar) {
+                Button("Coding Agent") {
+                    NotificationCenter.default.post(name: .focusAgent, object: nil)
+                }
+                .keyboardShortcut(.return, modifiers: .command)
 
-                Divider()
+                Button("New Terminal") {
+                    NotificationCenter.default.post(name: .toggleTerminal, object: nil)
+                }
+                .keyboardShortcut("t", modifiers: .command)
+
+                Button("New Browser") {
+                    NotificationCenter.default.post(name: .toggleBrowser, object: nil)
+                }
+                .keyboardShortcut("b", modifiers: .command)
 
                 Button("Start/Rerun") {
                     NotificationCenter.default.post(name: .rerunScript, object: nil)
@@ -282,16 +313,6 @@ struct FF2App: App {
                 .keyboardShortcut(.return, modifiers: [.command, .shift])
 
                 Divider()
-
-                Button("Toggle Terminal") {
-                    NotificationCenter.default.post(name: .toggleTerminal, object: nil)
-                }
-                .keyboardShortcut("t", modifiers: .command)
-
-                Button("Toggle Browser") {
-                    NotificationCenter.default.post(name: .toggleBrowser, object: nil)
-                }
-                .keyboardShortcut("b", modifiers: .command)
 
                 Button("Next Tab") {
                     NotificationCenter.default.post(name: .nextTab, object: nil)
@@ -302,6 +323,13 @@ struct FF2App: App {
                     NotificationCenter.default.post(name: .prevTab, object: nil)
                 }
                 .keyboardShortcut("[", modifiers: [.command, .shift])
+
+                Button("Back to Project") {
+                    NotificationCenter.default.post(name: .switchToProject, object: nil)
+                }
+                .keyboardShortcut("0", modifiers: .command)
+
+                Divider()
 
                 Button("Next Workstream") {
                     NotificationCenter.default.post(name: .nextWorkstream, object: nil)
@@ -325,16 +353,6 @@ struct FF2App: App {
 
                 Divider()
 
-                Button("Address Bar") {
-                    NotificationCenter.default.post(name: .focusAddressBar, object: nil)
-                }
-                .keyboardShortcut("l", modifiers: .command)
-
-                Button("Focus Agent") {
-                    NotificationCenter.default.post(name: .focusAgent, object: nil)
-                }
-                .keyboardShortcut(.return, modifiers: .command)
-
                 Button("Open in External Browser") {
                     NotificationCenter.default.post(name: .openExternalBrowser, object: nil)
                 }
@@ -345,19 +363,12 @@ struct FF2App: App {
                 }
                 .keyboardShortcut("t", modifiers: [.command, .option])
 
+                Divider()
+
                 Button("Archive Workstream") {
                     NotificationCenter.default.post(name: .archiveWorkstream, object: nil)
                 }
                 .keyboardShortcut("w", modifiers: [.command, .shift])
-            }
-            // Contextual shortcuts (in menu but minimal labels)
-            CommandGroup(after: .toolbar) {
-                Button("Back to Project") { NotificationCenter.default.post(name: .switchToProject, object: nil) }
-                    .keyboardShortcut("0", modifiers: .command)
-                ForEach(1 ... 9, id: \.self) { n in
-                    Button("Switch to Tab \(n)") { NotificationCenter.default.post(name: .switchByNumber, object: n) }
-                        .keyboardShortcut(KeyEquivalent(Character("\(n)")), modifiers: .command)
-                }
             }
         }
     }
