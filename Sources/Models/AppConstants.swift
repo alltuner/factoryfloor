@@ -23,6 +23,10 @@ func resolvedConfigDirectory(
     return configBase.appendingPathComponent(configDirectoryName)
 }
 
+func isRunningXCTest(environment: [String: String] = ProcessInfo.processInfo.environment) -> Bool {
+    environment["XCTestConfigurationFilePath"] != nil
+}
+
 enum AppConstants {
     static let appID: String = {
         #if DEBUG
@@ -71,7 +75,7 @@ enum AppConstants {
             configDirectoryName: "factoryfloor",
             environment: ProcessInfo.processInfo.environment,
             defaultConfigBase: FileManager.default.homeDirectoryForCurrentUser.appendingPathComponent(".config"),
-            isRunningTests: ProcessInfo.processInfo.environment["XCTestConfigurationFilePath"] != nil
+            isRunningTests: isRunningXCTest()
         )
     }
 
@@ -79,7 +83,7 @@ enum AppConstants {
     /// Used for transient files like run-state and tmux config.
     static var cacheDirectory: URL {
         let base = FileManager.default.urls(for: .cachesDirectory, in: .userDomainMask).first!
-        let dirName = ProcessInfo.processInfo.environment["XCTestConfigurationFilePath"] != nil
+        let dirName = isRunningXCTest()
             ? "factoryfloor-tests"
             : "factoryfloor"
         return base.appendingPathComponent(dirName)

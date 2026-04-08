@@ -1,6 +1,7 @@
 // ABOUTME: Main application view composing the sidebar and terminal content area.
 // ABOUTME: Uses NavigationSplitView for the sidebar/detail pattern.
 
+import AppKit
 import OSLog
 import SwiftUI
 
@@ -19,6 +20,57 @@ final class ProjectList: ObservableObject {
 
     init() {
         items = ProjectStore.load()
+    }
+}
+
+func workstreamHasUsablePath(_ workstream: Workstream, pathExists: (String) -> Bool = { FileManager.default.fileExists(atPath: $0) }) -> Bool {
+    guard let worktreePath = workstream.worktreePath else { return false }
+    return pathExists(worktreePath)
+}
+
+func renderableWorkstreamID(
+    in project: Project,
+    selectedWorkstreamID: UUID?,
+    pathExists: (String) -> Bool = { FileManager.default.fileExists(atPath: $0) }
+) -> UUID? {
+    guard let selectedWorkstreamID else { return nil }
+    return project.workstreams.contains {
+        $0.id == selectedWorkstreamID && workstreamHasUsablePath($0, pathExists: pathExists)
+    } ? selectedWorkstreamID : nil
+}
+
+func cycledWorkstreamID(
+    in project: Project,
+    selectedWorkstreamID: UUID?,
+    direction: Int,
+    pathExists: (String) -> Bool = { FileManager.default.fileExists(atPath: $0) }
+) -> UUID? {
+    let sorted = project.workstreams
+        .filter { workstreamHasUsablePath($0, pathExists: pathExists) }
+        .sorted { $0.lastAccessedAt > $1.lastAccessedAt }
+    guard !sorted.isEmpty else { return nil }
+    guard let selectedWorkstreamID,
+          let currentIndex = sorted.firstIndex(where: { $0.id == selectedWorkstreamID })
+    else {
+        return direction > 0 ? sorted.first?.id : sorted.last?.id
+    }
+    let next = (currentIndex + direction + sorted.count) % sorted.count
+    return sorted[next].id
+}
+
+func commandKeyNotification(charactersIgnoringModifiers: String?, modifierFlags: NSEvent.ModifierFlags) -> Notification.Name? {
+    guard let charactersIgnoringModifiers else { return nil }
+    let flags = modifierFlags.intersection(.deviceIndependentFlagsMask)
+    guard flags.contains(.command), !flags.contains(.option), !flags.contains(.control) else { return nil }
+    let hasShift = flags.contains(.shift)
+
+    switch (charactersIgnoringModifiers, hasShift) {
+    case ("[", false): return .prevWorkstream
+    case ("]", false): return .nextWorkstream
+    case ("[", true): return .prevTab
+    case ("]", true): return .nextTab
+    case ("w", false): return .closeTerminal
+    default: return nil
     }
 }
 
@@ -86,16 +138,25 @@ struct ContentView: View {
                 .navigationTitle("Help")
                 .navigationSubtitle(AppConstants.appName)
         } else if let workstream = activeWorkstream, let project = activeProject {
-            if workstream.worktreePath != nil {
+            if let workstreamID = renderableWorkstreamID(in: project, selectedWorkstreamID: workstream.id) {
+                let scriptConfig = ScriptConfig.load(from: project.directory)
+                let initialTabState = startupWorkspaceTabState(
+                    snapshot: surfaceCache.restoreTabSnapshot(for: workstreamID),
+                    savedTab: WorkspaceStateStore.load(for: workstreamID),
+                    hasEnvironmentTab: scriptConfig.hasAnyScript
+                )
                 TerminalContainerView(
-                    workstreamID: workstream.id,
+                    workstreamID: workstreamID,
                     workingDirectory: workstream.workingDirectory(projectDirectory: project.directory),
                     projectDirectory: project.directory,
                     projectName: project.name,
                     workstreamName: workstream.name,
-                    bypassPermissions: workstream.bypassPermissions
+                    bypassPermissions: workstream.bypassPermissions,
+                    isActive: true,
+                    scriptConfig: scriptConfig,
+                    initialTabState: initialTabState
                 )
-                .id(workstream.id)
+                .id(workstreamID)
                 .navigationTitle(workstream.name)
                 .navigationSubtitle(appEnvironment.taskDescription(for: workstream.worktreePath) ?? project.name)
             } else {
@@ -259,8 +320,11 @@ struct ContentView: View {
                 guard !keyMonitorInstalled else { return }
                 keyMonitorInstalled = true
                 NSEvent.addLocalMonitorForEvents(matching: .keyDown) { event in
-                    if event.modifierFlags.contains(.command) && event.charactersIgnoringModifiers == "w" {
-                        NotificationCenter.default.post(name: .closeTerminal, object: nil)
+                    if let notification = commandKeyNotification(
+                        charactersIgnoringModifiers: event.charactersIgnoringModifiers,
+                        modifierFlags: event.modifierFlags
+                    ) {
+                        NotificationCenter.default.post(name: notification, object: nil)
                         return nil // swallow the event
                     }
                     return event
@@ -430,17 +494,17 @@ struct ContentView: View {
     /// Only acts when a project or workstream is selected (not settings/help).
     private func cycleWorkstream(direction: Int) {
         guard let project = activeProject else { return }
-        let sorted = project.workstreams.sorted { $0.lastAccessedAt > $1.lastAccessedAt }
-        guard !sorted.isEmpty else { return }
 
-        if let wsID = selection?.workstreamID,
-           let currentIndex = sorted.firstIndex(where: { $0.id == wsID })
-        {
-            let next = (currentIndex + direction + sorted.count) % sorted.count
-            selection = .workstream(sorted[next].id)
-        } else if case .project = selection {
-            // In project view: jump to first/last workstream
-            selection = .workstream(direction > 0 ? sorted.first!.id : sorted.last!.id)
+        if selection?.workstreamID != nil || selection?.projectID != nil {
+            guard let id = cycledWorkstreamID(in: project, selectedWorkstreamID: selection?.workstreamID, direction: direction) else { return }
+            deferSelection(.workstream(id))
+        }
+    }
+
+    private func deferSelection(_ target: SidebarSelection) {
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.01) {
+            guard selection != target else { return }
+            selection = target
         }
     }
 

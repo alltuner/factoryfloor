@@ -1,8 +1,8 @@
 // ABOUTME: Tests for config-directory resolution across app, debug, and test contexts.
 // ABOUTME: Keeps XCTest persistence isolated from the app's real project roster.
 
-import XCTest
 @testable import FactoryFloor
+import XCTest
 
 final class AppConstantsTests: XCTestCase {
     func testDebugBuildUsesReleaseConfigDirectory() {
@@ -29,5 +29,10 @@ final class AppConstantsTests: XCTestCase {
         )
 
         XCTAssertEqual(resolved, base.appendingPathComponent("factoryfloor-tests"))
+    }
+
+    func testDetectsXCTestEnvironment() {
+        XCTAssertTrue(isRunningXCTest(environment: ["XCTestConfigurationFilePath": "/tmp/tests.xctestconfiguration"]))
+        XCTAssertFalse(isRunningXCTest(environment: [:]))
     }
 }

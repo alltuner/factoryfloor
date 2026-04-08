@@ -7,6 +7,22 @@ import UniformTypeIdentifiers
 
 private let logger = Logger(subsystem: "factoryfloor", category: "sidebar")
 
+func expandedProjectIDs(afterSelecting selection: SidebarSelection?, current: Set<UUID>, projectIDByWorkstreamID: [UUID: UUID]) -> Set<UUID> {
+    guard let selection else { return current }
+    var expanded = current
+    switch selection {
+    case let .project(projectID):
+        expanded.insert(projectID)
+    case let .workstream(workstreamID):
+        if let projectID = projectIDByWorkstreamID[workstreamID] {
+            expanded.insert(projectID)
+        }
+    case .settings, .help:
+        break
+    }
+    return expanded
+}
+
 extension Notification.Name {
     static let addProject = Notification.Name("factoryfloor.addProject")
     static let addNew = Notification.Name("factoryfloor.addNew")
@@ -66,6 +82,29 @@ struct ProjectSidebar: View {
                 }
             }
         )
+    }
+
+    private func projectIDByWorkstreamIDSnapshot() -> [UUID: UUID] {
+        Dictionary(
+            uniqueKeysWithValues: cachedWorkstreamIndex.compactMap { workstreamID, index in
+                guard projects.indices.contains(index.0) else { return nil }
+                return (workstreamID, projects[index.0].id)
+            }
+        )
+    }
+
+    private func deferSelectionExpansion(_ selected: SidebarSelection, projectIDByWorkstreamID: [UUID: UUID], scrollProxy: ScrollViewProxy) {
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.05) {
+            guard selection == selected else { return }
+            expandedProjects = expandedProjectIDs(
+                afterSelecting: selected,
+                current: expandedProjects,
+                projectIDByWorkstreamID: projectIDByWorkstreamID
+            )
+            withAnimation {
+                scrollProxy.scrollTo(selected, anchor: .center)
+            }
+        }
     }
 
     private func projectRows() -> some View {
@@ -304,17 +343,7 @@ struct ProjectSidebar: View {
                     }
                     .onChange(of: selection) { _, sel in
                         guard let sel else { return }
-                        if case let .project(pid) = sel {
-                            expandedProjects.insert(pid)
-                        }
-                        if case let .workstream(wsID) = sel,
-                           let (pi, _) = cachedWorkstreamIndex[wsID]
-                        {
-                            expandedProjects.insert(projects[pi].id)
-                        }
-                        withAnimation {
-                            scrollProxy.scrollTo(sel, anchor: .center)
-                        }
+                        deferSelectionExpansion(sel, projectIDByWorkstreamID: projectIDByWorkstreamIDSnapshot(), scrollProxy: scrollProxy)
                     }
                 } // ScrollViewReader
 

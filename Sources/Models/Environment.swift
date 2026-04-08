@@ -184,9 +184,14 @@ final class AppEnvironment: ObservableObject {
                 hasBranchCommits: GitOperations.hasBranchCommits(at: path, projectPath: projectDir),
                 hasRemote: GitOperations.hasRemote(at: path)
             )
-            await MainActor.run {
-                self.worktreeStateCache[path] = state
-            }
+            await self.deferWorktreeStateUpdate(state, for: path)
+        }
+    }
+
+    private func deferWorktreeStateUpdate(_ state: WorktreeState, for path: String) {
+        Task { @MainActor in
+            try? await Task.sleep(nanoseconds: 50_000_000)
+            self.worktreeStateCache[path] = state
         }
     }
 
