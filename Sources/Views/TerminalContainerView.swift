@@ -243,6 +243,7 @@ struct TerminalContainerView: View {
     @State private var workspaceStarted = false
     @State private var defaultBranch = "main"
     @State private var setupGateState: SetupGateState = .notNeeded
+    @State private var setupFileWatcher: DispatchSourceFileSystemObject?
     init(
         workstreamID: UUID,
         workingDirectory: String,
@@ -666,7 +667,11 @@ struct TerminalContainerView: View {
             .onReceive(NotificationCenter.default.publisher(for: .terminalTabExited)) { notification in
                 guard let surfaceID = notification.object as? UUID else { return }
                 if surfaceID == setupGateID {
-                    handleSetupGateExited()
+                    if setupGateState == .running {
+                        handleSetupGateExited()
+                    } else if setupGateState == .failed {
+                        launchAgentAfterSetup()
+                    }
                     return
                 }
                 if let tab = tabs.first(where: {
@@ -883,7 +888,7 @@ struct TerminalContainerView: View {
         cachedClaudeCommand = buildClaudeCommand()
         if scriptConfig.setup != nil {
             setupGateState = .running
-            surfaceCache.retainedSurfaceIDs.insert(setupGateID)
+            startSetupFileWatcher()
         } else {
             setupGateState = .notNeeded
             surfaceCache.respawnableIDs.insert(claudeID)
@@ -1015,8 +1020,29 @@ struct TerminalContainerView: View {
         }
     }
 
+    private func startSetupFileWatcher() {
+        let dir = NSTemporaryDirectory() as NSString
+        let fd = open(dir.fileSystemRepresentation, O_EVTONLY)
+        guard fd >= 0 else { return }
+        let source = DispatchSource.makeFileSystemObjectSource(fileDescriptor: fd, eventMask: .write, queue: .main)
+        source.setEventHandler { [weak surfaceCache] in
+            guard FileManager.default.fileExists(atPath: self.setupExitCodePath) else { return }
+            _ = surfaceCache // prevent unused capture warning
+            self.handleSetupGateExited()
+        }
+        source.setCancelHandler { close(fd) }
+        source.resume()
+        setupFileWatcher = source
+    }
+
+    private func stopSetupFileWatcher() {
+        setupFileWatcher?.cancel()
+        setupFileWatcher = nil
+    }
+
     private func handleSetupGateExited() {
         guard setupGateState == .running else { return }
+        stopSetupFileWatcher()
         let exitCode = readSetupExitCode()
         try? FileManager.default.removeItem(atPath: setupExitCodePath)
         if exitCode == 0 {
@@ -1037,7 +1063,7 @@ struct TerminalContainerView: View {
     }
 
     private func launchAgentAfterSetup() {
-        surfaceCache.retainedSurfaceIDs.remove(setupGateID)
+        stopSetupFileWatcher()
         surfaceCache.removeSurface(for: setupGateID)
         setupGateState = .completed
         surfaceCache.respawnableIDs.insert(claudeID)
@@ -1543,8 +1569,6 @@ final class TerminalSurfaceCache: ObservableObject {
     private var quickActionRunners: [UUID: QuickActionRunner] = [:]
     /// Surface IDs that should respawn when closed (e.g., the agent).
     var respawnableIDs: Set<UUID> = []
-    /// Surface IDs that should not be removed when their process exits.
-    var retainedSurfaceIDs: Set<UUID> = []
     /// Guards against concurrent respawns for the same surface ID.
     private var respawning = Set<UUID>()
     /// Surface IDs where creation failed, with the command that was attempted.
@@ -1717,9 +1741,6 @@ final class TerminalSurfaceCache: ObservableObject {
                 logger.detailed("Respawned surface \(id)")
             }
             objectWillChange.send()
-        } else if retainedSurfaceIDs.contains(id) {
-            // Retained surfaces stay alive after process exit (e.g., setup gate).
-            NotificationCenter.default.post(name: .terminalTabExited, object: id)
         } else if diedImmediately {
             // Terminal tab died immediately: show error instead of closing the tab.
             let command = surfaceParams[id]?.command ?? "(default shell)"
