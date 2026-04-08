@@ -1,5 +1,46 @@
 # Changelog
 
+## [0.1.66](https://github.com/alltuner/factoryfloor/compare/v0.1.65...v0.1.66) (2026-04-08)
+
+
+### Features
+
+* add emdash config support, FF_DEFAULT_BRANCH, and compatibility env var aliases ([#367](https://github.com/alltuner/factoryfloor/issues/367)) ([1bd820c](https://github.com/alltuner/factoryfloor/commit/1bd820c20e85f04b20c649764ce3f2670c590233))
+* add setting to restrict agent filesystem writes to worktree ([#358](https://github.com/alltuner/factoryfloor/issues/358)) ([188d1ec](https://github.com/alltuner/factoryfloor/commit/188d1ecc1bf80fe6f7b201dcb2b6a66a7b204a13))
+* redesign workstream info page with native macOS grouped form ([#360](https://github.com/alltuner/factoryfloor/issues/360)) ([6ed3ac9](https://github.com/alltuner/factoryfloor/commit/6ed3ac951944ec612e6afaeb21b7f7c3d97cda2f))
+* show workstream description tooltip on sidebar hover ([#350](https://github.com/alltuner/factoryfloor/issues/350)) ([a89d090](https://github.com/alltuner/factoryfloor/commit/a89d090e42d35786840de2d211693dddbb47a71a))
+* sync terminal color scheme with system dark/light mode ([#362](https://github.com/alltuner/factoryfloor/issues/362)) ([a6dd299](https://github.com/alltuner/factoryfloor/commit/a6dd299c2fc3280d95847df51846fbd8447bae57)), closes [#359](https://github.com/alltuner/factoryfloor/issues/359)
+* update main branch and clean up after purging a workstream ([#369](https://github.com/alltuner/factoryfloor/issues/369)) ([f20b13c](https://github.com/alltuner/factoryfloor/commit/f20b13c14f5aed4776cb6315c51bcccd9ea21aeb))
+
+
+### Bug Fixes
+
+* **browser:** enable passkey support in embedded browser ([#366](https://github.com/alltuner/factoryfloor/issues/366)) ([e940ffa](https://github.com/alltuner/factoryfloor/commit/e940ffac87aa5df41142e19edf05873312a7516c))
+* keep workstream views alive across rapid Cmd+[/] switching ([#372](https://github.com/alltuner/factoryfloor/issues/372)) ([48642ab](https://github.com/alltuner/factoryfloor/commit/48642ab80d7cbd348d59e12025e507bb4d1e8120))
+* preserve run terminal visibility across workstream switching ([#375](https://github.com/alltuner/factoryfloor/issues/375)) ([2a9d37b](https://github.com/alltuner/factoryfloor/commit/2a9d37b05458076bea9e9449d28d2b58832ee8f0))
+* revert ZStack-all-workstreams to single active TerminalContainerView ([#374](https://github.com/alltuner/factoryfloor/issues/374)) ([e68cb0e](https://github.com/alltuner/factoryfloor/commit/e68cb0e2c08845fcb521809e14dabd45a049047f))
+* separate debug entitlements to fix ad-hoc signed builds ([#368](https://github.com/alltuner/factoryfloor/issues/368)) ([c155ca4](https://github.com/alltuner/factoryfloor/commit/c155ca4d5a101476452fa3c26b1fa7967782096b))
+* toolbar duplication and SourceKit-LSP false positives in worktrees ([#373](https://github.com/alltuner/factoryfloor/issues/373)) ([3bae95b](https://github.com/alltuner/factoryfloor/commit/3bae95b2b6ab81b06ec8fe4a28a44bd1980b2233))
+* update stale keyboard shortcut references across UI and docs ([#371](https://github.com/alltuner/factoryfloor/issues/371)) ([911d311](https://github.com/alltuner/factoryfloor/commit/911d31173ee51c842234415d704678b5d7674893))
+* **website:** improve footer and nav responsiveness ([#357](https://github.com/alltuner/factoryfloor/issues/357)) ([d96557f](https://github.com/alltuner/factoryfloor/commit/d96557f2e839722a33b8e18f2d96f7591852f929))
+
+
+### Refactoring
+
+* revamp keyboard shortcuts to follow macOS conventions ([#365](https://github.com/alltuner/factoryfloor/issues/365)) ([c18ef6f](https://github.com/alltuner/factoryfloor/commit/c18ef6f3ec0c1b36a06d92f12541eaaa0545dd17))
+
+
+### Performance
+
+* instant workstream switching ([#377](https://github.com/alltuner/factoryfloor/issues/377)) ([3f987a9](https://github.com/alltuner/factoryfloor/commit/3f987a94cc22c20004eaf84bba58522f3a042fcf))
+
+
+### Documentation
+
+* add architecture and security review, updated for v0.1.65 ([#355](https://github.com/alltuner/factoryfloor/issues/355)) ([46013da](https://github.com/alltuner/factoryfloor/commit/46013da22f1782587ff8fb1544a3b428d7b40051))
+* add Corner Office and mobile app design docs ([#361](https://github.com/alltuner/factoryfloor/issues/361)) ([e6285a9](https://github.com/alltuner/factoryfloor/commit/e6285a9790442c3b8ec5eb8a7ddf80103d345c5e))
+* add translation contribution guide and sponsor page updates ([#356](https://github.com/alltuner/factoryfloor/issues/356)) ([67e4add](https://github.com/alltuner/factoryfloor/commit/67e4addc4faefd733b7d0dba4b25aa6952afc043))
+
 ## [0.1.65](https://github.com/alltuner/factoryfloor/compare/v0.1.64...v0.1.65) (2026-04-03)
 
 
