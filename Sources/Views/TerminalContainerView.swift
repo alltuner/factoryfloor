@@ -243,7 +243,6 @@ struct TerminalContainerView: View {
     @State private var workspaceStarted = false
     @State private var defaultBranch = "main"
     @State private var setupGateState: SetupGateState = .notNeeded
-    @State private var setupFileWatcher: DispatchSourceFileSystemObject?
     init(
         workstreamID: UUID,
         workingDirectory: String,
@@ -280,10 +279,6 @@ struct TerminalContainerView: View {
 
     private var setupGateID: UUID {
         derivedUUID(from: workstreamID, salt: "setup-gate")
-    }
-
-    private var setupExitCodePath: String {
-        NSTemporaryDirectory() + "ff-setup-\(workstreamID.uuidString)"
     }
 
     private var quickActionRunner: QuickActionRunner {
@@ -664,14 +659,16 @@ struct TerminalContainerView: View {
                 guard let currentIndex = tabs.firstIndex(of: activeTab) else { return }
                 activeTab = tabs[(currentIndex - 1 + tabs.count) % tabs.count]
             }
+            .onReceive(NotificationCenter.default.publisher(for: .terminalChildExited)) { notification in
+                guard let surfaceID = notification.object as? UUID, surfaceID == setupGateID,
+                      let exitCode = notification.userInfo?["exitCode"] as? Int32
+                else { return }
+                handleSetupChildExited(exitCode: exitCode)
+            }
             .onReceive(NotificationCenter.default.publisher(for: .terminalTabExited)) { notification in
                 guard let surfaceID = notification.object as? UUID else { return }
-                if surfaceID == setupGateID {
-                    if setupGateState == .running {
-                        handleSetupGateExited()
-                    } else if setupGateState == .failed {
-                        launchAgentAfterSetup()
-                    }
+                if surfaceID == setupGateID, setupGateState == .failed {
+                    launchAgentAfterSetup()
                     return
                 }
                 if let tab = tabs.first(where: {
@@ -888,7 +885,6 @@ struct TerminalContainerView: View {
         cachedClaudeCommand = buildClaudeCommand()
         if scriptConfig.setup != nil {
             setupGateState = .running
-            startSetupFileWatcher()
         } else {
             setupGateState = .notNeeded
             surfaceCache.respawnableIDs.insert(claudeID)
@@ -910,7 +906,8 @@ struct TerminalContainerView: View {
                     app: app,
                     workingDirectory: workingDirectory,
                     command: cmd,
-                    environmentVars: terminalEnvVars
+                    environmentVars: terminalEnvVars,
+                    waitAfterCommand: false
                 )
             }
         } else {
@@ -929,11 +926,7 @@ struct TerminalContainerView: View {
 
     private func buildSetupGateCommand() -> String? {
         guard let setup = scriptConfig.setup else { return nil }
-        let inner = scriptCommand(script: setup, role: "setup")
-        let exitFile = CommandBuilder.shellQuote(setupExitCodePath)
-        let wrapped = "\(inner); EXIT_CODE=$?; printf '%d' \"$EXIT_CODE\" > \(exitFile); exit $EXIT_CODE"
-        let shell = CommandBuilder.userShell
-        return "\(shell) -lic \(CommandBuilder.shellQuote(wrapped, forShell: shell))"
+        return scriptCommand(script: setup, role: "setup")
     }
 
     private func buildEnvironmentCommand(script: String, role: String) -> String {
@@ -1020,31 +1013,8 @@ struct TerminalContainerView: View {
         }
     }
 
-    private func startSetupFileWatcher() {
-        let dir = NSTemporaryDirectory() as NSString
-        let fd = open(dir.fileSystemRepresentation, O_EVTONLY)
-        guard fd >= 0 else { return }
-        let source = DispatchSource.makeFileSystemObjectSource(fileDescriptor: fd, eventMask: .write, queue: .main)
-        source.setEventHandler { [weak surfaceCache] in
-            guard FileManager.default.fileExists(atPath: self.setupExitCodePath) else { return }
-            _ = surfaceCache // prevent unused capture warning
-            self.handleSetupGateExited()
-        }
-        source.setCancelHandler { close(fd) }
-        source.resume()
-        setupFileWatcher = source
-    }
-
-    private func stopSetupFileWatcher() {
-        setupFileWatcher?.cancel()
-        setupFileWatcher = nil
-    }
-
-    private func handleSetupGateExited() {
+    private func handleSetupChildExited(exitCode: Int32) {
         guard setupGateState == .running else { return }
-        stopSetupFileWatcher()
-        let exitCode = readSetupExitCode()
-        try? FileManager.default.removeItem(atPath: setupExitCodePath)
         if exitCode == 0 {
             launchAgentAfterSetup()
         } else {
@@ -1052,18 +1022,7 @@ struct TerminalContainerView: View {
         }
     }
 
-    private func readSetupExitCode() -> Int32 {
-        guard let data = FileManager.default.contents(atPath: setupExitCodePath),
-              let str = String(data: data, encoding: .utf8)?.trimmingCharacters(in: .whitespacesAndNewlines),
-              let code = Int32(str)
-        else {
-            return 1
-        }
-        return code
-    }
-
     private func launchAgentAfterSetup() {
-        stopSetupFileWatcher()
         surfaceCache.removeSurface(for: setupGateID)
         setupGateState = .completed
         surfaceCache.respawnableIDs.insert(claudeID)
@@ -1583,6 +1542,7 @@ final class TerminalSurfaceCache: ObservableObject {
         let command: String?
         let initialInput: String?
         let environmentVars: [String: String]
+        let waitAfterCommand: Bool
     }
 
     init() {
@@ -1607,15 +1567,15 @@ final class TerminalSurfaceCache: ObservableObject {
         }
     }
 
-    func surface(for id: UUID, app: ghostty_app_t, workingDirectory: String, command: String? = nil, initialInput: String? = nil, environmentVars: [String: String] = [:]) -> TerminalView {
+    func surface(for id: UUID, app: ghostty_app_t, workingDirectory: String, command: String? = nil, initialInput: String? = nil, environmentVars: [String: String] = [:], waitAfterCommand: Bool = true) -> TerminalView {
         if let existing = surfaces[id] {
             existing.workstreamID = id
             return existing
         }
-        let view = TerminalView(app: app, workingDirectory: workingDirectory, command: command, initialInput: initialInput, environmentVars: environmentVars)
+        let view = TerminalView(app: app, workingDirectory: workingDirectory, command: command, initialInput: initialInput, environmentVars: environmentVars, waitAfterCommand: waitAfterCommand)
         view.workstreamID = id
         surfaces[id] = view
-        surfaceParams[id] = SurfaceParams(workingDirectory: workingDirectory, command: command, initialInput: initialInput, environmentVars: environmentVars)
+        surfaceParams[id] = SurfaceParams(workingDirectory: workingDirectory, command: command, initialInput: initialInput, environmentVars: environmentVars, waitAfterCommand: waitAfterCommand)
         if view.surface == nil {
             logger.error("Surface creation failed for \(id) command=\(command ?? "<shell>")")
             failedSurfaces[id] = command ?? "(default shell)"
@@ -1635,7 +1595,7 @@ final class TerminalSurfaceCache: ObservableObject {
             view.destroy()
         }
         failedSurfaces.removeValue(forKey: id)
-        let view = TerminalView(app: app, workingDirectory: params.workingDirectory, command: params.command, initialInput: params.initialInput, environmentVars: params.environmentVars)
+        let view = TerminalView(app: app, workingDirectory: params.workingDirectory, command: params.command, initialInput: params.initialInput, environmentVars: params.environmentVars, waitAfterCommand: params.waitAfterCommand)
         view.workstreamID = id
         surfaces[id] = view
         if view.surface == nil {
@@ -1729,7 +1689,7 @@ final class TerminalSurfaceCache: ObservableObject {
 
             respawning.insert(id)
             surfaces.removeValue(forKey: id)
-            let newView = TerminalView(app: app, workingDirectory: params.workingDirectory, command: params.command, initialInput: params.initialInput, environmentVars: params.environmentVars)
+            let newView = TerminalView(app: app, workingDirectory: params.workingDirectory, command: params.command, initialInput: params.initialInput, environmentVars: params.environmentVars, waitAfterCommand: params.waitAfterCommand)
             newView.workstreamID = id
             surfaces[id] = newView
             respawning.remove(id)

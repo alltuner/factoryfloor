@@ -78,6 +78,18 @@ private func handleTerminalAction(
     case GHOSTTY_ACTION_RING_BELL:
         sendDesktopNotification(title: AppConstants.appName, body: "Terminal bell", suppressWhenActive: true)
         return true
+    case GHOSTTY_ACTION_SHOW_CHILD_EXITED:
+        let exitCode = action.action.child_exited.exit_code
+        guard let view = TerminalView.view(for: target.target.surface),
+              let wsID = view.workstreamID else { return false }
+        DispatchQueue.main.async {
+            NotificationCenter.default.post(
+                name: .terminalChildExited,
+                object: wsID,
+                userInfo: ["exitCode": Int32(exitCode), "surfaceView": view]
+            )
+        }
+        return true
     default:
         return false
     }

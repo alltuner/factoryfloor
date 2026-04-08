@@ -7,6 +7,7 @@ import os
 private let logger = Logger(subsystem: "factoryfloor", category: "terminal-view")
 
 extension Notification.Name {
+    static let terminalChildExited = Notification.Name("factoryfloor.terminalChildExited")
     static let terminalActivity = Notification.Name("ff2.terminalActivity")
 }
 
@@ -44,7 +45,7 @@ final class TerminalView: NSView {
         .URL,
     ]
 
-    init(app: ghostty_app_t, workingDirectory: String? = nil, command: String? = nil, initialInput: String? = nil, environmentVars: [String: String] = [:]) {
+    init(app: ghostty_app_t, workingDirectory: String? = nil, command: String? = nil, initialInput: String? = nil, environmentVars: [String: String] = [:], waitAfterCommand: Bool = true) {
         super.init(frame: NSRect(x: 0, y: 0, width: 800, height: 600))
 
         wantsLayer = true
@@ -62,6 +63,7 @@ final class TerminalView: NSView {
         )
         config.scale_factor = Double(NSScreen.main?.backingScaleFactor ?? 2.0)
         config.font_size = 0 // inherit from ghostty config
+        config.wait_after_command = waitAfterCommand
         config.context = GHOSTTY_SURFACE_CONTEXT_WINDOW
 
         // Heap-allocate C strings for env vars so pointers remain valid until surface creation.
