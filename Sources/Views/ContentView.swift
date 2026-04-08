@@ -22,6 +22,23 @@ final class ProjectList: ObservableObject {
     }
 }
 
+func workstreamIDsAroundSelection(in project: Project, selectedWorkstreamID: UUID?) -> Set<UUID> {
+    guard let selectedWorkstreamID else { return [] }
+    let readyWorkstreams = project.workstreams
+        .filter { $0.worktreePath != nil }
+        .sorted { $0.lastAccessedAt > $1.lastAccessedAt }
+    guard let currentIndex = readyWorkstreams.firstIndex(where: { $0.id == selectedWorkstreamID }) else { return [] }
+
+    let previousIndex = (currentIndex - 1 + readyWorkstreams.count) % readyWorkstreams.count
+    let nextIndex = (currentIndex + 1) % readyWorkstreams.count
+
+    return [
+        readyWorkstreams[currentIndex].id,
+        readyWorkstreams[previousIndex].id,
+        readyWorkstreams[nextIndex].id,
+    ]
+}
+
 struct ContentView: View {
     @StateObject private var projectList = ProjectList()
     @State private var selection: SidebarSelection? = SidebarSelection.loadSaved() ?? ContentView.initialSelection()
@@ -37,7 +54,7 @@ struct ContentView: View {
     @StateObject private var updateChecker = UpdateChecker()
     @EnvironmentObject private var updater: Updater
     @State private var saveWork: DispatchWorkItem?
-    @State private var visitedWorkstreamIDs: Set<UUID> = []
+    @State private var mountedWorkstreamIDs: Set<UUID> = []
     @State private var workstreamToRemove: UUID?
     @State private var workstreamToPurge: UUID?
     @State private var purgeWarningMessage: String?
@@ -76,13 +93,15 @@ struct ContentView: View {
         return project.workstreams.first(where: { $0.id == wsID })
     }
 
-    /// All workstreams across all projects that have a worktree ready and have been visited.
-    private var visitedReadyWorkstreams: [(workstream: Workstream, project: Project)] {
-        projects.flatMap { project in
-            project.workstreams
-                .filter { $0.worktreePath != nil && visitedWorkstreamIDs.contains($0.id) }
-                .map { (workstream: $0, project: project) }
+    private var mountedReadyWorkstreams: [(workstream: Workstream, project: Project)] {
+        guard let project = activeProject else { return [] }
+        var ids = mountedWorkstreamIDs
+        if let activeID = activeWorkstream?.id {
+            ids.insert(activeID)
         }
+        return project.workstreams
+            .filter { $0.worktreePath != nil && ids.contains($0.id) }
+            .map { (workstream: $0, project: project) }
     }
 
     @ViewBuilder
@@ -131,7 +150,7 @@ struct ContentView: View {
 
     private var workstreamZStack: some View {
         ZStack {
-            ForEach(visitedReadyWorkstreams, id: \.workstream.id) { entry in
+            ForEach(mountedReadyWorkstreams, id: \.workstream.id) { entry in
                 let isActive = activeWorkstream?.id == entry.workstream.id
                 TerminalContainerView(
                     workstreamID: entry.workstream.id,
@@ -176,7 +195,7 @@ struct ContentView: View {
                     }
                 }
                 projects.removeAll()
-                visitedWorkstreamIDs.removeAll()
+                mountedWorkstreamIDs.removeAll()
                 selectionBeforeSettings = nil
                 selection = .settings
                 ProjectStore.save([])
@@ -247,7 +266,7 @@ struct ContentView: View {
                     if let project = projects.first(where: { $0.id == id }) {
                         for ws in project.workstreams {
                             surfaceCache.removeWorkstreamSurfaces(for: ws.id)
-                            visitedWorkstreamIDs.remove(ws.id)
+                            mountedWorkstreamIDs.remove(ws.id)
                         }
                     }
                 }
@@ -270,10 +289,7 @@ struct ContentView: View {
                 if newValue != .settings && newValue != .help {
                     newValue?.save()
                 }
-                // Track visited workstreams for the lazy ZStack
-                if let wsID = newValue?.workstreamID {
-                    visitedWorkstreamIDs.insert(wsID)
-                }
+                updateMountedWorkstreams(for: newValue)
             }
             .onKeyPress(.escape) {
                 if selection == .settings || selection == .help {
@@ -312,10 +328,7 @@ struct ContentView: View {
         .environmentObject(updateChecker)
         .environmentObject(updater)
         .onAppear {
-            // Seed the initial selection into visited set
-            if let wsID = selection?.workstreamID {
-                visitedWorkstreamIDs.insert(wsID)
-            }
+            updateMountedWorkstreams(for: selection)
             appEnvironment.refresh()
             appEnvironment.refreshAllRepoInfo(projects: projects)
             appEnvironment.refreshPathValidity(projects: projects)
@@ -508,7 +521,7 @@ struct ContentView: View {
         guard let wsID = workstreamToRemove,
               let projectIndex = projects.firstIndex(where: { $0.workstreams.contains(where: { $0.id == wsID }) }) else { return }
         WorkstreamArchiver.remove(wsID, in: &projects[projectIndex], surfaceCache: surfaceCache, tmuxPath: appEnvironment.toolStatus.tmux.path)
-        visitedWorkstreamIDs.remove(wsID)
+        mountedWorkstreamIDs.remove(wsID)
         ProjectStore.save(projects)
         workstreamToRemove = nil
     }
@@ -517,9 +530,27 @@ struct ContentView: View {
         guard let wsID = workstreamToPurge,
               let projectIndex = projects.firstIndex(where: { $0.workstreams.contains(where: { $0.id == wsID }) }) else { return }
         WorkstreamArchiver.purge(wsID, in: &projects[projectIndex], surfaceCache: surfaceCache, tmuxPath: appEnvironment.toolStatus.tmux.path)
-        visitedWorkstreamIDs.remove(wsID)
+        mountedWorkstreamIDs.remove(wsID)
         ProjectStore.save(projects)
         workstreamToPurge = nil
+    }
+
+    private func updateMountedWorkstreams(for selection: SidebarSelection?) {
+        guard let workstreamID = selection?.workstreamID,
+              let project = projects.first(where: { $0.workstreams.contains(where: { $0.id == workstreamID }) })
+        else {
+            mountedWorkstreamIDs.removeAll()
+            return
+        }
+
+        let ids = workstreamIDsAroundSelection(in: project, selectedWorkstreamID: workstreamID)
+        mountedWorkstreamIDs = mountedWorkstreamIDs
+            .intersection(ids)
+            .union([workstreamID])
+
+        DispatchQueue.main.async {
+            mountedWorkstreamIDs = ids
+        }
     }
 }
 

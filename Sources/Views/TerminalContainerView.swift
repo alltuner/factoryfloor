@@ -665,7 +665,6 @@ struct TerminalContainerView: View {
             .onChange(of: isActive) { _, active in
                 if active {
                     surfaceCache.updateOcclusion(visibleSurfaceIDs: visibleSurfaceIDs)
-                    appEnv.refreshWorktreeState(for: workingDirectory, projectDirectory: projectDirectory)
                 } else {
                     surfaceCache.saveTabSnapshot(for: workstreamID, snapshot: currentTabSnapshot())
                 }

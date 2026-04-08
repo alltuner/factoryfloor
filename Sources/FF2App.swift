@@ -44,6 +44,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCent
     }
 
     func applicationDidFinishLaunching(_: Notification) {
+        guard !isRunningXCTest() else { return }
+
         // Debug settings should not persist across launches
         UserDefaults.standard.set(false, forKey: "factoryfloor.quickActionDebug")
 
@@ -107,6 +109,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCent
     }
 
     func applicationWillTerminate(_: Notification) {
+        guard !isRunningXCTest() else { return }
+
         let tmuxPath = ToolStatus.detect().tmux.path
         if let tmuxPath {
             TmuxSession.killAllSessions(tmuxPath: tmuxPath)
@@ -142,6 +146,8 @@ struct FF2App: App {
     @State private var pendingURLDirectory: String?
 
     init() {
+        guard !isRunningXCTest() else { return }
+
         let crashReportingEnabled = UserDefaults.standard.object(forKey: "factoryfloor.crashReportingEnabled") as? Bool ?? true
         if crashReportingEnabled {
             SentrySDK.start { options in
@@ -189,43 +195,47 @@ struct FF2App: App {
 
     var body: some Scene {
         Window(AppConstants.appName, id: "main") {
-            ContentView()
-                .environmentObject(updater)
-                .onAppear {
-                    Telemetry.shared.trackLaunch()
-                    if let dir = Self.launchDirectory {
-                        DispatchQueue.main.async {
-                            NotificationCenter.default.post(name: .openDirectory, object: dir)
+            if isRunningXCTest() {
+                EmptyView()
+            } else {
+                ContentView()
+                    .environmentObject(updater)
+                    .onAppear {
+                        Telemetry.shared.trackLaunch()
+                        if let dir = Self.launchDirectory {
+                            DispatchQueue.main.async {
+                                NotificationCenter.default.post(name: .openDirectory, object: dir)
+                            }
                         }
                     }
-                }
-                .onOpenURL { url in
-                    guard url.scheme == AppConstants.urlScheme else { return }
-                    let path = url.path
-                    guard !path.isEmpty else { return }
-                    var isDir: ObjCBool = false
-                    guard FileManager.default.fileExists(atPath: path, isDirectory: &isDir), isDir.boolValue else { return }
-                    pendingURLDirectory = path
-                }
-                .alert(
-                    Text("Open Directory"),
-                    isPresented: Binding(
-                        get: { pendingURLDirectory != nil },
-                        set: { if !$0 { pendingURLDirectory = nil } }
-                    )
-                ) {
-                    Button("Allow") {
-                        if let path = pendingURLDirectory {
-                            NotificationCenter.default.post(name: .openDirectory, object: path)
+                    .onOpenURL { url in
+                        guard url.scheme == AppConstants.urlScheme else { return }
+                        let path = url.path
+                        guard !path.isEmpty else { return }
+                        var isDir: ObjCBool = false
+                        guard FileManager.default.fileExists(atPath: path, isDirectory: &isDir), isDir.boolValue else { return }
+                        pendingURLDirectory = path
+                    }
+                    .alert(
+                        Text("Open Directory"),
+                        isPresented: Binding(
+                            get: { pendingURLDirectory != nil },
+                            set: { if !$0 { pendingURLDirectory = nil } }
+                        )
+                    ) {
+                        Button("Allow") {
+                            if let path = pendingURLDirectory {
+                                NotificationCenter.default.post(name: .openDirectory, object: path)
+                            }
+                            pendingURLDirectory = nil
                         }
-                        pendingURLDirectory = nil
+                        Button("Cancel", role: .cancel) {
+                            pendingURLDirectory = nil
+                        }
+                    } message: {
+                        Text("An external application wants to open \(pendingURLDirectory ?? "") in \(AppConstants.appName).")
                     }
-                    Button("Cancel", role: .cancel) {
-                        pendingURLDirectory = nil
-                    }
-                } message: {
-                    Text("An external application wants to open \(pendingURLDirectory ?? "") in \(AppConstants.appName).")
-                }
+            }
         }
         .defaultSize(width: 1200, height: 800)
         .commands {
