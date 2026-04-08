@@ -157,8 +157,8 @@ struct ContentView: View {
                     initialTabState: initialTabState
                 )
                 .id(workstreamID)
-                .navigationTitle(workstream.name)
-                .navigationSubtitle(appEnvironment.taskDescription(for: workstream.worktreePath) ?? project.name)
+                .navigationTitle(appEnvironment.taskDescription(for: workstream.worktreePath) ?? workstream.name)
+                .navigationSubtitle(workstreamSubtitle(project: project, workstream: workstream))
             } else {
                 VStack(spacing: 12) {
                     ProgressView()
@@ -167,8 +167,8 @@ struct ContentView: View {
                         .foregroundStyle(.secondary)
                 }
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
-                .navigationTitle(workstream.name)
-                .navigationSubtitle(appEnvironment.taskDescription(for: workstream.worktreePath) ?? project.name)
+                .navigationTitle(appEnvironment.taskDescription(for: workstream.worktreePath) ?? workstream.name)
+                .navigationSubtitle(workstreamSubtitle(project: project, workstream: workstream))
             }
         } else if let project = activeProject,
                   let projectIndex = projects.firstIndex(where: { $0.id == project.id })
@@ -445,6 +445,14 @@ struct ContentView: View {
         .onReceive(Timer.publish(every: 6 * 60 * 60, on: .main, in: .common).autoconnect()) { _ in
             updateChecker.check()
         }
+    }
+
+    private func workstreamSubtitle(project: Project, workstream: Workstream) -> String {
+        let branch = appEnvironment.branchName(for: workstream.worktreePath)
+        if let branch {
+            return "\(project.name) · \(branch)"
+        }
+        return project.name
     }
 
     private func openExternalTerminal() {

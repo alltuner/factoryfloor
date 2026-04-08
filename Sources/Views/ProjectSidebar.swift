@@ -610,13 +610,13 @@ extension FileManager {
     }
 }
 
-private func copyTextToPasteboard(_ text: String) {
+func copyTextToPasteboard(_ text: String) {
     NSPasteboard.general.clearContents()
     NSPasteboard.general.setString(text, forType: .string)
 }
 
 /// Opens a directory in the user's configured terminal, falling back to Apple Terminal.
-private func openDirectoryInTerminal(_ directory: String) {
+func openDirectoryInTerminal(_ directory: String) {
     let terminalBundleID = UserDefaults.standard.string(forKey: "factoryfloor.defaultTerminal") ?? ""
     let appURL: URL?
     if !terminalBundleID.isEmpty {
@@ -756,15 +756,20 @@ private struct WorkstreamRow: View {
 
     @State private var isHovering = false
 
-    /// Subtext to display below the workstream name.
-    /// Priority: PR title (#number) > branch name (only if different from workstream name)
+    private var headline: String {
+        if let prTitle { return prTitle }
+        if let taskDescription { return taskDescription }
+        return name
+    }
+
+    private var hasRichHeadline: Bool {
+        prTitle != nil || taskDescription != nil
+    }
+
     private var subtitle: String? {
         guard isPathValid else { return nil }
-        if let prTitle, let prNumber {
-            return "\(prTitle) #\(prNumber)"
-        }
-        if let taskDescription {
-            return taskDescription
+        if hasRichHeadline {
+            return branchName ?? name
         }
         if let branchName, branchName != name {
             return branchName
@@ -782,10 +787,11 @@ private struct WorkstreamRow: View {
 
             VStack(alignment: .leading, spacing: 1) {
                 HStack(spacing: 4) {
-                    Text(name)
+                    Text(headline)
                         .font(.system(.body))
                         .strikethrough(!isPathValid)
                         .foregroundStyle(isPathValid ? .primary : .secondary)
+                        .lineLimit(1)
                     if hasActivePort {
                         Image(systemName: "circle.fill")
                             .font(.system(size: 6))
@@ -802,7 +808,7 @@ private struct WorkstreamRow: View {
                         Text(subtitle)
                             .lineLimit(1)
                     }
-                    .font(.system(size: 10))
+                    .font(.system(size: 10, design: .monospaced))
                     .foregroundStyle(prState == "MERGED" ? AnyShapeStyle(.purple) : AnyShapeStyle(.tertiary))
                 }
             }

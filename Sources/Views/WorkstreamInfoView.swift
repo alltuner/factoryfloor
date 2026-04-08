@@ -36,13 +36,16 @@ struct WorkstreamInfoView: View {
                         Text(projectName)
                             .font(.system(size: 13))
                             .foregroundStyle(.secondary)
-                        Text(workstreamName)
-                            .font(.system(size: 22, weight: .bold, design: .monospaced))
                         if let desc = appEnv.taskDescription(for: workingDirectory), !desc.isEmpty {
                             Text(desc)
-                                .font(.system(size: 13))
-                                .foregroundStyle(.secondary)
+                                .font(.system(size: 22, weight: .bold))
                                 .multilineTextAlignment(.center)
+                            Text(workstreamName)
+                                .font(.system(size: 13, design: .monospaced))
+                                .foregroundStyle(.secondary)
+                        } else {
+                            Text(workstreamName)
+                                .font(.system(size: 22, weight: .bold, design: .monospaced))
                         }
                     }
                     .frame(maxWidth: .infinity)
