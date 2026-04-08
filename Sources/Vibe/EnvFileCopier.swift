@@ -85,8 +85,13 @@ enum EnvFileCopier {
                 let destDir = destination.deletingLastPathComponent()
                 try? fm.createDirectory(at: destDir, withIntermediateDirectories: true)
 
-                // Skip if destination already exists
-                guard !fm.fileExists(atPath: destination.path) else { continue }
+                // If destination is a symlink (from upstream), replace with a copy
+                let attrs = try? fm.attributesOfItem(atPath: destination.path)
+                if attrs?[.type] as? FileAttributeType == .typeSymbolicLink {
+                    try? fm.removeItem(at: destination)
+                } else if fm.fileExists(atPath: destination.path) {
+                    continue
+                }
 
                 do {
                     try fm.copyItem(at: item, to: destination)

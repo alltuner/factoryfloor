@@ -124,12 +124,14 @@ struct SettingsView: View {
                                     .replacingOccurrences(of: "--", with: "-")
                                 let trimmed = filtered.trimmingCharacters(in: CharacterSet(charactersIn: "-"))
                                 branchPrefix = trimmed
+                                // Explicit write to ensure empty strings persist in UserDefaults
+                                UserDefaults.standard.set(trimmed, forKey: "factoryfloor.branchPrefix")
                             }
                         ))
                         .textFieldStyle(.roundedBorder)
                         .frame(maxWidth: 150)
                     }
-                    Text("e.g. \(branchPrefix.isEmpty ? "ff" : branchPrefix)/deploy-ludicrous-speed")
+                    Text("e.g. \(branchPrefix.isEmpty ? "" : "\(branchPrefix)/")deploy-ludicrous-speed")
                         .font(.system(.caption, design: .monospaced))
                         .foregroundStyle(.tertiary)
                 }

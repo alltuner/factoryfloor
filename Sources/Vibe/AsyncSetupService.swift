@@ -208,6 +208,22 @@ actor AsyncSetupService {
         }
     }
 
+    /// Run background setup on a worktree that was already created externally.
+    /// Use this when the worktree was created by upstream GitOperations
+    /// and we just need to run the vibe-specific setup steps.
+    func setupExistingWorktree(
+        workstreamID: UUID,
+        projectPath: String,
+        worktreePath: String
+    ) async {
+        await updateState(for: workstreamID, to: .inProgress(step: "Setting up workspace", progress: 0.2))
+        await runBackgroundSetup(
+            workstreamID: workstreamID,
+            projectPath: projectPath,
+            worktreePath: worktreePath
+        )
+    }
+
     /// Remove tracked state for a workstream (cleanup after archiving).
     func clearState(for workstreamID: UUID) {
         states.removeValue(forKey: workstreamID)

@@ -334,6 +334,15 @@ struct ContentView: View {
                     ProjectStore.save(projects)
                     appEnvironment.refreshPathValidity(projects: projects)
                     logger.warning("[FF] workstreamWorktreeReady: updated \(workstreamID, privacy: .public) with path \(worktreePath, privacy: .public)")
+                    // Trigger vibe background setup (env copy, symlinks, Claude settings, deps)
+                    let projectPath = projects[pi].directory
+                    Task {
+                        await AsyncSetupService.shared.setupExistingWorktree(
+                            workstreamID: workstreamID,
+                            projectPath: projectPath,
+                            worktreePath: worktreePath
+                        )
+                    }
                     return
                 }
             }
