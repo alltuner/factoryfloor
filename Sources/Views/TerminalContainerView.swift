@@ -138,6 +138,54 @@ struct WorkspaceTabSnapshot {
     }
 }
 
+func startupWorkspaceTabState(snapshot: WorkspaceTabSnapshot?, savedTab: RestorableWorkspaceTab?, hasEnvironmentTab: Bool) -> WorkspaceTabSnapshot {
+    if var snapshot {
+        if hasEnvironmentTab && !snapshot.tabs.contains(.environment) {
+            snapshot.tabs.insert(.environment, at: min(2, snapshot.tabs.count))
+        }
+        return snapshot
+    }
+
+    var tabs: [WorkspaceTab] = [.info, .agent]
+    if hasEnvironmentTab {
+        tabs.append(.environment)
+    }
+    return WorkspaceTabSnapshot(
+        tabs: tabs,
+        terminalCount: 0,
+        browserCount: 0,
+        activeTab: (savedTab ?? .info).workspaceTab(hasEnvironmentTab: hasEnvironmentTab),
+        browserTitles: [:],
+        terminalTitles: [:],
+        runStarted: false,
+        runStoppedManually: false
+    )
+}
+
+func workspaceEnvironmentVariables(
+    workstreamID: UUID,
+    projectName: String,
+    workstreamName: String,
+    projectDirectory: String,
+    workingDirectory: String,
+    port: Int,
+    agentTeams: Bool,
+    defaultBranch: String,
+    scriptSource: String?
+) -> [String: String] {
+    WorkstreamEnvironment.variables(
+        workstreamID: workstreamID,
+        projectName: projectName,
+        workstreamName: workstreamName,
+        projectDirectory: projectDirectory,
+        workingDirectory: workingDirectory,
+        port: port,
+        agentTeams: agentTeams,
+        defaultBranch: defaultBranch,
+        scriptSource: scriptSource
+    )
+}
+
 enum TerminalSessionMode: Equatable {
     case standard
     case tmux
@@ -185,7 +233,19 @@ struct TerminalContainerView: View {
     @StateObject private var portDetector: PortDetector
     @State private var runStoppedManually = false
     @State private var runStarted = false
-    init(workstreamID: UUID, workingDirectory: String, projectDirectory: String, projectName: String, workstreamName: String, bypassPermissions: Bool, isActive: Bool) {
+    @State private var workspaceStarted = false
+    @State private var defaultBranch = "main"
+    init(
+        workstreamID: UUID,
+        workingDirectory: String,
+        projectDirectory: String,
+        projectName: String,
+        workstreamName: String,
+        bypassPermissions: Bool,
+        isActive: Bool,
+        scriptConfig: ScriptConfig = .empty,
+        initialTabState: WorkspaceTabSnapshot = startupWorkspaceTabState(snapshot: nil, savedTab: nil, hasEnvironmentTab: false)
+    ) {
         self.workstreamID = workstreamID
         self.workingDirectory = workingDirectory
         self.projectDirectory = projectDirectory
@@ -193,6 +253,15 @@ struct TerminalContainerView: View {
         self.workstreamName = workstreamName
         self.bypassPermissions = bypassPermissions
         self.isActive = isActive
+        _activeTab = State(initialValue: initialTabState.activeTab)
+        _tabs = State(initialValue: initialTabState.tabs)
+        _terminalCount = State(initialValue: initialTabState.terminalCount)
+        _browserCount = State(initialValue: initialTabState.browserCount)
+        _scriptConfig = State(initialValue: scriptConfig)
+        _browserTitles = State(initialValue: initialTabState.browserTitles)
+        _terminalTitles = State(initialValue: initialTabState.terminalTitles)
+        _runStoppedManually = State(initialValue: initialTabState.runStoppedManually)
+        _runStarted = State(initialValue: initialTabState.runStarted)
         _portDetector = StateObject(wrappedValue: PortDetector(workstreamID: workstreamID))
     }
 
@@ -523,44 +592,19 @@ struct TerminalContainerView: View {
                 QuickActionDebugView(runner: quickActionRunner)
             }
         }
-        .onAppear {
-            quickActionRunner.onSuccess = { action in
-                appEnv.refreshWorktreeState(for: workingDirectory, projectDirectory: projectDirectory)
-                if let branch = appEnv.branchName(for: workingDirectory) {
-                    if action == .abandonPR {
-                        appEnv.clearBranchPR(for: projectDirectory, branch: branch)
-                    }
-                    if action == .createPR || action == .abandonPR {
-                        appEnv.refreshGitHubInfo(for: projectDirectory, branch: branch)
-                    }
-                }
+        .task(id: workstreamID) {
+            try? await Task.sleep(nanoseconds: 50_000_000)
+            guard !Task.isCancelled else { return }
+            let branch = await Task.detached {
+                GitOperations.defaultBranch(at: projectDirectory)
+            }.value
+            guard !Task.isCancelled else { return }
+            await MainActor.run {
+                startWorkspace(defaultBranch: branch)
             }
-            appEnv.refreshWorktreeState(for: workingDirectory, projectDirectory: projectDirectory)
-            cachedClaudeCommand = buildClaudeCommand()
-            scriptConfig = ScriptConfig.load(from: projectDirectory)
-            surfaceCache.respawnableIDs.insert(claudeID)
-            if let snapshot = surfaceCache.restoreTabSnapshot(for: workstreamID) {
-                tabs = snapshot.tabs
-                terminalCount = snapshot.terminalCount
-                browserCount = snapshot.browserCount
-                activeTab = snapshot.activeTab
-                browserTitles = snapshot.browserTitles
-                terminalTitles = snapshot.terminalTitles
-                runStarted = snapshot.runStarted
-                runStoppedManually = snapshot.runStoppedManually
-                if scriptConfig.hasAnyScript && !tabs.contains(.environment) {
-                    tabs.insert(.environment, at: 2)
-                }
-            } else {
-                if scriptConfig.hasAnyScript && !tabs.contains(.environment) {
-                    tabs.insert(.environment, at: 2)
-                }
-                activeTab = restoredActiveTab()
-            }
-            preloadSurfaces()
-            surfaceCache.updateOcclusion(visibleSurfaceIDs: visibleSurfaceIDs)
         }
         .onDisappear {
+            guard workspaceStarted else { return }
             surfaceCache.saveTabSnapshot(for: workstreamID, snapshot: currentTabSnapshot())
         }
         .onChange(of: activeTab) {
@@ -792,10 +836,26 @@ struct TerminalContainerView: View {
         draggedCustomTab = nil
     }
 
-    private func restoredActiveTab() -> WorkspaceTab {
-        let hasEnvironmentTab = scriptConfig.hasAnyScript
-        guard let savedTab = WorkspaceStateStore.load(for: workstreamID) else { return .info }
-        return savedTab.workspaceTab(hasEnvironmentTab: hasEnvironmentTab)
+    @MainActor
+    private func startWorkspace(defaultBranch: String) {
+        workspaceStarted = true
+        self.defaultBranch = defaultBranch
+        quickActionRunner.onSuccess = { action in
+            appEnv.refreshWorktreeState(for: workingDirectory, projectDirectory: projectDirectory)
+            if let branch = appEnv.branchName(for: workingDirectory) {
+                if action == .abandonPR {
+                    appEnv.clearBranchPR(for: projectDirectory, branch: branch)
+                }
+                if action == .createPR || action == .abandonPR {
+                    appEnv.refreshGitHubInfo(for: projectDirectory, branch: branch)
+                }
+            }
+        }
+        appEnv.refreshWorktreeState(for: workingDirectory, projectDirectory: projectDirectory)
+        cachedClaudeCommand = buildClaudeCommand()
+        surfaceCache.respawnableIDs.insert(claudeID)
+        preloadSurfaces()
+        surfaceCache.updateOcclusion(visibleSurfaceIDs: visibleSurfaceIDs)
     }
 
     /// Pre-create terminal surfaces so they start running before their tab is visible.
@@ -846,7 +906,7 @@ struct TerminalContainerView: View {
     }
 
     private var envVars: [String: String] {
-        WorkstreamEnvironment.variables(
+        workspaceEnvironmentVariables(
             workstreamID: workstreamID,
             projectName: projectName,
             workstreamName: workstreamName,
@@ -854,7 +914,7 @@ struct TerminalContainerView: View {
             workingDirectory: workingDirectory,
             port: workstreamPort,
             agentTeams: agentTeams,
-            defaultBranch: GitOperations.defaultBranch(at: projectDirectory),
+            defaultBranch: defaultBranch,
             scriptSource: scriptConfig.source
         )
     }
