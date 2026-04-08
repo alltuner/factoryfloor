@@ -1,5 +1,20 @@
 # Changelog
 
+## [0.1.67](https://github.com/alltuner/factoryfloor/compare/v0.1.66...v0.1.67) (2026-04-08)
+
+
+### Features
+
+* add German (de) localization for app and website ([#383](https://github.com/alltuner/factoryfloor/issues/383)) ([20d82a8](https://github.com/alltuner/factoryfloor/commit/20d82a8bf871d281ab2abf7bfcb7d8a775a39227))
+* prioritize task description over generated name across all views ([#380](https://github.com/alltuner/factoryfloor/issues/380)) ([45e66d4](https://github.com/alltuner/factoryfloor/commit/45e66d46393ab143aa6ec6fefe60ab8b44cbed7c))
+* setup script as blocking gate, tmux restore, menu cleanup ([#382](https://github.com/alltuner/factoryfloor/issues/382)) ([15d74b1](https://github.com/alltuner/factoryfloor/commit/15d74b19c6fbbd8c593e178792d4166fb4a4c7d1))
+
+
+### Bug Fixes
+
+* remove web-browser entitlement that requires Apple approval ([#378](https://github.com/alltuner/factoryfloor/issues/378)) ([31c0578](https://github.com/alltuner/factoryfloor/commit/31c0578f862b7e49dda044be1f8b7c9a3c2d4456))
+* set manual signing and remove redundant debug entitlements ([#381](https://github.com/alltuner/factoryfloor/issues/381)) ([2881455](https://github.com/alltuner/factoryfloor/commit/28814551982b8ce72d4e6fe6cb94aa4a8a06b0c8))
+
 ## [0.1.66](https://github.com/alltuner/factoryfloor/compare/v0.1.65...v0.1.66) (2026-04-08)
 
 
