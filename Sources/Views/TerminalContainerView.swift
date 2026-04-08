@@ -620,6 +620,10 @@ struct TerminalContainerView: View {
                 guard isActive else { return }
                 if tabs.contains(.environment) { activeTab = .environment }
             }
+            .onReceive(NotificationCenter.default.publisher(for: .rerunScript)) { _ in
+                guard isActive else { return }
+                if tabs.contains(.environment) { activeTab = .environment }
+            }
             .onReceive(NotificationCenter.default.publisher(for: .toggleTerminal)) { _ in
                 guard isActive else { return }
                 addTerminal()
