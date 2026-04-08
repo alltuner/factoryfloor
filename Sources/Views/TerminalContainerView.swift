@@ -204,6 +204,13 @@ enum TerminalSessionMode: Equatable {
     }
 }
 
+enum SetupGateState: Equatable {
+    case notNeeded
+    case running
+    case failed
+    case completed
+}
+
 struct TerminalContainerView: View {
     let workstreamID: UUID
     let workingDirectory: String
@@ -235,6 +242,7 @@ struct TerminalContainerView: View {
     @State private var runStarted = false
     @State private var workspaceStarted = false
     @State private var defaultBranch = "main"
+    @State private var setupGateState: SetupGateState = .notNeeded
     init(
         workstreamID: UUID,
         workingDirectory: String,
@@ -269,6 +277,14 @@ struct TerminalContainerView: View {
         workstreamID
     }
 
+    private var setupGateID: UUID {
+        derivedUUID(from: workstreamID, salt: "setup-gate")
+    }
+
+    private var setupExitCodePath: String {
+        NSTemporaryDirectory() + "ff-setup-\(workstreamID.uuidString)"
+    }
+
     private var quickActionRunner: QuickActionRunner {
         surfaceCache.quickActionRunner(for: workstreamID)
     }
@@ -277,7 +293,11 @@ struct TerminalContainerView: View {
     /// Returns nil for the environment tab (env surface IDs are managed internally).
     private var visibleSurfaceIDs: Set<UUID>? {
         switch activeTab {
-        case .agent: return [claudeID]
+        case .agent:
+            if setupGateState == .running || setupGateState == .failed {
+                return [setupGateID]
+            }
+            return [claudeID]
         case let .terminal(id): return [id]
         case .info, .browser: return []
         case .environment: return nil
@@ -489,7 +509,11 @@ struct TerminalContainerView: View {
                 scriptConfig: scriptConfig
             )
         case .agent:
-            if sessionMode == .waitingForTools || appEnv.isDetecting {
+            if setupGateState == .running {
+                setupGateRunningView
+            } else if setupGateState == .failed {
+                setupGateFailedView
+            } else if sessionMode == .waitingForTools || appEnv.isDetecting {
                 terminalLoadingView(message: "Checking terminal tools...")
             } else if appEnv.toolStatus.claude.path == nil {
                 VStack(spacing: 16) {
@@ -641,6 +665,10 @@ struct TerminalContainerView: View {
             }
             .onReceive(NotificationCenter.default.publisher(for: .terminalTabExited)) { notification in
                 guard let surfaceID = notification.object as? UUID else { return }
+                if surfaceID == setupGateID {
+                    handleSetupGateExited()
+                    return
+                }
                 if let tab = tabs.first(where: {
                     if case let .terminal(id) = $0 { return id == surfaceID }
                     return false
@@ -853,7 +881,13 @@ struct TerminalContainerView: View {
         }
         appEnv.refreshWorktreeState(for: workingDirectory, projectDirectory: projectDirectory)
         cachedClaudeCommand = buildClaudeCommand()
-        surfaceCache.respawnableIDs.insert(claudeID)
+        if scriptConfig.setup != nil {
+            setupGateState = .running
+            surfaceCache.retainedSurfaceIDs.insert(setupGateID)
+        } else {
+            setupGateState = .notNeeded
+            surfaceCache.respawnableIDs.insert(claudeID)
+        }
         preloadSurfaces()
         surfaceCache.updateOcclusion(visibleSurfaceIDs: visibleSurfaceIDs)
     }
@@ -863,29 +897,38 @@ struct TerminalContainerView: View {
         guard sessionMode != .waitingForTools else { return }
         guard let app = TerminalApp.shared.app else { return }
 
-        // Agent surface
-        if let cmd = cachedClaudeCommand {
-            _ = surfaceCache.surface(
-                for: claudeID,
-                app: app,
-                workingDirectory: workingDirectory,
-                command: cmd,
-                environmentVars: envVars
-            )
+        if setupGateState == .running {
+            // Setup gate: only preload setup surface, agent waits.
+            if let cmd = buildSetupGateCommand() {
+                _ = surfaceCache.surface(
+                    for: setupGateID,
+                    app: app,
+                    workingDirectory: workingDirectory,
+                    command: cmd,
+                    environmentVars: terminalEnvVars
+                )
+            }
+        } else {
+            // Agent surface
+            if let cmd = cachedClaudeCommand {
+                _ = surfaceCache.surface(
+                    for: claudeID,
+                    app: app,
+                    workingDirectory: workingDirectory,
+                    command: cmd,
+                    environmentVars: envVars
+                )
+            }
         }
+    }
 
-        // Environment script surfaces
-        if let setup = scriptConfig.setup {
-            let setupID = derivedUUID(from: workstreamID, salt: "env-setup-0")
-            let cmd = buildEnvironmentCommand(script: setup, role: "setup")
-            _ = surfaceCache.surface(
-                for: setupID,
-                app: app,
-                workingDirectory: workingDirectory,
-                command: cmd,
-                environmentVars: terminalEnvVars
-            )
-        }
+    private func buildSetupGateCommand() -> String? {
+        guard let setup = scriptConfig.setup else { return nil }
+        let inner = scriptCommand(script: setup, role: "setup")
+        let exitFile = CommandBuilder.shellQuote(setupExitCodePath)
+        let wrapped = "\(inner); EXIT_CODE=$?; printf '%d' \"$EXIT_CODE\" > \(exitFile); exit $EXIT_CODE"
+        let shell = CommandBuilder.userShell
+        return "\(shell) -lic \(CommandBuilder.shellQuote(wrapped, forShell: shell))"
     }
 
     private func buildEnvironmentCommand(script: String, role: String) -> String {
@@ -917,6 +960,89 @@ struct TerminalContainerView: View {
             defaultBranch: defaultBranch,
             scriptSource: scriptConfig.source
         )
+    }
+
+    private var setupGateRunningView: some View {
+        VStack(spacing: 0) {
+            HStack(spacing: 6) {
+                ProgressView()
+                    .controlSize(.small)
+                Text("Running setup...")
+                    .font(.system(size: 11))
+                    .foregroundStyle(.secondary)
+                Spacer()
+            }
+            .padding(.horizontal, 8)
+            .padding(.vertical, 4)
+            .background(.bar)
+            Divider()
+            SingleTerminalView(
+                surfaceID: setupGateID,
+                workingDirectory: workingDirectory,
+                command: buildSetupGateCommand() ?? "",
+                isFocused: true,
+                environmentVars: terminalEnvVars
+            )
+        }
+    }
+
+    private var setupGateFailedView: some View {
+        VStack(spacing: 0) {
+            HStack(spacing: 6) {
+                Image(systemName: "exclamationmark.triangle.fill")
+                    .foregroundStyle(.yellow)
+                    .font(.system(size: 11))
+                Text("Setup failed.")
+                    .font(.system(size: 11))
+                    .foregroundStyle(.secondary)
+                Spacer()
+                Button("Continue to Agent") {
+                    launchAgentAfterSetup()
+                }
+                .controlSize(.small)
+            }
+            .padding(.horizontal, 8)
+            .padding(.vertical, 4)
+            .background(.bar)
+            Divider()
+            SingleTerminalView(
+                surfaceID: setupGateID,
+                workingDirectory: workingDirectory,
+                command: buildSetupGateCommand() ?? "",
+                isFocused: false,
+                environmentVars: terminalEnvVars
+            )
+        }
+    }
+
+    private func handleSetupGateExited() {
+        guard setupGateState == .running else { return }
+        let exitCode = readSetupExitCode()
+        try? FileManager.default.removeItem(atPath: setupExitCodePath)
+        if exitCode == 0 {
+            launchAgentAfterSetup()
+        } else {
+            setupGateState = .failed
+        }
+    }
+
+    private func readSetupExitCode() -> Int32 {
+        guard let data = FileManager.default.contents(atPath: setupExitCodePath),
+              let str = String(data: data, encoding: .utf8)?.trimmingCharacters(in: .whitespacesAndNewlines),
+              let code = Int32(str)
+        else {
+            return 1
+        }
+        return code
+    }
+
+    private func launchAgentAfterSetup() {
+        surfaceCache.retainedSurfaceIDs.remove(setupGateID)
+        surfaceCache.removeSurface(for: setupGateID)
+        setupGateState = .completed
+        surfaceCache.respawnableIDs.insert(claudeID)
+        preloadSurfaces()
+        surfaceCache.updateOcclusion(visibleSurfaceIDs: visibleSurfaceIDs)
     }
 
     private func terminalLoadingView(message: String) -> some View {
@@ -1417,6 +1543,8 @@ final class TerminalSurfaceCache: ObservableObject {
     private var quickActionRunners: [UUID: QuickActionRunner] = [:]
     /// Surface IDs that should respawn when closed (e.g., the agent).
     var respawnableIDs: Set<UUID> = []
+    /// Surface IDs that should not be removed when their process exits.
+    var retainedSurfaceIDs: Set<UUID> = []
     /// Guards against concurrent respawns for the same surface ID.
     private var respawning = Set<UUID>()
     /// Surface IDs where creation failed, with the command that was attempted.
@@ -1589,6 +1717,9 @@ final class TerminalSurfaceCache: ObservableObject {
                 logger.detailed("Respawned surface \(id)")
             }
             objectWillChange.send()
+        } else if retainedSurfaceIDs.contains(id) {
+            // Retained surfaces stay alive after process exit (e.g., setup gate).
+            NotificationCenter.default.post(name: .terminalTabExited, object: id)
         } else if diedImmediately {
             // Terminal tab died immediately: show error instead of closing the tab.
             let command = surfaceParams[id]?.command ?? "(default shell)"

@@ -255,10 +255,13 @@
 "Report a Bug" = "Reporta un error";
 "Documentation" = "Documentació";
 "Request a Feature" = "Suggereix una funcionalitat";
-"Rebuild" = "Reconstruir";
 "Rerun" = "Reexecutar";
 "Start" = "Iniciar";
 "Stop" = "Atura";
+
+"Running setup..." = "Executant la configuració inicial...";
+"Setup failed." = "La configuració inicial ha fallat.";
+"Continue to Agent" = "Continuar a l'Agent";
 
 "Restarting..." = "Reiniciant...";
 "Preparing workstream..." = "Preparant el flux de treball...";

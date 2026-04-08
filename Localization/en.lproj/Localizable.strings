@@ -255,10 +255,13 @@
 "Report a Bug" = "Report a Bug";
 "Documentation" = "Documentation";
 "Request a Feature" = "Request a Feature";
-"Rebuild" = "Rebuild";
 "Rerun" = "Rerun";
 "Start" = "Start";
 "Stop" = "Stop";
+
+"Running setup..." = "Running setup...";
+"Setup failed." = "Setup failed.";
+"Continue to Agent" = "Continue to Agent";
 
 "Restarting..." = "Restarting...";
 "Preparing workstream..." = "Preparing workstream...";

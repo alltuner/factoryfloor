@@ -255,10 +255,13 @@
 "Report a Bug" = "Rapportera en bugg";
 "Documentation" = "Dokumentation";
 "Request a Feature" = "Föreslå en funktion";
-"Rebuild" = "Bygg om";
 "Rerun" = "Kör igen";
 "Start" = "Starta";
 "Stop" = "Stoppa";
+
+"Running setup..." = "Kör konfiguration...";
+"Setup failed." = "Konfigurationen misslyckades.";
+"Continue to Agent" = "Fortsätt till Agenten";
 
 "Restarting..." = "Startar om...";
 "Preparing workstream..." = "Förbereder arbetsflöde...";

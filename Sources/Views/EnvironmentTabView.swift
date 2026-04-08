@@ -1,5 +1,5 @@
-// ABOUTME: Split-pane view for setup and run scripts in the Environment tab.
-// ABOUTME: Shows terminals for each script, or instructions when scripts are not configured.
+// ABOUTME: View for the run script in the Environment tab.
+// ABOUTME: Shows a terminal for the run script, or instructions when not configured.
 
 import SwiftUI
 
@@ -30,14 +30,8 @@ struct EnvironmentTabView: View {
 
     @EnvironmentObject var surfaceCache: TerminalSurfaceCache
     @EnvironmentObject var appEnv: AppEnvironment
-    @State private var setupGeneration = 0
     @State private var runGeneration = 0
-    @State private var setupRestarting = false
     @State private var runRestarting = false
-
-    private var setupID: UUID {
-        derivedUUID(from: workstreamID, salt: "env-setup-\(setupGeneration)")
-    }
 
     private var runID: UUID {
         derivedUUID(from: workstreamID, salt: "env-run-\(runGeneration)")
@@ -58,89 +52,20 @@ struct EnvironmentTabView: View {
     }
 
     private var environmentContent: some View {
-        HSplitView {
-            scriptPane(
-                title: NSLocalizedString("Setup", comment: ""),
-                icon: "hammer",
-                restartLabel: NSLocalizedString("Rebuild", comment: ""),
-                shortcut: "",
-                script: scriptConfig.setup,
-                surfaceID: setupID,
-                tmuxRole: "setup",
-                restarting: setupRestarting,
-                onRestart: restartSetup
-            )
-
-            runPane()
-        }
-        .onReceive(NotificationCenter.default.publisher(for: .rebuildSetup)) { _ in
-            if scriptConfig.setup != nil { restartSetup() }
-        }
-        .onReceive(NotificationCenter.default.publisher(for: .rerunScript)) { _ in
-            if scriptConfig.run != nil {
-                if runStarted {
-                    restartRun()
-                } else {
-                    runStoppedManually = false
-                    runStarted = true
+        runPane()
+            .onReceive(NotificationCenter.default.publisher(for: .rerunScript)) { _ in
+                if scriptConfig.run != nil {
+                    if runStarted {
+                        restartRun()
+                    } else {
+                        runStoppedManually = false
+                        runStarted = true
+                    }
                 }
             }
-        }
-        .onAppear {
-            restoreRunState()
-        }
-    }
-
-    private func scriptPane(title: String, icon: String, restartLabel: String, shortcut: String, script: String?, surfaceID: UUID, tmuxRole: String, restarting: Bool, onRestart: @escaping () -> Void) -> some View {
-        VStack(spacing: 0) {
-            HStack {
-                Image(systemName: icon)
-                    .font(.system(size: 11))
-                    .foregroundStyle(.secondary)
-                Text(title)
-                    .font(.system(size: 12, weight: .semibold))
-
-                if let script {
-                    Text(script)
-                        .font(.system(size: 10, design: .monospaced))
-                        .foregroundStyle(.tertiary)
-                        .lineLimit(1)
-                        .truncationMode(.tail)
-                }
-
-                Spacer()
-
-                if script != nil {
-                    EnvActionButton(label: restartLabel, icon: "arrow.counterclockwise", shortcut: shortcut, action: onRestart)
-                }
+            .onAppear {
+                restoreRunState()
             }
-            .padding(.horizontal, 10)
-            .padding(.vertical, 6)
-            .background(.bar)
-
-            Divider()
-
-            if restarting {
-                VStack(spacing: 12) {
-                    ProgressView()
-                    Text("Restarting...")
-                        .font(.caption)
-                        .foregroundStyle(.secondary)
-                }
-                .frame(maxWidth: .infinity, maxHeight: .infinity)
-            } else if let script {
-                SingleTerminalView(
-                    surfaceID: surfaceID,
-                    workingDirectory: workingDirectory,
-                    command: envCommand(script: script, role: tmuxRole),
-                    isFocused: false,
-                    environmentVars: environmentVars
-                )
-                .id(surfaceID)
-            } else {
-                scriptInstructions(title: title)
-            }
-        }
     }
 
     @ViewBuilder
@@ -312,7 +237,7 @@ struct EnvironmentTabView: View {
         }
         let finalCommand = buildCommand(script: baseCommand, role: role)
 
-        let event = role == "run" ? "run-start" : "setup-start"
+        let event = "run-start"
         var intermediates = [script, baseCommand]
         if finalCommand != baseCommand {
             intermediates.append(finalCommand)
@@ -356,16 +281,6 @@ struct EnvironmentTabView: View {
         TmuxSession.killSession(tmuxPath: tmuxPath, sessionName: session)
     }
 
-    private func restartSetup() {
-        killTmuxSession(role: "setup")
-        surfaceCache.removeSurface(for: setupID)
-        setupRestarting = true
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
-            setupGeneration += 1
-            setupRestarting = false
-        }
-    }
-
     private func stopRun() {
         killTmuxSession(role: "run")
         surfaceCache.removeSurface(for: runID)
@@ -401,7 +316,6 @@ struct EnvironmentTabView: View {
 }
 
 extension Notification.Name {
-    static let rebuildSetup = Notification.Name("factoryfloor.rebuildSetup")
     static let rerunScript = Notification.Name("factoryfloor.rerunScript")
 }
 
