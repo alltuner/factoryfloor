@@ -110,11 +110,6 @@ final class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCent
 
     func applicationWillTerminate(_: Notification) {
         guard !isRunningXCTest() else { return }
-
-        let tmuxPath = ToolStatus.detect().tmux.path
-        if let tmuxPath {
-            TmuxSession.killAllSessions(tmuxPath: tmuxPath)
-        }
     }
 
     func applicationShouldTerminate(_: NSApplication) -> NSApplication.TerminateReply {
