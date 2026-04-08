@@ -37,6 +37,7 @@ struct ContentView: View {
     @StateObject private var updateChecker = UpdateChecker()
     @EnvironmentObject private var updater: Updater
     @State private var saveWork: DispatchWorkItem?
+    @State private var visitedWorkstreamIDs: Set<UUID> = []
     @State private var workstreamToRemove: UUID?
     @State private var workstreamToPurge: UUID?
     @State private var purgeWarningMessage: String?
@@ -75,6 +76,15 @@ struct ContentView: View {
         return project.workstreams.first(where: { $0.id == wsID })
     }
 
+    /// All workstreams across all projects that have a worktree ready and have been visited.
+    private var visitedReadyWorkstreams: [(workstream: Workstream, project: Project)] {
+        projects.flatMap { project in
+            project.workstreams
+                .filter { $0.worktreePath != nil && visitedWorkstreamIDs.contains($0.id) }
+                .map { (workstream: $0, project: project) }
+        }
+    }
+
     @ViewBuilder
     private var detailView: some View {
         if selection == .settings {
@@ -87,17 +97,9 @@ struct ContentView: View {
                 .navigationSubtitle(AppConstants.appName)
         } else if let workstream = activeWorkstream, let project = activeProject {
             if workstream.worktreePath != nil {
-                TerminalContainerView(
-                    workstreamID: workstream.id,
-                    workingDirectory: workstream.workingDirectory(projectDirectory: project.directory),
-                    projectDirectory: project.directory,
-                    projectName: project.name,
-                    workstreamName: workstream.name,
-                    bypassPermissions: workstream.bypassPermissions
-                )
-                .id(workstream.id)
-                .navigationTitle(workstream.name)
-                .navigationSubtitle(appEnvironment.taskDescription(for: workstream.worktreePath) ?? project.name)
+                workstreamZStack
+                    .navigationTitle(workstream.name)
+                    .navigationSubtitle(appEnvironment.taskDescription(for: workstream.worktreePath) ?? project.name)
             } else {
                 VStack(spacing: 12) {
                     ProgressView()
@@ -124,6 +126,26 @@ struct ContentView: View {
         } else {
             OnboardingView(toolStatus: appEnvironment.toolStatus, isDetecting: appEnvironment.isDetecting)
                 .navigationTitle(AppConstants.appName)
+        }
+    }
+
+    private var workstreamZStack: some View {
+        ZStack {
+            ForEach(visitedReadyWorkstreams, id: \.workstream.id) { entry in
+                let isActive = activeWorkstream?.id == entry.workstream.id
+                TerminalContainerView(
+                    workstreamID: entry.workstream.id,
+                    workingDirectory: entry.workstream.workingDirectory(projectDirectory: entry.project.directory),
+                    projectDirectory: entry.project.directory,
+                    projectName: entry.project.name,
+                    workstreamName: entry.workstream.name,
+                    bypassPermissions: entry.workstream.bypassPermissions,
+                    isActive: isActive
+                )
+                .opacity(isActive ? 1 : 0)
+                .allowsHitTesting(isActive)
+                .accessibilityHidden(!isActive)
+            }
         }
     }
 
@@ -154,6 +176,7 @@ struct ContentView: View {
                     }
                 }
                 projects.removeAll()
+                visitedWorkstreamIDs.removeAll()
                 selectionBeforeSettings = nil
                 selection = .settings
                 ProjectStore.save([])
@@ -224,6 +247,7 @@ struct ContentView: View {
                     if let project = projects.first(where: { $0.id == id }) {
                         for ws in project.workstreams {
                             surfaceCache.removeWorkstreamSurfaces(for: ws.id)
+                            visitedWorkstreamIDs.remove(ws.id)
                         }
                     }
                 }
@@ -245,6 +269,10 @@ struct ContentView: View {
                 // Don't persist settings/help as saved selection
                 if newValue != .settings && newValue != .help {
                     newValue?.save()
+                }
+                // Track visited workstreams for the lazy ZStack
+                if let wsID = newValue?.workstreamID {
+                    visitedWorkstreamIDs.insert(wsID)
                 }
             }
             .onKeyPress(.escape) {
@@ -284,6 +312,10 @@ struct ContentView: View {
         .environmentObject(updateChecker)
         .environmentObject(updater)
         .onAppear {
+            // Seed the initial selection into visited set
+            if let wsID = selection?.workstreamID {
+                visitedWorkstreamIDs.insert(wsID)
+            }
             appEnvironment.refresh()
             appEnvironment.refreshAllRepoInfo(projects: projects)
             appEnvironment.refreshPathValidity(projects: projects)
@@ -476,6 +508,7 @@ struct ContentView: View {
         guard let wsID = workstreamToRemove,
               let projectIndex = projects.firstIndex(where: { $0.workstreams.contains(where: { $0.id == wsID }) }) else { return }
         WorkstreamArchiver.remove(wsID, in: &projects[projectIndex], surfaceCache: surfaceCache, tmuxPath: appEnvironment.toolStatus.tmux.path)
+        visitedWorkstreamIDs.remove(wsID)
         ProjectStore.save(projects)
         workstreamToRemove = nil
     }
@@ -484,6 +517,7 @@ struct ContentView: View {
         guard let wsID = workstreamToPurge,
               let projectIndex = projects.firstIndex(where: { $0.workstreams.contains(where: { $0.id == wsID }) }) else { return }
         WorkstreamArchiver.purge(wsID, in: &projects[projectIndex], surfaceCache: surfaceCache, tmuxPath: appEnvironment.toolStatus.tmux.path)
+        visitedWorkstreamIDs.remove(wsID)
         ProjectStore.save(projects)
         workstreamToPurge = nil
     }
