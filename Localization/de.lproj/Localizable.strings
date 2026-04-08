@@ -1,0 +1,283 @@
+/* Menu */
+"New" = "Neu";
+"New Project" = "Neues Projekt";
+
+/* Onboarding */
+"AI-powered workspaces for your codebase." = "KI-gestützte Arbeitsbereiche für deine Codebasis.";
+"Prerequisites" = "Voraussetzungen";
+"Optional" = "Optional";
+"Getting Started" = "Erste Schritte";
+"Add a project" = "Projekt hinzufügen";
+"Or drag a directory to the sidebar" = "Oder ziehe ein Verzeichnis in die Seitenleiste";
+"Key Concepts" = "Grundkonzepte";
+"An isolated workspace with its own git branch, terminal, and AI agent." = "Ein isolierter Arbeitsbereich mit eigenem Git-Branch, Terminal und KI-Agent.";
+"to create one inside a project." = "um einen innerhalb eines Projekts zu erstellen.";
+
+/* Project Overview */
+"No workstreams yet" = "Noch keine Workstreams";
+"Workstreams" = "Workstreams";
+"Press " = "Drücke ";
+"to create one." = "um einen zu erstellen.";
+
+/* Sidebar */
+"Recent" = "Zuletzt";
+"A-Z" = "A-Z";
+
+/* Alerts */
+"Remove Project" = "Projekt entfernen";
+"Remove Workstream" = "Workstream entfernen";
+"Ongoing terminals and Coding Agent sessions will be killed. The worktree and its files will remain on disk." = "Laufende Terminals und Coding-Agent-Sitzungen werden beendet. Der Worktree und seine Dateien bleiben auf der Festplatte erhalten.";
+"Purge Workstream" = "Workstream bereinigen";
+"Purge" = "Bereinigen";
+"Purge Anyway" = "Trotzdem bereinigen";
+"uncommitted changes" = "nicht committete Änderungen";
+"unpushed commits" = "nicht gepushte Commits";
+" and " = " und ";
+"This workstream has %@ that will be lost." = "Dieser Workstream hat %@, die verloren gehen.";
+"The worktree and its branch will be permanently deleted." = "Der Worktree und sein Branch werden dauerhaft gelöscht.";
+"Projects Not Found" = "Projekte nicht gefunden";
+"The following projects were removed because their directories no longer exist on disk: %@" = "Die folgenden Projekte wurden entfernt, da ihre Verzeichnisse nicht mehr auf der Festplatte existieren: %@";
+"Cancel" = "Abbrechen";
+"Remove" = "Entfernen";
+"Worktree Creation Failed" = "Worktree-Erstellung fehlgeschlagen";
+"Could not create the git worktree. The branch may already exist, or there may be an ongoing merge or rebase." = "Der Git-Worktree konnte nicht erstellt werden. Der Branch existiert möglicherweise bereits, oder es läuft ein Merge oder Rebase.";
+"OK" = "OK";
+"Not a Git Repository" = "Kein Git-Repository";
+"Workstreams require a git repository. Initialize one with git init or select a different directory." = "Workstreams benötigen ein Git-Repository. Initialisiere eines mit git init oder wähle ein anderes Verzeichnis.";
+
+/* Sheets */
+"Add Project" = "Projekt hinzufügen";
+"Directory" = "Verzeichnis";
+"Project Name" = "Projektname";
+"Add" = "Hinzufügen";
+/* File Picker */
+"Choose a project directory" = "Projektverzeichnis auswählen";
+"Select" = "Auswählen";
+
+/* Settings */
+"Settings" = "Einstellungen";
+"Session" = "Sitzung";
+"Tmux Mode" = "Tmux-Modus";
+"Coding Agent sessions persist across app restarts. The Terminal tab is not affected. Sessions are lost on system restart." = "Coding-Agent-Sitzungen bleiben über App-Neustarts hinweg erhalten. Der Terminal-Tab ist nicht betroffen. Sitzungen gehen bei Systemneustart verloren.";
+"Language" = "Sprache";
+"System Default" = "Systemstandard";
+"Restart the app for the language change to take effect." = "Starte die App neu, damit die Sprachänderung wirksam wird.";
+"Not found" = "Nicht gefunden";
+"Authenticated" = "Authentifiziert";
+"Not authenticated" = "Nicht authentifiziert";
+"Run: gh auth login" = "Ausführen: gh auth login";
+"Terminal" = "Terminal";
+"None" = "Keine";
+"Browser" = "Browser";
+"GitHub" = "GitHub";
+"Coding Agent" = "Coding-Agent";
+"Bypass permission prompts" = "Berechtigungsabfragen überspringen";
+"When enabled, the coding agent will not ask for confirmation before making changes. Use with caution: the agent will be able to edit files, run commands, and make git commits without asking." = "Wenn aktiviert, fragt der Coding-Agent nicht mehr nach Bestätigung, bevor er Änderungen vornimmt. Mit Vorsicht verwenden: Der Agent kann Dateien bearbeiten, Befehle ausführen und Git-Commits erstellen, ohne zu fragen.";
+"Allow writes outside worktree" = "Schreibzugriff außerhalb des Worktree erlauben";
+"When enabled, the coding agent can modify files anywhere on disk. When disabled, writes are restricted to the worktree directory." = "Wenn aktiviert, kann der Coding-Agent Dateien überall auf der Festplatte ändern. Wenn deaktiviert, sind Schreibzugriffe auf das Worktree-Verzeichnis beschränkt.";
+"External Terminal" = "Externes Terminal";
+"Requires tmux to be installed." = "Erfordert eine tmux-Installation.";
+"URL" = "URL";
+
+/* Worktrees */
+"Git Worktrees" = "Git-Worktrees";
+"Prune Worktrees" = "Worktrees bereinigen";
+"Prune" = "Bereinigen";
+"Clean" = "Sauber";
+"Uncommitted changes" = "Nicht committete Änderungen";
+"Commits ahead" = "Commits voraus";
+"Open as workstream" = "Als Workstream öffnen";
+"Worktrees on disk for this repository. Pruning removes clean worktrees and their associated workstreams." = "Worktrees auf der Festplatte für dieses Repository. Bereinigen entfernt saubere Worktrees und ihre zugehörigen Workstreams.";
+"Prune %d clean worktree" = "%d sauberen Worktree bereinigen";
+"Prune %d clean worktrees" = "%d saubere Worktrees bereinigen";
+"Remove %d worktree with no uncommitted changes? Associated workstreams will also be removed from the sidebar." = "%d Worktree ohne nicht committete Änderungen entfernen? Zugehörige Workstreams werden ebenfalls aus der Seitenleiste entfernt.";
+"Remove %d worktrees with no uncommitted changes? Associated workstreams will also be removed from the sidebar." = "%d Worktrees ohne nicht committete Änderungen entfernen? Zugehörige Workstreams werden ebenfalls aus der Seitenleiste entfernt.";
+"Remove \"%@\" from the list? Files in %@ will not be deleted." = "\"%@\" aus der Liste entfernen? Dateien in %@ werden nicht gelöscht.";
+
+/* Projects */
+"Symlink .env files" = ".env-Dateien verknüpfen";
+"Symlink .env and .env.local from the main repository into new worktrees." = ".env und .env.local aus dem Hauptrepository in neue Worktrees verknüpfen.";
+
+/* Quit confirmation */
+"Quit Factory Floor?" = "Factory Floor beenden?";
+"Active workstreams will be stopped." = "Aktive Workstreams werden gestoppt.";
+"Quit" = "Beenden";
+"Confirm before quitting" = "Vor dem Beenden bestätigen";
+"Show a confirmation dialog when quitting with active workstreams." = "Zeige einen Bestätigungsdialog beim Beenden mit aktiven Workstreams.";
+"Launch at login" = "Beim Anmelden starten";
+"Automatically open Factory Floor when you log in." = "Factory Floor automatisch beim Anmelden öffnen.";
+"Detailed logging" = "Ausführliche Protokollierung";
+"Log setup, run, and teardown script output to files for debugging." = "Setup-, Run- und Teardown-Skriptausgaben zur Fehlersuche in Dateien protokollieren.";
+"Open Logs Directory" = "Protokollverzeichnis öffnen";
+
+/* Settings - Environment */
+"Environment" = "Umgebung";
+"Installed" = "Installiert";
+"Install..." = "Installieren...";
+
+/* Settings - General */
+"General" = "Allgemein";
+"Base directory" = "Basisverzeichnis";
+"Change..." = "Ändern...";
+"Choose base directory for projects" = "Basisverzeichnis für Projekte auswählen";
+"Default location when adding new projects." = "Standardort beim Hinzufügen neuer Projekte.";
+"Branch prefix" = "Branch-Präfix";
+"Theme" = "Design";
+"System" = "System";
+"Light" = "Hell";
+"Dark" = "Dunkel";
+
+/* Settings - Coding Agent */
+"Agent Teams" = "Agent-Teams";
+"Enables experimental multi-agent coordination. Agents can spawn teammates, delegate tasks, and collaborate across workstreams." = "Aktiviert experimentelle Multi-Agent-Koordination. Agenten können Teammitglieder erstellen, Aufgaben delegieren und workstream-übergreifend zusammenarbeiten.";
+"Auto-rename branch" = "Branch automatisch umbenennen";
+"On the first request, the agent renames the branch to match the task and writes a short description visible in the sidebar." = "Bei der ersten Anfrage benennt der Agent den Branch passend zur Aufgabe um und schreibt eine kurze Beschreibung, die in der Seitenleiste sichtbar ist.";
+"External Browser" = "Externer Browser";
+
+/* Settings - Advanced */
+"Advanced" = "Erweitert";
+"Usage analytics" = "Nutzungsanalyse";
+"Send anonymous usage data to help improve Factory Floor. We collect: app version, build type, macOS version, locale, and screen resolution. No project names, file contents, or personal data." = "Sende anonyme Nutzungsdaten, um Factory Floor zu verbessern. Wir erfassen: App-Version, Build-Typ, macOS-Version, Sprache und Bildschirmauflösung. Keine Projektnamen, Dateiinhalte oder persönliche Daten.";
+"Crash reports" = "Absturzberichte";
+"Send crash reports and performance data. Requires restart to take effect." = "Absturzberichte und Leistungsdaten senden. Erfordert einen Neustart.";
+"Bleeding edge" = "Vorabversionen";
+"Receive pre-release builds with the latest features. These may be less stable." = "Vorabversionen mit den neuesten Funktionen erhalten. Diese können weniger stabil sein.";
+"Clear project list" = "Projektliste leeren";
+"Clear All..." = "Alle löschen...";
+"Clear All" = "Alle löschen";
+"Removes all projects and workstreams from the sidebar. No files or directories on disk will be deleted." = "Entfernt alle Projekte und Workstreams aus der Seitenleiste. Keine Dateien oder Verzeichnisse auf der Festplatte werden gelöscht.";
+"Clear project list?" = "Projektliste leeren?";
+"This will remove all projects and workstreams from the sidebar. No files on disk will be deleted. This cannot be undone." = "Alle Projekte und Workstreams werden aus der Seitenleiste entfernt. Keine Dateien auf der Festplatte werden gelöscht. Dies kann nicht rückgängig gemacht werden.";
+
+/* HelpView - Shortcuts */
+"Shortcuts" = "Tastaturkürzel";
+"Global" = "Global";
+"Available everywhere" = "Überall verfügbar";
+"Help" = "Hilfe";
+"New workstream or project" = "Neuer Workstream oder Projekt";
+"New project" = "Neues Projekt";
+"Workstream" = "Workstream";
+"When a workstream is active" = "Wenn ein Workstream aktiv ist";
+"Focus Coding Agent" = "Coding-Agent fokussieren";
+"Info panel" = "Info-Panel";
+"New Terminal" = "Neues Terminal";
+"New Browser" = "Neuer Browser";
+"Close tab" = "Tab schließen";
+"Address bar" = "Adressleiste";
+"Back to project" = "Zurück zum Projekt";
+"Switch tab" = "Tab wechseln";
+"Previous tab" = "Vorheriger Tab";
+"Next tab" = "Nächster Tab";
+"Navigation" = "Navigation";
+"Works from any view in a project" = "Funktioniert in jeder Ansicht eines Projekts";
+"Switch workstream" = "Workstream wechseln";
+"External Apps" = "Externe Apps";
+"Opens the current workstream directory" = "Öffnet das aktuelle Workstream-Verzeichnis";
+"Open in external browser" = "In externem Browser öffnen";
+"Open in external terminal" = "In externem Terminal öffnen";
+"Open in External Terminal" = "In externem Terminal öffnen";
+"Open on GitHub" = "Auf GitHub öffnen";
+"Reveal in Finder" = "Im Finder anzeigen";
+"Copy project path" = "Projektpfad kopieren";
+"Copy branch name" = "Branch-Name kopieren";
+"Copy worktree path" = "Worktree-Pfad kopieren";
+
+/* Agent tab - Claude not installed */
+"Claude Code not found" = "Claude Code nicht gefunden";
+"Install Claude Code to use the Coding Agent." = "Installiere Claude Code, um den Coding-Agent zu verwenden.";
+"Install Claude Code" = "Claude Code installieren";
+
+/* BrowserView */
+"Server not responding" = "Server antwortet nicht";
+"Retry" = "Erneut versuchen";
+
+/* ProjectOverviewView */
+"Repository" = "Repository";
+"GitHub" = "GitHub";
+"Branch" = "Branch";
+"Commits" = "Commits";
+"Remote" = "Remote";
+"Status" = "Status";
+"Stars" = "Sterne";
+"Open Issues" = "Offene Issues";
+"Open PRs" = "Offene PRs";
+"Not a git repository" = "Kein Git-Repository";
+"Description" = "Beschreibung";
+
+/* Initialization errors */
+"Factory Floor cannot start" = "Factory Floor kann nicht gestartet werden";
+"The terminal engine (Ghostty) failed to initialize. This may indicate a system compatibility issue." = "Die Terminal-Engine (Ghostty) konnte nicht initialisiert werden. Dies könnte auf ein Systemkompatibilitätsproblem hindeuten.";
+
+/* EnvironmentTabView */
+"Setup" = "Setup";
+"Run" = "Ausführen";
+"Restart %@ script" = "%@-Skript neustarten";
+"Start %@ script" = "%@-Skript starten";
+"No %@ script configured" = "Kein %@-Skript konfiguriert";
+"Add a %@ field to .factoryfloor.json:" = "Füge ein %@-Feld zu .factoryfloor.json hinzu:";
+"Also supports .factoryfloor/config.json." = "Unterstützt auch .factoryfloor/config.json.";
+
+/* Tab labels */
+"Info" = "Info";
+"Agent" = "Agent";
+
+/* ProjectSidebar - context menu */
+"New workstream (full permissions)" = "Neuer Workstream (volle Berechtigungen)";
+"New workstream (with prompts)" = "Neuer Workstream (mit Abfragen)";
+
+/* AddProjectChoiceSheet */
+"Existing Directory" = "Vorhandenes Verzeichnis";
+"Create a new directory in the base directory" = "Neues Verzeichnis im Basisverzeichnis erstellen";
+"Select an existing directory from disk" = "Vorhandenes Verzeichnis von der Festplatte auswählen";
+
+/* NewProjectSheet */
+"(change in Settings)" = "(in Einstellungen ändern)";
+"Create" = "Erstellen";
+
+/* Settings - CLI install */
+"Install '%@' command" = "'%@'-Befehl installieren";
+"The '%@' command is installed and ready to use." = "Der '%@'-Befehl ist installiert und einsatzbereit.";
+"Install the '%@' command to open directories in %@ from any terminal." = "Installiere den '%@'-Befehl, um Verzeichnisse in %@ von jedem Terminal aus zu öffnen.";
+
+/* HelpView - credits */
+"Version %@" = "Version %@";
+"Made with " = "Gemacht mit ";
+" in Poblenou, Barcelona" = " in Poblenou, Barcelona";
+"Built by David Poblador i Garcia" = "Entwickelt von David Poblador i Garcia";
+"with the support of" = "mit der Unterstützung von";
+"by " = "von ";
+"Help " = "Hilf ";
+" the development." = " bei der Entwicklung.";
+
+
+/* Help */
+"Sponsor" = "Unterstützen";
+"Report a Bug" = "Fehler melden";
+"Documentation" = "Dokumentation";
+"Request a Feature" = "Funktion vorschlagen";
+"Rebuild" = "Neu bauen";
+"Rerun" = "Erneut ausführen";
+"Start" = "Starten";
+"Stop" = "Stoppen";
+
+"Restarting..." = "Wird neu gestartet...";
+"Preparing workstream..." = "Workstream wird vorbereitet...";
+
+/* Update Banner */
+"v%@ available" = "v%@ verfügbar";
+"Release Notes" = "Versionshinweise";
+"Using scripts from %@" = "Verwendet Skripte aus %@";
+
+/* Quick Actions */
+"Quick Actions" = "Schnellaktionen";
+"Commit" = "Commit";
+"Push" = "Push";
+"Create PR" = "PR erstellen";
+"Abandon PR" = "PR aufgeben";
+"This branch has been merged." = "Dieser Branch wurde gemergt.";
+"gh CLI is not installed." = "gh CLI ist nicht installiert.";
+"Claude Code is not installed." = "Claude Code ist nicht installiert.";
+"Enable \"Bypass permission prompts\" in Settings." = "Aktiviere \"Berechtigungsabfragen überspringen\" in den Einstellungen.";
+"No GitHub remote found for this project." = "Kein GitHub-Remote für dieses Projekt gefunden.";
+"Quick action debug" = "Schnellaktionen-Debug";
+"Show a debug panel with command output from quick actions (Create PR, Commit & Push)." = "Zeige ein Debug-Panel mit Befehlsausgaben der Schnellaktionen (PR erstellen, Commit & Push).";

@@ -155,8 +155,8 @@ All user-facing strings MUST use localization. Never hardcode strings directly i
 - **SwiftUI Text/Button/Label**: Use string literals directly (e.g., `Text("Cancel")`). SwiftUI automatically treats these as `LocalizedStringKey`.
 - **AppKit APIs** (NSOpenPanel, NSAlert, etc.): Use `NSLocalizedString("string", comment: "")`.
 - **String interpolation with Images**: Split into `Text` concatenation. E.g., `(Text("Press ") + Text(Image(systemName: "command")) + Text(" N"))`.
-- **Every new user-facing string** must be added to all 4 locale files.
-- Current locales: English (en), Catalan (ca), Spanish (es), Swedish (sv).
+- **Every new user-facing string** must be added to all 5 locale files.
+- Current locales: English (en), Catalan (ca), German (de), Spanish (es), Swedish (sv).
 
 ## Keyboard Shortcuts
 When adding, removing, or changing keyboard shortcuts:

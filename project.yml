@@ -93,6 +93,10 @@ targets:
         buildPhase: resources
       - path: Localization/sv.lproj/InfoPlist.strings
         buildPhase: resources
+      - path: Localization/de.lproj/Localizable.strings
+        buildPhase: resources
+      - path: Localization/de.lproj/InfoPlist.strings
+        buildPhase: resources
       - path: Resources/Scripts/ff
         buildPhase: resources
       - path: Resources/notification.wav

@@ -64,8 +64,8 @@
         <h1>{{ .Title }}</h1>
         <p>{{ T "docs_subtitle" }}</p>
         {{ $currentLang := .Site.Language.Lang }}
-        {{ $langs := dict "en" "English" "ca" "Català" "es" "Español" "sv" "Svenska" }}
-        {{ $codes := slice "en" "ca" "es" "sv" }}
+        {{ $langs := dict "en" "English" "ca" "Català" "de" "Deutsch" "es" "Español" "sv" "Svenska" }}
+        {{ $codes := slice "en" "ca" "de" "es" "sv" }}
         <p class="docs-lang-switcher">{{ range $i, $code := $codes }}{{ if $i }} | {{ end }}{{ $href := "/docs" }}{{ if ne $code "en" }}{{ $href = printf "/%s/docs" $code }}{{ end }}{{ if eq $code $currentLang }}<strong>{{ index $langs $code }}</strong>{{ else }}<a href="{{ $href }}">{{ index $langs $code }}</a>{{ end }}{{ end }}</p>
         {{ .Content }}
       </div>
