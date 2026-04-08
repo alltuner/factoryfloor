@@ -137,7 +137,7 @@ final class WorkspaceTabStateTests: XCTestCase {
         XCTAssertEqual(reordered, [.info, .agent, .environment, terminalC, terminalA, browserB])
     }
 
-    func testWorkstreamIDsAroundSelectionKeepsCurrentPreviousAndNextReadyWorkstreams() throws {
+    func testRenderableWorkstreamIDKeepsOnlySelectedReadyWorkstream() throws {
         let selectedID = try XCTUnwrap(UUID(uuidString: "BBBBBBBB-BBBB-BBBB-BBBB-BBBBBBBBBBBB"))
         let previousID = try XCTUnwrap(UUID(uuidString: "AAAAAAAA-AAAA-AAAA-AAAA-AAAAAAAAAAAA"))
         let nextID = try XCTUnwrap(UUID(uuidString: "CCCCCCCC-CCCC-CCCC-CCCC-CCCCCCCCCCCC"))
@@ -153,27 +153,23 @@ final class WorkspaceTabStateTests: XCTestCase {
             ]
         )
 
-        let ids = workstreamIDsAroundSelection(in: project, selectedWorkstreamID: selectedID)
+        let id = renderableWorkstreamID(in: project, selectedWorkstreamID: selectedID)
 
-        XCTAssertEqual(ids, [selectedID, previousID, nextID])
+        XCTAssertEqual(id, selectedID)
     }
 
-    func testWorkstreamIDsAroundSelectionWrapsAtEdges() throws {
-        let firstID = try XCTUnwrap(UUID(uuidString: "AAAAAAAA-AAAA-AAAA-AAAA-AAAAAAAAAAAA"))
-        let secondID = try XCTUnwrap(UUID(uuidString: "BBBBBBBB-BBBB-BBBB-BBBB-BBBBBBBBBBBB"))
-        let lastID = try XCTUnwrap(UUID(uuidString: "CCCCCCCC-CCCC-CCCC-CCCC-CCCCCCCCCCCC"))
+    func testRenderableWorkstreamIDSkipsUnreadySelection() throws {
+        let selectedID = try XCTUnwrap(UUID(uuidString: "AAAAAAAA-AAAA-AAAA-AAAA-AAAAAAAAAAAA"))
         let project = Project(
             name: "app",
             directory: "/app",
             workstreams: [
-                Workstream(name: "first", worktreePath: "/app/first", id: firstID, lastAccessedAt: Date(timeIntervalSince1970: 30)),
-                Workstream(name: "second", worktreePath: "/app/second", id: secondID, lastAccessedAt: Date(timeIntervalSince1970: 20)),
-                Workstream(name: "last", worktreePath: "/app/last", id: lastID, lastAccessedAt: Date(timeIntervalSince1970: 10)),
+                Workstream(name: "selected", id: selectedID),
             ]
         )
 
-        let ids = workstreamIDsAroundSelection(in: project, selectedWorkstreamID: firstID)
+        let id = renderableWorkstreamID(in: project, selectedWorkstreamID: selectedID)
 
-        XCTAssertEqual(ids, [firstID, secondID, lastID])
+        XCTAssertNil(id)
     }
 }

@@ -22,21 +22,9 @@ final class ProjectList: ObservableObject {
     }
 }
 
-func workstreamIDsAroundSelection(in project: Project, selectedWorkstreamID: UUID?) -> Set<UUID> {
-    guard let selectedWorkstreamID else { return [] }
-    let readyWorkstreams = project.workstreams
-        .filter { $0.worktreePath != nil }
-        .sorted { $0.lastAccessedAt > $1.lastAccessedAt }
-    guard let currentIndex = readyWorkstreams.firstIndex(where: { $0.id == selectedWorkstreamID }) else { return [] }
-
-    let previousIndex = (currentIndex - 1 + readyWorkstreams.count) % readyWorkstreams.count
-    let nextIndex = (currentIndex + 1) % readyWorkstreams.count
-
-    return [
-        readyWorkstreams[currentIndex].id,
-        readyWorkstreams[previousIndex].id,
-        readyWorkstreams[nextIndex].id,
-    ]
+func renderableWorkstreamID(in project: Project, selectedWorkstreamID: UUID?) -> UUID? {
+    guard let selectedWorkstreamID else { return nil }
+    return project.workstreams.contains { $0.id == selectedWorkstreamID && $0.worktreePath != nil } ? selectedWorkstreamID : nil
 }
 
 struct ContentView: View {
@@ -54,7 +42,6 @@ struct ContentView: View {
     @StateObject private var updateChecker = UpdateChecker()
     @EnvironmentObject private var updater: Updater
     @State private var saveWork: DispatchWorkItem?
-    @State private var mountedWorkstreamIDs: Set<UUID> = []
     @State private var workstreamToRemove: UUID?
     @State private var workstreamToPurge: UUID?
     @State private var purgeWarningMessage: String?
@@ -93,17 +80,6 @@ struct ContentView: View {
         return project.workstreams.first(where: { $0.id == wsID })
     }
 
-    private var mountedReadyWorkstreams: [(workstream: Workstream, project: Project)] {
-        guard let project = activeProject else { return [] }
-        var ids = mountedWorkstreamIDs
-        if let activeID = activeWorkstream?.id {
-            ids.insert(activeID)
-        }
-        return project.workstreams
-            .filter { $0.worktreePath != nil && ids.contains($0.id) }
-            .map { (workstream: $0, project: project) }
-    }
-
     @ViewBuilder
     private var detailView: some View {
         if selection == .settings {
@@ -115,10 +91,19 @@ struct ContentView: View {
                 .navigationTitle("Help")
                 .navigationSubtitle(AppConstants.appName)
         } else if let workstream = activeWorkstream, let project = activeProject {
-            if workstream.worktreePath != nil {
-                workstreamZStack
-                    .navigationTitle(workstream.name)
-                    .navigationSubtitle(appEnvironment.taskDescription(for: workstream.worktreePath) ?? project.name)
+            if let workstreamID = renderableWorkstreamID(in: project, selectedWorkstreamID: workstream.id) {
+                TerminalContainerView(
+                    workstreamID: workstreamID,
+                    workingDirectory: workstream.workingDirectory(projectDirectory: project.directory),
+                    projectDirectory: project.directory,
+                    projectName: project.name,
+                    workstreamName: workstream.name,
+                    bypassPermissions: workstream.bypassPermissions,
+                    isActive: true
+                )
+                .id(workstreamID)
+                .navigationTitle(workstream.name)
+                .navigationSubtitle(appEnvironment.taskDescription(for: workstream.worktreePath) ?? project.name)
             } else {
                 VStack(spacing: 12) {
                     ProgressView()
@@ -145,26 +130,6 @@ struct ContentView: View {
         } else {
             OnboardingView(toolStatus: appEnvironment.toolStatus, isDetecting: appEnvironment.isDetecting)
                 .navigationTitle(AppConstants.appName)
-        }
-    }
-
-    private var workstreamZStack: some View {
-        ZStack {
-            ForEach(mountedReadyWorkstreams, id: \.workstream.id) { entry in
-                let isActive = activeWorkstream?.id == entry.workstream.id
-                TerminalContainerView(
-                    workstreamID: entry.workstream.id,
-                    workingDirectory: entry.workstream.workingDirectory(projectDirectory: entry.project.directory),
-                    projectDirectory: entry.project.directory,
-                    projectName: entry.project.name,
-                    workstreamName: entry.workstream.name,
-                    bypassPermissions: entry.workstream.bypassPermissions,
-                    isActive: isActive
-                )
-                .opacity(isActive ? 1 : 0)
-                .allowsHitTesting(isActive)
-                .accessibilityHidden(!isActive)
-            }
         }
     }
 
@@ -195,7 +160,6 @@ struct ContentView: View {
                     }
                 }
                 projects.removeAll()
-                mountedWorkstreamIDs.removeAll()
                 selectionBeforeSettings = nil
                 selection = .settings
                 ProjectStore.save([])
@@ -266,7 +230,6 @@ struct ContentView: View {
                     if let project = projects.first(where: { $0.id == id }) {
                         for ws in project.workstreams {
                             surfaceCache.removeWorkstreamSurfaces(for: ws.id)
-                            mountedWorkstreamIDs.remove(ws.id)
                         }
                     }
                 }
@@ -289,7 +252,6 @@ struct ContentView: View {
                 if newValue != .settings && newValue != .help {
                     newValue?.save()
                 }
-                updateMountedWorkstreams(for: newValue)
             }
             .onKeyPress(.escape) {
                 if selection == .settings || selection == .help {
@@ -328,7 +290,6 @@ struct ContentView: View {
         .environmentObject(updateChecker)
         .environmentObject(updater)
         .onAppear {
-            updateMountedWorkstreams(for: selection)
             appEnvironment.refresh()
             appEnvironment.refreshAllRepoInfo(projects: projects)
             appEnvironment.refreshPathValidity(projects: projects)
@@ -521,7 +482,6 @@ struct ContentView: View {
         guard let wsID = workstreamToRemove,
               let projectIndex = projects.firstIndex(where: { $0.workstreams.contains(where: { $0.id == wsID }) }) else { return }
         WorkstreamArchiver.remove(wsID, in: &projects[projectIndex], surfaceCache: surfaceCache, tmuxPath: appEnvironment.toolStatus.tmux.path)
-        mountedWorkstreamIDs.remove(wsID)
         ProjectStore.save(projects)
         workstreamToRemove = nil
     }
@@ -530,27 +490,8 @@ struct ContentView: View {
         guard let wsID = workstreamToPurge,
               let projectIndex = projects.firstIndex(where: { $0.workstreams.contains(where: { $0.id == wsID }) }) else { return }
         WorkstreamArchiver.purge(wsID, in: &projects[projectIndex], surfaceCache: surfaceCache, tmuxPath: appEnvironment.toolStatus.tmux.path)
-        mountedWorkstreamIDs.remove(wsID)
         ProjectStore.save(projects)
         workstreamToPurge = nil
-    }
-
-    private func updateMountedWorkstreams(for selection: SidebarSelection?) {
-        guard let workstreamID = selection?.workstreamID,
-              let project = projects.first(where: { $0.workstreams.contains(where: { $0.id == workstreamID }) })
-        else {
-            mountedWorkstreamIDs.removeAll()
-            return
-        }
-
-        let ids = workstreamIDsAroundSelection(in: project, selectedWorkstreamID: workstreamID)
-        mountedWorkstreamIDs = mountedWorkstreamIDs
-            .intersection(ids)
-            .union([workstreamID])
-
-        DispatchQueue.main.async {
-            mountedWorkstreamIDs = ids
-        }
     }
 }
 
