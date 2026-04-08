@@ -30,7 +30,7 @@
         {{ if ne $currentLang "en" }}
           {{ $pagePath = strings.TrimPrefix (printf "/%s" $currentLang) .RelPermalink }}
         {{ end }}
-        {{ $codes := slice "en" "ca" "es" "sv" }}
+        {{ $codes := slice "en" "ca" "de" "es" "sv" }}
         {{ range $i, $code := $codes }}
           {{ $href := $pagePath }}
           {{ if ne $code "en" }}{{ $href = printf "/%s%s" $code $pagePath }}{{ end }}
@@ -39,7 +39,7 @@
           {{ else }}
             <a href="{{ $href }}" class="text-fg-muted no-underline hover:text-fg transition-colors uppercase">{{ $code }}</a>
           {{ end }}
-          {{ if lt $i 3 }}<span class="text-fg-faint">|</span>{{ end }}
+          {{ if lt $i 4 }}<span class="text-fg-faint">|</span>{{ end }}
         {{ end }}
       </div>
     </div>

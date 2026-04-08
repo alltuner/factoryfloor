@@ -29,6 +29,12 @@ defaultContentLanguage = "en"
   weight = 4
   contentDir = "content/sv"
 
+[languages.de]
+  languageCode = "de"
+  languageName = "Deutsch"
+  weight = 5
+  contentDir = "content/de"
+
 [params]
   description = "A native macOS app that manages git worktrees, Claude Code sessions, and dev servers from a single window."
   ogImage = "/img/og-image.png"

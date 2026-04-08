@@ -1,0 +1,44 @@
+/* Privacy - AppleScript */
+"NSAppleEventsUsageDescription" = "Ein Programm in Factory Floor möchte AppleScript verwenden.";
+
+/* Privacy - Audio */
+"NSAudioCaptureUsageDescription" = "Ein Programm in Factory Floor möchte auf das Audio deines Systems zugreifen.";
+
+/* Privacy - Bluetooth */
+"NSBluetoothAlwaysUsageDescription" = "Ein Programm in Factory Floor möchte Bluetooth verwenden.";
+
+/* Privacy - Calendars */
+"NSCalendarsUsageDescription" = "Ein Programm in Factory Floor möchte auf deinen Kalender zugreifen.";
+
+/* Privacy - Camera */
+"NSCameraUsageDescription" = "Ein Programm in Factory Floor möchte die Kamera verwenden.";
+
+/* Privacy - Contacts */
+"NSContactsUsageDescription" = "Ein Programm in Factory Floor möchte auf deine Kontakte zugreifen.";
+
+/* Privacy - Local Network */
+"NSLocalNetworkUsageDescription" = "Ein Programm in Factory Floor möchte auf das lokale Netzwerk zugreifen.";
+
+/* Privacy - Location (Temporary) */
+"NSLocationTemporaryUsageDescriptionDictionary" = "Ein Programm in Factory Floor möchte vorübergehend deinen Standort verwenden.";
+
+/* Privacy - Location */
+"NSLocationUsageDescription" = "Ein Programm in Factory Floor möchte auf deine Standortinformationen zugreifen.";
+
+/* Privacy - Microphone */
+"NSMicrophoneUsageDescription" = "Ein Programm in Factory Floor möchte dein Mikrofon verwenden.";
+
+/* Privacy - Motion */
+"NSMotionUsageDescription" = "Ein Programm in Factory Floor möchte auf Bewegungsdaten zugreifen.";
+
+/* Privacy - Photos */
+"NSPhotoLibraryUsageDescription" = "Ein Programm in Factory Floor möchte auf deine Fotomediathek zugreifen.";
+
+/* Privacy - Reminders */
+"NSRemindersUsageDescription" = "Ein Programm in Factory Floor möchte auf deine Erinnerungen zugreifen.";
+
+/* Privacy - Speech Recognition */
+"NSSpeechRecognitionUsageDescription" = "Ein Programm in Factory Floor möchte die Spracherkennung verwenden.";
+
+/* Privacy - System Administration */
+"NSSystemAdministrationUsageDescription" = "Ein Programm in Factory Floor benötigt erhöhte Berechtigungen.";

@@ -1,0 +1,250 @@
+# Site
+[site_tagline]
+other = "KI-gestützter Entwicklungsarbeitsbereich für macOS"
+
+# Navigation
+[nav_features]
+other = "Funktionen"
+[nav_how]
+other = "So funktioniert's"
+[nav_config]
+other = "Konfiguration"
+
+# Hero
+[hero_badge]
+other = "Open Source"
+[hero_title_1]
+other = "Dein"
+[hero_title_accent]
+other = "KI-gestützter"
+[hero_title_2]
+other = "Dev-Arbeitsbereich."
+[hero_desc]
+other = "Eine native macOS-App auf Basis von <a href=\"https://ghostty.org\" class=\"text-wine-light hover:underline\">Ghosttys</a> GPU-gerendertem Terminal. Verwaltet Git-Worktrees, <a href=\"https://docs.anthropic.com/en/docs/claude-code/overview\" class=\"text-wine-light hover:underline\">Claude Code</a>-Sitzungen und Dev-Server in einem einzigen Fenster. Jeder Workstream bekommt seinen eigenen Branch, sein eigenes Terminal und seinen eigenen KI-Agenten — alles läuft parallel, alles in nativer Geschwindigkeit."
+[hero_demo_tab]
+other = "Demo"
+[hero_download]
+other = "Herunterladen"
+[hero_source]
+other = "Quellcode ansehen"
+
+# Features
+[features_label]
+other = "Funktionen"
+[features_title]
+other = "Alles in einem Fenster."
+[features_desc]
+other = "Schluss mit dem Jonglieren zwischen Terminals, Browsern und Git-Clients. Jeder Workstream ist eine eigenständige Entwicklungsumgebung."
+[feat_worktrees_title]
+other = "Git-Worktrees"
+[feat_worktrees_desc]
+other = "Jeder Workstream bekommt seinen eigenen Branch und Worktree. Wechsle zwischen Aufgaben, ohne zu stashen — .env-Dateien werden automatisch verknüpft."
+[feat_claude_title]
+other = "Claude Code"
+[feat_claude_desc]
+other = "Integrierter <a href='https://docs.anthropic.com/en/docs/claude-code/overview' class='text-wine-light no-underline hover:underline'>Claude Code</a>-Agent mit Sitzungspersistenz. Setze Gespräche über App-Neustarts hinweg fort, dank automatischer Sitzungs-IDs."
+[feat_tmux_title]
+other = "Tmux-Persistenz"
+[feat_tmux_desc]
+other = "Agent-Sitzungen überleben App-Neustarts dank tmux auf einem dedizierten Socket. Kein verlorener Kontext, keine unterbrochenen Arbeitsabläufe mehr."
+[feat_scripts_title]
+other = "Setup- und Run-Skripte"
+[feat_scripts_desc]
+other = "Konfiguriere Setup-, Run- und Teardown-Skripte pro Projekt über .factoryfloor.json."
+[feat_browser_title]
+other = "Integrierter Browser"
+[feat_browser_desc]
+other = "Integrierter Browser mit automatischer Port-Erkennung. Der lauschende Port des Run-Skripts wird automatisch erkannt und der Browser navigiert dorthin. Sieh dir deine App an, ohne den Arbeitsbereich zu verlassen."
+[feat_github_title]
+other = "GitHub-Integration"
+[feat_github_desc]
+other = "Sieh Repo-Infos, offene PRs und Branch-PR-Status direkt in der Projektansicht. Unterstützt durch die gh CLI."
+
+# How it works
+[how_label]
+other = "So funktioniert's"
+[how_title]
+other = "Drei Schritte zur parallelen Entwicklung."
+[how_desc]
+other = "Vom Repo zum laufenden Workstream in Sekunden. Jeder Workstream ist isoliert und eigenständig."
+[step1_title]
+other = "Projekt hinzufügen"
+[step1_desc]
+other = "Ziehe ein Verzeichnis auf die Seitenleiste oder erstelle ein neues. Factory Floor erkennt Git-Repos, installierte Tools und GitHub-Verbindungen automatisch."
+[step2_title]
+other = "Workstream erstellen"
+[step2_desc]
+other = "Ein neuer Git-Worktree mit einem frischen Branch, einer Claude-Code-Sitzung, einem Terminal und einem Browser-Tab. Port-Erkennung erfolgt automatisch — der Browser öffnet deinen Dev-Server, sobald er lauscht."
+[step3_title]
+other = "Mit KI programmieren"
+[step3_desc]
+other = "Der Coding-Agent benennt deinen Branch passend zur Aufgabe um. Setup-Skripte installieren Abhängigkeiten. Wechsle zwischen Workstreams, ohne den Zustand zu verlieren."
+
+# Config
+[config_label]
+other = "Konfiguration"
+[config_title]
+other = "Einfache Skript-Konfiguration."
+[config_desc]
+other = "Automatisiere den Workstream-Lebenszyklus mit Setup-, Run- und Teardown-Skripten. Installiere Abhängigkeiten bei der Worktree-Erstellung, starte Dev-Server auf Abruf und räume Ressourcen beim Archivieren auf."
+[config_add]
+other = "Füge eine"
+[config_or_use]
+other = "deinem Projektverzeichnis hinzu."
+[config_hook]
+other = "Hook"
+[config_when]
+other = "Wann es läuft"
+[config_setup_desc]
+other = "Einmal, wenn ein Workstream erstellt wird. Zum Installieren von Abhängigkeiten oder Build-Schritten."
+[config_run_desc]
+other = "Auf Abruf über den Environment-Tab. Eingebettet in ff-run für automatische Port-Erkennung."
+[config_teardown_desc]
+other = "Wenn ein Workstream archiviert wird. Zum Aufräumen, wie das Stoppen von Containern."
+[config_optional_note]
+other = "Alle Felder sind optional. Skripte laufen im Workstream-Verzeichnis mit deiner Login-Shell."
+
+# Env vars
+[env_label]
+other = "Umgebung"
+[env_title]
+other = "Variablen in jedem Terminal verfügbar."
+[env_desc]
+other = "Jedes Workstream-Terminal, Setup-Skript und Run-Kommando hat Zugriff auf diese Umgebungsvariablen. Verwende sie in deinen Skripten und Dev-Server-Konfigurationen."
+[env_variable]
+other = "Variable"
+[env_description]
+other = "Beschreibung"
+[env_example]
+other = "Beispiel"
+[env_project]
+other = "Projektname"
+[env_workstream]
+other = "Workstream-Name"
+[env_project_dir]
+other = "Hauptrepository-Pfad"
+[env_worktree_dir]
+other = "Worktree-Pfad für diesen Workstream"
+[env_port]
+other = "Deterministischer Port für diesen Workstream"
+
+# Shortcuts
+[shortcuts_label]
+other = "Tastatur zuerst"
+[shortcuts_title]
+other = "Navigiere ohne Maus."
+[shortcuts_desc]
+other = "Kontextsensitive Tastaturkürzel, die sich anpassen, ob du in der Projektansicht oder einem Workstream bist."
+[shortcuts_global]
+other = "Global"
+[shortcuts_workstream]
+other = "Workstream"
+[shortcuts_navigation]
+other = "Navigation"
+[sc_new]
+other = "Neuer Workstream oder Projekt"
+[sc_settings]
+other = "Einstellungen"
+[sc_back]
+other = "Zurück zum Projekt"
+[sc_tabs]
+other = "Tab wechseln"
+[sc_cycle]
+other = "Tabs durchschalten"
+[sc_archive]
+other = "Workstream archivieren"
+[sc_cycle_ws]
+other = "Workstreams durchschalten"
+[sc_cycle_project]
+other = "Projekte durchschalten"
+[sc_ext_browser]
+other = "Externer Browser"
+[sc_ext_terminal]
+other = "Externes Terminal"
+
+# Footer
+[footer_built_by]
+other = "Entwickelt von"
+[footer_support]
+other = "mit der Unterstützung von"
+[footer_contact]
+other = "Kontakt"
+[footer_sponsor]
+other = "Unterstützen"
+[footer_privacy]
+other = "Datenschutz"
+
+# Open Source
+[oss_label]
+other = "Open Source"
+[oss_title]
+other = "Frei und quelloffen."
+[oss_desc]
+other = "Factory Floor ist MIT-lizenziert und kostenlos nutzbar. Der Quellcode ist auf GitHub verfügbar. Beiträge, Fehlerberichte und Funktionswünsche sind willkommen."
+[oss_view]
+other = "Auf GitHub ansehen"
+[oss_star]
+other = "Projekt mit Stern markieren"
+
+[footer_poblenou]
+other = "Gemacht mit ❤️ in Poblenou, Barcelona 🇪🇺"
+
+# Sponsor
+[sponsor_intro]
+other = "Factory Floor ist frei und quelloffen."
+[sponsor_intro_2]
+other = "Deine Unterstützung hilft bei der Weiterentwicklung und neuen Funktionen."
+[sponsor_financial]
+other = "Finanzielle Unterstützung"
+[sponsor_other]
+other = "Andere Möglichkeiten zu helfen"
+[sponsor_github]
+other = "GitHub Sponsors"
+[sponsor_github_desc]
+other = "Wiederkehrendes oder einmaliges Sponsoring über GitHub."
+[sponsor_coffee]
+other = "Buy Me a Coffee"
+[sponsor_coffee_desc]
+other = "Schneller Einmalbeitrag."
+[sponsor_star]
+other = "Projekt auf GitHub mit Stern markieren"
+[sponsor_star_desc]
+other = "Sterne helfen anderen, Factory Floor zu entdecken."
+[sponsor_issues]
+other = "Fehler melden"
+[sponsor_issues_desc]
+other = "Fehlerberichte und Funktionswünsche helfen, die App zu verbessern."
+[sponsor_contribute]
+other = "Code beitragen"
+[sponsor_contribute_desc]
+other = "Pull Requests für Fehlerbehebungen und Funktionen sind willkommen."
+[sponsor_translate]
+other = "App oder Website übersetzen"
+[sponsor_translate_desc]
+other = "Hilf dabei, Factory Floor in mehr Sprachen verfügbar zu machen."
+[sponsor_ghostty]
+other = "Ghostty unterstützen"
+[sponsor_ghostty_desc]
+other = "Factory Floor basiert auf Ghosttys GPU-gerendertem Terminal."
+
+# Get
+[get_title]
+other = "Factory Floor herunterladen"
+[get_desc]
+other = "Installiere über Homebrew oder lade die neueste Version herunter."
+[get_install]
+other = "Installieren"
+[get_upgrade]
+other = "Aktualisieren"
+[get_download]
+other = "Von GitHub Releases herunterladen"
+
+# Docs
+[nav_docs]
+other = "Doku"
+[docs_subtitle]
+other = "Alles was du wissen musst, nichts was du nicht brauchst."
+
+# Changelog
+[changelog_subtitle]
+other = "Versionshistorie für Factory Floor"
