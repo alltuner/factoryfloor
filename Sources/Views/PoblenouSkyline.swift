@@ -85,6 +85,6 @@ struct PoblenouSkylineView: View {
     var body: some View {
         PoblenouSkyline()
             .stroke(Color.primary.opacity(0.1), style: StrokeStyle(lineWidth: 3, lineCap: .round, lineJoin: .round))
-            .aspectRatio(1200/260, contentMode: .fit)
+            .aspectRatio(1200 / 260, contentMode: .fit)
     }
 }

@@ -16,9 +16,11 @@ final class WorkspaceTabSnapshotTests: XCTestCase {
             tabs: tabs,
             terminalCount: 1,
             browserCount: 1,
+            editorCount: 0,
             activeTab: .terminal(terminalID),
             browserTitles: [browserID: "localhost"],
             terminalTitles: [terminalID: "zsh"],
+            editorFilePaths: [:],
             runStarted: false,
             runStoppedManually: false
         )
@@ -41,9 +43,11 @@ final class WorkspaceTabSnapshotTests: XCTestCase {
             tabs: [.info, .agent, .terminal(liveTerminalID), .terminal(deadTerminalID), .browser(browserID)],
             terminalCount: 2,
             browserCount: 1,
+            editorCount: 0,
             activeTab: .terminal(deadTerminalID),
             browserTitles: [:],
             terminalTitles: [:],
+            editorFilePaths: [:],
             runStarted: false,
             runStoppedManually: false
         )
@@ -63,9 +67,11 @@ final class WorkspaceTabSnapshotTests: XCTestCase {
             tabs: [.info, .agent, .terminal(terminalID)],
             terminalCount: 1,
             browserCount: 0,
+            editorCount: 0,
             activeTab: .terminal(terminalID),
             browserTitles: [:],
             terminalTitles: [:],
+            editorFilePaths: [:],
             runStarted: false,
             runStoppedManually: false
         )
@@ -81,9 +87,11 @@ final class WorkspaceTabSnapshotTests: XCTestCase {
             tabs: [.info, .agent],
             terminalCount: 0,
             browserCount: 0,
+            editorCount: 0,
             activeTab: .agent,
             browserTitles: [:],
             terminalTitles: [:],
+            editorFilePaths: [:],
             runStarted: true,
             runStoppedManually: false
         )
@@ -101,9 +109,11 @@ final class WorkspaceTabSnapshotTests: XCTestCase {
             tabs: [.info, .agent, .browser(browserID)],
             terminalCount: 0,
             browserCount: 1,
+            editorCount: 0,
             activeTab: .browser(browserID),
             browserTitles: [:],
             terminalTitles: [:],
+            editorFilePaths: [:],
             runStarted: false,
             runStoppedManually: false
         )
@@ -120,9 +130,11 @@ final class WorkspaceTabSnapshotTests: XCTestCase {
             tabs: [.info, .agent],
             terminalCount: 0,
             browserCount: 0,
+            editorCount: 0,
             activeTab: .agent,
             browserTitles: [:],
             terminalTitles: [:],
+            editorFilePaths: [:],
             runStarted: true,
             runStoppedManually: false
         )

@@ -13,6 +13,7 @@ APP_PATH="$BUILD_DIR/Build/Products/Debug/$APP_NAME.app"
 SPM_CACHE="$HOME/Library/Caches/factoryfloor/spm"
 BRANCH=$(git branch --show-current 2>/dev/null || echo "unknown")
 GHOSTTY_RESOURCES="ghostty/zig-out/share"
+MONACO_OUTPUT="Resources/MonacoEditor/index.html"
 
 ensure_ghostty_resources() {
   if [ ! -d "$GHOSTTY_RESOURCES/terminfo" ] || [ ! -d "$GHOSTTY_RESOURCES/ghostty" ]; then
@@ -22,12 +23,21 @@ ensure_ghostty_resources() {
   fi
 }
 
+ensure_monaco_editor() {
+  if [ ! -f "$MONACO_OUTPUT" ]; then
+    echo "info: Monaco editor not built, running scripts/build-editor.sh..."
+    bash scripts/build-editor.sh
+  fi
+}
+
 case "${1:-build}" in
   build)
     ensure_ghostty_resources
+    ensure_monaco_editor
     xcodegen generate
     xcodebuild -project "$PROJECT" -scheme "$SCHEME" -configuration Debug \
       -derivedDataPath "$BUILD_DIR" -clonedSourcePackagesDirPath "$SPM_CACHE" \
+      -skipPackagePluginValidation \
       CURRENT_PROJECT_VERSION="$BRANCH" build
     ;;
   run)
@@ -44,9 +54,11 @@ case "${1:-build}" in
   br)
     shift 2>/dev/null || true
     ensure_ghostty_resources
+    ensure_monaco_editor
     xcodegen generate
     xcodebuild -project "$PROJECT" -scheme "$SCHEME" -configuration Debug \
       -derivedDataPath "$BUILD_DIR" -clonedSourcePackagesDirPath "$SPM_CACHE" \
+      -skipPackagePluginValidation \
       CURRENT_PROJECT_VERSION="$BRANCH" build
     pkill -xf ".*/Contents/MacOS/$APP_NAME" 2>/dev/null || true
     sleep 0.5
@@ -59,16 +71,20 @@ case "${1:-build}" in
     ;;
   test)
     ensure_ghostty_resources
+    ensure_monaco_editor
     xcodegen generate
     xcodebuild -project "$PROJECT" -scheme "$TEST_SCHEME" -configuration Debug \
-      -derivedDataPath "$BUILD_DIR" -clonedSourcePackagesDirPath "$SPM_CACHE" test
+      -derivedDataPath "$BUILD_DIR" -clonedSourcePackagesDirPath "$SPM_CACHE" \
+      -skipPackagePluginValidation test
     ;;
   release)
     RELEASE_DIR="build/release-local/derived"
     ensure_ghostty_resources
+    ensure_monaco_editor
     xcodegen generate
     xcodebuild -project "$PROJECT" -scheme "$SCHEME" -configuration Release \
       -derivedDataPath "$RELEASE_DIR" -clonedSourcePackagesDirPath "$SPM_CACHE" \
+      -skipPackagePluginValidation \
       CODE_SIGN_IDENTITY="-" \
       CODE_SIGN_STYLE=Manual \
       ENABLE_HARDENED_RUNTIME=YES \
