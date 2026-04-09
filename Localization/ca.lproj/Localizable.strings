@@ -38,6 +38,10 @@
 "Projects Not Found" = "Projectes no trobats";
 "The following projects were removed because their directories no longer exist on disk: %@" = "Els projectes següents s'han eliminat perquè els seus directoris ja no existeixen al disc: %@";
 "Cancel" = "Cancel·la";
+"Save" = "Desa";
+"Don't Save" = "No desis";
+"Do you want to save changes to \"%@\"?" = "Vols desar els canvis a \"%@\"?";
+"Your changes will be lost if you don't save them." = "Els canvis es perdran si no els deses.";
 "Remove" = "Elimina";
 "Worktree Creation Failed" = "Error en crear l'arbre de treball";
 "Could not create the git worktree. The branch may already exist, or there may be an ongoing merge or rebase." = "No s'ha pogut crear l'arbre de treball git. La branca pot ja existir, o pot haver-hi una fusió o un rebase en curs.";
@@ -69,6 +73,9 @@
 "Terminal" = "Terminal";
 "None" = "Cap";
 "Browser" = "Navegador";
+"Editor" = "Editor";
+"New Editor (\u2318E)" = "Nou editor (\u2318E)";
+"Open File" = "Obrir fitxer";
 "GitHub" = "GitHub";
 "Coding Agent" = "Agent de codi";
 "Bypass permission prompts" = "Ometre les sol·licituds de permisos";

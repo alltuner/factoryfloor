@@ -38,6 +38,10 @@
 "Projects Not Found" = "Projekt hittades inte";
 "The following projects were removed because their directories no longer exist on disk: %@" = "Följande projekt togs bort eftersom deras kataloger inte längre finns på disken: %@";
 "Cancel" = "Avbryt";
+"Save" = "Spara";
+"Don't Save" = "Spara inte";
+"Do you want to save changes to \"%@\"?" = "Vill du spara ändringarna i \"%@\"?";
+"Your changes will be lost if you don't save them." = "Dina ändringar går förlorade om du inte sparar dem.";
 "Remove" = "Ta bort";
 "Worktree Creation Failed" = "Kunde inte skapa arbetsträd";
 "Could not create the git worktree. The branch may already exist, or there may be an ongoing merge or rebase." = "Kunde inte skapa git-arbetsträdet. Grenen kanske redan finns, eller så pågår en sammanslagning eller rebase.";
@@ -69,6 +73,9 @@
 "Terminal" = "Terminal";
 "None" = "Ingen";
 "Browser" = "Webbläsare";
+"Editor" = "Redigerare";
+"New Editor (\u2318E)" = "Ny redigerare (\u2318E)";
+"Open File" = "Öppna fil";
 "GitHub" = "GitHub";
 "Coding Agent" = "Kodningsagent";
 "Bypass permission prompts" = "Hoppa över behörighetsförfrågningar";

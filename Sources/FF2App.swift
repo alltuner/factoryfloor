@@ -307,6 +307,16 @@ struct FF2App: App {
                 }
                 .keyboardShortcut("b", modifiers: .command)
 
+                Button("New Editor") {
+                    NotificationCenter.default.post(name: .toggleEditor, object: nil)
+                }
+                .keyboardShortcut("e", modifiers: .command)
+
+                Button("Save") {
+                    NotificationCenter.default.post(name: .saveEditor, object: nil)
+                }
+                .keyboardShortcut("s", modifiers: .command)
+
                 Button("Start/Rerun") {
                     NotificationCenter.default.post(name: .rerunScript, object: nil)
                 }

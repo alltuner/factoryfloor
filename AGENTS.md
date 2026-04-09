@@ -12,6 +12,7 @@
 ./scripts/dev.sh release --run      # release build and run
 ./scripts/dev.sh clean              # clean build artifacts
 ./scripts/release.sh [version]      # release build: sign, notarize, create DMG
+./scripts/build-editor.sh           # rebuild Monaco editor bundle (auto-run by dev.sh)
 ```
 
 ### After code changes
@@ -89,9 +90,11 @@ Breaking changes: add `!` after the type or include `BREAKING CHANGE:` in the fo
 ### Key directories
 - `Sources/Models/` - Data models, git operations, tmux, name generator, app constants
 - `Sources/Terminal/` - Ghostty integration (TerminalApp singleton, TerminalView NSView)
-- `Sources/Views/` - SwiftUI views (sidebar, settings, project overview, workspace, browser)
+- `Sources/Views/` - SwiftUI views (sidebar, settings, project overview, workspace, browser, editor)
 - `Localization/` - lproj directories with Localizable.strings
 - `Resources/` - Entitlements, bridging header, Assets.xcassets, CLI script
+- `Resources/MonacoEditor/` - Built Monaco editor bundle (gitignored, built by `scripts/build-editor.sh`)
+- `editor/` - Monaco editor Vite project (source for `Resources/MonacoEditor/`). Requires Node.js to build.
 - `ghostty/` - Git submodule (do not modify, pinned to stable release tag)
 - `website/` - Hugo + Tailwind CSS site for factory-floor.com. **Do not use `.AllTranslations`** in Hugo templates; it returns duplicates because localized contentDirs are nested inside the English `content/` dir. Use a hardcoded language code list instead (see `footer.html` or `docs.html` for the pattern).
 - `scripts/` - Release and build automation
@@ -172,6 +175,8 @@ Current shortcuts:
 - **Cmd+Return**: Focus Coding Agent
 - **Cmd+T**: New Terminal
 - **Cmd+B**: New Browser
+- **Cmd+E**: New Editor
+- **Cmd+S**: Save (Editor)
 - **Cmd+W**: Close tab
 - **Cmd+Shift+W**: Archive workstream
 - **Cmd+L**: Address bar (browser)
