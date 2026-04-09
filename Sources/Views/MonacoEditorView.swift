@@ -19,7 +19,7 @@ final class MonacoResourceSchemeHandler: NSObject, WKURLSchemeHandler {
         self.baseURL = baseURL
     }
 
-    func webView(_ webView: WKWebView, start urlSchemeTask: any WKURLSchemeTask) {
+    func webView(_: WKWebView, start urlSchemeTask: any WKURLSchemeTask) {
         guard let url = urlSchemeTask.request.url else {
             urlSchemeTask.didFailWithError(URLError(.badURL))
             return
@@ -49,7 +49,7 @@ final class MonacoResourceSchemeHandler: NSObject, WKURLSchemeHandler {
         urlSchemeTask.didFinish()
     }
 
-    func webView(_ webView: WKWebView, stop urlSchemeTask: any WKURLSchemeTask) {}
+    func webView(_: WKWebView, stop _: any WKURLSchemeTask) {}
 
     private static func mimeType(for ext: String) -> String {
         switch ext.lowercased() {
@@ -124,7 +124,7 @@ final class MonacoEditorBridge {
         if let webView { return webView }
 
         let coord = Coordinator(bridge: self)
-        self.coordinator = coord
+        coordinator = coord
 
         let contentController = WKUserContentController()
         contentController.add(coord, name: "editor")
@@ -144,14 +144,14 @@ final class MonacoEditorBridge {
         let wv = EditorWebView(frame: .zero, configuration: config)
         wv.setValue(false, forKey: "drawsBackground")
         #if DEBUG
-        wv.isInspectable = true
+            wv.isInspectable = true
         #endif
 
         if let url = URL(string: "ff-resource://monaco/index.html") {
             wv.load(URLRequest(url: url))
         }
 
-        self.webView = wv
+        webView = wv
         return wv
     }
 
@@ -197,7 +197,9 @@ final class MonacoEditorBridge {
 
     fileprivate func markReady() {
         isReady = true
-        for op in pendingOps { op() }
+        for op in pendingOps {
+            op()
+        }
         pendingOps.removeAll()
     }
 
@@ -215,7 +217,8 @@ final class MonacoEditorBridge {
     /// Uses JSONEncoder which handles all escaping (quotes, newlines, unicode, etc.).
     private func jsLiteral(_ string: String) -> String {
         guard let data = try? JSONEncoder().encode(string),
-              let json = String(data: data, encoding: .utf8) else {
+              let json = String(data: data, encoding: .utf8)
+        else {
             return "\"\""
         }
         return json
@@ -231,7 +234,7 @@ final class MonacoEditorBridge {
         }
 
         nonisolated func userContentController(
-            _ userContentController: WKUserContentController,
+            _: WKUserContentController,
             didReceive message: WKScriptMessage
         ) {
             Task { @MainActor in
@@ -243,7 +246,8 @@ final class MonacoEditorBridge {
                     self.bridge.markReady()
                 case "contentChanged":
                     if let modelId = body["modelId"] as? String,
-                       let dirty = body["dirty"] as? Bool {
+                       let dirty = body["dirty"] as? Bool
+                    {
                         self.bridge.onContentChanged?(modelId, dirty)
                     }
                 case "error":
