@@ -1,12 +1,40 @@
-import { initialize } from '@codingame/monaco-vscode-api'
+import { initialize, getService } from '@codingame/monaco-vscode-api'
+import { IExtensionResourceLoaderService } from '@codingame/monaco-vscode-api/vscode/vs/platform/extensionResourceLoader/common/extensionResourceLoader.service'
+import { IConfigurationService } from '@codingame/monaco-vscode-api/vscode/vs/platform/configuration/common/configuration.service'
+import { FileAccess } from '@codingame/monaco-vscode-api/vscode/vs/base/common/network'
 import getTextmateServiceOverride from '@codingame/monaco-vscode-textmate-service-override'
 import getThemeServiceOverride from '@codingame/monaco-vscode-theme-service-override'
 import getLanguagesServiceOverride from '@codingame/monaco-vscode-languages-service-override'
 
-// All 54 language TextMate grammars (auto-register on import)
-import '@codingame/monaco-vscode-all-language-default-extensions'
-// VS Code Dark+/Light+ themes
-import '@codingame/monaco-vscode-theme-defaults-default-extension'
+// --- Capture extension resource URL mappings ---
+// FileAccess.uriToBrowserUri() uses a ResourceMap internally, but the URI lookup
+// can fail when the theme service constructs a new URI object (different reference).
+// We capture the mappings ourselves in a simple string-keyed Map.
+// This MUST run before the extension imports so the map is populated.
+const extensionResourceUrls = new Map()
+const origRegister = FileAccess.registerStaticBrowserUri.bind(FileAccess)
+FileAccess.registerStaticBrowserUri = function (uri, browserUri) {
+  extensionResourceUrls.set(uri.toString(), browserUri.toString(true))
+  return origRegister(uri, browserUri)
+}
+
+// Dynamic imports so they run AFTER the monkey-patch above.
+// Static imports would evaluate before the module body.
+await import('@codingame/monaco-vscode-all-language-default-extensions')
+await import('@codingame/monaco-vscode-theme-defaults-default-extension')
+
+// --- JS ↔ Swift bridge ---
+function postToSwift(msg) {
+  window.webkit?.messageHandlers?.editor?.postMessage(msg)
+}
+
+// Forward uncaught errors to Swift for debugging
+window.onerror = (msg, src, line, col, err) => {
+  postToSwift({ type: 'error', message: `${msg} (${src}:${line}:${col})` })
+}
+window.onunhandledrejection = (e) => {
+  postToSwift({ type: 'error', message: `Unhandled rejection: ${e.reason}` })
+}
 
 // --- Worker setup ---
 // TextMate runs grammar tokenization in a Web Worker using oniguruma WASM.
@@ -32,13 +60,61 @@ window.MonacoEnvironment = {
   }
 }
 
+// --- Extension resource loader for WKWebView ---
+// The default readExtensionResource is "unsupported". We provide a simple
+// implementation that resolves extension-file:// URIs to ff-resource:// URLs
+// using our captured mapping, then fetches via the WKURLSchemeHandler.
+class ExtensionResourceLoader {
+  _serviceBrand = undefined
+  supportsExtensionGalleryResources = false
+
+  async readExtensionResource(uri) {
+    const uriStr = uri.toString()
+    const mappedUrl = extensionResourceUrls.get(uriStr)
+    if (!mappedUrl) {
+      throw new Error(`No resource mapping for ${uriStr}`)
+    }
+    const response = await fetch(mappedUrl)
+    if (!response.ok) {
+      throw new Error(`Failed to load ${uriStr}: ${response.status}`)
+    }
+    return response.text()
+  }
+
+  async getExtensionGalleryResourceURL() {
+    return undefined
+  }
+
+  getExtensionGalleryRequestHeaders() {
+    return {}
+  }
+
+  async isExtensionGalleryResource() {
+    return false
+  }
+}
+
 // --- Initialize VS Code services ---
 // MUST be called once, BEFORE creating any editor instance.
+// Uses full VS Code service overrides for TextMate grammars and themes.
+// Resources are served via WKURLSchemeHandler (ff-resource://) so fetch() works.
 await initialize({
   ...getTextmateServiceOverride(),
   ...getThemeServiceOverride(),
-  ...getLanguagesServiceOverride()
+  ...getLanguagesServiceOverride(),
+  [IExtensionResourceLoaderService.toString()]: new ExtensionResourceLoader()
+}, undefined, {
+  // initialColorTheme sets the dark appearance immediately at construction time.
+  // configurationDefaults is NOT wired into the config system in standalone mode,
+  // so we also force the theme via configurationService after init.
+  initialColorTheme: { themeType: 'dark' }
 })
+
+// Force the dark theme via the configuration service.
+// configurationDefaults doesn't work in @codingame/monaco-vscode-api standalone mode
+// because DefaultConfiguration.getConfigurationDefaultOverrides() is never overridden.
+const configService = await getService(IConfigurationService)
+await configService.updateValue('workbench.colorTheme', 'Dark Modern')
 
 // Import monaco AFTER initialize()
 const monaco = await import('monaco-editor')
@@ -47,7 +123,6 @@ const monaco = await import('monaco-editor')
 const editor = monaco.editor.create(document.getElementById('editor'), {
   value: '',
   language: 'plaintext',
-  theme: 'Default Dark+',
   automaticLayout: true,
   minimap: { enabled: false },
   fontSize: 13,
@@ -62,11 +137,6 @@ const editor = monaco.editor.create(document.getElementById('editor'), {
   },
   padding: { top: 8 }
 })
-
-// --- JS ↔ Swift bridge ---
-function postToSwift(msg) {
-  window.webkit?.messageHandlers?.editor?.postMessage(msg)
-}
 
 // --- Multi-model management ---
 // One model per open file, keyed by UUID string from Swift.
@@ -137,12 +207,6 @@ window.editorAPI = {
     if (activeModelId === modelId) {
       activeModelId = null
     }
-  },
-
-  // Apply a custom theme. themeData must be a Monaco IStandaloneThemeData object.
-  setTheme(themeData) {
-    monaco.editor.defineTheme('ghostty', themeData)
-    monaco.editor.setTheme('ghostty')
   },
 
   // Focus the editor.

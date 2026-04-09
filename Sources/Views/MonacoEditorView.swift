@@ -5,6 +5,69 @@ import Cocoa
 import SwiftUI
 import WebKit
 
+// MARK: - MonacoResourceSchemeHandler
+
+/// Serves Monaco editor resources from the app bundle via a custom URL scheme.
+/// WKWebView's `loadFileURL` uses `file://` which breaks `fetch()` in JS
+/// (WebKit's fetch only supports http/https/blob/data). By serving everything
+/// through a custom scheme, all requests — JS modules, CSS, JSON, WASM, worker
+/// fetches — go through this handler and work reliably.
+final class MonacoResourceSchemeHandler: NSObject, WKURLSchemeHandler {
+    private let baseURL: URL
+
+    init(baseURL: URL) {
+        self.baseURL = baseURL
+    }
+
+    func webView(_ webView: WKWebView, start urlSchemeTask: any WKURLSchemeTask) {
+        guard let url = urlSchemeTask.request.url else {
+            urlSchemeTask.didFailWithError(URLError(.badURL))
+            return
+        }
+
+        // Strip leading slash from path to get relative path within MonacoEditor/
+        let relativePath = String(url.path.dropFirst())
+        let fileURL = baseURL.appendingPathComponent(relativePath)
+
+        guard let data = try? Data(contentsOf: fileURL) else {
+            urlSchemeTask.didFailWithError(URLError(.fileDoesNotExist))
+            return
+        }
+
+        let mimeType = Self.mimeType(for: fileURL.pathExtension)
+        let response = HTTPURLResponse(
+            url: url,
+            statusCode: 200,
+            httpVersion: nil,
+            headerFields: [
+                "Content-Type": mimeType,
+                "Content-Length": "\(data.count)",
+            ]
+        )!
+        urlSchemeTask.didReceive(response)
+        urlSchemeTask.didReceive(data)
+        urlSchemeTask.didFinish()
+    }
+
+    func webView(_ webView: WKWebView, stop urlSchemeTask: any WKURLSchemeTask) {}
+
+    private static func mimeType(for ext: String) -> String {
+        switch ext.lowercased() {
+        case "html": return "text/html"
+        case "js", "mjs": return "text/javascript"
+        case "css": return "text/css"
+        case "json": return "application/json"
+        case "wasm": return "application/wasm"
+        case "ttf": return "font/ttf"
+        case "woff": return "font/woff"
+        case "woff2": return "font/woff2"
+        case "svg": return "image/svg+xml"
+        case "png": return "image/png"
+        default: return "application/octet-stream"
+        }
+    }
+}
+
 // MARK: - EditorWebView
 
 /// WKWebView subclass that lets app-level keyboard shortcuts pass through to the
@@ -68,15 +131,24 @@ final class MonacoEditorBridge {
 
         let config = WKWebViewConfiguration()
         config.userContentController = contentController
-        config.preferences.setValue(true, forKey: "allowFileAccessFromFileURLs")
+
+        // Serve Monaco resources via custom scheme so fetch() works for all
+        // resource types (JS, CSS, JSON, WASM). WKWebView's file:// breaks
+        // fetch() which the VS Code extension system depends on.
+        if let resourceURL = Bundle.main.resourceURL {
+            let bundleURL = resourceURL.appendingPathComponent("MonacoEditor")
+            let handler = MonacoResourceSchemeHandler(baseURL: bundleURL)
+            config.setURLSchemeHandler(handler, forURLScheme: "ff-resource")
+        }
 
         let wv = EditorWebView(frame: .zero, configuration: config)
         wv.setValue(false, forKey: "drawsBackground")
+        #if DEBUG
+        wv.isInspectable = true
+        #endif
 
-        if let resourceURL = Bundle.main.resourceURL {
-            let bundleURL = resourceURL.appendingPathComponent("MonacoEditor")
-            let htmlURL = bundleURL.appendingPathComponent("index.html")
-            wv.loadFileURL(htmlURL, allowingReadAccessTo: bundleURL)
+        if let url = URL(string: "ff-resource://monaco/index.html") {
+            wv.load(URLRequest(url: url))
         }
 
         self.webView = wv
@@ -118,13 +190,6 @@ final class MonacoEditorBridge {
         enqueue {
             guard let webView = self.webView else { return }
             webView.evaluateJavaScript("window.editorAPI.closeModel(\(self.jsLiteral(modelId)))")
-        }
-    }
-
-    func setTheme(_ json: String) {
-        enqueue {
-            guard let webView = self.webView else { return }
-            webView.evaluateJavaScript("window.editorAPI.setTheme(\(json))")
         }
     }
 
@@ -180,6 +245,10 @@ final class MonacoEditorBridge {
                     if let modelId = body["modelId"] as? String,
                        let dirty = body["dirty"] as? Bool {
                         self.bridge.onContentChanged?(modelId, dirty)
+                    }
+                case "error":
+                    if let msg = body["message"] as? String {
+                        print("[MonacoEditor] JS error: \(msg)")
                     }
                 default:
                     break

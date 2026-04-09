@@ -200,7 +200,6 @@ struct EditorView: View {
             let fileName = (relativePath as NSString).lastPathComponent
             let langId = Self.monacoLanguageId(for: fileName)
             bridge.openFile(modelId: modelId, text: content, languageId: langId)
-            bridge.setTheme(Self.monacoTheme.toJSON())
             isDirtyState = false
             fileLoaded = true
             loadError = nil
@@ -221,15 +220,6 @@ struct EditorView: View {
         } catch {
             loadError = error.localizedDescription
         }
-    }
-
-    // MARK: - Theme
-
-    private static var monacoTheme: MonacoTheme {
-        guard let config = TerminalApp.shared.config else {
-            return MonacoTheme.fallback
-        }
-        return TerminalPalette.from(config).monacoTheme
     }
 
     // MARK: - Language Detection
