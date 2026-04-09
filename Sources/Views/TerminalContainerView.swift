@@ -966,7 +966,6 @@ struct TerminalContainerView: View {
             directoryWatcher?.stop()
             directoryWatcher = nil
             fileTree = []
-            editorBridge = nil
         }
     }
 
@@ -1090,7 +1089,21 @@ struct TerminalContainerView: View {
             surfaceCache.respawnableIDs.insert(claudeID)
         }
         preloadSurfaces()
+        preloadEditorBridge()
         surfaceCache.updateOcclusion(visibleSurfaceIDs: visibleSurfaceIDs)
+    }
+
+    /// Pre-create the editor WKWebView so Monaco is ready before the user opens an editor tab.
+    private func preloadEditorBridge() {
+        guard editorBridge == nil else { return }
+        let bridge = MonacoEditorBridge()
+        bridge.onContentChanged = { [self] modelId, dirty in
+            if let uuid = UUID(uuidString: modelId) {
+                editorDirtyState[uuid] = dirty
+            }
+        }
+        editorBridge = bridge
+        _ = bridge.ensureWebView()
     }
 
     /// Pre-create terminal surfaces so they start running before their tab is visible.
