@@ -269,6 +269,30 @@ final class GitOperationsTests: XCTestCase {
                       "Working tree should still be dirty")
     }
 
+    // MARK: - pruneCleanWorktrees
+
+    func testPruneCleanWorktreesPrunesOnlyRequestedPaths() throws {
+        let repoDir = tempDir.appendingPathComponent("prune-filtered")
+        try FileManager.default.createDirectory(at: repoDir, withIntermediateDirectories: true)
+        git(["init", "-b", "main"], in: repoDir)
+        git(["-c", "user.email=test@test.com", "-c", "user.name=Test",
+             "commit", "--allow-empty", "-m", "init"], in: repoDir)
+
+        let worktreeA = tempDir.appendingPathComponent("worktree-a")
+        let worktreeB = tempDir.appendingPathComponent("worktree-b")
+        XCTAssertTrue(git(["worktree", "add", "-b", "feature/a", worktreeA.path], in: repoDir))
+        XCTAssertTrue(git(["worktree", "add", "-b", "feature/b", worktreeB.path], in: repoDir))
+
+        let pruned = GitOperations.pruneCleanWorktrees(
+            at: repoDir.path,
+            onlyPaths: Set([worktreeA.path])
+        )
+
+        XCTAssertEqual(pruned, 1)
+        XCTAssertFalse(FileManager.default.fileExists(atPath: worktreeA.path))
+        XCTAssertTrue(FileManager.default.fileExists(atPath: worktreeB.path))
+    }
+
     // MARK: - Helpers
 
     @discardableResult

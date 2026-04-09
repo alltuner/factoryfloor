@@ -87,11 +87,11 @@
 "Uncommitted changes" = "Osparade ändringar";
 "Commits ahead" = "Commits före";
 "Open as workstream" = "Öppna som arbetsflöde";
-"Worktrees on disk for this repository. Pruning removes clean worktrees and their associated workstreams." = "Arbetsträd på disk för detta repository. Rensning tar bort rena arbetsträd och deras associerade arbetsflöden.";
+"Worktrees on disk for this repository. Pruning removes clean worktrees that are not associated with a workstream." = "Arbetsträd på disk för detta repository. Rensning tar bort rena arbetsträd som inte är associerade med ett arbetsflöde.";
 "Prune %d clean worktree" = "Rensa %d rent arbetsträd";
 "Prune %d clean worktrees" = "Rensa %d rena arbetsträd";
-"Remove %d worktree with no uncommitted changes? Associated workstreams will also be removed from the sidebar." = "Ta bort %d arbetsträd utan osparade ändringar? Associerade arbetsflöden kommer också att tas bort från sidofältet.";
-"Remove %d worktrees with no uncommitted changes? Associated workstreams will also be removed from the sidebar." = "Ta bort %d arbetsträd utan osparade ändringar? Associerade arbetsflöden kommer också att tas bort från sidofältet.";
+"Remove %d clean worktree with no uncommitted changes?" = "Ta bort %d rent arbetsträd utan osparade ändringar?";
+"Remove %d clean worktrees with no uncommitted changes?" = "Ta bort %d rena arbetsträd utan osparade ändringar?";
 "Remove \"%@\" from the list? Files in %@ will not be deleted." = "Ta bort \"%@\" från listan? Filer i %@ kommer inte att raderas.";
 
 /* Projects */
