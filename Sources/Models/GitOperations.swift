@@ -289,7 +289,11 @@ enum GitOperations {
     @discardableResult
     static func pruneCleanWorktrees(at projectPath: String, onlyPaths: Set<String>? = nil) -> Int {
         let worktrees = listWorktreesWithInfo(at: projectPath)
-        let allowedPaths = onlyPaths.map { Set($0.map { URL(fileURLWithPath: $0).standardizedFileURL.path }) }
+        let allowedPaths = onlyPaths.map { paths in
+            Set(paths.map { path in
+                URL(fileURLWithPath: path).standardizedFileURL.path
+            })
+        }
         var pruned = 0
         for wt in worktrees where !wt.isMain && !wt.isDirty && !wt.hasBranchCommits {
             let standardizedPath = URL(fileURLWithPath: wt.path).standardizedFileURL.path
