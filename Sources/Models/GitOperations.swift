@@ -284,12 +284,18 @@ enum GitOperations {
         return results
     }
 
-    /// Remove all worktrees that have no uncommitted changes and no unmerged branch commits.
+    /// Remove clean worktrees (no uncommitted changes and no unmerged branch commits).
+    /// When `onlyPaths` is provided, only those worktree paths are considered.
     @discardableResult
-    static func pruneCleanWorktrees(at projectPath: String) -> Int {
+    static func pruneCleanWorktrees(at projectPath: String, onlyPaths: Set<String>? = nil) -> Int {
         let worktrees = listWorktreesWithInfo(at: projectPath)
+        let allowedPaths = onlyPaths.map { Set($0.map { URL(fileURLWithPath: $0).standardizedFileURL.path }) }
         var pruned = 0
         for wt in worktrees where !wt.isMain && !wt.isDirty && !wt.hasBranchCommits {
+            let standardizedPath = URL(fileURLWithPath: wt.path).standardizedFileURL.path
+            if let allowedPaths, !allowedPaths.contains(standardizedPath) {
+                continue
+            }
             let result = run(args: ["worktree", "remove", wt.path], in: projectPath)
             if result != nil {
                 pruned += 1

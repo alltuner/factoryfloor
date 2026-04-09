@@ -87,11 +87,11 @@
 "Uncommitted changes" = "Uncommitted changes";
 "Commits ahead" = "Commits ahead";
 "Open as workstream" = "Open as workstream";
-"Worktrees on disk for this repository. Pruning removes clean worktrees and their associated workstreams." = "Worktrees on disk for this repository. Pruning removes clean worktrees and their associated workstreams.";
+"Worktrees on disk for this repository. Pruning removes clean worktrees that are not associated with a workstream." = "Worktrees on disk for this repository. Pruning removes clean worktrees that are not associated with a workstream.";
 "Prune %d clean worktree" = "Prune %d clean worktree";
 "Prune %d clean worktrees" = "Prune %d clean worktrees";
-"Remove %d worktree with no uncommitted changes? Associated workstreams will also be removed from the sidebar." = "Remove %d worktree with no uncommitted changes? Associated workstreams will also be removed from the sidebar.";
-"Remove %d worktrees with no uncommitted changes? Associated workstreams will also be removed from the sidebar." = "Remove %d worktrees with no uncommitted changes? Associated workstreams will also be removed from the sidebar.";
+"Remove %d clean worktree with no uncommitted changes?" = "Remove %d clean worktree with no uncommitted changes?";
+"Remove %d clean worktrees with no uncommitted changes?" = "Remove %d clean worktrees with no uncommitted changes?";
 "Remove \"%@\" from the list? Files in %@ will not be deleted." = "Remove \"%@\" from the list? Files in %@ will not be deleted.";
 
 /* Projects */

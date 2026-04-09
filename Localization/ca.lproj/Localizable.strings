@@ -87,11 +87,11 @@
 "Uncommitted changes" = "Canvis sense confirmar";
 "Commits ahead" = "Commits per endavant";
 "Open as workstream" = "Obre com a flux de treball";
-"Worktrees on disk for this repository. Pruning removes clean worktrees and their associated workstreams." = "Arbres de treball al disc per a aquest repositori. La neteja elimina els arbres de treball nets i els seus fluxos de treball associats.";
+"Worktrees on disk for this repository. Pruning removes clean worktrees that are not associated with a workstream." = "Arbres de treball al disc per a aquest repositori. La neteja elimina els arbres de treball nets que no estan associats a cap flux de treball.";
 "Prune %d clean worktree" = "Neteja %d arbre de treball net";
 "Prune %d clean worktrees" = "Neteja %d arbres de treball nets";
-"Remove %d worktree with no uncommitted changes? Associated workstreams will also be removed from the sidebar." = "Vols eliminar %d arbre de treball sense canvis sense confirmar? Els fluxos de treball associats també s'eliminaran de la barra lateral.";
-"Remove %d worktrees with no uncommitted changes? Associated workstreams will also be removed from the sidebar." = "Vols eliminar %d arbres de treball sense canvis sense confirmar? Els fluxos de treball associats també s'eliminaran de la barra lateral.";
+"Remove %d clean worktree with no uncommitted changes?" = "Vols eliminar %d arbre de treball net sense canvis sense confirmar?";
+"Remove %d clean worktrees with no uncommitted changes?" = "Vols eliminar %d arbres de treball nets sense canvis sense confirmar?";
 "Remove \"%@\" from the list? Files in %@ will not be deleted." = "Vols eliminar \"%@\" de la llista? Els fitxers a %@ no s'esborraran.";
 
 /* Projects */

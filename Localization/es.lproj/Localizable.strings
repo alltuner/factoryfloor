@@ -87,11 +87,11 @@
 "Uncommitted changes" = "Cambios sin confirmar";
 "Commits ahead" = "Commits por delante";
 "Open as workstream" = "Abrir como flujo de trabajo";
-"Worktrees on disk for this repository. Pruning removes clean worktrees and their associated workstreams." = "Árboles de trabajo en disco para este repositorio. La limpieza elimina los árboles de trabajo limpios y sus flujos de trabajo asociados.";
+"Worktrees on disk for this repository. Pruning removes clean worktrees that are not associated with a workstream." = "Árboles de trabajo en disco para este repositorio. La limpieza elimina los árboles de trabajo limpios que no están asociados a un flujo de trabajo.";
 "Prune %d clean worktree" = "Limpiar %d árbol de trabajo limpio";
 "Prune %d clean worktrees" = "Limpiar %d árboles de trabajo limpios";
-"Remove %d worktree with no uncommitted changes? Associated workstreams will also be removed from the sidebar." = "¿Eliminar %d árbol de trabajo sin cambios sin confirmar? Los flujos de trabajo asociados también se eliminarán de la barra lateral.";
-"Remove %d worktrees with no uncommitted changes? Associated workstreams will also be removed from the sidebar." = "¿Eliminar %d árboles de trabajo sin cambios sin confirmar? Los flujos de trabajo asociados también se eliminarán de la barra lateral.";
+"Remove %d clean worktree with no uncommitted changes?" = "¿Eliminar %d árbol de trabajo limpio sin cambios sin confirmar?";
+"Remove %d clean worktrees with no uncommitted changes?" = "¿Eliminar %d árboles de trabajo limpios sin cambios sin confirmar?";
 "Remove \"%@\" from the list? Files in %@ will not be deleted." = "¿Eliminar \"%@\" de la lista? Los archivos en %@ no se borrarán.";
 
 /* Projects */

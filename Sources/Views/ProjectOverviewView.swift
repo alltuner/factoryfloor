@@ -192,7 +192,7 @@ struct ProjectOverviewView: View {
                             WorktreeInfoRow(
                                 worktree: wt,
                                 projectDirectory: project.directory,
-                                isWorkstream: workstreamPaths.contains(wt.path),
+                                isWorkstream: workstreamPaths.contains(Self.standardizedPath(wt.path)),
                                 onAdopt: { adoptWorktree(wt) }
                             )
                         }
@@ -218,7 +218,7 @@ struct ProjectOverviewView: View {
                                 .foregroundStyle(.secondary)
                         }
                     } footer: {
-                        Text("Worktrees on disk for this repository. Pruning removes clean worktrees and their associated workstreams.")
+                        Text("Worktrees on disk for this repository. Pruning removes clean worktrees that are not associated with a workstream.")
                     }
                 }
             }
@@ -261,16 +261,27 @@ struct ProjectOverviewView: View {
             Button("Cancel", role: .cancel) {}
             Button("Prune", role: .destructive) { pruneWorktrees() }
         } message: {
-            Text(String(format: NSLocalizedString(prunableCount == 1 ? "Remove %d worktree with no uncommitted changes? Associated workstreams will also be removed from the sidebar." : "Remove %d worktrees with no uncommitted changes? Associated workstreams will also be removed from the sidebar.", comment: ""), prunableCount))
+            Text(String(format: NSLocalizedString(prunableCount == 1 ? "Remove %d clean worktree with no uncommitted changes?" : "Remove %d clean worktrees with no uncommitted changes?", comment: ""), prunableCount))
         }
     }
 
     private var workstreamPaths: Set<String> {
-        Set(project.workstreams.compactMap(\.worktreePath))
+        Set(project.workstreams.compactMap(\.worktreePath).map(Self.standardizedPath))
+    }
+
+    private var prunableWorktrees: [WorktreeInfo] {
+        return worktrees.filter { worktree in
+            guard !worktree.isMain && !worktree.isDirty && !worktree.hasBranchCommits else { return false }
+            return !workstreamPaths.contains(Self.standardizedPath(worktree.path))
+        }
+    }
+
+    private var prunablePaths: Set<String> {
+        Set(prunableWorktrees.map(\.path).map(Self.standardizedPath))
     }
 
     private var prunableCount: Int {
-        worktrees.filter { !$0.isMain && !$0.isDirty && !$0.hasBranchCommits }.count
+        prunableWorktrees.count
     }
 
     private func adoptWorktree(_ worktree: WorktreeInfo) {
@@ -307,10 +318,10 @@ struct ProjectOverviewView: View {
     private func pruneWorktrees() {
         isPruning = true
         let dir = project.directory
-        let prunablePaths = Set(worktrees.filter { !$0.isMain && !$0.isDirty && !$0.hasBranchCommits }.map(\.path))
+        let pathsToPrune = prunablePaths
         Task.detached {
-            GitOperations.pruneCleanWorktrees(at: dir)
-            await applyPrunedWorktrees(prunablePaths)
+            GitOperations.pruneCleanWorktrees(at: dir, onlyPaths: pathsToPrune)
+            await applyPrunedWorktrees(pathsToPrune)
         }
     }
 
@@ -337,11 +348,15 @@ struct ProjectOverviewView: View {
     private func applyPrunedWorktrees(_ prunablePaths: Set<String>) {
         project.workstreams.removeAll { ws in
             guard let path = ws.worktreePath else { return false }
-            return prunablePaths.contains(path)
+            return prunablePaths.contains(Self.standardizedPath(path))
         }
         onProjectChanged()
         isPruning = false
         refreshWorktrees()
+    }
+
+    private static func standardizedPath(_ path: String) -> String {
+        URL(fileURLWithPath: path).standardizedFileURL.path
     }
 }
 
