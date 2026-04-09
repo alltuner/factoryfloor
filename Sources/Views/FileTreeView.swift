@@ -1,5 +1,5 @@
-// ABOUTME: SwiftUI view that renders a nested file tree with selection support.
-// ABOUTME: Directories are always expanded; files are clickable to open in the editor.
+// ABOUTME: SwiftUI view that renders a nested file tree with togglable folders and selection support.
+// ABOUTME: Folders expand/collapse on click; horizontal scrolling for long paths.
 
 import SwiftUI
 
@@ -8,14 +8,42 @@ struct FileTreeView: View {
     let selectedPath: String?
     var onSelect: (String) -> Void
 
+    @State private var expandedFolders: Set<String> = []
+
     var body: some View {
-        ScrollView {
-            LazyVStack(alignment: .leading, spacing: 0) {
-                ForEach(nodes) { node in
-                    FileTreeNodeView(node: node, depth: 0, selectedPath: selectedPath, onSelect: onSelect)
+        GeometryReader { geometry in
+            ScrollView([.horizontal, .vertical]) {
+                VStack(alignment: .leading, spacing: 0) {
+                    ForEach(nodes) { node in
+                        FileTreeNodeView(
+                            node: node,
+                            depth: 0,
+                            selectedPath: selectedPath,
+                            expandedFolders: $expandedFolders,
+                            onSelect: onSelect
+                        )
+                    }
                 }
+                .padding(.vertical, 4)
+                .frame(minWidth: geometry.size.width, minHeight: geometry.size.height, alignment: .topLeading)
             }
-            .padding(.vertical, 4)
+        }
+        .onAppear {
+            expandAncestors(of: selectedPath)
+        }
+        .onChange(of: selectedPath) { _, newPath in
+            expandAncestors(of: newPath)
+        }
+    }
+
+    /// Expand all ancestor folders so a selected file is visible in the tree.
+    private func expandAncestors(of path: String?) {
+        guard let path, !path.isEmpty else { return }
+        let components = path.split(separator: "/").map(String.init)
+        var current = ""
+        for component in components.dropLast() {
+            current = current.isEmpty ? component : current + "/" + component
+            expandedFolders.insert(current)
         }
     }
 }
@@ -24,13 +52,26 @@ private struct FileTreeNodeView: View {
     let node: FileNode
     let depth: Int
     let selectedPath: String?
+    @Binding var expandedFolders: Set<String>
     var onSelect: (String) -> Void
+
+    private var isExpanded: Bool {
+        expandedFolders.contains(node.id)
+    }
 
     var body: some View {
         if node.isDirectory {
             directoryRow
-            ForEach(node.children) { child in
-                FileTreeNodeView(node: child, depth: depth + 1, selectedPath: selectedPath, onSelect: onSelect)
+            if isExpanded {
+                ForEach(node.children) { child in
+                    FileTreeNodeView(
+                        node: child,
+                        depth: depth + 1,
+                        selectedPath: selectedPath,
+                        expandedFolders: $expandedFolders,
+                        onSelect: onSelect
+                    )
+                }
             }
         } else {
             fileRow
@@ -38,17 +79,37 @@ private struct FileTreeNodeView: View {
     }
 
     private var directoryRow: some View {
-        HStack(spacing: 4) {
-            Image(systemName: "folder")
-                .foregroundStyle(.secondary)
-                .font(.system(size: 11))
-            Text(node.name)
-                .font(.system(size: 12, weight: .medium))
-                .foregroundStyle(.secondary)
+        Button {
+            withAnimation(.easeInOut(duration: 0.15)) {
+                if isExpanded {
+                    expandedFolders.remove(node.id)
+                } else {
+                    expandedFolders.insert(node.id)
+                }
+            }
+        } label: {
+            HStack(spacing: 4) {
+                Image(systemName: "chevron.right")
+                    .font(.system(size: 9, weight: .bold))
+                    .foregroundStyle(.tertiary)
+                    .frame(width: 10)
+                    .rotationEffect(.degrees(isExpanded ? 90 : 0))
+                Image(systemName: "folder.fill")
+                    .font(.system(size: 11))
+                    .foregroundStyle(.secondary)
+                Text(node.name)
+                    .font(.system(size: 12, weight: .medium))
+                    .foregroundStyle(.primary)
+                    .lineLimit(1)
+                    .fixedSize(horizontal: true, vertical: false)
+            }
+            .padding(.leading, CGFloat(depth) * 16 + 8)
+            .padding(.vertical, 3)
+            .padding(.trailing, 8)
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .contentShape(Rectangle())
         }
-        .padding(.leading, CGFloat(depth) * 16 + 8)
-        .padding(.vertical, 3)
-        .frame(maxWidth: .infinity, alignment: .leading)
+        .buttonStyle(.plain)
     }
 
     private var fileRow: some View {
@@ -57,16 +118,24 @@ private struct FileTreeNodeView: View {
         return Button {
             onSelect(node.id)
         } label: {
-            Text(node.name)
-                .font(.system(size: 12))
-                .lineLimit(1)
-                .truncationMode(.middle)
-                .frame(maxWidth: .infinity, alignment: .leading)
-                .padding(.leading, CGFloat(depth) * 16 + 8)
-                .padding(.vertical, 3)
-                .padding(.trailing, 8)
-                .background(isSelected ? Color.accentColor.opacity(0.15) : .clear)
-                .cornerRadius(4)
+            HStack(spacing: 4) {
+                Color.clear
+                    .frame(width: 10, height: 1)
+                Image(systemName: "doc")
+                    .font(.system(size: 11))
+                    .foregroundStyle(.secondary)
+                Text(node.name)
+                    .font(.system(size: 12))
+                    .foregroundStyle(.primary)
+                    .lineLimit(1)
+                    .fixedSize(horizontal: true, vertical: false)
+            }
+            .padding(.leading, CGFloat(depth) * 16 + 8)
+            .padding(.vertical, 3)
+            .padding(.trailing, 8)
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .background(isSelected ? Color.accentColor.opacity(0.15) : .clear)
+            .cornerRadius(4)
         }
         .buttonStyle(.plain)
     }
