@@ -39,6 +39,7 @@
 "The following projects were removed because their directories no longer exist on disk: %@" = "Els projectes següents s'han eliminat perquè els seus directoris ja no existeixen al disc: %@";
 "Cancel" = "Cancel·la";
 "Save" = "Desa";
+"Save As..." = "Desa com a...";
 "Don't Save" = "No desis";
 "Do you want to save changes to \"%@\"?" = "Vols desar els canvis a \"%@\"?";
 "Your changes will be lost if you don't save them." = "Els canvis es perdran si no els deses.";

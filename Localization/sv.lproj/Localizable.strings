@@ -39,6 +39,7 @@
 "The following projects were removed because their directories no longer exist on disk: %@" = "Följande projekt togs bort eftersom deras kataloger inte längre finns på disken: %@";
 "Cancel" = "Avbryt";
 "Save" = "Spara";
+"Save As..." = "Spara som …";
 "Don't Save" = "Spara inte";
 "Do you want to save changes to \"%@\"?" = "Vill du spara ändringarna i \"%@\"?";
 "Your changes will be lost if you don't save them." = "Dina ändringar går förlorade om du inte sparar dem.";

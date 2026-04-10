@@ -19,6 +19,7 @@ extension Notification.Name {
     static let terminalTitleChanged = Notification.Name("factoryfloor.terminalTitleChanged")
     static let toggleEditor = Notification.Name("factoryfloor.toggleEditor")
     static let saveEditor = Notification.Name("factoryfloor.saveEditor")
+    static let saveEditorAs = Notification.Name("factoryfloor.saveEditorAs")
 }
 
 enum RestorableWorkspaceTab: String, Codable {
@@ -272,6 +273,7 @@ struct TerminalContainerView: View {
     @AppStorage("factoryfloor.autoRenameBranch") private var autoRenameBranch: Bool = false
     @AppStorage("factoryfloor.allowOutsideWorktree") private var allowOutsideWorktree: Bool = false
     @AppStorage("factoryfloor.quickActionDebug") private var quickActionDebug: Bool = false
+    @AppStorage("factoryfloor.editorTabActive") private var editorTabActive: Bool = false
     @State private var activeTab: WorkspaceTab = .info
     @State private var tabs: [WorkspaceTab] = [.info, .agent]
     @State private var terminalCount = 0
@@ -335,6 +337,11 @@ struct TerminalContainerView: View {
 
     private var quickActionRunner: QuickActionRunner {
         surfaceCache.quickActionRunner(for: workstreamID)
+    }
+
+    private var isEditorTabActive: Bool {
+        if case .editor = activeTab { return true }
+        return false
     }
 
     /// Surface IDs that should be rendering for the active tab.
@@ -623,17 +630,20 @@ struct TerminalContainerView: View {
                     fileTree: fileTree,
                     initialFilePath: editorFilePaths[id],
                     bridge: bridge,
-                    modelId: id.uuidString
-                ) { dirty in
-                    editorDirtyState[id] = dirty
-                } onFileChanged: { path in
-                    if let path {
-                        editorFilePaths[id] = path
-                    } else {
-                        editorFilePaths.removeValue(forKey: id)
+                    modelId: id.uuidString,
+                    isDirtyState: Binding(
+                        get: { editorDirtyState[id] ?? false },
+                        set: { editorDirtyState[id] = $0 }
+                    ),
+                    onFileChanged: { path in
+                        if let path {
+                            editorFilePaths[id] = path
+                        } else {
+                            editorFilePaths.removeValue(forKey: id)
+                        }
+                        saveTabSnapshot()
                     }
-                    saveTabSnapshot()
-                }
+                )
             } else {
                 ProgressView()
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
@@ -703,12 +713,17 @@ struct TerminalContainerView: View {
                 startWorkspace(defaultBranch: branch)
             }
         }
+        .onAppear {
+            editorTabActive = isEditorTabActive
+        }
         .onDisappear {
+            editorTabActive = false
             guard workspaceStarted else { return }
             surfaceCache.saveTabSnapshot(for: workstreamID, snapshot: currentTabSnapshot())
         }
         .onChange(of: activeTab) {
             guard isActive else { return }
+            editorTabActive = isEditorTabActive
             surfaceCache.updateOcclusion(visibleSurfaceIDs: visibleSurfaceIDs)
             WorkspaceStateStore.save(RestorableWorkspaceTab(activeTab: activeTab), for: workstreamID)
             appEnv.refreshWorktreeState(for: workingDirectory, projectDirectory: projectDirectory)
@@ -805,6 +820,7 @@ struct TerminalContainerView: View {
                 }
             }
             .onChange(of: isActive) { _, active in
+                editorTabActive = active && isEditorTabActive
                 if active {
                     surfaceCache.updateOcclusion(visibleSurfaceIDs: visibleSurfaceIDs)
                 } else {

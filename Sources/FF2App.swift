@@ -154,6 +154,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCent
 struct FF2App: App {
     @NSApplicationDelegateAdaptor(AppDelegate.self) var appDelegate
     @StateObject private var updater = Updater()
+    @AppStorage("factoryfloor.editorTabActive") private var isEditorActive = false
     @State private var pendingURLDirectory: String?
 
     init() {
@@ -266,6 +267,19 @@ struct FF2App: App {
                 }
                 .keyboardShortcut("n", modifiers: [.command, .shift])
             }
+            CommandGroup(replacing: .saveItem) {
+                Button("Save") {
+                    NotificationCenter.default.post(name: .saveEditor, object: nil)
+                }
+                .keyboardShortcut("s", modifiers: .command)
+                .disabled(!isEditorActive)
+
+                Button("Save As...") {
+                    NotificationCenter.default.post(name: .saveEditorAs, object: nil)
+                }
+                .keyboardShortcut("s", modifiers: [.command, .shift])
+                .disabled(!isEditorActive)
+            }
             // Cmd+,: toggle settings
             CommandGroup(after: .appSettings) {
                 Button("Check for Updates...") {
@@ -311,11 +325,6 @@ struct FF2App: App {
                     NotificationCenter.default.post(name: .toggleEditor, object: nil)
                 }
                 .keyboardShortcut("e", modifiers: .command)
-
-                Button("Save") {
-                    NotificationCenter.default.post(name: .saveEditor, object: nil)
-                }
-                .keyboardShortcut("s", modifiers: .command)
 
                 Button("Start/Rerun") {
                     NotificationCenter.default.post(name: .rerunScript, object: nil)

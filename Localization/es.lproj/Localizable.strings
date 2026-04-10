@@ -39,6 +39,7 @@
 "The following projects were removed because their directories no longer exist on disk: %@" = "Los siguientes proyectos se eliminaron porque sus directorios ya no existen en el disco: %@";
 "Cancel" = "Cancelar";
 "Save" = "Guardar";
+"Save As..." = "Guardar como...";
 "Don't Save" = "No guardar";
 "Do you want to save changes to \"%@\"?" = "¿Quieres guardar los cambios en \"%@\"?";
 "Your changes will be lost if you don't save them." = "Los cambios se perderán si no los guardas.";
