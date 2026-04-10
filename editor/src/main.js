@@ -159,9 +159,14 @@ const editor = monaco.editor.create(document.getElementById('editor'), {
   scrollBeyondLastLine: false,
   overviewRulerLanes: 0,
   hideCursorInOverviewRuler: true,
+  cursorBlinking: 'smooth',
+  smoothScrolling: true,
   scrollbar: {
-    verticalScrollbarSize: 10,
-    horizontalScrollbarSize: 10
+    verticalScrollbarSize: 8,
+    horizontalScrollbarSize: 8,
+    vertical: 'auto',
+    horizontal: 'auto',
+    useShadows: false
   },
   padding: { top: 8 }
 })
