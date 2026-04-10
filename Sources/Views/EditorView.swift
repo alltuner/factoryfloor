@@ -10,12 +10,11 @@ struct EditorView: View {
     let initialFilePath: String?
     let bridge: MonacoEditorBridge
     let modelId: String
-    var onDirtyChanged: ((Bool) -> Void)?
+    @Binding var isDirtyState: Bool
     var onFileChanged: ((String?) -> Void)?
 
     // Current file state
     @State private var currentFilePath: String?
-    @State private var isDirtyState = false
     @State private var fileLoaded = false
     @State private var loadError: String?
 
@@ -83,11 +82,11 @@ struct EditorView: View {
         } message: {
             Text("Your changes will be lost if you don't save them.")
         }
-        .onChange(of: isDirtyState) {
-            onDirtyChanged?(isDirtyState)
-        }
         .onReceive(NotificationCenter.default.publisher(for: .saveEditor)) { _ in
             Task { await saveFile() }
+        }
+        .onReceive(NotificationCenter.default.publisher(for: .saveEditorAs)) { _ in
+            Task { await saveFileAs() }
         }
     }
 
@@ -184,7 +183,7 @@ struct EditorView: View {
 
         currentFilePath = relativePath
         onFileChanged?(relativePath)
-        onDirtyChanged?(false)
+
         loadFile()
     }
 
@@ -216,7 +215,32 @@ struct EditorView: View {
             try content.write(toFile: fullPath, atomically: true, encoding: .utf8)
             bridge.markClean(modelId: modelId)
             isDirtyState = false
-            onDirtyChanged?(false)
+
+        } catch {
+            loadError = error.localizedDescription
+        }
+    }
+
+    private func saveFileAs() async {
+        guard fileLoaded else { return }
+        guard let content = await bridge.getContent(modelId: modelId) else { return }
+
+        let panel = NSSavePanel()
+        panel.nameFieldStringValue = currentFileName
+        if let currentFilePath {
+            let fullPath = (workingDirectory as NSString).appendingPathComponent(currentFilePath)
+            panel.directoryURL = URL(fileURLWithPath: fullPath).deletingLastPathComponent()
+        }
+
+        guard let window = NSApp.keyWindow else { return }
+        let response = await panel.beginSheetModal(for: window)
+        guard response == .OK, let url = panel.url else { return }
+
+        do {
+            try content.write(to: url, atomically: true, encoding: .utf8)
+            bridge.markClean(modelId: modelId)
+            isDirtyState = false
+
         } catch {
             loadError = error.localizedDescription
         }

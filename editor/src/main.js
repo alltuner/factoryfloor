@@ -148,6 +148,11 @@ let contentChangedListener = null
 window.editorAPI = {
   // Create or update a model and switch the editor to it.
   openFile(modelId, text, languageId) {
+    // Dispose listener BEFORE setValue() so the old listener doesn't
+    // catch it and send a false dirty event to Swift.
+    if (contentChangedListener) contentChangedListener.dispose()
+    contentChangedListener = null
+
     let model = models.get(modelId)
     if (!model) {
       model = monaco.editor.createModel(text, languageId)
@@ -156,8 +161,6 @@ window.editorAPI = {
       model.setValue(text)
       monaco.editor.setModelLanguage(model, languageId)
     }
-    // Switch editor to this model
-    if (contentChangedListener) contentChangedListener.dispose()
     editor.setModel(model)
     activeModelId = modelId
     // Track dirty state via version IDs
