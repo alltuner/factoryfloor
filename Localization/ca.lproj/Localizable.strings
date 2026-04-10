@@ -230,6 +230,16 @@
 /* Tab labels */
 "Info" = "Informació";
 "Agent" = "Agent";
+"Changes" = "Canvis";
+
+/* Changes tab */
+"Select a file to view changes" = "Selecciona un fitxer per veure els canvis";
+"%d files changed" = "%d fitxers modificats";
+"All changes" = "Tots els canvis";
+"Uncommitted" = "Sense confirmar";
+"No changes" = "Sense canvis";
+"Toggle file list" = "Mostrar/amagar llista de fitxers";
+"Refresh" = "Actualitzar";
 
 /* ProjectSidebar - context menu */
 "New workstream (full permissions)" = "Nou flux de treball (permisos complets)";

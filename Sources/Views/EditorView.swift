@@ -249,7 +249,7 @@ struct EditorView: View {
 
     // MARK: - Language Detection
 
-    private static func monacoLanguageId(for fileName: String) -> String {
+    static func monacoLanguageId(for fileName: String) -> String {
         let ext = (fileName as NSString).pathExtension.lowercased()
         switch ext {
         case "swift": return "swift"

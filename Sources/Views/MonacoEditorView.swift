@@ -81,7 +81,7 @@ class EditorWebView: WKWebView {
 
         // Shortcuts that must reach the app menu
         switch chars {
-        case "s", "w", "t", "b", "e":
+        case "s", "w", "t", "b", "e", "g":
             return false
         case "[", "]":
             return false
@@ -224,6 +224,39 @@ final class MonacoEditorBridge {
         enqueue {
             guard let webView = self.webView else { return }
             webView.evaluateJavaScript("window.editorAPI.layout()")
+        }
+    }
+
+    // MARK: - Diff API
+
+    func showDiff(originalText: String, modifiedText: String, languageId: String, filePath: String? = nil) {
+        enqueue {
+            guard let webView = self.webView else { return }
+            let filePathArg = filePath.map { self.jsLiteral($0) } ?? "undefined"
+            webView.evaluateJavaScript(
+                "window.diffEditorAPI.showDiff(\(self.jsLiteral(originalText)), \(self.jsLiteral(modifiedText)), \(self.jsLiteral(languageId)), \(filePathArg))"
+            )
+        }
+    }
+
+    func hideDiff() {
+        enqueue {
+            guard let webView = self.webView else { return }
+            webView.evaluateJavaScript("window.diffEditorAPI.hideDiff()")
+        }
+    }
+
+    func clearDiff() {
+        enqueue {
+            guard let webView = self.webView else { return }
+            webView.evaluateJavaScript("window.diffEditorAPI.clear()")
+        }
+    }
+
+    func relayoutDiff() {
+        enqueue {
+            guard let webView = self.webView else { return }
+            webView.evaluateJavaScript("window.diffEditorAPI.layout()")
         }
     }
 

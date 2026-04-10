@@ -230,6 +230,16 @@
 /* Tab labels */
 "Info" = "Info";
 "Agent" = "Agent";
+"Changes" = "Ändringar";
+
+/* Changes tab */
+"Select a file to view changes" = "Välj en fil för att visa ändringar";
+"%d files changed" = "%d filer ändrade";
+"All changes" = "Alla ändringar";
+"Uncommitted" = "Ej committade";
+"No changes" = "Inga ändringar";
+"Toggle file list" = "Visa/dölj fillista";
+"Refresh" = "Uppdatera";
 
 /* ProjectSidebar - context menu */
 "New workstream (full permissions)" = "Nytt arbetsflöde (fulla behörigheter)";

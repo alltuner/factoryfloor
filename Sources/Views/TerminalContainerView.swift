@@ -21,12 +21,14 @@ extension Notification.Name {
     static let toggleEditor = Notification.Name("factoryfloor.toggleEditor")
     static let saveEditor = Notification.Name("factoryfloor.saveEditor")
     static let saveEditorAs = Notification.Name("factoryfloor.saveEditorAs")
+    static let toggleChanges = Notification.Name("factoryfloor.toggleChanges")
 }
 
 enum RestorableWorkspaceTab: String, Codable {
     case info
     case agent
     case environment
+    case changes
 
     init(activeTab: WorkspaceTab) {
         switch activeTab {
@@ -34,6 +36,8 @@ enum RestorableWorkspaceTab: String, Codable {
             self = .agent
         case .environment:
             self = .environment
+        case .changes:
+            self = .changes
         case .info, .terminal, .browser, .editor:
             self = .info
         }
@@ -47,6 +51,8 @@ enum RestorableWorkspaceTab: String, Codable {
             return .agent
         case .environment:
             return hasEnvironmentTab ? .environment : .info
+        case .changes:
+            return .changes
         }
     }
 }
@@ -128,13 +134,14 @@ enum WorkspaceTab: Hashable {
     case info
     case agent
     case environment
+    case changes
     case terminal(UUID)
     case browser(UUID)
     case editor(UUID)
 
     var isCloseable: Bool {
         switch self {
-        case .info, .agent, .environment: return false
+        case .info, .agent, .environment, .changes: return false
         case .terminal, .browser, .editor: return true
         }
     }
@@ -183,6 +190,13 @@ func startupWorkspaceTabState(snapshot: WorkspaceTabSnapshot?, savedTab: Restora
         if hasEnvironmentTab && !snapshot.tabs.contains(.environment) {
             snapshot.tabs.insert(.environment, at: min(2, snapshot.tabs.count))
         }
+        if !snapshot.tabs.contains(.changes) {
+            // Insert after environment (or after agent if no environment)
+            let insertIdx = snapshot.tabs.firstIndex(of: .environment).map { $0 + 1 }
+                ?? snapshot.tabs.firstIndex(of: .agent).map { $0 + 1 }
+                ?? snapshot.tabs.count
+            snapshot.tabs.insert(.changes, at: min(insertIdx, snapshot.tabs.count))
+        }
         return snapshot
     }
 
@@ -190,6 +204,7 @@ func startupWorkspaceTabState(snapshot: WorkspaceTabSnapshot?, savedTab: Restora
     if hasEnvironmentTab {
         tabs.append(.environment)
     }
+    tabs.append(.changes)
     return WorkspaceTabSnapshot(
         tabs: tabs,
         terminalCount: 0,
@@ -359,7 +374,7 @@ struct TerminalContainerView: View {
             }
             return [claudeID]
         case let .terminal(id): return [id]
-        case .info, .browser, .editor: return []
+        case .info, .browser, .editor, .changes: return []
         case .environment: return nil
         }
     }
@@ -622,6 +637,17 @@ struct TerminalContainerView: View {
                     runStarted: $runStarted
                 )
             }
+        case .changes:
+            if let bridge = editorBridge {
+                ChangesView(
+                    workingDirectory: workingDirectory,
+                    projectDirectory: projectDirectory,
+                    bridge: bridge
+                )
+            } else {
+                ProgressView()
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+            }
         case let .terminal(id):
             SingleTerminalView(
                 surfaceID: id,
@@ -703,6 +729,10 @@ struct TerminalContainerView: View {
             .onReceive(NotificationCenter.default.publisher(for: .toggleEditor)) { _ in
                 guard isActive else { return }
                 openEditor()
+            }
+            .onReceive(NotificationCenter.default.publisher(for: .toggleChanges)) { _ in
+                guard isActive else { return }
+                activeTab = .changes
             }
             .onReceive(NotificationCenter.default.publisher(for: .closeTerminal)) { _ in
                 guard isActive else { return }
@@ -886,6 +916,7 @@ struct TerminalContainerView: View {
         case .info: return NSLocalizedString("Info", comment: "")
         case .agent: return NSLocalizedString("Agent", comment: "")
         case .environment: return NSLocalizedString("Environment", comment: "")
+        case .changes: return NSLocalizedString("Changes", comment: "")
         case .terminal:
             return nil
         case let .browser(id):
@@ -905,6 +936,7 @@ struct TerminalContainerView: View {
         case .info: return "info.circle"
         case .agent: return "sparkle"
         case .environment: return "gearshape.2"
+        case .changes: return "plus.forwardslash.minus"
         case .terminal: return "terminal"
         case .browser: return "globe"
         case .editor: return "doc.text"
@@ -935,6 +967,8 @@ struct TerminalContainerView: View {
             return "agent"
         case .environment:
             return "environment"
+        case .changes:
+            return "changes"
         }
     }
 

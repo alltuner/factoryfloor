@@ -172,6 +172,10 @@ const editor = monaco.editor.create(document.getElementById('editor'), {
   hideCursorInOverviewRuler: true,
   cursorBlinking: 'smooth',
   smoothScrolling: true,
+  glyphMargin: false,
+  folding: true,
+  lineDecorationsWidth: 8,
+  lineNumbersMinChars: 4,
   scrollbar: {
     verticalScrollbarSize: 8,
     horizontalScrollbarSize: 8,
@@ -312,6 +316,84 @@ window.editorAPI = {
   setTheme(isDark) {
     configService.updateValue('workbench.colorTheme', isDark ? 'Dark Modern' : 'Light Modern')
     document.documentElement.style.colorScheme = isDark ? 'dark' : 'light'
+  }
+}
+
+// --- Diff editor (shares the same WebView, hidden until needed) ---
+const diffEditorContainer = document.getElementById('diff-editor')
+const diffEditor = monaco.editor.createDiffEditor(diffEditorContainer, {
+  automaticLayout: true,
+  readOnly: true,
+  renderSideBySide: true,
+  minimap: { enabled: false },
+  fontSize: 13,
+  fontFamily: 'Menlo, monospace',
+  scrollBeyondLastLine: false,
+  overviewRulerLanes: 0,
+  hideCursorInOverviewRuler: true,
+  smoothScrolling: true,
+  glyphMargin: true,
+  folding: true,
+  lineDecorationsWidth: 8,
+  lineNumbersMinChars: 4,
+  scrollbar: {
+    verticalScrollbarSize: 8,
+    horizontalScrollbarSize: 8,
+    vertical: 'auto',
+    horizontal: 'auto',
+    useShadows: false
+  },
+  padding: { top: 8 },
+  enableSplitViewResizing: true,
+  ignoreTrimWhitespace: false
+})
+
+let currentDiffOriginal = null
+let currentDiffModified = null
+
+window.diffEditorAPI = {
+  showDiff(originalText, modifiedText, languageId, filePath) {
+    if (currentDiffOriginal) currentDiffOriginal.dispose()
+    if (currentDiffModified) currentDiffModified.dispose()
+
+    // Use custom URI schemes to avoid clashing with regular editor models
+    const originalUri = filePath
+      ? monaco.Uri.from({ scheme: 'diff-original', path: filePath })
+      : undefined
+    const modifiedUri = filePath
+      ? monaco.Uri.from({ scheme: 'diff-modified', path: filePath })
+      : undefined
+
+    currentDiffOriginal = monaco.editor.createModel(originalText, languageId, originalUri)
+    currentDiffModified = monaco.editor.createModel(modifiedText, languageId, modifiedUri)
+
+    // Show diff editor, hide regular editor
+    document.getElementById('editor').style.display = 'none'
+    diffEditorContainer.style.display = 'block'
+
+    diffEditor.setModel({
+      original: currentDiffOriginal,
+      modified: currentDiffModified
+    })
+    // Layout after browser reflows the now-visible container
+    requestAnimationFrame(() => diffEditor.layout())
+  },
+
+  hideDiff() {
+    // Show regular editor, hide diff editor
+    diffEditorContainer.style.display = 'none'
+    document.getElementById('editor').style.display = 'block'
+    requestAnimationFrame(() => editor.layout())
+  },
+
+  clear() {
+    if (currentDiffOriginal) { currentDiffOriginal.dispose(); currentDiffOriginal = null }
+    if (currentDiffModified) { currentDiffModified.dispose(); currentDiffModified = null }
+    diffEditor.setModel(null)
+  },
+
+  layout() {
+    diffEditor.layout()
   }
 }
 

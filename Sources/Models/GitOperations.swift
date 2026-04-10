@@ -14,6 +14,21 @@ struct GitRepoInfo {
     let isDirty: Bool
 }
 
+enum ChangeStatus: Hashable {
+    case added
+    case modified
+    case deleted
+    case renamed(from: String)
+}
+
+struct ChangedFile: Identifiable, Hashable {
+    let path: String
+    let status: ChangeStatus
+    var id: String {
+        path
+    }
+}
+
 struct WorktreeInfo: Identifiable {
     let path: String
     let branch: String?
@@ -412,6 +427,129 @@ enum GitOperations {
             }
         }
         return result
+    }
+
+    // MARK: - Diff / Changes
+
+    /// Find the merge-base commit between the current HEAD and a base branch.
+    static func mergeBase(at path: String, baseBranch: String) -> String? {
+        run(args: ["merge-base", baseBranch, "HEAD"], in: path)?
+            .trimmingCharacters(in: .whitespacesAndNewlines)
+    }
+
+    /// List all files changed between a ref and the working tree (committed + uncommitted + untracked).
+    static func changedFiles(at path: String, ref: String) -> [ChangedFile] {
+        var byPath: [String: ChangedFile] = [:]
+
+        // Diff ref against working tree — catches both committed and uncommitted changes
+        if let output = runWithTimeout(
+            args: ["diff", "--name-status", ref],
+            in: path,
+            timeout: 5
+        ) {
+            for file in parseNameStatus(output) {
+                byPath[file.path] = file
+            }
+        }
+
+        // Also include staged changes not yet in the working tree diff
+        if let staged = runWithTimeout(args: ["diff", "--name-status", "--cached", ref], in: path, timeout: 3) {
+            for file in parseNameStatus(staged) {
+                if byPath[file.path] == nil {
+                    byPath[file.path] = file
+                }
+            }
+        }
+
+        // Untracked files (new files never staged)
+        if let untracked = runWithTimeout(
+            args: ["ls-files", "--others", "--exclude-standard"],
+            in: path,
+            timeout: 3
+        ) {
+            for line in untracked.components(separatedBy: "\n") {
+                let trimmed = line.trimmingCharacters(in: .whitespacesAndNewlines)
+                guard !trimmed.isEmpty else { continue }
+                if byPath[trimmed] == nil {
+                    byPath[trimmed] = ChangedFile(path: trimmed, status: .added)
+                }
+            }
+        }
+
+        return byPath.values.sorted { $0.path < $1.path }
+    }
+
+    /// List uncommitted files (staged + unstaged + untracked).
+    static func uncommittedChangedFiles(at path: String) -> [ChangedFile] {
+        var byPath: [String: ChangedFile] = [:]
+
+        // Unstaged changes
+        if let unstaged = runWithTimeout(args: ["diff", "--name-status", "HEAD"], in: path, timeout: 3) {
+            for file in parseNameStatus(unstaged) {
+                byPath[file.path] = file
+            }
+        }
+
+        // Staged changes
+        if let staged = runWithTimeout(args: ["diff", "--name-status", "--cached"], in: path, timeout: 3) {
+            for file in parseNameStatus(staged) {
+                byPath[file.path] = file
+            }
+        }
+
+        // Untracked files
+        if let untracked = runWithTimeout(
+            args: ["ls-files", "--others", "--exclude-standard"],
+            in: path,
+            timeout: 3
+        ) {
+            for line in untracked.components(separatedBy: "\n") {
+                let trimmed = line.trimmingCharacters(in: .whitespacesAndNewlines)
+                guard !trimmed.isEmpty else { continue }
+                if byPath[trimmed] == nil {
+                    byPath[trimmed] = ChangedFile(path: trimmed, status: .added)
+                }
+            }
+        }
+
+        return byPath.values.sorted { $0.path < $1.path }
+    }
+
+    /// Get file content at a specific git ref (e.g. a commit hash or "HEAD").
+    /// Returns nil for new/missing files or binary content.
+    static func fileContentAtRef(at path: String, ref: String, filePath: String) -> String? {
+        runWithTimeout(args: ["show", "\(ref):\(filePath)"], in: path, timeout: 3)
+    }
+
+    /// Parse `git diff --name-status` output into ChangedFile array.
+    private static func parseNameStatus(_ output: String) -> [ChangedFile] {
+        var results: [ChangedFile] = []
+        for line in output.components(separatedBy: "\n") {
+            let trimmed = line.trimmingCharacters(in: .whitespacesAndNewlines)
+            guard !trimmed.isEmpty else { continue }
+
+            let parts = trimmed.components(separatedBy: "\t")
+            guard parts.count >= 2 else { continue }
+
+            let statusCode = parts[0]
+            let filePath = parts.last!
+
+            let status: ChangeStatus
+            if statusCode == "A" {
+                status = .added
+            } else if statusCode == "M" {
+                status = .modified
+            } else if statusCode == "D" {
+                status = .deleted
+            } else if statusCode.hasPrefix("R"), parts.count >= 3 {
+                status = .renamed(from: parts[1])
+            } else {
+                status = .modified
+            }
+
+            results.append(ChangedFile(path: filePath, status: status))
+        }
+        return results
     }
 
     // MARK: - Private

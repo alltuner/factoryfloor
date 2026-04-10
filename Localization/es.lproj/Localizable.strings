@@ -230,6 +230,16 @@
 /* Tab labels */
 "Info" = "Información";
 "Agent" = "Agente";
+"Changes" = "Cambios";
+
+/* Changes tab */
+"Select a file to view changes" = "Selecciona un archivo para ver los cambios";
+"%d files changed" = "%d archivos modificados";
+"All changes" = "Todos los cambios";
+"Uncommitted" = "Sin confirmar";
+"No changes" = "Sin cambios";
+"Toggle file list" = "Mostrar/ocultar lista de archivos";
+"Refresh" = "Actualizar";
 
 /* ProjectSidebar - context menu */
 "New workstream (full permissions)" = "Nuevo flujo de trabajo (permisos completos)";
