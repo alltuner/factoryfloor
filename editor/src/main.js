@@ -24,15 +24,6 @@ FileAccess.registerStaticBrowserUri = function (uri, browserUri) {
 await import('@codingame/monaco-vscode-all-language-default-extensions')
 await import('@codingame/monaco-vscode-theme-defaults-default-extension')
 
-// Standalone language features — the languages-service-override replaces Monaco's
-// built-in IntelliSense with VS Code's extension-based system. These packages
-// restore it without needing the full extension host, providing completions,
-// hover, diagnostics, and go-to-definition.
-await import('@codingame/monaco-vscode-standalone-typescript-language-features')
-await import('@codingame/monaco-vscode-standalone-json-language-features')
-await import('@codingame/monaco-vscode-standalone-css-language-features')
-await import('@codingame/monaco-vscode-standalone-html-language-features')
-
 // --- JS ↔ Swift bridge ---
 function postToSwift(msg) {
   window.webkit?.messageHandlers?.editor?.postMessage(msg)
@@ -147,6 +138,25 @@ await configService.updateValue('workbench.colorTheme', 'Dark Modern')
 
 // Import monaco AFTER initialize()
 const monaco = await import('monaco-editor')
+
+// Block Monarch tokenizer registration from standalone language features.
+// Their setupMode() is lazy (called via onLanguage when the first model for
+// that language is created) and registers a Monarch tokenizer via
+// setTokensProvider. This conflicts with the TextMate tokenizer: the
+// registration fires handleChange → todo_resetTokenization before the
+// TextMate grammar is loaded, crashing _toBinaryTokens. Since TextMate
+// handles all syntax highlighting, we no-op setTokensProvider entirely.
+// The TextMate service uses setEncodedTokensProvider (different API).
+monaco.languages.setTokensProvider = () => ({ dispose() {} })
+
+// Standalone language features — must be imported AFTER initialize() so the
+// VS Code service overrides (TextMate, themes, languages) are in place.
+// These restore IntelliSense (completions, hover, diagnostics) without
+// needing the full extension host.
+await import('@codingame/monaco-vscode-standalone-typescript-language-features')
+await import('@codingame/monaco-vscode-standalone-json-language-features')
+await import('@codingame/monaco-vscode-standalone-css-language-features')
+await import('@codingame/monaco-vscode-standalone-html-language-features')
 
 // --- Create editor ---
 const editor = monaco.editor.create(document.getElementById('editor'), {
