@@ -155,6 +155,7 @@ struct FF2App: App {
     @NSApplicationDelegateAdaptor(AppDelegate.self) var appDelegate
     @StateObject private var updater = Updater()
     @AppStorage("factoryfloor.editorTabActive") private var isEditorActive = false
+    @AppStorage("factoryfloor.editorFileDirty") private var isEditorDirty = false
     @State private var pendingURLDirectory: String?
 
     init() {
@@ -268,17 +269,18 @@ struct FF2App: App {
                 .keyboardShortcut("n", modifiers: [.command, .shift])
             }
             CommandGroup(replacing: .saveItem) {
-                Button("Save") {
-                    NotificationCenter.default.post(name: .saveEditor, object: nil)
-                }
-                .keyboardShortcut("s", modifiers: .command)
-                .disabled(!isEditorActive)
+                if isEditorActive {
+                    Button("Save") {
+                        NotificationCenter.default.post(name: .saveEditor, object: nil)
+                    }
+                    .keyboardShortcut("s", modifiers: .command)
+                    .disabled(!isEditorDirty)
 
-                Button("Save As...") {
-                    NotificationCenter.default.post(name: .saveEditorAs, object: nil)
+                    Button("Save As...") {
+                        NotificationCenter.default.post(name: .saveEditorAs, object: nil)
+                    }
+                    .keyboardShortcut("s", modifiers: [.command, .shift])
                 }
-                .keyboardShortcut("s", modifiers: [.command, .shift])
-                .disabled(!isEditorActive)
             }
             // Cmd+,: toggle settings
             CommandGroup(after: .appSettings) {

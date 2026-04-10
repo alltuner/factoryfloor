@@ -274,6 +274,7 @@ struct TerminalContainerView: View {
     @AppStorage("factoryfloor.allowOutsideWorktree") private var allowOutsideWorktree: Bool = false
     @AppStorage("factoryfloor.quickActionDebug") private var quickActionDebug: Bool = false
     @AppStorage("factoryfloor.editorTabActive") private var editorTabActive: Bool = false
+    @AppStorage("factoryfloor.editorFileDirty") private var editorFileDirty: Bool = false
     @State private var activeTab: WorkspaceTab = .info
     @State private var tabs: [WorkspaceTab] = [.info, .agent]
     @State private var terminalCount = 0
@@ -342,6 +343,11 @@ struct TerminalContainerView: View {
 
     private var isEditorTabActive: Bool {
         if case .editor = activeTab { return true }
+        return false
+    }
+
+    private var isActiveEditorDirty: Bool {
+        if case let .editor(id) = activeTab { return editorDirtyState[id] == true }
         return false
     }
 
@@ -721,15 +727,18 @@ struct TerminalContainerView: View {
         }
         .onAppear {
             editorTabActive = isEditorTabActive
+            editorFileDirty = isActiveEditorDirty
         }
         .onDisappear {
             editorTabActive = false
+            editorFileDirty = false
             guard workspaceStarted else { return }
             surfaceCache.saveTabSnapshot(for: workstreamID, snapshot: currentTabSnapshot())
         }
         .onChange(of: activeTab) {
             guard isActive else { return }
             editorTabActive = isEditorTabActive
+            editorFileDirty = isActiveEditorDirty
             surfaceCache.updateOcclusion(visibleSurfaceIDs: visibleSurfaceIDs)
             WorkspaceStateStore.save(RestorableWorkspaceTab(activeTab: activeTab), for: workstreamID)
             appEnv.refreshWorktreeState(for: workingDirectory, projectDirectory: projectDirectory)
@@ -827,6 +836,7 @@ struct TerminalContainerView: View {
             }
             .onChange(of: isActive) { _, active in
                 editorTabActive = active && isEditorTabActive
+                editorFileDirty = active && isActiveEditorDirty
                 if active {
                     surfaceCache.updateOcclusion(visibleSurfaceIDs: visibleSurfaceIDs)
                 } else {
@@ -926,6 +936,9 @@ struct TerminalContainerView: View {
             bridge.onContentChanged = { [self] modelId, dirty in
                 if let uuid = UUID(uuidString: modelId) {
                     editorDirtyState[uuid] = dirty
+                    if case .editor(uuid) = activeTab {
+                        editorFileDirty = dirty
+                    }
                 }
             }
 
@@ -1113,6 +1126,9 @@ struct TerminalContainerView: View {
             bridge.onContentChanged = { [self] modelId, dirty in
                 if let uuid = UUID(uuidString: modelId) {
                     editorDirtyState[uuid] = dirty
+                    if case .editor(uuid) = activeTab {
+                        editorFileDirty = dirty
+                    }
                 }
             }
             editorBridge = bridge
