@@ -7,6 +7,7 @@ import WebKit
 struct EditorView: View {
     let workingDirectory: String
     let fileTree: [FileNode]
+    let gitStatus: GitFileStatusProvider
     let initialFilePath: String?
     let bridge: MonacoEditorBridge
     let modelId: String
@@ -123,7 +124,7 @@ struct EditorView: View {
     // MARK: - File Tree Panel
 
     private var fileTreePanel: some View {
-        FileTreeView(nodes: fileTree, selectedPath: currentFilePath) { selectedPath in
+        FileTreeView(nodes: fileTree, selectedPath: currentFilePath, gitStatus: gitStatus) { selectedPath in
             handleFileSelection(selectedPath)
         } onExpandFolder: { path in
             onExpandFolder?(path)
