@@ -113,6 +113,7 @@ final class MonacoEditorBridge {
     private(set) var isReady = false
     private var pendingOps: [() -> Void] = []
     private var coordinator: Coordinator?
+    private var appearanceObserver: NSKeyValueObservation?
 
     /// Called when any model's dirty state changes. Parameters: (modelId, isDirty).
     var onContentChanged: ((String, Bool) -> Void)?
@@ -160,9 +161,20 @@ final class MonacoEditorBridge {
     func openFile(modelId: String, text: String, languageId: String, filePath: String? = nil) {
         enqueue {
             guard let webView = self.webView else { return }
-            let filePathArg = filePath.map { self.jsLiteral($0) } ?? "undefined"
-            let js = "window.editorAPI.openFile(\(self.jsLiteral(modelId)), \(self.jsLiteral(text)), \(self.jsLiteral(languageId)), \(filePathArg))"
-            webView.evaluateJavaScript(js)
+            nonisolated(unsafe) let wv = webView
+            Task { @MainActor in
+                var args: [String: Any] = [
+                    "modelId": modelId,
+                    "text": text,
+                    "languageId": languageId,
+                ]
+                if let filePath { args["filePath"] = filePath }
+                try? await wv.callAsyncJavaScript(
+                    "window.editorAPI.openFile(modelId, text, languageId, filePath)",
+                    arguments: args,
+                    contentWorld: .page
+                )
+            }
         }
     }
 
@@ -175,9 +187,14 @@ final class MonacoEditorBridge {
 
     func getContent(modelId: String) async -> String? {
         guard let webView, isReady else { return nil }
-        return try? await webView.evaluateJavaScript(
-            "window.editorAPI.getContent(\(jsLiteral(modelId)))"
-        ) as? String
+        do {
+            return try await webView.evaluateJavaScript(
+                "window.editorAPI.getContent(\(jsLiteral(modelId)))"
+            ) as? String
+        } catch {
+            print("[MonacoEditor] getContent failed for \(modelId): \(error)")
+            return nil
+        }
     }
 
     func markClean(modelId: String) {
@@ -194,14 +211,41 @@ final class MonacoEditorBridge {
         }
     }
 
+    func setTheme(isDark: Bool) {
+        enqueue {
+            guard let webView = self.webView else { return }
+            webView.evaluateJavaScript("window.editorAPI.setTheme(\(isDark))")
+        }
+    }
+
     // MARK: - Ready state
 
     fileprivate func markReady() {
         isReady = true
+        syncThemeWithAppearance()
+        startAppearanceObservation()
         for op in pendingOps {
             op()
         }
         pendingOps.removeAll()
+    }
+
+    private func syncThemeWithAppearance() {
+        let isDark = NSApp?.effectiveAppearance.isDark ?? true
+        guard let webView else { return }
+        webView.evaluateJavaScript("window.editorAPI.setTheme(\(isDark))")
+    }
+
+    private func startAppearanceObservation() {
+        guard appearanceObserver == nil else { return }
+        appearanceObserver = NSApplication.shared.observe(
+            \.effectiveAppearance,
+            options: [.new]
+        ) { [weak self] _, _ in
+            Task { @MainActor in
+                self?.syncThemeWithAppearance()
+            }
+        }
     }
 
     // MARK: - Private

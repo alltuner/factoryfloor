@@ -301,6 +301,12 @@ window.editorAPI = {
   // Focus the editor.
   focus() {
     editor.focus()
+  },
+
+  // Switch between light and dark theme.
+  setTheme(isDark) {
+    configService.updateValue('workbench.colorTheme', isDark ? 'Dark Modern' : 'Light Modern')
+    document.documentElement.style.colorScheme = isDark ? 'dark' : 'light'
   }
 }
 
