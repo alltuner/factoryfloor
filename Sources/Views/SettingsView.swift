@@ -466,6 +466,7 @@ struct ToolStatus {
     var ghAuthDetail: String?
     var git: BinaryStatus = .notFound
     var gitVersion: String?
+
     static func detect() -> ToolStatus {
         var status = ToolStatus()
 
