@@ -179,6 +179,7 @@ Current shortcuts:
 - **Cmd+B**: New Browser
 - **Cmd+E**: New Editor
 - **Cmd+S**: Save (Editor)
+- **Cmd+Shift+S**: Save As (Editor)
 - **Cmd+W**: Close tab
 - **Cmd+Shift+W**: Archive workstream
 - **Cmd+L**: Address bar (browser)

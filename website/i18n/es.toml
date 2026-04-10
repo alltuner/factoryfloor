@@ -151,6 +151,12 @@ other = "Archivar workstream"
 other = "Recorrer workstreams"
 [sc_cycle_project]
 other = "Recorrer proyectos"
+[sc_editor]
+other = "Nuevo Editor"
+[sc_save]
+other = "Guardar (Editor)"
+[sc_save_as]
+other = "Guardar como (Editor)"
 [sc_ext_browser]
 other = "Browser externo"
 [sc_ext_terminal]

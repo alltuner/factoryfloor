@@ -150,6 +150,12 @@ other = "Arkivera workstream"
 other = "Växla workstreams"
 [sc_cycle_project]
 other = "Växla projekt"
+[sc_editor]
+other = "Ny Editor"
+[sc_save]
+other = "Spara (Editor)"
+[sc_save_as]
+other = "Spara som (Editor)"
 [sc_ext_browser]
 other = "Extern browser"
 [sc_ext_terminal]
