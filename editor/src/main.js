@@ -5,6 +5,7 @@ import { FileAccess } from '@codingame/monaco-vscode-api/vscode/vs/base/common/n
 import getTextmateServiceOverride from '@codingame/monaco-vscode-textmate-service-override'
 import getThemeServiceOverride from '@codingame/monaco-vscode-theme-service-override'
 import getLanguagesServiceOverride from '@codingame/monaco-vscode-languages-service-override'
+import { MenuRegistry, MenuId } from '@codingame/monaco-vscode-api/vscode/vs/platform/actions/common/actions'
 
 // --- Capture extension resource URL mappings ---
 // FileAccess.uriToBrowserUri() uses a ResourceMap internally, but the URI lookup
@@ -170,6 +171,23 @@ const editor = monaco.editor.create(document.getElementById('editor'), {
   },
   padding: { top: 8 }
 })
+
+// Disable Quick Open (Cmd+P) — file search is not supported in this editor
+editor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.KeyP, () => {})
+
+// Disable Command Palette (F1 / Cmd+Shift+P) — not supported in this editor
+editor.addCommand(monaco.KeyCode.F1, () => {})
+editor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyMod.Shift | monaco.KeyCode.KeyP, () => {})
+
+// Remove "Command Palette..." from the right-click context menu
+const origGetMenuItems = MenuRegistry.getMenuItems
+MenuRegistry.getMenuItems = function (id) {
+  const items = origGetMenuItems.call(this, id)
+  if (id === MenuId.EditorContext) {
+    return items.filter(item => !item.command || item.command.id !== 'workbench.action.showCommands')
+  }
+  return items
+}
 
 // --- Multi-model management ---
 // One model per open file, keyed by UUID string from Swift.
