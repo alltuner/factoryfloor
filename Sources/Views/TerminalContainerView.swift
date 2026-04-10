@@ -644,6 +644,7 @@ struct TerminalContainerView: View {
                         saveTabSnapshot()
                     }
                 )
+                .id(id)
             } else {
                 ProgressView()
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
