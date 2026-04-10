@@ -296,3 +296,6 @@ window.editorAPI = {
 
 // Signal readiness to Swift
 postToSwift({ type: 'ready' })
+
+// Yield to the event loop so WebKit paints the themed content before revealing.
+setTimeout(() => document.body.classList.remove('loading'))

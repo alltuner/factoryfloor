@@ -142,7 +142,7 @@ final class MonacoEditorBridge {
         }
 
         let wv = EditorWebView(frame: .zero, configuration: config)
-        wv.setValue(false, forKey: "drawsBackground")
+        wv.underPageBackgroundColor = .windowBackgroundColor
         #if DEBUG
             wv.isInspectable = true
         #endif

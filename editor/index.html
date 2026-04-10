@@ -4,17 +4,24 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <style>
+    :root {
+      color-scheme: light dark;
+    }
     html, body {
       margin: 0;
       padding: 0;
       width: 100%;
       height: 100%;
       overflow: hidden;
-      background: transparent;
     }
     #editor {
       width: 100%;
       height: 100%;
+    }
+    /* Hide editor until Monaco has applied the theme, so any brief
+       light-theme flash is invisible against the color-scheme background. */
+    body.loading #editor {
+      opacity: 0;
     }
 
     /* macOS-style overlay scrollbars */
@@ -35,7 +42,7 @@
     }
   </style>
 </head>
-<body>
+<body class="loading">
   <div id="editor"></div>
   <script type="module" src="./src/main.js"></script>
 </body>
