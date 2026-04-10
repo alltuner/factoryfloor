@@ -945,7 +945,6 @@ struct TerminalContainerView: View {
                     }
                 }
             }
-
             editorBridge = bridge
         }
         editorCount += 1
@@ -1127,8 +1126,8 @@ struct TerminalContainerView: View {
         }
         preloadSurfaces()
         // Eagerly create the Monaco bridge so it's ready when the user opens
-        // an editor tab. The WKWebView itself is created lazily in updateNSView
-        // (it needs a real container for Monaco to initialize at the right size).
+        // an editor tab. The WKWebView is created lazily when MonacoEditorView
+        // enters the tree (it needs a real container to avoid 0x0 initialization).
         if editorBridge == nil {
             let bridge = MonacoEditorBridge()
             bridge.onContentChanged = { [self] modelId, dirty in

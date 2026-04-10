@@ -133,36 +133,34 @@ struct EditorView: View {
 
     // MARK: - Editor Panel
 
-    /// The editor panel uses a ZStack so that MonacoEditorView is ALWAYS in the tree
-    /// once a file path is set. This keeps its view identity stable — no makeNSView
-    /// re-calls, no WKWebView reparenting, no blinking. The placeholder and error
-    /// states are overlays on top.
+    /// MonacoEditorView is ALWAYS in the tree so the WKWebView starts loading
+    /// immediately when the editor tab opens (before the user picks a file).
+    /// Placeholder and error states overlay on top with opaque backgrounds.
     @ViewBuilder
     private var editorPanel: some View {
-        if currentFilePath != nil {
-            ZStack {
-                MonacoEditorView(bridge: bridge)
-                if let loadError {
-                    VStack(spacing: 12) {
-                        Image(systemName: "exclamationmark.triangle")
-                            .font(.system(size: 36))
-                            .foregroundStyle(.tertiary)
-                        Text(loadError)
-                            .foregroundStyle(.secondary)
-                    }
-                    .frame(maxWidth: .infinity, maxHeight: .infinity)
-                    .background(.background)
+        ZStack {
+            MonacoEditorView(bridge: bridge)
+            if currentFilePath == nil {
+                VStack(spacing: 12) {
+                    Image(systemName: "doc.text")
+                        .font(.system(size: 36))
+                        .foregroundStyle(.tertiary)
+                    Text("Select a file to edit")
+                        .foregroundStyle(.secondary)
                 }
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
+                .background(.background)
+            } else if let loadError {
+                VStack(spacing: 12) {
+                    Image(systemName: "exclamationmark.triangle")
+                        .font(.system(size: 36))
+                        .foregroundStyle(.tertiary)
+                    Text(loadError)
+                        .foregroundStyle(.secondary)
+                }
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
+                .background(.background)
             }
-        } else {
-            VStack(spacing: 12) {
-                Image(systemName: "doc.text")
-                    .font(.system(size: 36))
-                    .foregroundStyle(.tertiary)
-                Text("Select a file to edit")
-                    .foregroundStyle(.secondary)
-            }
-            .frame(maxWidth: .infinity, maxHeight: .infinity)
         }
     }
 

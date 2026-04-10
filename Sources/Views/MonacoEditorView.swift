@@ -218,6 +218,15 @@ final class MonacoEditorBridge {
         }
     }
 
+    /// Force Monaco to recalculate its layout. Call after reparenting the
+    /// WKWebView into a new container so the editor fills the available space.
+    func relayout() {
+        enqueue {
+            guard let webView = self.webView else { return }
+            webView.evaluateJavaScript("window.editorAPI.layout()")
+        }
+    }
+
     // MARK: - Ready state
 
     fileprivate func markReady() {
@@ -335,6 +344,10 @@ struct MonacoEditorView: NSViewRepresentable {
                 webView.leadingAnchor.constraint(equalTo: container.leadingAnchor),
                 webView.trailingAnchor.constraint(equalTo: container.trailingAnchor),
             ])
+            // Force Monaco to relayout after autolayout applies the new frame.
+            DispatchQueue.main.async {
+                self.bridge.relayout()
+            }
         }
     }
 }

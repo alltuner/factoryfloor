@@ -303,6 +303,11 @@ window.editorAPI = {
     editor.focus()
   },
 
+  // Force a layout pass (call after reparenting the WKWebView into a new container).
+  layout() {
+    editor.layout()
+  },
+
   // Switch between light and dark theme.
   setTheme(isDark) {
     configService.updateValue('workbench.colorTheme', isDark ? 'Dark Modern' : 'Light Modern')
