@@ -618,22 +618,26 @@ struct TerminalContainerView: View {
             BrowserView(defaultURL: browserDefaultURL, tabID: id, webView: surfaceCache.webView(for: id))
                 .id(id)
         case let .editor(id):
-            // editorBridge is guaranteed non-nil here — created in addEditor()
-            EditorView(
-                workingDirectory: workingDirectory,
-                fileTree: fileTree,
-                initialFilePath: editorFilePaths[id],
-                bridge: editorBridge!,
-                modelId: id.uuidString
-            ) { dirty in
-                editorDirtyState[id] = dirty
-            } onFileChanged: { path in
-                if let path {
-                    editorFilePaths[id] = path
-                } else {
-                    editorFilePaths.removeValue(forKey: id)
+            if let bridge = editorBridge {
+                EditorView(
+                    workingDirectory: workingDirectory,
+                    fileTree: fileTree,
+                    initialFilePath: editorFilePaths[id],
+                    bridge: bridge,
+                    modelId: id.uuidString
+                ) { dirty in
+                    editorDirtyState[id] = dirty
+                } onFileChanged: { path in
+                    if let path {
+                        editorFilePaths[id] = path
+                    } else {
+                        editorFilePaths.removeValue(forKey: id)
+                    }
+                    saveTabSnapshot()
                 }
-                saveTabSnapshot()
+            } else {
+                ProgressView()
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
             }
         }
     }
@@ -966,7 +970,7 @@ struct TerminalContainerView: View {
             directoryWatcher?.stop()
             directoryWatcher = nil
             fileTree = []
-            editorBridge = nil
+            // Keep editorBridge alive — the WebView is expensive to recreate (~17 MB JS)
         }
     }
 
@@ -1090,6 +1094,18 @@ struct TerminalContainerView: View {
             surfaceCache.respawnableIDs.insert(claudeID)
         }
         preloadSurfaces()
+        // Eagerly create the Monaco bridge so it's ready when the user opens
+        // an editor tab. The WKWebView itself is created lazily in updateNSView
+        // (it needs a real container for Monaco to initialize at the right size).
+        if editorBridge == nil {
+            let bridge = MonacoEditorBridge()
+            bridge.onContentChanged = { [self] modelId, dirty in
+                if let uuid = UUID(uuidString: modelId) {
+                    editorDirtyState[uuid] = dirty
+                }
+            }
+            editorBridge = bridge
+        }
         surfaceCache.updateOcclusion(visibleSurfaceIDs: visibleSurfaceIDs)
     }
 
