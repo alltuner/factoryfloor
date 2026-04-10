@@ -949,6 +949,7 @@ struct TerminalContainerView: View {
                     editorDirtyState[uuid] = dirty
                 }
             }
+
             editorBridge = bridge
         }
         editorCount += 1

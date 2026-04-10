@@ -198,7 +198,7 @@ struct EditorView: View {
             let content = try String(contentsOf: url, encoding: .utf8)
             let fileName = (relativePath as NSString).lastPathComponent
             let langId = Self.monacoLanguageId(for: fileName)
-            bridge.openFile(modelId: modelId, text: content, languageId: langId)
+            bridge.openFile(modelId: modelId, text: content, languageId: langId, filePath: fullPath)
             isDirtyState = false
             fileLoaded = true
             loadError = nil

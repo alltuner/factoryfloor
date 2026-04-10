@@ -23,6 +23,15 @@ FileAccess.registerStaticBrowserUri = function (uri, browserUri) {
 await import('@codingame/monaco-vscode-all-language-default-extensions')
 await import('@codingame/monaco-vscode-theme-defaults-default-extension')
 
+// Standalone language features — the languages-service-override replaces Monaco's
+// built-in IntelliSense with VS Code's extension-based system. These packages
+// restore it without needing the full extension host, providing completions,
+// hover, diagnostics, and go-to-definition.
+await import('@codingame/monaco-vscode-standalone-typescript-language-features')
+await import('@codingame/monaco-vscode-standalone-json-language-features')
+await import('@codingame/monaco-vscode-standalone-css-language-features')
+await import('@codingame/monaco-vscode-standalone-html-language-features')
+
 // --- JS ↔ Swift bridge ---
 function postToSwift(msg) {
   window.webkit?.messageHandlers?.editor?.postMessage(msg)
@@ -37,24 +46,43 @@ window.onunhandledrejection = (e) => {
 }
 
 // --- Worker setup ---
-// TextMate runs grammar tokenization in a Web Worker using oniguruma WASM.
+// Each language feature runs its own Web Worker for IntelliSense.
+// TextMate runs grammar tokenization in a separate worker using oniguruma WASM.
 // The editor worker handles diff computation, word completion, etc.
 window.MonacoEnvironment = {
   getWorker(_, label) {
     if (label === 'TextMateWorker') {
       return new Worker(
-        new URL(
-          '@codingame/monaco-vscode-textmate-service-override/worker',
-          import.meta.url
-        ),
+        new URL('@codingame/monaco-vscode-textmate-service-override/worker', import.meta.url),
+        { type: 'module' }
+      )
+    }
+    if (label === 'typescript' || label === 'javascript') {
+      return new Worker(
+        new URL('@codingame/monaco-vscode-standalone-typescript-language-features/worker', import.meta.url),
+        { type: 'module' }
+      )
+    }
+    if (label === 'css' || label === 'scss' || label === 'less') {
+      return new Worker(
+        new URL('@codingame/monaco-vscode-standalone-css-language-features/worker', import.meta.url),
+        { type: 'module' }
+      )
+    }
+    if (label === 'html' || label === 'handlebars' || label === 'razor') {
+      return new Worker(
+        new URL('@codingame/monaco-vscode-standalone-html-language-features/worker', import.meta.url),
+        { type: 'module' }
+      )
+    }
+    if (label === 'json') {
+      return new Worker(
+        new URL('@codingame/monaco-vscode-standalone-json-language-features/worker', import.meta.url),
         { type: 'module' }
       )
     }
     return new Worker(
-      new URL(
-        'monaco-editor/esm/vs/editor/editor.worker.js',
-        import.meta.url
-      ),
+      new URL('monaco-editor/esm/vs/editor/editor.worker.js', import.meta.url),
       { type: 'module' }
     )
   }
@@ -147,7 +175,9 @@ let contentChangedListener = null
 
 window.editorAPI = {
   // Create or update a model and switch the editor to it.
-  openFile(modelId, text, languageId) {
+  // filePath gives the model a file:// URI so the TypeScript worker can
+  // resolve imports between open files and infer file types from the path.
+  openFile(modelId, text, languageId, filePath) {
     // Dispose listener BEFORE setValue() so the old listener doesn't
     // catch it and send a false dirty event to Swift.
     if (contentChangedListener) contentChangedListener.dispose()
@@ -155,7 +185,10 @@ window.editorAPI = {
 
     let model = models.get(modelId)
     if (!model) {
-      model = monaco.editor.createModel(text, languageId)
+      const uri = filePath ? monaco.Uri.file(filePath) : undefined
+      // Reuse an existing model with the same URI (e.g. file reopened in new tab)
+      if (uri) model = monaco.editor.getModel(uri)
+      if (!model) model = monaco.editor.createModel(text, languageId, uri)
       models.set(modelId, model)
     } else {
       model.setValue(text)

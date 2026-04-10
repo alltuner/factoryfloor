@@ -157,10 +157,11 @@ final class MonacoEditorBridge {
 
     // MARK: - Model API
 
-    func openFile(modelId: String, text: String, languageId: String) {
+    func openFile(modelId: String, text: String, languageId: String, filePath: String? = nil) {
         enqueue {
             guard let webView = self.webView else { return }
-            let js = "window.editorAPI.openFile(\(self.jsLiteral(modelId)), \(self.jsLiteral(text)), \(self.jsLiteral(languageId)))"
+            let filePathArg = filePath.map { self.jsLiteral($0) } ?? "undefined"
+            let js = "window.editorAPI.openFile(\(self.jsLiteral(modelId)), \(self.jsLiteral(text)), \(self.jsLiteral(languageId)), \(filePathArg))"
             webView.evaluateJavaScript(js)
         }
     }
