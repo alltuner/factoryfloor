@@ -41,6 +41,7 @@ struct FileTypeIcon {
         // Web
         case "html", "htm":
             return FileTypeIcon(symbolName: "globe")
+
         case "css", "scss", "sass", "less":
             return FileTypeIcon(symbolName: "paintbrush")
 

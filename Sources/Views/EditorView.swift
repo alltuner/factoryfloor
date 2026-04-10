@@ -136,7 +136,6 @@ struct EditorView: View {
     /// MonacoEditorView is ALWAYS in the tree so the WKWebView starts loading
     /// immediately when the editor tab opens (before the user picks a file).
     /// Placeholder and error states overlay on top with opaque backgrounds.
-    @ViewBuilder
     private var editorPanel: some View {
         ZStack {
             MonacoEditorView(bridge: bridge)

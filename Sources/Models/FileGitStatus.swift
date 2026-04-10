@@ -4,9 +4,9 @@
 import Foundation
 
 enum FileGitStatus {
-    case modified   // M, A, D, R, C in either index or worktree
-    case untracked  // ??
-    case ignored    // !!
+    case modified // M, A, D, R, C in either index or worktree
+    case untracked // ??
+    case ignored // !!
 }
 
 struct GitFileStatusProvider {
@@ -24,7 +24,7 @@ struct GitFileStatusProvider {
             // check in isIgnored will handle both files and directories correctly.
             dirs.insert(path)
         }
-        self.ignoredDirectories = dirs
+        ignoredDirectories = dirs
     }
 
     /// Status for a file or directory. Directories derive status from children.
@@ -55,7 +55,7 @@ struct GitFileStatusProvider {
         // Check if any ancestor directory is ignored
         var current = relativePath
         while let slashIndex = current.lastIndex(of: "/") {
-            current = String(current[current.startIndex..<slashIndex])
+            current = String(current[current.startIndex ..< slashIndex])
             if ignoredDirectories.contains(current) { return true }
         }
         return false

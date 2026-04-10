@@ -412,9 +412,9 @@ enum GitOperations {
             } else if xy == "??" {
                 result[filePath] = .untracked
             } else {
-                // Handle renames/copies: "R  new -> old" or "C  new -> old"
+                // Handle renames/copies: "R  old -> new" or "C  old -> new"
                 if let arrowRange = filePath.range(of: " -> ") {
-                    let newPath = String(filePath[filePath.startIndex ..< arrowRange.lowerBound])
+                    let newPath = String(filePath[arrowRange.upperBound...]).trimmingCharacters(in: .whitespaces)
                     result[newPath] = .modified
                 } else {
                     result[filePath] = .modified

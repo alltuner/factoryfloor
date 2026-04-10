@@ -935,18 +935,7 @@ struct TerminalContainerView: View {
 
     private func addEditor(filePath: String? = nil) {
         // Create bridge before adding the tab — never during body evaluation
-        if editorBridge == nil {
-            let bridge = MonacoEditorBridge()
-            bridge.onContentChanged = { [self] modelId, dirty in
-                if let uuid = UUID(uuidString: modelId) {
-                    editorDirtyState[uuid] = dirty
-                    if case .editor(uuid) = activeTab {
-                        editorFileDirty = dirty
-                    }
-                }
-            }
-            editorBridge = bridge
-        }
+        createEditorBridgeIfNeeded()
         editorCount += 1
         let id = derivedUUID(from: workstreamID, salt: "editor-\(editorCount)")
         if let filePath {
@@ -989,8 +978,15 @@ struct TerminalContainerView: View {
 
     private func expandFileTreeFolder(_ relativePath: String) {
         if let node = FileNode.findNode(atPath: relativePath, in: fileTree), node.isLoaded { return }
-        let children = FileNode.loadChildren(atRelativePath: relativePath, rootPath: workingDirectory)
-        fileTree = FileNode.insertChildren(children, atPath: relativePath, in: fileTree)
+        let gen = refreshGeneration
+        let root = workingDirectory
+        DispatchQueue.global(qos: .userInitiated).async {
+            let children = FileNode.loadChildren(atRelativePath: relativePath, rootPath: root)
+            DispatchQueue.main.async {
+                guard gen == refreshGeneration else { return }
+                fileTree = FileNode.insertChildren(children, atPath: relativePath, in: fileTree)
+            }
+        }
     }
 
     private func stopFileTreeWatcherIfUnneeded() {
@@ -1003,6 +999,20 @@ struct TerminalContainerView: View {
             gitFileStatuses = GitFileStatusProvider()
             // Keep editorBridge alive — the WebView is expensive to recreate (~17 MB JS)
         }
+    }
+
+    private func createEditorBridgeIfNeeded() {
+        guard editorBridge == nil else { return }
+        let bridge = MonacoEditorBridge()
+        bridge.onContentChanged = { [self] modelId, dirty in
+            if let uuid = UUID(uuidString: modelId) {
+                editorDirtyState[uuid] = dirty
+                if case .editor(uuid) = activeTab {
+                    editorFileDirty = dirty
+                }
+            }
+        }
+        editorBridge = bridge
     }
 
     private func closeTab(_ tab: WorkspaceTab) {
@@ -1128,18 +1138,7 @@ struct TerminalContainerView: View {
         // Eagerly create the Monaco bridge so it's ready when the user opens
         // an editor tab. The WKWebView is created lazily when MonacoEditorView
         // enters the tree (it needs a real container to avoid 0x0 initialization).
-        if editorBridge == nil {
-            let bridge = MonacoEditorBridge()
-            bridge.onContentChanged = { [self] modelId, dirty in
-                if let uuid = UUID(uuidString: modelId) {
-                    editorDirtyState[uuid] = dirty
-                    if case .editor(uuid) = activeTab {
-                        editorFileDirty = dirty
-                    }
-                }
-            }
-            editorBridge = bridge
-        }
+        createEditorBridgeIfNeeded()
         surfaceCache.updateOcclusion(visibleSurfaceIDs: visibleSurfaceIDs)
     }
 

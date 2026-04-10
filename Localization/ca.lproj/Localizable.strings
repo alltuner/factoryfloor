@@ -77,6 +77,8 @@
 "Editor" = "Editor";
 "New Editor (\u2318E)" = "Nou editor (\u2318E)";
 "Open File" = "Obrir fitxer";
+"Toggle file tree" = "Commuta l'arbre de fitxers";
+"Select a file to edit" = "Selecciona un fitxer per editar";
 "GitHub" = "GitHub";
 "Coding Agent" = "Agent de codi";
 "Bypass permission prompts" = "Ometre les sol·licituds de permisos";

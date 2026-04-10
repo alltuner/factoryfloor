@@ -77,6 +77,8 @@
 "Editor" = "Redigerare";
 "New Editor (\u2318E)" = "Ny redigerare (\u2318E)";
 "Open File" = "Öppna fil";
+"Toggle file tree" = "Visa/dölj filträd";
+"Select a file to edit" = "Välj en fil att redigera";
 "GitHub" = "GitHub";
 "Coding Agent" = "Kodningsagent";
 "Bypass permission prompts" = "Hoppa över behörighetsförfrågningar";

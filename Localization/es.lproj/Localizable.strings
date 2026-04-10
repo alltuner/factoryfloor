@@ -77,6 +77,8 @@
 "Editor" = "Editor";
 "New Editor (\u2318E)" = "Nuevo editor (\u2318E)";
 "Open File" = "Abrir archivo";
+"Toggle file tree" = "Mostrar/ocultar árbol de archivos";
+"Select a file to edit" = "Selecciona un archivo para editar";
 "GitHub" = "GitHub";
 "Coding Agent" = "Agente de código";
 "Bypass permission prompts" = "Omitir solicitudes de permisos";
