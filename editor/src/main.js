@@ -193,6 +193,9 @@ MenuRegistry.getMenuItems = function (id) {
 // One model per open file, keyed by UUID string from Swift.
 // Switching tabs calls editor.setModel() — instant, preserves undo history.
 const models = new Map()
+// Deduplication: one Monaco model per file path, shared across tabs.
+// Prevents the TypeScript language service from seeing duplicate declarations.
+const fileModels = new Map()
 let activeModelId = null
 let contentChangedListener = null
 
@@ -208,10 +211,16 @@ window.editorAPI = {
 
     let model = models.get(modelId)
     if (!model) {
-      const uri = filePath ? monaco.Uri.file(filePath) : undefined
-      // Reuse an existing model with the same URI (e.g. file reopened in new tab)
-      if (uri) model = monaco.editor.getModel(uri)
-      if (!model) model = monaco.editor.createModel(text, languageId, uri)
+      // Reuse existing model for the same file (e.g. same file in two tabs).
+      // Uses our own map instead of monaco.editor.getModel(uri) which can fail
+      // with VS Code service overrides, creating duplicate models that confuse
+      // the TypeScript language service ("Duplicate identifier" errors).
+      if (filePath) model = fileModels.get(filePath)
+      if (!model) {
+        const uri = filePath ? monaco.Uri.file(filePath) : undefined
+        model = monaco.editor.createModel(text, languageId, uri)
+        if (filePath) fileModels.set(filePath, model)
+      }
       models.set(modelId, model)
     } else {
       model.setValue(text)
@@ -257,14 +266,25 @@ window.editorAPI = {
   },
 
   // Dispose a model (tab closed).
+  // Only actually disposes the Monaco model if no other tab references it,
+  // since multiple tabs can share a model when they open the same file.
   closeModel(modelId) {
     const model = models.get(modelId)
-    if (model) {
-      model.dispose()
-      models.delete(modelId)
-    }
+    models.delete(modelId)
     if (activeModelId === modelId) {
       activeModelId = null
+    }
+    if (model) {
+      let stillReferenced = false
+      for (const m of models.values()) {
+        if (m === model) { stillReferenced = true; break }
+      }
+      if (!stillReferenced) {
+        model.dispose()
+        for (const [path, m] of fileModels) {
+          if (m === model) { fileModels.delete(path); break }
+        }
+      }
     }
   },
 
