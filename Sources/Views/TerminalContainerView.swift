@@ -643,6 +643,9 @@ struct TerminalContainerView: View {
                             editorFilePaths.removeValue(forKey: id)
                         }
                         saveTabSnapshot()
+                    },
+                    onExpandFolder: { path in
+                        expandFileTreeFolder(path)
                     }
                 )
                 .id(id)
@@ -974,12 +977,24 @@ struct TerminalContainerView: View {
     }
 
     private func refreshFileTree() {
+        let currentTree = fileTree
         DispatchQueue.global(qos: .userInitiated).async {
-            let tree = FileNode.buildTree(rootPath: workingDirectory)
+            let tree: [FileNode]
+            if currentTree.isEmpty {
+                tree = FileNode.buildShallowTree(rootPath: workingDirectory)
+            } else {
+                tree = FileNode.refreshLoadedNodes(in: currentTree, rootPath: workingDirectory)
+            }
             DispatchQueue.main.async {
                 fileTree = tree
             }
         }
+    }
+
+    private func expandFileTreeFolder(_ relativePath: String) {
+        if let node = FileNode.findNode(atPath: relativePath, in: fileTree), node.isLoaded { return }
+        let children = FileNode.loadChildren(atRelativePath: relativePath, rootPath: workingDirectory)
+        fileTree = FileNode.insertChildren(children, atPath: relativePath, in: fileTree)
     }
 
     private func stopFileTreeWatcherIfUnneeded() {

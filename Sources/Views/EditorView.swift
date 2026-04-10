@@ -12,6 +12,7 @@ struct EditorView: View {
     let modelId: String
     @Binding var isDirtyState: Bool
     var onFileChanged: ((String?) -> Void)?
+    var onExpandFolder: ((String) -> Void)?
 
     // Current file state
     @State private var currentFilePath: String?
@@ -124,6 +125,8 @@ struct EditorView: View {
     private var fileTreePanel: some View {
         FileTreeView(nodes: fileTree, selectedPath: currentFilePath) { selectedPath in
             handleFileSelection(selectedPath)
+        } onExpandFolder: { path in
+            onExpandFolder?(path)
         }
     }
 

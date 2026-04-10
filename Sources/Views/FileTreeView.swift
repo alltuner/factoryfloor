@@ -7,6 +7,7 @@ struct FileTreeView: View {
     let nodes: [FileNode]
     let selectedPath: String?
     var onSelect: (String) -> Void
+    var onExpandFolder: (String) -> Void
 
     @State private var expandedFolders: Set<String> = []
 
@@ -20,7 +21,8 @@ struct FileTreeView: View {
                             depth: 0,
                             selectedPath: selectedPath,
                             expandedFolders: $expandedFolders,
-                            onSelect: onSelect
+                            onSelect: onSelect,
+                            onExpandFolder: onExpandFolder
                         )
                     }
                 }
@@ -37,12 +39,14 @@ struct FileTreeView: View {
     }
 
     /// Expand all ancestor folders so a selected file is visible in the tree.
+    /// Also triggers lazy loading for any unloaded ancestor directories.
     private func expandAncestors(of path: String?) {
         guard let path, !path.isEmpty else { return }
         let components = path.split(separator: "/").map(String.init)
         var current = ""
         for component in components.dropLast() {
             current = current.isEmpty ? component : current + "/" + component
+            onExpandFolder(current)
             expandedFolders.insert(current)
         }
     }
@@ -54,6 +58,7 @@ private struct FileTreeNodeView: View {
     let selectedPath: String?
     @Binding var expandedFolders: Set<String>
     var onSelect: (String) -> Void
+    var onExpandFolder: (String) -> Void
 
     private var isExpanded: Bool {
         expandedFolders.contains(node.id)
@@ -62,14 +67,15 @@ private struct FileTreeNodeView: View {
     var body: some View {
         if node.isDirectory {
             directoryRow
-            if isExpanded {
-                ForEach(node.children) { child in
+            if isExpanded, let children = node.children {
+                ForEach(children) { child in
                     FileTreeNodeView(
                         node: child,
                         depth: depth + 1,
                         selectedPath: selectedPath,
                         expandedFolders: $expandedFolders,
-                        onSelect: onSelect
+                        onSelect: onSelect,
+                        onExpandFolder: onExpandFolder
                     )
                 }
             }
@@ -84,6 +90,9 @@ private struct FileTreeNodeView: View {
                 if isExpanded {
                     expandedFolders.remove(node.id)
                 } else {
+                    if !node.isLoaded {
+                        onExpandFolder(node.id)
+                    }
                     expandedFolders.insert(node.id)
                 }
             }
