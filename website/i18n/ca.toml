@@ -157,6 +157,12 @@ other = "Arxiva workstream"
 other = "Cicla workstreams"
 [sc_cycle_project]
 other = "Cicla projectes"
+[sc_editor]
+other = "Nou Editor"
+[sc_save]
+other = "Desa (Editor)"
+[sc_save_as]
+other = "Desa com a (Editor)"
 [sc_ext_browser]
 other = "Browser extern"
 [sc_ext_terminal]

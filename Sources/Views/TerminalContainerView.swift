@@ -18,6 +18,9 @@ extension Notification.Name {
     static let prevTab = Notification.Name("factoryfloor.prevTab")
     static let toggleEnvironment = Notification.Name("factoryfloor.toggleEnvironment")
     static let terminalTitleChanged = Notification.Name("factoryfloor.terminalTitleChanged")
+    static let toggleEditor = Notification.Name("factoryfloor.toggleEditor")
+    static let saveEditor = Notification.Name("factoryfloor.saveEditor")
+    static let saveEditorAs = Notification.Name("factoryfloor.saveEditorAs")
 }
 
 enum RestorableWorkspaceTab: String, Codable {
@@ -31,7 +34,7 @@ enum RestorableWorkspaceTab: String, Codable {
             self = .agent
         case .environment:
             self = .environment
-        case .info, .terminal, .browser:
+        case .info, .terminal, .browser, .editor:
             self = .info
         }
     }
@@ -127,11 +130,12 @@ enum WorkspaceTab: Hashable {
     case environment
     case terminal(UUID)
     case browser(UUID)
+    case editor(UUID)
 
     var isCloseable: Bool {
         switch self {
         case .info, .agent, .environment: return false
-        case .terminal, .browser: return true
+        case .terminal, .browser, .editor: return true
         }
     }
 }
@@ -141,14 +145,16 @@ struct WorkspaceTabSnapshot {
     var tabs: [WorkspaceTab]
     var terminalCount: Int
     var browserCount: Int
+    var editorCount: Int
     var activeTab: WorkspaceTab
     var browserTitles: [UUID: String]
     var terminalTitles: [UUID: String]
+    var editorFilePaths: [UUID: String]
     var runStarted: Bool
     var runStoppedManually: Bool
 
     /// Returns a copy with dead terminal tabs removed.
-    /// Browser tabs are kept regardless (they don't use terminal surfaces).
+    /// Browser and editor tabs are kept regardless (they don't use terminal surfaces).
     func reconciled(liveSurfaceIDs: Set<UUID>) -> WorkspaceTabSnapshot {
         let filteredTabs = tabs.filter { tab in
             if case let .terminal(id) = tab {
@@ -161,9 +167,11 @@ struct WorkspaceTabSnapshot {
             tabs: filteredTabs,
             terminalCount: terminalCount,
             browserCount: browserCount,
+            editorCount: editorCount,
             activeTab: resolvedActiveTab,
             browserTitles: browserTitles,
             terminalTitles: terminalTitles,
+            editorFilePaths: editorFilePaths,
             runStarted: runStarted,
             runStoppedManually: runStoppedManually
         )
@@ -186,9 +194,11 @@ func startupWorkspaceTabState(snapshot: WorkspaceTabSnapshot?, savedTab: Restora
         tabs: tabs,
         terminalCount: 0,
         browserCount: 0,
+        editorCount: 0,
         activeTab: (savedTab ?? .info).workspaceTab(hasEnvironmentTab: hasEnvironmentTab),
         browserTitles: [:],
         terminalTitles: [:],
+        editorFilePaths: [:],
         runStarted: false,
         runStoppedManually: false
     )
@@ -260,13 +270,23 @@ struct TerminalContainerView: View {
     @AppStorage("factoryfloor.autoRenameBranch") private var autoRenameBranch: Bool = false
     @AppStorage("factoryfloor.allowOutsideWorktree") private var allowOutsideWorktree: Bool = false
     @AppStorage("factoryfloor.quickActionDebug") private var quickActionDebug: Bool = false
+    @AppStorage("factoryfloor.editorTabActive") private var editorTabActive: Bool = false
+    @AppStorage("factoryfloor.editorFileDirty") private var editorFileDirty: Bool = false
     @State private var activeTab: WorkspaceTab = .info
     @State private var tabs: [WorkspaceTab] = [.info, .agent]
     @State private var terminalCount = 0
     @State private var browserCount = 0
+    @State private var editorCount = 0
     @State private var scriptConfig: ScriptConfig = .empty
     @State private var browserTitles: [UUID: String] = [:]
     @State private var terminalTitles: [UUID: String] = [:]
+    @State private var editorFilePaths: [UUID: String] = [:]
+    @State private var editorDirtyState: [UUID: Bool] = [:]
+    @State private var editorBridge: MonacoEditorBridge?
+    @State private var fileTree: [FileNode] = []
+    @State private var gitFileStatuses = GitFileStatusProvider()
+    @State private var directoryWatcher: DirectoryWatcher?
+    @State private var refreshGeneration = 0
     @State private var cachedClaudeCommand: String?
     @State private var draggedCustomTab: WorkspaceTab?
     @StateObject private var portDetector: PortDetector
@@ -298,8 +318,10 @@ struct TerminalContainerView: View {
         _terminalCount = State(initialValue: initialTabState.terminalCount)
         _browserCount = State(initialValue: initialTabState.browserCount)
         _scriptConfig = State(initialValue: scriptConfig)
+        _editorCount = State(initialValue: initialTabState.editorCount)
         _browserTitles = State(initialValue: initialTabState.browserTitles)
         _terminalTitles = State(initialValue: initialTabState.terminalTitles)
+        _editorFilePaths = State(initialValue: initialTabState.editorFilePaths)
         _runStoppedManually = State(initialValue: initialTabState.runStoppedManually)
         _runStarted = State(initialValue: initialTabState.runStarted)
         _portDetector = StateObject(wrappedValue: PortDetector(workstreamID: workstreamID))
@@ -317,6 +339,16 @@ struct TerminalContainerView: View {
         surfaceCache.quickActionRunner(for: workstreamID)
     }
 
+    private var isEditorTabActive: Bool {
+        if case .editor = activeTab { return true }
+        return false
+    }
+
+    private var isActiveEditorDirty: Bool {
+        if case let .editor(id) = activeTab { return editorDirtyState[id] == true }
+        return false
+    }
+
     /// Surface IDs that should be rendering for the active tab.
     /// Returns nil for the environment tab (env surface IDs are managed internally).
     private var visibleSurfaceIDs: Set<UUID>? {
@@ -327,7 +359,7 @@ struct TerminalContainerView: View {
             }
             return [claudeID]
         case let .terminal(id): return [id]
-        case .info, .browser: return []
+        case .info, .browser, .editor: return []
         case .environment: return nil
         }
     }
@@ -497,6 +529,11 @@ struct TerminalContainerView: View {
         .background(.bar)
     }
 
+    private func isEditorDirty(_ tab: WorkspaceTab) -> Bool {
+        if case let .editor(id) = tab { return editorDirtyState[id] == true }
+        return false
+    }
+
     @ViewBuilder
     private func tabButton(for tab: WorkspaceTab) -> some View {
         let shortcut = tabShortcut(tab) ?? closeableTabShortcut(tab)
@@ -506,6 +543,7 @@ struct TerminalContainerView: View {
             icon: tabIcon(tab),
             shortcut: shortcut,
             isActive: activeTab == tab,
+            isDirty: isEditorDirty(tab),
             onSelect: { activeTab = tab },
             onClose: tab.isCloseable ? { closeTab(tab) } : nil
         )
@@ -594,6 +632,36 @@ struct TerminalContainerView: View {
         case let .browser(id):
             BrowserView(defaultURL: browserDefaultURL, tabID: id, webView: surfaceCache.webView(for: id))
                 .id(id)
+        case let .editor(id):
+            if let bridge = editorBridge {
+                EditorView(
+                    workingDirectory: workingDirectory,
+                    fileTree: fileTree,
+                    gitStatus: gitFileStatuses,
+                    initialFilePath: editorFilePaths[id],
+                    bridge: bridge,
+                    modelId: id.uuidString,
+                    isDirtyState: Binding(
+                        get: { editorDirtyState[id] ?? false },
+                        set: { editorDirtyState[id] = $0 }
+                    ),
+                    onFileChanged: { path in
+                        if let path {
+                            editorFilePaths[id] = path
+                        } else {
+                            editorFilePaths.removeValue(forKey: id)
+                        }
+                        saveTabSnapshot()
+                    },
+                    onExpandFolder: { path in
+                        expandFileTreeFolder(path)
+                    }
+                )
+                .id(id)
+            } else {
+                ProgressView()
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+            }
         }
     }
 
@@ -632,6 +700,10 @@ struct TerminalContainerView: View {
                 guard isActive else { return }
                 addBrowser()
             }
+            .onReceive(NotificationCenter.default.publisher(for: .toggleEditor)) { _ in
+                guard isActive else { return }
+                openEditor()
+            }
             .onReceive(NotificationCenter.default.publisher(for: .closeTerminal)) { _ in
                 guard isActive else { return }
                 if activeTab.isCloseable { closeTab(activeTab) }
@@ -659,12 +731,23 @@ struct TerminalContainerView: View {
                 startWorkspace(defaultBranch: branch)
             }
         }
+        .onAppear {
+            editorTabActive = isEditorTabActive
+            editorFileDirty = isActiveEditorDirty
+            if tabs.contains(where: { if case .editor = $0 { return true } else { return false } }) {
+                startFileTreeWatcherIfNeeded()
+            }
+        }
         .onDisappear {
+            editorTabActive = false
+            editorFileDirty = false
             guard workspaceStarted else { return }
             surfaceCache.saveTabSnapshot(for: workstreamID, snapshot: currentTabSnapshot())
         }
         .onChange(of: activeTab) {
             guard isActive else { return }
+            editorTabActive = isEditorTabActive
+            editorFileDirty = isActiveEditorDirty
             surfaceCache.updateOcclusion(visibleSurfaceIDs: visibleSurfaceIDs)
             WorkspaceStateStore.save(RestorableWorkspaceTab(activeTab: activeTab), for: workstreamID)
             appEnv.refreshWorktreeState(for: workingDirectory, projectDirectory: projectDirectory)
@@ -758,6 +841,12 @@ struct TerminalContainerView: View {
                         }
                         .help("New Browser (\u{2318}B)")
 
+                        Button(action: openEditor) {
+                            Label(NSLocalizedString("Editor", comment: ""), systemImage: "doc.text")
+                                .labelStyle(.titleAndIcon)
+                        }
+                        .help(NSLocalizedString("New Editor (\u{2318}E)", comment: ""))
+
                         QuickActionButtons(
                             runner: quickActionRunner,
                             claudePath: appEnv.toolStatus.claude.path,
@@ -773,6 +862,8 @@ struct TerminalContainerView: View {
                 }
             }
             .onChange(of: isActive) { _, active in
+                editorTabActive = active && isEditorTabActive
+                editorFileDirty = active && isActiveEditorDirty
                 if active {
                     surfaceCache.updateOcclusion(visibleSurfaceIDs: visibleSurfaceIDs)
                 } else {
@@ -801,6 +892,11 @@ struct TerminalContainerView: View {
             guard !useCompactTabs else { return nil }
             guard let title = browserTitles[id], !title.isEmpty else { return nil }
             return title.count > 20 ? String(title.prefix(20)) + "..." : title
+        case let .editor(id):
+            guard !useCompactTabs else { return nil }
+            guard let path = editorFilePaths[id] else { return nil }
+            let name = (path as NSString).lastPathComponent
+            return name.count > 20 ? String(name.prefix(20)) + "..." : name
         }
     }
 
@@ -811,6 +907,7 @@ struct TerminalContainerView: View {
         case .environment: return "gearshape.2"
         case .terminal: return "terminal"
         case .browser: return "globe"
+        case .editor: return "doc.text"
         }
     }
 
@@ -830,7 +927,7 @@ struct TerminalContainerView: View {
 
     private func tabDragIdentifier(_ tab: WorkspaceTab) -> String {
         switch tab {
-        case let .terminal(id), let .browser(id):
+        case let .terminal(id), let .browser(id), let .editor(id):
             return id.uuidString
         case .info:
             return "info"
@@ -859,7 +956,139 @@ struct TerminalContainerView: View {
         saveTabSnapshot()
     }
 
+    private func openEditor() {
+        addEditor()
+    }
+
+    private func addEditor(filePath: String? = nil) {
+        // Create bridge before adding the tab — never during body evaluation
+        createEditorBridgeIfNeeded()
+        editorCount += 1
+        let id = derivedUUID(from: workstreamID, salt: "editor-\(editorCount)")
+        if let filePath {
+            editorFilePaths[id] = filePath
+        }
+        let tab = WorkspaceTab.editor(id)
+        tabs.append(tab)
+        activeTab = tab
+        startFileTreeWatcherIfNeeded()
+        saveTabSnapshot()
+    }
+
+    private func startFileTreeWatcherIfNeeded() {
+        guard directoryWatcher == nil else { return }
+        refreshFileTree()
+        directoryWatcher = DirectoryWatcher(path: workingDirectory) { [self] in
+            refreshFileTree()
+        }
+    }
+
+    private func refreshFileTree() {
+        refreshGeneration += 1
+        let gen = refreshGeneration
+        let currentTree = fileTree
+        DispatchQueue.global(qos: .userInitiated).async {
+            let tree: [FileNode]
+            if currentTree.isEmpty {
+                tree = FileNode.buildShallowTree(rootPath: workingDirectory)
+            } else {
+                tree = FileNode.refreshLoadedNodes(in: currentTree, rootPath: workingDirectory)
+            }
+            let statuses = GitOperations.fileStatuses(at: workingDirectory)
+            DispatchQueue.main.async {
+                guard gen == refreshGeneration else { return }
+                fileTree = tree
+                gitFileStatuses = GitFileStatusProvider(fileStatuses: statuses)
+            }
+        }
+    }
+
+    private func expandFileTreeFolder(_ relativePath: String) {
+        if let node = FileNode.findNode(atPath: relativePath, in: fileTree), node.isLoaded { return }
+        let gen = refreshGeneration
+        let root = workingDirectory
+        DispatchQueue.global(qos: .userInitiated).async {
+            let children = FileNode.loadChildren(atRelativePath: relativePath, rootPath: root)
+            DispatchQueue.main.async {
+                guard gen == refreshGeneration else { return }
+                fileTree = FileNode.insertChildren(children, atPath: relativePath, in: fileTree)
+            }
+        }
+    }
+
+    private func stopFileTreeWatcherIfUnneeded() {
+        let hasEditorTabs = tabs.contains { if case .editor = $0 { return true } else { return false } }
+        if !hasEditorTabs {
+            refreshGeneration += 1
+            directoryWatcher?.stop()
+            directoryWatcher = nil
+            fileTree = []
+            gitFileStatuses = GitFileStatusProvider()
+            // Keep editorBridge alive — the WebView is expensive to recreate (~17 MB JS)
+        }
+    }
+
+    private func createEditorBridgeIfNeeded() {
+        guard editorBridge == nil else { return }
+        let bridge = MonacoEditorBridge()
+        bridge.onContentChanged = { [self] modelId, dirty in
+            if let uuid = UUID(uuidString: modelId) {
+                editorDirtyState[uuid] = dirty
+                if case .editor(uuid) = activeTab {
+                    editorFileDirty = dirty
+                }
+            }
+        }
+        editorBridge = bridge
+    }
+
     private func closeTab(_ tab: WorkspaceTab) {
+        if case let .editor(id) = tab, editorDirtyState[id] == true {
+            confirmCloseEditor(tab: tab, id: id)
+            return
+        }
+        forceCloseTab(tab)
+    }
+
+    private func confirmCloseEditor(tab: WorkspaceTab, id: UUID) {
+        let fileName = (editorFilePaths[id] as? NSString)?.lastPathComponent ?? "file"
+        let alert = NSAlert()
+        alert.messageText = String(
+            format: NSLocalizedString("Do you want to save changes to \"%@\"?", comment: ""),
+            fileName
+        )
+        alert.informativeText = NSLocalizedString("Your changes will be lost if you don't save them.", comment: "")
+        alert.addButton(withTitle: NSLocalizedString("Save", comment: ""))
+        alert.addButton(withTitle: NSLocalizedString("Don't Save", comment: ""))
+        alert.addButton(withTitle: NSLocalizedString("Cancel", comment: ""))
+        alert.alertStyle = .warning
+
+        let response = alert.runModal()
+        switch response {
+        case .alertFirstButtonReturn:
+            // Save then close — async to wait for bridge.getContent()
+            Task {
+                if let bridge = editorBridge,
+                   let relativePath = editorFilePaths[id]
+                {
+                    let fullPath = (workingDirectory as NSString)
+                        .appendingPathComponent(relativePath)
+                    if let content = await bridge.getContent(modelId: id.uuidString) {
+                        try? content.write(toFile: fullPath, atomically: true, encoding: .utf8)
+                    }
+                }
+                forceCloseTab(tab)
+            }
+        case .alertSecondButtonReturn:
+            // Don't save, just close
+            forceCloseTab(tab)
+        default:
+            // Cancel — do nothing
+            break
+        }
+    }
+
+    private func forceCloseTab(_ tab: WorkspaceTab) {
         guard let index = tabs.firstIndex(of: tab) else { return }
         tabs.remove(at: index)
         // Clean up cached views
@@ -868,9 +1097,14 @@ struct TerminalContainerView: View {
             surfaceCache.removeSurface(for: id)
         case let .browser(id):
             surfaceCache.removeWebView(for: id)
+        case let .editor(id):
+            editorFilePaths.removeValue(forKey: id)
+            editorDirtyState.removeValue(forKey: id)
+            editorBridge?.closeModel(modelId: id.uuidString)
         default:
             break
         }
+        stopFileTreeWatcherIfUnneeded()
         // Switch to previous tab or agent
         if activeTab == tab {
             let newIndex = min(index, tabs.count - 1)
@@ -884,9 +1118,11 @@ struct TerminalContainerView: View {
             tabs: tabs,
             terminalCount: terminalCount,
             browserCount: browserCount,
+            editorCount: editorCount,
             activeTab: activeTab,
             browserTitles: browserTitles,
             terminalTitles: terminalTitles,
+            editorFilePaths: editorFilePaths,
             runStarted: runStarted,
             runStoppedManually: runStoppedManually
         )
@@ -926,6 +1162,10 @@ struct TerminalContainerView: View {
             surfaceCache.respawnableIDs.insert(claudeID)
         }
         preloadSurfaces()
+        // Eagerly create the Monaco bridge so it's ready when the user opens
+        // an editor tab. The WKWebView is created lazily when MonacoEditorView
+        // enters the tree (it needs a real container to avoid 0x0 initialization).
+        createEditorBridgeIfNeeded()
         surfaceCache.updateOcclusion(visibleSurfaceIDs: visibleSurfaceIDs)
     }
 
@@ -1087,6 +1327,7 @@ private struct WorkspaceTabButton: View {
     let icon: String
     var shortcut: String? = nil
     let isActive: Bool
+    var isDirty: Bool = false
     let onSelect: () -> Void
     var onClose: (() -> Void)?
 
@@ -1094,6 +1335,11 @@ private struct WorkspaceTabButton: View {
 
     var body: some View {
         HStack(spacing: 4) {
+            if isDirty {
+                Circle()
+                    .fill(Color.primary.opacity(0.6))
+                    .frame(width: 6, height: 6)
+            }
             Image(systemName: icon)
                 .font(.system(size: 11))
             if let label {
@@ -1682,7 +1928,7 @@ final class TerminalSurfaceCache: ObservableObject {
         removeSurface(for: workstreamID)
         // Build a set of all possible derived IDs and remove matches
         var derivedIDs = Set<UUID>()
-        for prefix in ["terminal", "browser", "env-setup", "env-run"] {
+        for prefix in ["terminal", "browser", "editor", "env-setup", "env-run"] {
             for i in 0 ... 99 {
                 derivedIDs.insert(derivedUUID(from: workstreamID, salt: "\(prefix)-\(i)"))
             }

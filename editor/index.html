@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <style>
+    :root {
+      color-scheme: light dark;
+    }
+    html, body {
+      margin: 0;
+      padding: 0;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+    }
+    #editor {
+      width: 100%;
+      height: 100%;
+    }
+    /* Hide editor until Monaco has applied the theme, so any brief
+       light-theme flash is invisible against the color-scheme background. */
+    body.loading #editor {
+      opacity: 0;
+    }
+
+    /* macOS-style overlay scrollbars */
+    .monaco-scrollable-element > .scrollbar {
+      background: transparent !important;
+      transition: opacity 0.8s ease-out !important;
+    }
+    .monaco-scrollable-element > .scrollbar > .slider {
+      background: light-dark(rgba(0, 0, 0, 0.25), rgba(255, 255, 255, 0.2)) !important;
+      border-radius: 4px !important;
+      transition: background 0.2s ease !important;
+    }
+    .monaco-scrollable-element > .scrollbar > .slider:hover {
+      background: light-dark(rgba(0, 0, 0, 0.4), rgba(255, 255, 255, 0.35)) !important;
+    }
+    .monaco-scrollable-element > .scrollbar > .slider.active {
+      background: light-dark(rgba(0, 0, 0, 0.55), rgba(255, 255, 255, 0.5)) !important;
+    }
+  </style>
+</head>
+<body class="loading">
+  <div id="editor"></div>
+  <script type="module" src="./src/main.js"></script>
+</body>
+</html>

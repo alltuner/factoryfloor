@@ -378,6 +378,42 @@ enum GitOperations {
         }
     }
 
+    /// Per-file git status for the file tree (modified, untracked, ignored).
+    /// Returns an empty dictionary on failure so the tree degrades gracefully.
+    static func fileStatuses(at path: String) -> [String: FileGitStatus] {
+        guard let output = runWithTimeout(
+            args: ["status", "--porcelain", "--ignored", "--ignore-submodules=dirty"],
+            in: path,
+            timeout: 3
+        ) else {
+            return [:]
+        }
+
+        var result: [String: FileGitStatus] = [:]
+        for line in output.components(separatedBy: "\n") {
+            guard line.count >= 4 else { continue }
+            let xy = String(line.prefix(2))
+            var filePath = String(line.dropFirst(3))
+
+            if xy == "!!" {
+                // Ignored — strip trailing slash for directories
+                if filePath.hasSuffix("/") { filePath = String(filePath.dropLast()) }
+                result[filePath] = .ignored
+            } else if xy == "??" {
+                result[filePath] = .untracked
+            } else {
+                // Handle renames/copies: "R  old -> new" or "C  old -> new"
+                if let arrowRange = filePath.range(of: " -> ") {
+                    let newPath = String(filePath[arrowRange.upperBound...]).trimmingCharacters(in: .whitespaces)
+                    result[newPath] = .modified
+                } else {
+                    result[filePath] = .modified
+                }
+            }
+        }
+        return result
+    }
+
     // MARK: - Private
 
     /// Fetch the default branch from origin. Fails silently when there is no

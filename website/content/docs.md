@@ -70,6 +70,7 @@ The UI shows up instantly — worktree creation happens in the background.
 - **Environment** — setup and run script controls
 - **Terminal** (⌘T) — additional terminal tabs, as many as you want
 - **Browser** (⌘B) — embedded browser with auto-port detection
+- **Editor** (⌘E) — built-in Monaco code editor with syntax highlighting and IntelliSense
 
 #### Branch auto-rename
 
@@ -108,7 +109,7 @@ These run as background `claude -p` calls. Enable **Quick action debug mode** in
 
 ## Your Workspace
 
-Terminals, browsers, and shortcuts — the tools inside each workstream.
+Terminals, browsers, editors, and shortcuts — the tools inside each workstream.
 
 ### Terminals
 
@@ -139,6 +140,11 @@ When your run script starts a dev server, Factory Floor detects the listening po
 
 The browser shows a connection error page with a retry button if the server isn't ready yet. It'll auto-navigate once the port is detected.
 
+### The Editor
+
+Each workstream can have editor tabs (⌘E). The editor is Monaco — the same engine that powers VS Code.
+
+
 ### Keyboard Shortcuts
 
 Factory Floor is keyboard-first. Here's everything.
@@ -163,6 +169,9 @@ Factory Floor is keyboard-first. Here's everything.
 | ⌘Return | Focus Coding Agent |
 | ⌘T | New Terminal |
 | ⌘B | New Browser |
+| ⌘E | New Editor |
+| ⌘S | Save (Editor) |
+| ⌘Shift+S | Save As (Editor) |
 | ⌘W | Close tab |
 | ⌘Shift+W | Archive workstream |
 | ⌘L | Address bar (browser) |
@@ -316,9 +325,9 @@ Enable **Bleeding edge updates** in Settings > Advanced for pre-release builds. 
 
 ## Enterprise Features 😉
 
-### Code Editor
+### Full IDE
 
-Nope. No syntax highlighting, no autocomplete, no minimap. Our nonexistent VCs have not been pushing any corporate agenda. We intend to have you using the tools you already love: [Zed](https://zed.dev), [VS Code](https://code.visualstudio.com), whatever. Factory Floor gives you a coding agent, a browser, and a worktree. Besides, who's writing code anymore?
+Nope. There's a built-in editor (⌘E) for quick looks and small edits — but we're not building an IDE. For serious editing sessions, you should be using the tools you already love: [Zed](https://zed.dev), [VS Code](https://code.visualstudio.com), whatever. Factory Floor gives you a coding agent, a browser, a worktree, and just enough editor to not have to leave. Besides, who's writing code anymore?
 
 ### Merge Viewer
 

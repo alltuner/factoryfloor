@@ -38,6 +38,11 @@
 "Projects Not Found" = "Projekte nicht gefunden";
 "The following projects were removed because their directories no longer exist on disk: %@" = "Die folgenden Projekte wurden entfernt, da ihre Verzeichnisse nicht mehr auf der Festplatte existieren: %@";
 "Cancel" = "Abbrechen";
+"Save" = "Sichern";
+"Save As..." = "Sichern unter …";
+"Don't Save" = "Nicht sichern";
+"Do you want to save changes to \"%@\"?" = "Möchtest du die Änderungen an \"%@\" sichern?";
+"Your changes will be lost if you don't save them." = "Deine Änderungen gehen verloren, wenn du sie nicht sicherst.";
 "Remove" = "Entfernen";
 "Worktree Creation Failed" = "Worktree-Erstellung fehlgeschlagen";
 "Could not create the git worktree. The branch may already exist, or there may be an ongoing merge or rebase." = "Der Git-Worktree konnte nicht erstellt werden. Der Branch existiert möglicherweise bereits, oder es läuft ein Merge oder Rebase.";
@@ -69,6 +74,11 @@
 "Terminal" = "Terminal";
 "None" = "Keine";
 "Browser" = "Browser";
+"Editor" = "Editor";
+"New Editor (\u2318E)" = "Neuer Editor (\u2318E)";
+"Open File" = "Datei öffnen";
+"Toggle file tree" = "Dateibaum ein-/ausblenden";
+"Select a file to edit" = "Datei zum Bearbeiten auswählen";
 "GitHub" = "GitHub";
 "Coding Agent" = "Coding-Agent";
 "Bypass permission prompts" = "Berechtigungsabfragen überspringen";

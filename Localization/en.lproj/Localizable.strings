@@ -38,6 +38,11 @@
 "Projects Not Found" = "Projects Not Found";
 "The following projects were removed because their directories no longer exist on disk: %@" = "The following projects were removed because their directories no longer exist on disk: %@";
 "Cancel" = "Cancel";
+"Save" = "Save";
+"Save As..." = "Save As...";
+"Don't Save" = "Don't Save";
+"Do you want to save changes to \"%@\"?" = "Do you want to save changes to \"%@\"?";
+"Your changes will be lost if you don't save them." = "Your changes will be lost if you don't save them.";
 "Remove" = "Remove";
 "Worktree Creation Failed" = "Worktree Creation Failed";
 "Could not create the git worktree. The branch may already exist, or there may be an ongoing merge or rebase." = "Could not create the git worktree. The branch may already exist, or there may be an ongoing merge or rebase.";
@@ -69,6 +74,11 @@
 "Terminal" = "Terminal";
 "None" = "None";
 "Browser" = "Browser";
+"Editor" = "Editor";
+"New Editor (\u2318E)" = "New Editor (\u2318E)";
+"Open File" = "Open File";
+"Toggle file tree" = "Toggle file tree";
+"Select a file to edit" = "Select a file to edit";
 "GitHub" = "GitHub";
 "Coding Agent" = "Coding Agent";
 "Bypass permission prompts" = "Bypass permission prompts";
