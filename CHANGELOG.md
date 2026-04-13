@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.1.71](https://github.com/alltuner/factoryfloor/compare/v0.1.70...v0.1.71) (2026-04-13)
+
+
+### Features
+
+* show cumulative changelog in update popover ([#418](https://github.com/alltuner/factoryfloor/issues/418)) ([12caa50](https://github.com/alltuner/factoryfloor/commit/12caa50d83bdcc7e585ec722fd243de1ce8b041d))
+
 ## [0.1.70](https://github.com/alltuner/factoryfloor/compare/v0.1.69...v0.1.70) (2026-04-13)
 
 
