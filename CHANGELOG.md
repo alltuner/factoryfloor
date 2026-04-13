@@ -1,5 +1,14 @@
 # Changelog
 
+## [0.1.69](https://github.com/alltuner/factoryfloor/compare/v0.1.68...v0.1.69) (2026-04-13)
+
+
+### Bug Fixes
+
+* **ci:** build Monaco editor before xcodegen in release workflow ([#415](https://github.com/alltuner/factoryfloor/issues/415)) ([ff7907f](https://github.com/alltuner/factoryfloor/commit/ff7907fa39f33af6c8c4a289033fae4d91e4f42e))
+* **deps:** update dependency @codingame/monaco-vscode-languages-service-override to v30.0.1 ([#412](https://github.com/alltuner/factoryfloor/issues/412)) ([55acef4](https://github.com/alltuner/factoryfloor/commit/55acef4169279f00c1e07ecc04e279cdb655fac7))
+* **deps:** update dependency @codingame/monaco-vscode-standalone-css-language-features to v30.0.1 ([#413](https://github.com/alltuner/factoryfloor/issues/413)) ([522052a](https://github.com/alltuner/factoryfloor/commit/522052a7565ada24dcf416d21fb9e4cab0065516))
+
 ## [0.1.68](https://github.com/alltuner/factoryfloor/compare/v0.1.67...v0.1.68) (2026-04-13)
 
 
