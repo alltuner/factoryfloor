@@ -2,5 +2,15 @@
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
   "extends": [
     "config:recommended"
+  ],
+  "packageRules": [
+    {
+      "description": "Group all Monaco/VSCode packages together since they must share the same version",
+      "matchPackageNames": [
+        "@codingame/monaco-vscode-*",
+        "monaco-editor"
+      ],
+      "groupName": "monaco-vscode"
+    }
   ]
 }
