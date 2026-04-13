@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.1.73](https://github.com/alltuner/factoryfloor/compare/v0.1.72...v0.1.73) (2026-04-13)
+
+
+### Bug Fixes
+
+* deduplicate versions and filter noise in Sparkle changelog ([#425](https://github.com/alltuner/factoryfloor/issues/425)) ([30c48d9](https://github.com/alltuner/factoryfloor/commit/30c48d985ac3005582e8257862e8df4e2114089d))
+
 ## [0.1.72](https://github.com/alltuner/factoryfloor/compare/v0.1.71...v0.1.72) (2026-04-13)
 
 
