@@ -1,5 +1,19 @@
 # Changelog
 
+## [0.1.74](https://github.com/alltuner/factoryfloor/compare/v0.1.73...v0.1.74) (2026-04-13)
+
+
+### Bug Fixes
+
+* **deps:** update dependency @codingame/monaco-vscode-standalone-typescript-language-features to v30.0.1 ([#427](https://github.com/alltuner/factoryfloor/issues/427)) ([0f8f342](https://github.com/alltuner/factoryfloor/commit/0f8f3425148fcbebc43f60fbc66a630d807425c6))
+* **deps:** update dependency @codingame/monaco-vscode-textmate-service-override to v30.0.1 ([#428](https://github.com/alltuner/factoryfloor/issues/428)) ([bdaf790](https://github.com/alltuner/factoryfloor/commit/bdaf79023b939604603c78b6a21b0ee51332b225))
+* **deps:** update dependency @codingame/monaco-vscode-theme-service-override to v30.0.1 ([#432](https://github.com/alltuner/factoryfloor/issues/432)) ([cbb8137](https://github.com/alltuner/factoryfloor/commit/cbb8137e5831b987d034287f7f3d4f678204d30f))
+
+
+### Refactoring
+
+* rebuild Sparkle changelog from CHANGELOG.md on every release ([#430](https://github.com/alltuner/factoryfloor/issues/430)) ([51d9c92](https://github.com/alltuner/factoryfloor/commit/51d9c922f2e8a5823fe95a0c46a0d058b324f53c))
+
 ## [0.1.73](https://github.com/alltuner/factoryfloor/compare/v0.1.72...v0.1.73) (2026-04-13)
 
 
