@@ -1,5 +1,15 @@
 # Changelog
 
+## [0.1.72](https://github.com/alltuner/factoryfloor/compare/v0.1.71...v0.1.72) (2026-04-13)
+
+
+### Bug Fixes
+
+* **ci:** download appcast from previous release, not latest ([#423](https://github.com/alltuner/factoryfloor/issues/423)) ([062b328](https://github.com/alltuner/factoryfloor/commit/062b328ed43e0db770fdb8f3b67e0fe644c9f405))
+* **deps:** update dependency @codingame/monaco-vscode-standalone-html-language-features to v30.0.1 ([#420](https://github.com/alltuner/factoryfloor/issues/420)) ([20517fd](https://github.com/alltuner/factoryfloor/commit/20517fd05a4054ceca73154cf61b527a1d260a31))
+* **deps:** update dependency @codingame/monaco-vscode-standalone-json-language-features to v30.0.1 ([#421](https://github.com/alltuner/factoryfloor/issues/421)) ([821c6b6](https://github.com/alltuner/factoryfloor/commit/821c6b6c28e64f1a044a15d76a3c5a662dd7a65f))
+* DMG skyline clipped by Finder status bar ([#424](https://github.com/alltuner/factoryfloor/issues/424)) ([c087cb9](https://github.com/alltuner/factoryfloor/commit/c087cb9ede4313aaa3f0f6fcb21739cf73ffc2b3))
+
 ## [0.1.71](https://github.com/alltuner/factoryfloor/compare/v0.1.70...v0.1.71) (2026-04-13)
 
 
