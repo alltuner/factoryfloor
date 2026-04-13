@@ -816,7 +816,7 @@ struct TerminalContainerView: View {
 
     private func closeableTabShortcut(_ tab: WorkspaceTab) -> String? {
         guard tab.isCloseable,
-              let idx = tabs.filter(\.isCloseable).firstIndex(of: tab),
+              let idx = tabs.firstIndex(of: tab),
               idx < 9 else { return nil }
         return "\(idx + 1)"
     }
