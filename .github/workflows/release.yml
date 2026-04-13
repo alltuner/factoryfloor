@@ -271,8 +271,12 @@ jobs:
               print(m.group(1).strip())
           " | uvx --with markdown python3 -c "import sys, markdown; print(markdown.markdown(sys.stdin.read()))")
 
-          # Download existing appcast to merge with (preserves history)
-          gh release download --repo "$GITHUB_REPOSITORY" --pattern "appcast.xml" --output existing-appcast.xml || true
+          # Download existing appcast from previous release to merge with (preserves history).
+          # Cannot use --latest because release-please already created the current (empty) release.
+          PREV_TAG=$(gh release list --repo "$GITHUB_REPOSITORY" --limit 10 --json tagName --jq "[.[] | select(.tagName != \"$TAG_NAME\")][0].tagName")
+          if [ -n "$PREV_TAG" ]; then
+            gh release download "$PREV_TAG" --repo "$GITHUB_REPOSITORY" --pattern "appcast.xml" --output existing-appcast.xml || true
+          fi
 
           DMG_URL="https://github.com/alltuner/factoryfloor/releases/download/v${VERSION}/${DMG_NAME}"
           python3 scripts/generate_appcast.py \
