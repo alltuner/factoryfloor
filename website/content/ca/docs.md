@@ -116,7 +116,7 @@ Els terminals es renderitzen per GPU via [Ghostty](https://ghostty.org). Són r�
 
 - **⌘T** — nou terminal tab
 - **⌘W** — tanca tab (o Ctrl+D per sortir del shell)
-- **⌘1-9** — canvia entre tabs
+- **⌘1** — Info, **⌘2** — Coding Agent, **⌘3-9** — canvia entre tabs
 - **⌘Shift+[** / **⌘Shift+]** — cicla entre tabs
 
 Pots arrossegar fitxers i text sobre el terminal. Perquè de vegades el ratolí està bé, la veritat.
@@ -157,7 +157,9 @@ Factory Floor prioritza el teclat. Aquí tens tot.
 
 | Drecera | Acció |
 |----------|--------|
-| ⌘1-9 | Canvia de tab |
+| ⌘1 | Info |
+| ⌘2 | Coding Agent |
+| ⌘3-9 | Canvia de tab |
 | ⌘Shift+[ | Tab anterior |
 | ⌘Shift+] | Tab següent |
 | ⌘Return | Focus Coding Agent |

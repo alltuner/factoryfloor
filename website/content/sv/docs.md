@@ -116,7 +116,7 @@ Terminals är GPU-renderade via [Ghostty](https://ghostty.org). De är snabba.
 
 - **⌘T** — ny terminal tab
 - **⌘W** — stäng tab (eller Ctrl+D för att avsluta shell)
-- **⌘1-9** — växla mellan tabs
+- **⌘1** — Info, **⌘2** — Coding Agent, **⌘3-9** — växla mellan tabs
 - **⌘Shift+[** / **⌘Shift+]** — bläddra genom tabs
 
 Du kan dra filer och text till terminal. För ibland är musen helt okej, faktiskt.
@@ -157,7 +157,9 @@ Factory Floor är tangentbord-först. Här är allt.
 
 | Genväg | Åtgärd |
 |----------|--------|
-| ⌘1-9 | Byt tab |
+| ⌘1 | Info |
+| ⌘2 | Coding Agent |
+| ⌘3-9 | Byt tab |
 | ⌘Shift+[ | Föregående tab |
 | ⌘Shift+] | Nästa tab |
 | ⌘Return | Fokusera Coding Agent |

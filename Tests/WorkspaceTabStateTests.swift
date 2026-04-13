@@ -115,7 +115,7 @@ final class WorkspaceTabSnapshotTests: XCTestCase {
         XCTAssertEqual(reconciled.activeTab, .browser(browserID))
     }
 
-    func testStartupStateAddsEnvironmentTabToRestoredSnapshot() {
+    func testStartupStatePreservesRestoredSnapshot() {
         let snapshot = WorkspaceTabSnapshot(
             tabs: [.info, .agent],
             terminalCount: 0,
@@ -129,11 +129,10 @@ final class WorkspaceTabSnapshotTests: XCTestCase {
 
         let state = startupWorkspaceTabState(
             snapshot: snapshot,
-            savedTab: nil,
-            hasEnvironmentTab: true
+            savedTab: nil
         )
 
-        XCTAssertEqual(state.tabs, [.info, .agent, .environment])
+        XCTAssertEqual(state.tabs, [.info, .agent])
         XCTAssertEqual(state.activeTab, .agent)
         XCTAssertTrue(state.runStarted)
     }
@@ -141,8 +140,7 @@ final class WorkspaceTabSnapshotTests: XCTestCase {
     func testStartupStateUsesSavedFixedTabWithoutSnapshot() {
         let state = startupWorkspaceTabState(
             snapshot: nil,
-            savedTab: .agent,
-            hasEnvironmentTab: false
+            savedTab: .agent
         )
 
         XCTAssertEqual(state.tabs, [.info, .agent])
@@ -204,20 +202,19 @@ final class WorkspaceTabStateTests: XCTestCase {
         XCTAssertEqual(RestorableWorkspaceTab(activeTab: .browser(UUID())), .info)
     }
 
-    func testEnvironmentRestoresToInfoWhenUnavailable() {
-        XCTAssertEqual(RestorableWorkspaceTab.environment.workspaceTab(hasEnvironmentTab: false), .info)
-        XCTAssertEqual(RestorableWorkspaceTab.environment.workspaceTab(hasEnvironmentTab: true), .environment)
+    func testEnvironmentRestoresToInfo() {
+        XCTAssertEqual(RestorableWorkspaceTab.environment.workspaceTab(), .info)
     }
 
     func testReorderedCustomTabsKeepsFixedTabsInPlace() throws {
         let terminalA = try WorkspaceTab.terminal(XCTUnwrap(UUID(uuidString: "AAAAAAAA-AAAA-AAAA-AAAA-AAAAAAAAAAAA")))
         let browserB = try WorkspaceTab.browser(XCTUnwrap(UUID(uuidString: "BBBBBBBB-BBBB-BBBB-BBBB-BBBBBBBBBBBB")))
         let terminalC = try WorkspaceTab.terminal(XCTUnwrap(UUID(uuidString: "CCCCCCCC-CCCC-CCCC-CCCC-CCCCCCCCCCCC")))
-        let tabs: [WorkspaceTab] = [.info, .agent, .environment, terminalA, browserB, terminalC]
+        let tabs: [WorkspaceTab] = [.info, .agent, terminalA, browserB, terminalC]
 
         let reordered = reorderedCustomTabs(tabs, dragging: terminalC, to: terminalA)
 
-        XCTAssertEqual(reordered, [.info, .agent, .environment, terminalC, terminalA, browserB])
+        XCTAssertEqual(reordered, [.info, .agent, terminalC, terminalA, browserB])
     }
 
     func testRenderableWorkstreamIDKeepsOnlySelectedReadyWorkstream() throws {
