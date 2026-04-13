@@ -38,7 +38,7 @@ if needs_rebuild; then
   echo "Building Monaco editor bundle..."
   cd "$EDITOR_DIR"
   bun install --frozen-lockfile 2>&1
-  bunx vite build 2>&1
+  NODE_OPTIONS="--max-old-space-size=4096" bunx vite build 2>&1
   echo "Monaco editor built to Resources/MonacoEditor/"
 else
   echo "Monaco editor bundle is up to date, skipping build."
