@@ -4,15 +4,23 @@
 import Foundation
 import os
 
-struct AppcastInfo {
+struct AppcastRelease {
     let version: String
     let releaseNotesURL: URL?
+    let releaseNotes: String?
 }
 
 @MainActor
 class UpdateChecker: ObservableObject {
-    @Published var availableVersion: String?
-    @Published var releaseNotesURL: URL?
+    @Published var pendingReleases: [AppcastRelease] = []
+
+    var availableVersion: String? {
+        pendingReleases.first?.version
+    }
+
+    var releaseNotesURL: URL? {
+        pendingReleases.first?.releaseNotesURL
+    }
 
     private let currentVersion: String
     private let logger = Logger(subsystem: AppConstants.appID, category: "UpdateChecker")
@@ -29,12 +37,11 @@ class UpdateChecker: ObservableObject {
             Task.detached { [currentVersion, logger] in
                 do {
                     let (data, _) = try await URLSession.shared.data(from: Self.appcastURL)
-                    guard let info = Self.parseAppcast(from: data) else { return }
-                    if Self.isNewer(info.version, than: currentVersion) {
-                        await MainActor.run { [weak self] in
-                            self?.availableVersion = info.version
-                            self?.releaseNotesURL = info.releaseNotesURL
-                        }
+                    let releases = Self.parseAppcast(from: data)
+                    let pending = Self.releasesNewer(than: currentVersion, in: releases)
+                    guard !pending.isEmpty else { return }
+                    await MainActor.run { [weak self] in
+                        self?.pendingReleases = pending
                     }
                 } catch {
                     logger.debug("Update check failed: \(error.localizedDescription)")
@@ -43,18 +50,23 @@ class UpdateChecker: ObservableObject {
         #endif
     }
 
-    /// Extracts version and release notes URL from the first item in an appcast feed.
-    nonisolated static func parseAppcast(from data: Data) -> AppcastInfo? {
+    /// Parses all release items from an appcast feed, ordered newest first.
+    nonisolated static func parseAppcast(from data: Data) -> [AppcastRelease] {
         let parser = AppcastParser()
         let xmlParser = XMLParser(data: data)
         xmlParser.delegate = parser
-        guard xmlParser.parse(), let version = parser.version else { return nil }
-        return AppcastInfo(version: version, releaseNotesURL: parser.releaseNotesURL)
+        guard xmlParser.parse() else { return [] }
+        return parser.releases
     }
 
     /// Extracts the sparkle:shortVersionString from the first enclosure in an appcast feed.
     nonisolated static func parseVersion(from data: Data) -> String? {
-        parseAppcast(from: data)?.version
+        parseAppcast(from: data).first?.version
+    }
+
+    /// Filters releases to those newer than the given version.
+    nonisolated static func releasesNewer(than version: String, in releases: [AppcastRelease]) -> [AppcastRelease] {
+        releases.filter { isNewer($0.version, than: version) }
     }
 
     /// Simple semver comparison: returns true if `remote` is newer than `local`.
@@ -72,12 +84,15 @@ class UpdateChecker: ObservableObject {
 }
 
 private class AppcastParser: NSObject, XMLParserDelegate {
-    var version: String?
-    var releaseNotesURL: URL?
+    var releases: [AppcastRelease] = []
 
     private var insideItem = false
     private var currentElement: String?
     private var currentText = ""
+
+    private var itemVersion: String?
+    private var itemLink: URL?
+    private var itemDescription: String?
 
     func parser(
         _: XMLParser,
@@ -88,8 +103,11 @@ private class AppcastParser: NSObject, XMLParserDelegate {
     ) {
         if elementName == "item" {
             insideItem = true
-        } else if elementName == "enclosure", version == nil {
-            version = attributeDict["sparkle:shortVersionString"]
+            itemVersion = nil
+            itemLink = nil
+            itemDescription = nil
+        } else if elementName == "enclosure", insideItem, itemVersion == nil {
+            itemVersion = attributeDict["sparkle:shortVersionString"]
         }
         currentElement = elementName
         currentText = ""
@@ -105,11 +123,24 @@ private class AppcastParser: NSObject, XMLParserDelegate {
         namespaceURI _: String?,
         qualifiedName _: String?
     ) {
-        if elementName == "link", insideItem, releaseNotesURL == nil {
+        if insideItem {
             let trimmed = currentText.trimmingCharacters(in: .whitespacesAndNewlines)
-            releaseNotesURL = URL(string: trimmed)
-        } else if elementName == "item" {
-            insideItem = false
+            if elementName == "link" {
+                itemLink = URL(string: trimmed)
+            } else if elementName == "description" {
+                if !trimmed.isEmpty {
+                    itemDescription = trimmed
+                }
+            } else if elementName == "item" {
+                if let version = itemVersion {
+                    releases.append(AppcastRelease(
+                        version: version,
+                        releaseNotesURL: itemLink,
+                        releaseNotes: itemDescription
+                    ))
+                }
+                insideItem = false
+            }
         }
         currentElement = nil
     }

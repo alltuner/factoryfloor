@@ -271,6 +271,9 @@ jobs:
               print(m.group(1).strip())
           " | uvx --with markdown python3 -c "import sys, markdown; print(markdown.markdown(sys.stdin.read()))")
 
+          # Download existing appcast to merge with (preserves history)
+          gh release download --repo "$GITHUB_REPOSITORY" --pattern "appcast.xml" --output existing-appcast.xml || true
+
           DMG_URL="https://github.com/alltuner/factoryfloor/releases/download/v${VERSION}/${DMG_NAME}"
           python3 scripts/generate_appcast.py \
             --version "$VERSION" \
@@ -278,6 +281,7 @@ jobs:
             --dmg-path "build/release/$DMG_NAME" \
             --dmg-url "$DMG_URL" \
             --release-notes "$RELEASE_NOTES" \
+            --existing existing-appcast.xml \
             --output appcast.xml
 
       - name: Upload to release

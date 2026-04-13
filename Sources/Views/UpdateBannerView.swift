@@ -5,7 +5,7 @@ import SwiftUI
 
 struct UpdateBanner: View {
     let version: String
-    let releaseNotesURL: URL?
+    let pendingReleases: [AppcastRelease]
     @ObservedObject var updater: Updater
 
     @State private var isHovering = false
@@ -34,23 +34,26 @@ struct UpdateBanner: View {
         .buttonStyle(.borderless)
         .onHover { isHovering = $0 }
         .popover(isPresented: $showBrewPopover, arrowEdge: .top) {
-            BrewUpdatePopover(version: version, releaseNotesURL: releaseNotesURL)
+            BrewUpdatePopover(pendingReleases: pendingReleases)
         }
     }
 }
 
 private struct BrewUpdatePopover: View {
-    let version: String
-    let releaseNotesURL: URL?
+    let pendingReleases: [AppcastRelease]
 
     @State private var copied = false
 
     private static let brewCommand = "brew upgrade factory-floor"
 
+    private var latestVersion: String {
+        pendingReleases.first?.version ?? ""
+    }
+
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
             Label {
-                Text("v\(version) available")
+                Text("v\(latestVersion) available")
                     .fontWeight(.semibold)
             } icon: {
                 Image(systemName: "arrow.up.circle.fill")
@@ -89,18 +92,75 @@ private struct BrewUpdatePopover: View {
                     .stroke(Color(nsColor: .separatorColor), lineWidth: 1)
             )
 
-            if let url = releaseNotesURL {
-                Link(destination: url) {
-                    HStack(spacing: 4) {
-                        Text("Release Notes")
-                            .font(.system(size: 11))
+            if !pendingReleases.isEmpty {
+                Divider()
+
+                ScrollView {
+                    VStack(alignment: .leading, spacing: 10) {
+                        ForEach(Array(pendingReleases.enumerated()), id: \.offset) { _, release in
+                            ReleaseEntryView(release: release)
+                        }
+                    }
+                }
+                .frame(maxHeight: 300)
+            }
+        }
+        .padding(12)
+        .frame(width: 320)
+    }
+}
+
+private struct ReleaseEntryView: View {
+    let release: AppcastRelease
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 4) {
+            HStack {
+                Text("v\(release.version)")
+                    .font(.system(size: 12, weight: .semibold))
+
+                Spacer()
+
+                if let url = release.releaseNotesURL {
+                    Link(destination: url) {
                         Image(systemName: "arrow.up.right")
                             .font(.system(size: 9))
                     }
                 }
             }
+
+            if let notes = release.releaseNotes {
+                ReleaseNotesText(html: notes)
+                    .font(.system(size: 11))
+                    .foregroundStyle(.secondary)
+            }
         }
-        .padding(12)
-        .frame(width: 260)
+    }
+}
+
+private struct ReleaseNotesText: View {
+    let html: String
+
+    var body: some View {
+        if let attributed = renderHTML(html) {
+            Text(attributed)
+        } else {
+            Text(html)
+        }
+    }
+
+    private func renderHTML(_ html: String) -> AttributedString? {
+        let wrapped = "<style>body { font-family: -apple-system; font-size: 11px; }</style>\(html)"
+        guard let data = wrapped.data(using: .utf8),
+              let nsAttr = try? NSAttributedString(
+                  data: data,
+                  options: [
+                      .documentType: NSAttributedString.DocumentType.html,
+                      .characterEncoding: String.Encoding.utf8.rawValue,
+                  ],
+                  documentAttributes: nil
+              )
+        else { return nil }
+        return try? AttributedString(nsAttr, including: \.swiftUI)
     }
 }

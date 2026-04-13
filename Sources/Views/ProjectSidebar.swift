@@ -164,7 +164,11 @@ struct ProjectSidebar: View {
     private var bottomBar: some View {
         VStack(spacing: 4) {
             if let version = updateChecker.availableVersion {
-                UpdateBanner(version: version, releaseNotesURL: updateChecker.releaseNotesURL, updater: updater)
+                UpdateBanner(
+                    version: version,
+                    pendingReleases: updateChecker.pendingReleases,
+                    updater: updater
+                )
             }
 
             // Credit
