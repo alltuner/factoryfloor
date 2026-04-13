@@ -124,13 +124,17 @@ def test_merges_with_existing_appcast() -> None:
         items = root.findall(".//item")
         assert len(items) == 2, f"Expected 2 items, got {len(items)}"
 
-        # First item is the new release
+        # First item has cumulative description with both versions
         enc0 = items[0].find("enclosure")
         assert enc0.get(f"{NS}shortVersionString") == "1.1.0"
         desc0 = items[0].find("description")
-        assert desc0 is not None and desc0.text == "Bug fixes"
+        assert desc0 is not None
+        assert "Bug fixes" in desc0.text
+        assert "First release" in desc0.text
+        assert 'data-sparkle-version="1.1.0"' in desc0.text
+        assert 'data-sparkle-version="1.0.0"' in desc0.text
 
-        # Second item is the old release
+        # Second item (old) keeps its own description
         enc1 = items[1].find("enclosure")
         assert enc1.get(f"{NS}shortVersionString") == "1.0.0"
         desc1 = items[1].find("description")
@@ -177,6 +181,62 @@ def test_deduplicates_same_version() -> None:
     finally:
         os.unlink(existing_path)
     print("PASS: deduplicates_same_version")
+
+
+def test_cumulative_description_includes_css_and_version_tags() -> None:
+    """Cumulative description should have CSS for Sparkle version highlighting."""
+    existing = """\
+<?xml version='1.0' encoding='utf-8'?>
+<rss version="2.0" xmlns:sparkle="https://www.andymatuschak.org/xml-namespaces/sparkle">
+  <channel>
+    <item>
+      <title>Version 1.1.0</title>
+      <description>&lt;p&gt;Middle release&lt;/p&gt;</description>
+      <enclosure sparkle:version="1.1.0" sparkle:shortVersionString="1.1.0"
+                 sparkle:edSignature="sig2" length="1500" url="https://example.com/1.1.dmg"
+                 type="application/octet-stream" />
+    </item>
+    <item>
+      <title>Version 1.0.0</title>
+      <description>Initial release</description>
+      <enclosure sparkle:version="1.0.0" sparkle:shortVersionString="1.0.0"
+                 sparkle:edSignature="sig1" length="1000" url="https://example.com/1.0.dmg"
+                 type="application/octet-stream" />
+    </item>
+  </channel>
+</rss>"""
+    with tempfile.NamedTemporaryFile(mode="w", suffix=".xml", delete=False) as f:
+        f.write(existing)
+        existing_path = f.name
+
+    try:
+        xml = build_appcast(
+            version="1.2.0",
+            signature="sig3",
+            dmg_length=2000,
+            dmg_url="https://example.com/1.2.dmg",
+            release_notes="<p>Latest stuff</p>",
+            existing_path=existing_path,
+        )
+        root = parse(xml)
+        desc = root.find(".//item/description")
+        assert desc is not None
+
+        # Should contain CSS with sparkle-installed-version rule
+        assert "sparkle-installed-version" in desc.text
+
+        # Should contain all three versions tagged
+        assert 'data-sparkle-version="1.2.0"' in desc.text
+        assert 'data-sparkle-version="1.1.0"' in desc.text
+        assert 'data-sparkle-version="1.0.0"' in desc.text
+
+        # Content from all versions present
+        assert "Latest stuff" in desc.text
+        assert "Middle release" in desc.text
+        assert "Initial release" in desc.text
+    finally:
+        os.unlink(existing_path)
+    print("PASS: cumulative_description_includes_css_and_version_tags")
 
 
 def test_handles_missing_existing_file() -> None:

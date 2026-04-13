@@ -8,14 +8,72 @@ import datetime
 import os
 import xml.etree.ElementTree as ET
 
+SPARKLE_NS = "https://www.andymatuschak.org/xml-namespaces/sparkle"
+ET.register_namespace("sparkle", SPARKLE_NS)
+
+# CSS injected into the cumulative release notes HTML. Sparkle (2.5+) adds the
+# class "sparkle-installed-version" to the div whose data-sparkle-version matches
+# the user's installed build. The general sibling combinator (~) hides everything
+# older than the installed version.
+RELEASE_NOTES_CSS = """\
+body { font-family: -apple-system, sans-serif; font-size: 13px; line-height: 1.5; padding: 8px 12px; }
+h3 { margin: 12px 0 4px; font-size: 15px; }
+h4 { margin: 8px 0 4px; font-size: 13px; }
+ul { margin: 4px 0; padding-left: 20px; }
+li { margin: 2px 0; }
+hr { border: none; border-top: 1px solid #ddd; margin: 12px 0; }
+.sparkle-installed-version ~ div { display: none; }
+@media (prefers-color-scheme: dark) {
+  body { color: #e0e0e0; }
+  hr { border-color: #444; }
+}"""
+
+
+def build_cumulative_description(
+    current_version: str,
+    current_notes: str | None,
+    existing_items: list[ET.Element],
+) -> str:
+    """Build an HTML description with all versions, tagged with data-sparkle-version."""
+    version_attr = f"{{{SPARKLE_NS}}}shortVersionString"
+    sections: list[str] = []
+
+    if current_notes:
+        sections.append(
+            f'<div data-sparkle-version="{current_version}">'
+            f"<h3>v{current_version}</h3>\n{current_notes}\n</div>"
+        )
+
+    for item in existing_items:
+        enclosure = item.find("enclosure")
+        if enclosure is None:
+            continue
+        version = enclosure.get(version_attr, "")
+        if not version or version == current_version:
+            continue
+        desc = item.find("description")
+        if desc is None or not desc.text or not desc.text.strip():
+            continue
+        sections.append(
+            f'<div data-sparkle-version="{version}">'
+            f"<h3>v{version}</h3>\n{desc.text.strip()}\n</div>"
+        )
+
+    if not sections:
+        return current_notes or ""
+
+    separator = "\n<hr>\n"
+    body = separator.join(sections)
+    return f"<style>{RELEASE_NOTES_CSS}</style>\n{body}"
+
 
 def build_item(
     version: str,
     signature: str,
     dmg_length: int,
     dmg_url: str,
+    description: str,
     min_os: str = "14.0",
-    release_notes: str | None = None,
 ) -> ET.Element:
     """Build a single appcast <item> element."""
     item = ET.Element("item")
@@ -30,8 +88,8 @@ def build_item(
     ns = f"{{{SPARKLE_NS}}}"
     ET.SubElement(item, f"{ns}minimumSystemVersion").text = min_os
 
-    if release_notes:
-        ET.SubElement(item, "description").text = release_notes
+    if description:
+        ET.SubElement(item, "description").text = description
 
     enclosure = ET.SubElement(item, "enclosure")
     enclosure.set("url", dmg_url)
@@ -42,10 +100,6 @@ def build_item(
     enclosure.set("type", "application/octet-stream")
 
     return item
-
-
-SPARKLE_NS = "https://www.andymatuschak.org/xml-namespaces/sparkle"
-ET.register_namespace("sparkle", SPARKLE_NS)
 
 
 def parse_existing_items(existing_path: str) -> list[ET.Element]:
@@ -68,6 +122,12 @@ def build_appcast(
     release_notes: str | None = None,
     existing_path: str | None = None,
 ) -> str:
+    existing_items = parse_existing_items(existing_path) if existing_path else []
+
+    cumulative_desc = build_cumulative_description(
+        version, release_notes, existing_items
+    )
+
     rss = ET.Element("rss")
     rss.set("version", "2.0")
     rss.set("xmlns:dc", "http://purl.org/dc/elements/1.1/")
@@ -83,14 +143,14 @@ def build_appcast(
         signature=signature,
         dmg_length=dmg_length,
         dmg_url=dmg_url,
+        description=cumulative_desc,
         min_os=min_os,
-        release_notes=release_notes,
     )
     channel.append(new_item)
 
-    # Append previous items, skipping any with the same version
+    # Append previous items (used by the in-app Homebrew update popover)
     version_attr = f"{{{SPARKLE_NS}}}shortVersionString"
-    for old_item in (parse_existing_items(existing_path) if existing_path else []):
+    for old_item in existing_items:
         enclosure = old_item.find("enclosure")
         if enclosure is not None:
             old_version = enclosure.get(version_attr, "")
