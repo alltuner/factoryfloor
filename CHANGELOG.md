@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.1.70](https://github.com/alltuner/factoryfloor/compare/v0.1.69...v0.1.70) (2026-04-13)
+
+
+### Bug Fixes
+
+* **ci:** increase Node heap size for Monaco editor build ([#416](https://github.com/alltuner/factoryfloor/issues/416)) ([ed37bdb](https://github.com/alltuner/factoryfloor/commit/ed37bdbf2ee8df457a7a4d967b10a7ed33e24ef9))
+
 ## [0.1.69](https://github.com/alltuner/factoryfloor/compare/v0.1.68...v0.1.69) (2026-04-13)
 
 
