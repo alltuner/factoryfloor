@@ -260,24 +260,9 @@ jobs:
             exit 1
           fi
 
-          # Extract current version's changelog section, filter noise, and convert to HTML
-          RELEASE_NOTES=$(python3 -c "
-          import re, sys
-          text = open('CHANGELOG.md').read()
-          # Match from '## [version]' to the next '## [' or end of file
-          pattern = r'## \[${VERSION}\].*?\n(.*?)(?=\n## \[|\Z)'
-          m = re.search(pattern, text, re.DOTALL)
-          if m:
-              body = m.group(1).strip()
-              # Remove CI and dependency entries (not useful to end users)
-              body = re.sub(r'^\* \*\*(?:ci|deps):\*\*.*\n?', '', body, flags=re.MULTILINE)
-              # Remove sections left empty after filtering
-              body = re.sub(r'### [^\n]+\n+(?=### |\Z)', '', body)
-              print(body.strip())
-          " | uvx --with markdown python3 -c "import sys, markdown; print(markdown.markdown(sys.stdin.read()))")
-
-          # Download existing appcast from previous release to merge with (preserves history).
-          # Cannot use --latest because release-please already created the current (empty) release.
+          # Download existing appcast from previous release to merge with (preserves items
+          # for the Homebrew update popover). Cannot use --latest because release-please
+          # already created the current (empty) release.
           PREV_TAG=$(gh release list --repo "$GITHUB_REPOSITORY" --limit 10 --json tagName --jq "[.[] | select(.tagName != \"$TAG_NAME\")][0].tagName")
           if [ -n "$PREV_TAG" ]; then
             gh release download "$PREV_TAG" --repo "$GITHUB_REPOSITORY" --pattern "appcast.xml" --output existing-appcast.xml || true
@@ -289,7 +274,7 @@ jobs:
             --signature "$SIGNATURE" \
             --dmg-path "build/release/$DMG_NAME" \
             --dmg-url "$DMG_URL" \
-            --release-notes "$RELEASE_NOTES" \
+            --changelog CHANGELOG.md \
             --existing existing-appcast.xml \
             --output appcast.xml
 
