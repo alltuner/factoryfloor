@@ -27,7 +27,13 @@ final class MonacoResourceSchemeHandler: NSObject, WKURLSchemeHandler {
 
         // Strip leading slash from path to get relative path within MonacoEditor/
         let relativePath = String(url.path.dropFirst())
-        let fileURL = baseURL.appendingPathComponent(relativePath)
+        let fileURL = baseURL.appendingPathComponent(relativePath).standardized
+
+        // Reject path traversal attempts that escape the base directory
+        guard fileURL.path.hasPrefix(baseURL.standardized.path) else {
+            urlSchemeTask.didFailWithError(URLError(.badURL))
+            return
+        }
 
         guard let data = try? Data(contentsOf: fileURL) else {
             urlSchemeTask.didFailWithError(URLError(.fileDoesNotExist))
