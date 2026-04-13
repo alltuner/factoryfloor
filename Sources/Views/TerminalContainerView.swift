@@ -872,7 +872,6 @@ struct TerminalContainerView: View {
             guard let title = browserTitles[id], !title.isEmpty else { return nil }
             return title.count > 20 ? String(title.prefix(20)) + "..." : title
         case let .editor(id):
-            guard !useCompactTabs else { return nil }
             guard let path = editorFilePaths[id] else { return nil }
             let name = (path as NSString).lastPathComponent
             return name.count > 20 ? String(name.prefix(20)) + "..." : name
