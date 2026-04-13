@@ -276,7 +276,7 @@
 "Commit" = "Commit";
 "Push" = "Push";
 "Create PR" = "Crear PR";
-"Abandon PR" = "Abandonar PR";
+"Close PR" = "Tancar PR";
 "This branch has been merged." = "Aquesta branca s'ha fusionat.";
 "gh CLI is not installed." = "gh CLI no està instal·lat.";
 "Claude Code is not installed." = "Claude Code no està instal·lat.";

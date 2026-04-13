@@ -10,7 +10,7 @@ enum QuickAction: String, CaseIterable, Identifiable {
     case commit
     case push
     case createPR
-    case abandonPR
+    case closePR
 
     var id: String {
         rawValue
@@ -21,7 +21,7 @@ enum QuickAction: String, CaseIterable, Identifiable {
         case .commit: return NSLocalizedString("Commit", comment: "")
         case .push: return NSLocalizedString("Push", comment: "")
         case .createPR: return NSLocalizedString("Create PR", comment: "")
-        case .abandonPR: return NSLocalizedString("Abandon PR", comment: "")
+        case .closePR: return NSLocalizedString("Close PR", comment: "")
         }
     }
 
@@ -30,7 +30,7 @@ enum QuickAction: String, CaseIterable, Identifiable {
         case .commit: return "checkmark.circle"
         case .push: return "arrow.up"
         case .createPR: return "arrow.triangle.pull"
-        case .abandonPR: return "xmark.circle"
+        case .closePR: return "xmark.circle"
         }
     }
 
@@ -38,13 +38,13 @@ enum QuickAction: String, CaseIterable, Identifiable {
     var usesLLM: Bool {
         switch self {
         case .commit, .createPR: return true
-        case .push, .abandonPR: return false
+        case .push, .closePR: return false
         }
     }
 
     var requiresGitHubRemote: Bool {
         switch self {
-        case .createPR, .abandonPR: return true
+        case .createPR, .closePR: return true
         case .commit, .push: return false
         }
     }
@@ -55,7 +55,7 @@ enum QuickAction: String, CaseIterable, Identifiable {
             return "Stage and commit all changes in the working tree with a good commit message based on the changes. Do not push."
         case .createPR:
             return "Create a pull request for the current changes. Write a clear title and description based on what we've been working on."
-        case .push, .abandonPR:
+        case .push, .closePR:
             return nil
         }
     }
@@ -103,9 +103,9 @@ final class QuickActionRunner: ObservableObject {
             runClaudeAction(action: action, claudePath: claudePath, workingDirectory: workingDirectory)
         case .push:
             runPush(workingDirectory: workingDirectory)
-        case .abandonPR:
+        case .closePR:
             guard let ghPath, let branchName else { return }
-            runAbandonPR(ghPath: ghPath, branchName: branchName, workingDirectory: workingDirectory)
+            runClosePR(ghPath: ghPath, branchName: branchName, workingDirectory: workingDirectory)
         }
     }
 
@@ -150,11 +150,11 @@ final class QuickActionRunner: ObservableObject {
         }
     }
 
-    private func runAbandonPR(ghPath: String, branchName: String, workingDirectory: String) {
-        let command = "\(ghPath) pr close \(branchName) --comment 'Abandoned from Factory Floor'"
+    private func runClosePR(ghPath: String, branchName: String, workingDirectory: String) {
+        let command = "\(ghPath) pr close \(branchName) --comment 'Closed from Factory Floor'"
 
-        appendLog(action: .abandonPR, command: command)
-        logger.info("Quick action abandonPR starting in \(workingDirectory)")
+        appendLog(action: .closePR, command: command)
+        logger.info("Quick action closePR starting in \(workingDirectory)")
 
         let dir = workingDirectory
         let path = ghPath
@@ -163,7 +163,7 @@ final class QuickActionRunner: ObservableObject {
             let process = Process()
             let pipe = Pipe()
             process.executableURL = URL(fileURLWithPath: path)
-            process.arguments = ["pr", "close", branch, "--comment", "Abandoned from Factory Floor"]
+            process.arguments = ["pr", "close", branch, "--comment", "Closed from Factory Floor"]
             process.currentDirectoryURL = URL(fileURLWithPath: dir)
             process.standardOutput = pipe
             process.standardError = pipe
@@ -182,9 +182,9 @@ final class QuickActionRunner: ObservableObject {
             await MainActor.run {
                 self.updateLog(output: output, exitCode: success ? 0 : 1)
                 self.runningProcess = nil
-                self.state = success ? .succeeded(.abandonPR) : .failed(.abandonPR)
+                self.state = success ? .succeeded(.closePR) : .failed(.closePR)
                 if success {
-                    self.onSuccess?(.abandonPR)
+                    self.onSuccess?(.closePR)
                 }
                 self.scheduleDismiss()
             }

@@ -909,10 +909,10 @@ struct TerminalContainerView: View {
         quickActionRunner.onSuccess = { action in
             appEnv.refreshWorktreeState(for: workingDirectory, projectDirectory: projectDirectory)
             if let branch = appEnv.branchName(for: workingDirectory) {
-                if action == .abandonPR {
+                if action == .closePR {
                     appEnv.clearBranchPR(for: projectDirectory, branch: branch)
                 }
-                if action == .createPR || action == .abandonPR {
+                if action == .createPR || action == .closePR {
                     appEnv.refreshGitHubInfo(for: projectDirectory, branch: branch)
                 }
             }
@@ -1164,7 +1164,7 @@ private struct QuickActionButtons: View {
             return worktreeState.hasUnpushedCommits && worktreeState.hasRemote
         case .createPR:
             return hasGitHubRemote && worktreeState.hasBranchCommits && prState == nil
-        case .abandonPR:
+        case .closePR:
             return hasOpenPR
         }
     }
@@ -1178,7 +1178,7 @@ private struct QuickActionButtons: View {
                 return NSLocalizedString("Enable \"Bypass permission prompts\" in Settings.", comment: "")
             }
         }
-        if action == .abandonPR, ghPath == nil {
+        if action == .closePR, ghPath == nil {
             return NSLocalizedString("gh CLI is not installed.", comment: "")
         }
         return nil

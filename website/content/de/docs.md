@@ -100,7 +100,7 @@ Schnellaktionen führen einmalige Claude-Aufgaben aus der Seitenleiste aus:
 - **Commit** — staged und committet mit einer KI-generierten Nachricht
 - **Push** — pusht den aktuellen Branch zu Origin
 - **Create PR** — erstellt einen Pull Request mit KI-generiertem Titel und Beschreibung
-- **Abandon PR** — schließt den PR
+- **Close PR** — schließt den PR
 
 Diese laufen als Hintergrund-`claude -p`-Aufrufe. Aktiviere **Quick action debug mode** in den Einstellungen, wenn du wissen willst, wie die Wurst gemacht wird. Vertrau uns, [David](https://davidpoblador.com) hat mehr Zeit als er zugeben will damit verbracht, seltsame Verhaltensweisen dort drin zu debuggen.
 
@@ -296,7 +296,7 @@ Erfordert die [gh CLI](https://cli.github.com/) mit Authentifizierung (`gh auth 
 
 #### Schnellaktionen {#quick-actions-1}
 
-Aus der Seitenleiste Ein-Klick-Operationen ausführen: **Create PR** (KI-generierter Titel und Beschreibung), **Push** (zu Origin mit `-u`) oder **Abandon PR** (schließt mit Kommentar). Weil wenn du es satt hast, „now commit, push, and open a PR" zum hundertsten Mal in Claude zu tippen, bist du nicht allein.
+Aus der Seitenleiste Ein-Klick-Operationen ausführen: **Create PR** (KI-generierter Titel und Beschreibung), **Push** (zu Origin mit `-u`) oder **Close PR** (schließt mit Kommentar). Weil wenn du es satt hast, „now commit, push, and open a PR" zum hundertsten Mal in Claude zu tippen, bist du nicht allein.
 
 ### Updates {#updates}
 

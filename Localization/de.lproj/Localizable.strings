@@ -273,7 +273,7 @@
 "Commit" = "Commit";
 "Push" = "Push";
 "Create PR" = "PR erstellen";
-"Abandon PR" = "PR aufgeben";
+"Close PR" = "PR schließen";
 "This branch has been merged." = "Dieser Branch wurde gemergt.";
 "gh CLI is not installed." = "gh CLI ist nicht installiert.";
 "Claude Code is not installed." = "Claude Code ist nicht installiert.";

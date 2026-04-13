@@ -276,7 +276,7 @@
 "Commit" = "Commit";
 "Push" = "Push";
 "Create PR" = "Skapa PR";
-"Abandon PR" = "Överge PR";
+"Close PR" = "Stäng PR";
 "This branch has been merged." = "Denna gren har mergats.";
 "gh CLI is not installed." = "gh CLI är inte installerat.";
 "Claude Code is not installed." = "Claude Code är inte installerat.";
