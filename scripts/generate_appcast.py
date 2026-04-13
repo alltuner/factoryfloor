@@ -6,6 +6,7 @@
 import argparse
 import datetime
 import os
+import re
 import xml.etree.ElementTree as ET
 
 SPARKLE_NS = "https://www.andymatuschak.org/xml-namespaces/sparkle"
@@ -28,6 +29,13 @@ hr { border: none; border-top: 1px solid #ddd; margin: 12px 0; }
   hr { border-color: #444; }
 }"""
 
+# Matches individual version-tagged divs inside cumulative descriptions.
+# Content never contains nested divs (only h3/h4/ul/li/p), so non-greedy works.
+_VERSION_DIV_RE = re.compile(
+    r'<div data-sparkle-version="([^"]+)">(.*?)</div>',
+    re.DOTALL,
+)
+
 
 def build_cumulative_description(
     current_version: str,
@@ -37,8 +45,10 @@ def build_cumulative_description(
     """Build an HTML description with all versions, tagged with data-sparkle-version."""
     version_attr = f"{{{SPARKLE_NS}}}shortVersionString"
     sections: list[str] = []
+    seen_versions: set[str] = set()
 
     if current_notes:
+        seen_versions.add(current_version)
         sections.append(
             f'<div data-sparkle-version="{current_version}">'
             f"<h3>v{current_version}</h3>\n{current_notes}\n</div>"
@@ -49,15 +59,30 @@ def build_cumulative_description(
         if enclosure is None:
             continue
         version = enclosure.get(version_attr, "")
-        if not version or version == current_version:
+        if not version or version in seen_versions:
             continue
         desc = item.find("description")
         if desc is None or not desc.text or not desc.text.strip():
             continue
-        sections.append(
-            f'<div data-sparkle-version="{version}">'
-            f"<h3>v{version}</h3>\n{desc.text.strip()}\n</div>"
-        )
+
+        text = desc.text.strip()
+        # Existing items may already have cumulative descriptions containing
+        # multiple version-tagged divs. Extract individual blocks to avoid
+        # nesting an entire cumulative blob inside a new div.
+        version_divs = list(_VERSION_DIV_RE.finditer(text))
+        if version_divs:
+            for m in version_divs:
+                div_version = m.group(1)
+                if div_version not in seen_versions:
+                    seen_versions.add(div_version)
+                    sections.append(m.group(0))
+        else:
+            # Legacy format: plain description without version tags.
+            seen_versions.add(version)
+            sections.append(
+                f'<div data-sparkle-version="{version}">'
+                f"<h3>v{version}</h3>\n{text}\n</div>"
+            )
 
     if not sections:
         return current_notes or ""

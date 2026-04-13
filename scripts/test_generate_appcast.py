@@ -239,6 +239,64 @@ def test_cumulative_description_includes_css_and_version_tags() -> None:
     print("PASS: cumulative_description_includes_css_and_version_tags")
 
 
+def test_cumulative_descriptions_are_not_nested() -> None:
+    """When existing items already have cumulative descriptions, versions must not duplicate."""
+    # Build a real appcast with cumulative descriptions by chaining two releases.
+    # This mirrors what happens in production: v1.0.0 is released, then v1.1.0
+    # merges with v1.0.0's appcast, producing cumulative descriptions.
+    with tempfile.NamedTemporaryFile(mode="w", suffix=".xml", delete=False) as f:
+        xml_v1 = build_appcast(
+            version="1.0.0",
+            signature="sig1",
+            dmg_length=1000,
+            dmg_url="https://example.com/app-1.0.0.dmg",
+            release_notes="<p>First release</p>",
+        )
+        f.write(xml_v1)
+        path_v1 = f.name
+
+    with tempfile.NamedTemporaryFile(mode="w", suffix=".xml", delete=False) as f:
+        xml_v11 = build_appcast(
+            version="1.1.0",
+            signature="sig2",
+            dmg_length=2000,
+            dmg_url="https://example.com/app-1.1.0.dmg",
+            release_notes="<p>Second release</p>",
+            existing_path=path_v1,
+        )
+        f.write(xml_v11)
+        existing_path = f.name
+
+    os.unlink(path_v1)
+
+    try:
+        xml = build_appcast(
+            version="1.2.0",
+            signature="sig3",
+            dmg_length=3000,
+            dmg_url="https://example.com/app-1.2.0.dmg",
+            release_notes="<p>Third release</p>",
+            existing_path=existing_path,
+        )
+        root = parse(xml)
+        desc = root.find(".//item/description")
+        assert desc is not None
+
+        # Each version should appear exactly once in the cumulative description
+        text = desc.text
+        assert text.count('data-sparkle-version="1.2.0"') == 1, "v1.2.0 should appear once"
+        assert text.count('data-sparkle-version="1.1.0"') == 1, "v1.1.0 should appear once"
+        assert text.count('data-sparkle-version="1.0.0"') == 1, "v1.0.0 should appear once"
+
+        # Content from all three versions should be present
+        assert "Third release" in text
+        assert "Second release" in text
+        assert "First release" in text
+    finally:
+        os.unlink(existing_path)
+    print("PASS: cumulative_descriptions_are_not_nested")
+
+
 def test_handles_missing_existing_file() -> None:
     """When existing file doesn't exist, should produce single-item appcast."""
     xml = build_appcast(

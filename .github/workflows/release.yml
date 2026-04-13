@@ -260,7 +260,7 @@ jobs:
             exit 1
           fi
 
-          # Extract current version's changelog section and convert to HTML
+          # Extract current version's changelog section, filter noise, and convert to HTML
           RELEASE_NOTES=$(python3 -c "
           import re, sys
           text = open('CHANGELOG.md').read()
@@ -268,7 +268,12 @@ jobs:
           pattern = r'## \[${VERSION}\].*?\n(.*?)(?=\n## \[|\Z)'
           m = re.search(pattern, text, re.DOTALL)
           if m:
-              print(m.group(1).strip())
+              body = m.group(1).strip()
+              # Remove CI and dependency entries (not useful to end users)
+              body = re.sub(r'^\* \*\*(?:ci|deps):\*\*.*\n?', '', body, flags=re.MULTILINE)
+              # Remove sections left empty after filtering
+              body = re.sub(r'### [^\n]+\n+(?=### |\Z)', '', body)
+              print(body.strip())
           " | uvx --with markdown python3 -c "import sys, markdown; print(markdown.markdown(sys.stdin.read()))")
 
           # Download existing appcast from previous release to merge with (preserves history).

@@ -51,15 +51,17 @@ def parse_changelog(text: str) -> list[dict[str, str]]:
 
 
 def clean_body(body: str) -> str:
-    """Strip commit hashes and PR links to keep release notes concise."""
+    """Strip noise from changelog entries to keep release notes user-facing."""
     # Remove trailing commit hash references like ([abc1234](https://...))
     body = re.sub(r"\s*\(\[[\da-f]+\]\([^)]+\)\)", "", body)
     # Remove issue/PR number links like ([#123](https://...))
     body = re.sub(r"\s*\(\[#\d+\]\([^)]+\)\)", "", body)
     # Remove standalone issue refs like , closes [#123](...)
     body = re.sub(r",?\s*closes\s+\[#\d+\]\([^)]+\)", "", body)
-    # Remove empty sections (header followed by blank lines)
-    body = re.sub(r"###\s+\w+\n+(?=###|\Z)", "", body)
+    # Remove CI and dependency update entries (not useful to end users)
+    body = re.sub(r"^\* \*\*(?:ci|deps):\*\*.*\n?", "", body, flags=re.MULTILINE)
+    # Remove empty sections (header followed by blank lines or end of string)
+    body = re.sub(r"### [^\n]+\n+(?=### |\Z)", "", body)
     return body.strip()
 
 
