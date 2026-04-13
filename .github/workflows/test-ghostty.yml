@@ -25,6 +25,8 @@ jobs:
         with:
           version: 0.15.2
 
+      - uses: oven-sh/setup-bun@v2
+
       - name: Update Ghostty submodule
         run: |
           cd ghostty
