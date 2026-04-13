@@ -6,7 +6,7 @@
       "dependencies": {
         "@codingame/monaco-vscode-all-language-default-extensions": "30.0.1",
         "@codingame/monaco-vscode-api": "30.0.1",
-        "@codingame/monaco-vscode-languages-service-override": "30.0.0",
+        "@codingame/monaco-vscode-languages-service-override": "30.0.1",
         "@codingame/monaco-vscode-standalone-css-language-features": "30.0.1",
         "@codingame/monaco-vscode-standalone-html-language-features": "30.0.0",
         "@codingame/monaco-vscode-standalone-json-language-features": "30.0.0",
@@ -84,7 +84,7 @@
 
     "@codingame/monaco-vscode-julia-default-extension": ["@codingame/monaco-vscode-julia-default-extension@30.0.1", "", { "dependencies": { "@codingame/monaco-vscode-api": "30.0.1" } }, "sha512-cL0ACIt8ggtIKdNdIBRrA1/RuwXhVQsFEMINH9ldp3TYW1QUynC43LICwUpuBCeKfRNPyfyDD8kIrgsQY4P7pw=="],
 
-    "@codingame/monaco-vscode-languages-service-override": ["@codingame/monaco-vscode-languages-service-override@30.0.0", "", { "dependencies": { "@codingame/monaco-vscode-api": "30.0.0", "@codingame/monaco-vscode-files-service-override": "30.0.0" } }, "sha512-9egr1f2ZPzHkiOOenUJiX/LcVIX2ziC+OG+pjnr7u9E0rdDFhKECDz3dbppXjuP7jGWM1tcAMyYXqjXYVKAAOg=="],
+    "@codingame/monaco-vscode-languages-service-override": ["@codingame/monaco-vscode-languages-service-override@30.0.1", "", { "dependencies": { "@codingame/monaco-vscode-api": "30.0.1", "@codingame/monaco-vscode-files-service-override": "30.0.1" } }, "sha512-dOkXrANtqLvgF6g1hBnC9pK+FYf6eUaJ08a1PawTCwj9hvkDphLLe1y564NSLNguYHapP6g8sN7e9t4bHDVdBg=="],
 
     "@codingame/monaco-vscode-latex-default-extension": ["@codingame/monaco-vscode-latex-default-extension@30.0.1", "", { "dependencies": { "@codingame/monaco-vscode-api": "30.0.1" } }, "sha512-h3ZFEUa1Dww3fiyDTkNucdhiiFTF+5qoVpp0vIH9TGWDvhxIg5xGocZUdJNSUKRK1VrM6OYa7aJRSv3MLI9M1Q=="],
 
@@ -318,10 +318,6 @@
 
     "vscode-uri": ["vscode-uri@3.0.8", "", {}, "sha512-AyFQ0EVmsOZOlAnxoFOGOq1SQDWAB7C6aqMGS23svWAllfOaxbuFvcT8D1i8z3Gyn8fraVeZNNmN6e9bxxXkKw=="],
 
-    "@codingame/monaco-vscode-languages-service-override/@codingame/monaco-vscode-api": ["@codingame/monaco-vscode-api@30.0.0", "", { "dependencies": { "@codingame/monaco-vscode-base-service-override": "30.0.0", "@codingame/monaco-vscode-environment-service-override": "30.0.0", "@codingame/monaco-vscode-extensions-service-override": "30.0.0", "@codingame/monaco-vscode-files-service-override": "30.0.0", "@codingame/monaco-vscode-host-service-override": "30.0.0", "@codingame/monaco-vscode-layout-service-override": "30.0.0", "@codingame/monaco-vscode-quickaccess-service-override": "30.0.0", "@vscode/iconv-lite-umd": "0.7.1", "dompurify": "3.3.3", "jschardet": "3.1.4", "marked": "14.0.0" } }, "sha512-qXy5h5B0fghp+5WDoSJV2XnczXjk3nuS4DHiqiYkDpgEqoBSOHwbeee19n9ZuQS/7VkY79/1kmXrTQfJuvycLw=="],
-
-    "@codingame/monaco-vscode-languages-service-override/@codingame/monaco-vscode-files-service-override": ["@codingame/monaco-vscode-files-service-override@30.0.0", "", { "dependencies": { "@codingame/monaco-vscode-api": "30.0.0" } }, "sha512-Js6xlKGg7/4DU1dZ5yidQUIy9SRVcm2bVY8ULmZsVYQSrrfeUBBxYWZm2OEIj2FTcGJrEJOx+cyksNiEvNztrw=="],
-
     "@codingame/monaco-vscode-standalone-css-language-features/monaco-editor": ["@codingame/monaco-vscode-editor-api@30.0.1", "", { "dependencies": { "@codingame/monaco-vscode-api": "30.0.1" } }, "sha512-j2d/lIiKKfnmA9rjBi7biTm9xy8WpRRvkN5i+pbnNdMj+g4JHLJW/7ZA4gZiRlgGLrJeUvoEZ8WalvDtp9RZGg=="],
 
     "@codingame/monaco-vscode-textmate-service-override/@codingame/monaco-vscode-api": ["@codingame/monaco-vscode-api@30.0.0", "", { "dependencies": { "@codingame/monaco-vscode-base-service-override": "30.0.0", "@codingame/monaco-vscode-environment-service-override": "30.0.0", "@codingame/monaco-vscode-extensions-service-override": "30.0.0", "@codingame/monaco-vscode-files-service-override": "30.0.0", "@codingame/monaco-vscode-host-service-override": "30.0.0", "@codingame/monaco-vscode-layout-service-override": "30.0.0", "@codingame/monaco-vscode-quickaccess-service-override": "30.0.0", "@vscode/iconv-lite-umd": "0.7.1", "dompurify": "3.3.3", "jschardet": "3.1.4", "marked": "14.0.0" } }, "sha512-qXy5h5B0fghp+5WDoSJV2XnczXjk3nuS4DHiqiYkDpgEqoBSOHwbeee19n9ZuQS/7VkY79/1kmXrTQfJuvycLw=="],
@@ -335,18 +331,6 @@
     "@codingame/monaco-vscode-theme-service-override/@codingame/monaco-vscode-files-service-override": ["@codingame/monaco-vscode-files-service-override@30.0.0", "", { "dependencies": { "@codingame/monaco-vscode-api": "30.0.0" } }, "sha512-Js6xlKGg7/4DU1dZ5yidQUIy9SRVcm2bVY8ULmZsVYQSrrfeUBBxYWZm2OEIj2FTcGJrEJOx+cyksNiEvNztrw=="],
 
     "monaco-editor/@codingame/monaco-vscode-api": ["@codingame/monaco-vscode-api@30.0.0", "", { "dependencies": { "@codingame/monaco-vscode-base-service-override": "30.0.0", "@codingame/monaco-vscode-environment-service-override": "30.0.0", "@codingame/monaco-vscode-extensions-service-override": "30.0.0", "@codingame/monaco-vscode-files-service-override": "30.0.0", "@codingame/monaco-vscode-host-service-override": "30.0.0", "@codingame/monaco-vscode-layout-service-override": "30.0.0", "@codingame/monaco-vscode-quickaccess-service-override": "30.0.0", "@vscode/iconv-lite-umd": "0.7.1", "dompurify": "3.3.3", "jschardet": "3.1.4", "marked": "14.0.0" } }, "sha512-qXy5h5B0fghp+5WDoSJV2XnczXjk3nuS4DHiqiYkDpgEqoBSOHwbeee19n9ZuQS/7VkY79/1kmXrTQfJuvycLw=="],
-
-    "@codingame/monaco-vscode-languages-service-override/@codingame/monaco-vscode-api/@codingame/monaco-vscode-base-service-override": ["@codingame/monaco-vscode-base-service-override@30.0.0", "", { "dependencies": { "@codingame/monaco-vscode-api": "30.0.0" } }, "sha512-jZHbbVQF+gA0WWz+e2R6n93K68YiOlnyiqiKm/zaVWEgBWMVx64UMjDjtPDVKvAyZXc+7P8ecNOkFGm3UmVKhQ=="],
-
-    "@codingame/monaco-vscode-languages-service-override/@codingame/monaco-vscode-api/@codingame/monaco-vscode-environment-service-override": ["@codingame/monaco-vscode-environment-service-override@30.0.0", "", { "dependencies": { "@codingame/monaco-vscode-api": "30.0.0" } }, "sha512-Cfgb2bEghNvpUR1tM0GK4nv8DVFJtaijYOsbg5mR/G3TstWHqh07NprPBWXbVXIPwnUaF0Ul8MnbDhFzVbQi7Q=="],
-
-    "@codingame/monaco-vscode-languages-service-override/@codingame/monaco-vscode-api/@codingame/monaco-vscode-extensions-service-override": ["@codingame/monaco-vscode-extensions-service-override@30.0.0", "", { "dependencies": { "@codingame/monaco-vscode-api": "30.0.0", "@codingame/monaco-vscode-files-service-override": "30.0.0" } }, "sha512-fUfEyLWAJabOvwbfTIy+Lk1DbCeggGmixk7/CxqdsFZp4lJkqSnHsK1VqxQGm0JvCWsa2dny5SowN8wCO9RNsg=="],
-
-    "@codingame/monaco-vscode-languages-service-override/@codingame/monaco-vscode-api/@codingame/monaco-vscode-host-service-override": ["@codingame/monaco-vscode-host-service-override@30.0.0", "", { "dependencies": { "@codingame/monaco-vscode-api": "30.0.0" } }, "sha512-a50IgD/LGw97T7wObPFVm0gMCWXZomvW/EoND71eiGVaii3F+TPunCZMr8wqsXqjwdr/EPhxfCBYSlcieHngKA=="],
-
-    "@codingame/monaco-vscode-languages-service-override/@codingame/monaco-vscode-api/@codingame/monaco-vscode-layout-service-override": ["@codingame/monaco-vscode-layout-service-override@30.0.0", "", { "dependencies": { "@codingame/monaco-vscode-api": "30.0.0" } }, "sha512-iXjNrd2aE/Nb+BUlCnfIKMqGmEACqy8mu+nC7XU9gAjBLTdp8Vne2k50Rpc+niy+fHXgeTNOY3vg4hXH64SBgQ=="],
-
-    "@codingame/monaco-vscode-languages-service-override/@codingame/monaco-vscode-api/@codingame/monaco-vscode-quickaccess-service-override": ["@codingame/monaco-vscode-quickaccess-service-override@30.0.0", "", { "dependencies": { "@codingame/monaco-vscode-api": "30.0.0" } }, "sha512-XUpbBgM55A/Up5jAjhwunHnCQuR/n1DRE7ri895VyceXdFm0CcGD6dScHJN1kxcHPVxAD6ocygk8B6LH0qTHMg=="],
 
     "@codingame/monaco-vscode-textmate-service-override/@codingame/monaco-vscode-api/@codingame/monaco-vscode-base-service-override": ["@codingame/monaco-vscode-base-service-override@30.0.0", "", { "dependencies": { "@codingame/monaco-vscode-api": "30.0.0" } }, "sha512-jZHbbVQF+gA0WWz+e2R6n93K68YiOlnyiqiKm/zaVWEgBWMVx64UMjDjtPDVKvAyZXc+7P8ecNOkFGm3UmVKhQ=="],
 
