@@ -100,7 +100,7 @@ Las quick actions ejecutan tareas puntuales de Claude desde el sidebar:
 - **Commit** — hace stage y commit con un mensaje generado por IA
 - **Push** — hace push de la branch actual al origin
 - **Create PR** — crea un pull request con título y descripción generados por IA
-- **Abandon PR** — cierra el PR
+- **Close PR** — cierra el PR
 
 Se ejecutan como llamadas `claude -p` en segundo plano. Activa **Quick action debug mode** en ajustes si quieres saber cómo se hace la salchicha. Confía en nosotros, [David](https://davidpoblador.com) pasó más tiempo del que puede admitir depurando comportamientos extraños ahí dentro.
 
@@ -296,7 +296,7 @@ Requiere el [gh CLI](https://cli.github.com/) con autenticación (`gh auth login
 
 #### Quick actions {#quick-actions-1}
 
-Desde el sidebar, ejecuta operaciones con un clic: **Create PR** (título y descripción generados por IA), **Push** (al origin con `-u`), o **Abandon PR** (cierra con un comentario). Porque si estás cansado de escribir "ahora haz commit, push y abre un PR" en Claude por centésima vez, no estás solo.
+Desde el sidebar, ejecuta operaciones con un clic: **Create PR** (título y descripción generados por IA), **Push** (al origin con `-u`), o **Close PR** (cierra con un comentario). Porque si estás cansado de escribir "ahora haz commit, push y abre un PR" en Claude por centésima vez, no estás solo.
 
 ### Actualizaciones {#updates}
 

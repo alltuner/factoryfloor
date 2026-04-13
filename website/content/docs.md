@@ -100,7 +100,7 @@ Quick actions run one-shot Claude tasks from the sidebar:
 - **Commit** — stages and commits with an AI-generated message
 - **Push** — pushes the current branch to origin
 - **Create PR** — creates a pull request with AI-generated title and description
-- **Abandon PR** — closes the PR
+- **Close PR** — closes the PR
 
 These run as background `claude -p` calls. Enable **Quick action debug mode** in settings if you want to know how the sausage is made. Trust us, [David](https://davidpoblador.com) spent more time than he can admit debugging weird behaviors in there.
 
@@ -296,7 +296,7 @@ Requires the [gh CLI](https://cli.github.com/) with authentication (`gh auth log
 
 #### Quick actions
 
-From the sidebar, run one-click operations: **Create PR** (AI-generated title and description), **Push** (to origin with `-u`), or **Abandon PR** (closes with a comment). Because if you're tired of typing "now commit, push, and open a PR" into Claude for the hundredth time, you're not alone.
+From the sidebar, run one-click operations: **Create PR** (AI-generated title and description), **Push** (to origin with `-u`), or **Close PR** (closes with a comment). Because if you're tired of typing "now commit, push, and open a PR" into Claude for the hundredth time, you're not alone.
 
 ### Updates
 

@@ -109,8 +109,8 @@ enum GitOperations {
             ? workstreamName
             : "\(branchPrefix)/\(workstreamName)"
 
-        // Fetch and fast-forward the default branch so worktrees start from latest
-        updateDefaultBranch(at: projectPath)
+        // Fetch the default branch so worktrees start from the latest remote ref
+        fetchDefaultBranch(at: projectPath)
 
         let baseBranch = defaultBranch(at: projectPath)
 
@@ -349,43 +349,6 @@ enum GitOperations {
     /// Delete a local branch by name.
     static func deleteLocalBranch(at path: String, branchName: String) {
         _ = run(args: ["branch", "-D", branchName], in: path)
-    }
-
-    /// Fetch the default branch from origin, fast-forward the local ref to match,
-    /// and reset the working tree if it is clean. Fails silently when there is no
-    /// remote, the network is unreachable, or the working tree has local changes.
-    static func updateDefaultBranch(at path: String) {
-        guard run(args: ["remote", "get-url", "origin"], in: path) != nil else { return }
-
-        let branch: String
-        if let ref = run(args: ["symbolic-ref", "refs/remotes/origin/HEAD", "--short"], in: path) {
-            branch = ref.trimmingCharacters(in: .whitespacesAndNewlines)
-                .replacingOccurrences(of: "origin/", with: "")
-        } else if run(args: ["rev-parse", "--verify", "refs/heads/main"], in: path) != nil {
-            branch = "main"
-        } else if run(args: ["rev-parse", "--verify", "refs/heads/master"], in: path) != nil {
-            branch = "master"
-        } else {
-            return
-        }
-
-        // Fetch with timeout so we don't block the UI
-        guard runWithTimeout(args: ["fetch", "origin", branch, "--no-tags"], in: path, timeout: 5) != nil else {
-            return
-        }
-
-        // Move the local ref to match origin
-        guard run(args: ["update-ref", "refs/heads/\(branch)", "refs/remotes/origin/\(branch)"], in: path) != nil else {
-            return
-        }
-
-        // Reset the working tree only if it is clean
-        if !hasUncommittedChanges(at: path) {
-            _ = run(args: ["reset", "--hard", "--quiet"], in: path)
-            logger.info("[FF] Updated \(branch, privacy: .public) to latest")
-        } else {
-            logger.info("[FF] Updated \(branch, privacy: .public) ref but working tree has local changes, skipping reset")
-        }
     }
 
     // MARK: - Private

@@ -17,6 +17,11 @@ enum TmuxSession {
         "\(AppConstants.appID)/\(sanitize(project))/\(sanitize(workstream))/\(role)"
     }
 
+    /// Config strips all UI chrome (status bar, prefix key, keybindings) so tmux is
+    /// invisible inside Factory Floor, which manages the terminal directly.
+    /// Sessions are still accessible from external terminals via:
+    ///   tmux -L factoryfloor list-sessions
+    ///   tmux -L factoryfloor attach-session -t <name>
     static var configContents: String {
         """
         # Managed by \(AppConstants.appID). Do not edit.
