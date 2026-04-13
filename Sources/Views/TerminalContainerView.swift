@@ -727,15 +727,19 @@ struct TerminalContainerView: View {
             }
         }
         .onAppear {
-            editorTabActive = isEditorTabActive
-            editorFileDirty = isActiveEditorDirty
+            if isActive {
+                editorTabActive = isEditorTabActive
+                editorFileDirty = isActiveEditorDirty
+            }
             if tabs.contains(where: { if case .editor = $0 { return true } else { return false } }) {
                 startFileTreeWatcherIfNeeded()
             }
         }
         .onDisappear {
-            editorTabActive = false
-            editorFileDirty = false
+            if isActive {
+                editorTabActive = false
+                editorFileDirty = false
+            }
             guard workspaceStarted else { return }
             surfaceCache.saveTabSnapshot(for: workstreamID, snapshot: currentTabSnapshot())
         }
