@@ -1050,8 +1050,13 @@ struct TerminalContainerView: View {
                 {
                     let fullPath = (workingDirectory as NSString)
                         .appendingPathComponent(relativePath)
-                    if let content = await bridge.getContent(modelId: id.uuidString) {
-                        try? content.write(toFile: fullPath, atomically: true, encoding: .utf8)
+                    guard let content = await bridge.getContent(modelId: id.uuidString) else { return }
+                    do {
+                        try content.write(toFile: fullPath, atomically: true, encoding: .utf8)
+                    } catch {
+                        let errorAlert = NSAlert(error: error)
+                        errorAlert.runModal()
+                        return
                     }
                 }
                 forceCloseTab(tab)
