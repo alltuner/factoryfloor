@@ -22,7 +22,7 @@ h4 { margin: 8px 0 4px; font-size: 13px; }
 ul { margin: 4px 0; padding-left: 20px; }
 li { margin: 2px 0; }
 hr { border: none; border-top: 1px solid #ddd; margin: 12px 0; }
-.sparkle-installed-version ~ div { display: none; }
+.sparkle-installed-version, .sparkle-installed-version ~ * { display: none; }
 @media (prefers-color-scheme: dark) {
   body { color: #e0e0e0; }
   hr { border-color: #444; }
