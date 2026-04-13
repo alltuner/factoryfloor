@@ -86,6 +86,9 @@ jobs:
         with:
           version: ${{ env.SPARKLE_VERSION }}
 
+      - name: Build Monaco editor
+        run: ./scripts/build-editor.sh
+
       - name: Generate Xcode project
         run: xcodegen generate
 
