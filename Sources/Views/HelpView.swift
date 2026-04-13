@@ -94,7 +94,7 @@ struct HelpView: View {
                         ShortcutRow(keys: "Return", description: "Focus Coding Agent")
                         ShortcutRow(keys: "T", description: "New Terminal")
                         ShortcutRow(keys: "B", description: "New Browser")
-                        ShortcutRow(keys: "E", description: "New Editor")
+                        ShortcutRow(keys: "O", description: "New Editor")
                         ShortcutRow(keys: "S", description: "Save (Editor)")
                         ShortcutRow(keys: "S", shift: true, description: "Save As (Editor)")
                         ShortcutRow(keys: "W", description: "Close tab")

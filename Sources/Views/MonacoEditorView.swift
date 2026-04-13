@@ -87,7 +87,7 @@ class EditorWebView: WKWebView {
 
         // Shortcuts that must reach the app menu
         switch chars {
-        case "s", "w", "t", "b", "e":
+        case "s", "w", "t", "b", "o":
             return false
         case "[", "]":
             return false
