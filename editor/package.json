@@ -16,7 +16,7 @@
     "@codingame/monaco-vscode-standalone-typescript-language-features": "30.0.0",
     "@codingame/monaco-vscode-standalone-json-language-features": "30.0.1",
     "@codingame/monaco-vscode-standalone-css-language-features": "30.0.1",
-    "@codingame/monaco-vscode-standalone-html-language-features": "30.0.0"
+    "@codingame/monaco-vscode-standalone-html-language-features": "30.0.1"
   },
   "devDependencies": {
     "vite": "^6.0.0"
