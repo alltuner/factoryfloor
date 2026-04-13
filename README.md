@@ -58,6 +58,22 @@ Factory Floor is a native macOS app built on [Ghostty](https://ghostty.org)'s GP
 - **Update Notifications** &mdash; Checks for new versions and shows a badge in the sidebar.
 - **Keyboard-first** &mdash; Every action has a shortcut. Cmd+1-9 for tabs, Cmd+Return for agent, Cmd+T for terminal, Cmd+B for browser.
 
+### Tmux Mode
+
+When tmux mode is enabled (Settings > Terminal), Factory Floor wraps Coding Agent sessions in tmux using a dedicated socket (`factoryfloor`). This keeps sessions alive across app restarts without interfering with your personal tmux setup.
+
+The tmux config strips all UI chrome (status bar, prefix key, keybindings) since Factory Floor manages the terminal directly. Sessions are still fully accessible from any external terminal:
+
+```bash
+# List active sessions
+tmux -L factoryfloor list-sessions
+
+# Attach to a session
+tmux -L factoryfloor attach-session -t <session-name>
+```
+
+Note that because keybindings are removed, you will need to detach with `tmux -L factoryfloor detach-client` from another terminal, or use the standard `kill-session` command.
+
 ### Script Configuration
 
 Add a `.factoryfloor.json` to your project root to automate your workstream lifecycle. All fields are optional.
