@@ -144,6 +144,7 @@ struct ProjectSidebar: View {
                         branchName: branch,
                         worktreePath: workstream.worktreePath,
                         isPathValid: appEnv.isPathValid(workstream.worktreePath),
+                        isActive: activityTracker.isActive(workstream.id),
                         hasActivePort: appEnv.hasActivePort(workstream.id),
                         githubURL: appEnv.githubURL(for: project.directory),
                         taskDescription: appEnv.taskDescription(for: workstream.worktreePath),
@@ -154,7 +155,7 @@ struct ProjectSidebar: View {
                         onPurge: { confirmPurge(workstream) }
                     )
                     .tag(SidebarSelection.workstream(workstream.id))
-                    .padding(.leading, 34)
+                    .padding(.leading, 28)
                 }
             }
         }
@@ -463,6 +464,7 @@ struct ProjectSidebar: View {
     @EnvironmentObject private var appEnv: AppEnvironment
     @EnvironmentObject private var updateChecker: UpdateChecker
     @EnvironmentObject private var updater: Updater
+    @EnvironmentObject private var activityTracker: WorkstreamActivityTracker
 
     private func confirmPurge(_ workstream: Workstream) {
         purgeWarningMessage = WorkstreamArchiver.purgeWarning(for: workstream)
@@ -665,16 +667,16 @@ private struct ProjectHeaderRow: View {
             }
             .frame(width: 22)
 
-            VStack(alignment: .leading, spacing: 2) {
-                HStack(spacing: 6) {
+            VStack(alignment: .leading, spacing: 1) {
+                HStack(spacing: 4) {
                     Text(project.name)
-                        .font(.system(.body, weight: .medium))
+                        .font(.system(size: 13, weight: .medium))
 
                     if !project.workstreams.isEmpty {
                         Text("\(project.workstreams.count)")
-                            .font(.system(size: 10, weight: .medium))
+                            .font(.system(size: 9, weight: .medium))
                             .foregroundStyle(.secondary)
-                            .padding(.horizontal, 5)
+                            .padding(.horizontal, 4)
                             .padding(.vertical, 1)
                             .background(.quaternary)
                             .clipShape(Capsule())
@@ -683,7 +685,7 @@ private struct ProjectHeaderRow: View {
                 }
 
                 Text(project.directory.abbreviatedPath)
-                    .font(.caption)
+                    .font(.system(size: 10))
                     .foregroundStyle(.secondary)
                     .lineLimit(1)
             }
@@ -709,7 +711,7 @@ private struct ProjectHeaderRow: View {
             .opacity(isHovering ? 1 : 0)
         }
         .frame(maxWidth: .infinity, alignment: .leading)
-        .padding(.vertical, 2)
+        .padding(.vertical, 1)
         .contentShape(Rectangle())
         .onHover { isHovering = $0 }
         .contextMenu {
@@ -745,6 +747,7 @@ private struct WorkstreamRow: View {
     var branchName: String?
     var worktreePath: String?
     let isPathValid: Bool
+    var isActive: Bool = false
     var hasActivePort: Bool = false
     var githubURL: URL?
     var taskDescription: String?
@@ -778,23 +781,19 @@ private struct WorkstreamRow: View {
     }
 
     var body: some View {
-        HStack {
-            if !isPathValid {
-                Image(systemName: "exclamationmark.triangle")
-                    .foregroundStyle(.orange)
-                    .font(.system(size: 12))
-            }
+        HStack(spacing: 4) {
+            ActivityIndicator(isActive: isActive, isPathValid: isPathValid)
 
-            VStack(alignment: .leading, spacing: 1) {
+            VStack(alignment: .leading, spacing: 0) {
                 HStack(spacing: 4) {
                     Text(headline)
-                        .font(.system(.body))
+                        .font(.system(size: 12))
                         .strikethrough(!isPathValid)
                         .foregroundStyle(isPathValid ? .primary : .secondary)
                         .lineLimit(1)
                     if hasActivePort {
                         Image(systemName: "circle.fill")
-                            .font(.system(size: 6))
+                            .font(.system(size: 5))
                             .foregroundStyle(.green)
                     }
                 }
@@ -808,7 +807,7 @@ private struct WorkstreamRow: View {
                         Text(subtitle)
                             .lineLimit(1)
                     }
-                    .font(.system(size: 10, design: .monospaced))
+                    .font(.system(size: 9, design: .monospaced))
                     .foregroundStyle(prState == "MERGED" ? AnyShapeStyle(.purple) : AnyShapeStyle(.tertiary))
                 }
             }
@@ -868,6 +867,38 @@ private struct WorkstreamRow: View {
                 Label("Purge", systemImage: "trash")
             }
         }
+    }
+}
+
+private struct ActivityIndicator: View {
+    let isActive: Bool
+    let isPathValid: Bool
+
+    @State private var isPulsing = false
+
+    var body: some View {
+        Group {
+            if !isPathValid {
+                Image(systemName: "exclamationmark.triangle")
+                    .foregroundStyle(.orange)
+                    .font(.system(size: 10))
+            } else if isActive {
+                Circle()
+                    .fill(.green)
+                    .frame(width: 6, height: 6)
+                    .opacity(isPulsing ? 0.4 : 1.0)
+                    .animation(.easeInOut(duration: 0.8).repeatForever(autoreverses: true), value: isPulsing)
+                    .onAppear { isPulsing = true }
+                    .onChange(of: isActive) { _, active in
+                        isPulsing = active
+                    }
+            } else {
+                Circle()
+                    .fill(.tertiary)
+                    .frame(width: 6, height: 6)
+            }
+        }
+        .frame(width: 12)
     }
 }
 
