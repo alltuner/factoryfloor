@@ -83,7 +83,7 @@ class EditorWebView: WKWebView {
         guard event.modifierFlags.contains(.command) else {
             return super.performKeyEquivalent(with: event)
         }
-        let chars = event.charactersIgnoringModifiers ?? ""
+        let chars = (event.charactersIgnoringModifiers ?? "").lowercased()
 
         // Shortcuts that must reach the app menu
         switch chars {
