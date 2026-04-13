@@ -201,9 +201,9 @@ final class GitOperationsTests: XCTestCase {
         XCTAssertFalse(result, "Branch should have been deleted")
     }
 
-    // MARK: - updateDefaultBranch
+    // MARK: - fetchDefaultBranch
 
-    func testUpdateDefaultBranchSkipsWithoutRemote() throws {
+    func testFetchDefaultBranchSkipsWithoutRemote() throws {
         let repoDir = tempDir.appendingPathComponent("no-remote-update")
         try FileManager.default.createDirectory(at: repoDir, withIntermediateDirectories: true)
         git(["init", "-b", "main"], in: repoDir)
@@ -211,10 +211,10 @@ final class GitOperationsTests: XCTestCase {
              "commit", "--allow-empty", "-m", "init"], in: repoDir)
 
         // Should return silently without crashing
-        GitOperations.updateDefaultBranch(at: repoDir.path)
+        GitOperations.fetchDefaultBranch(at: repoDir.path)
     }
 
-    func testUpdateDefaultBranchFastForwardsMain() throws {
+    func testFetchDefaultBranchDoesNotMoveLocalRef() throws {
         // Create a "remote" repo
         let remoteDir = tempDir.appendingPathComponent("remote")
         try FileManager.default.createDirectory(at: remoteDir, withIntermediateDirectories: true)
@@ -227,46 +227,20 @@ final class GitOperationsTests: XCTestCase {
         git(["clone", remoteDir.path, repoDir.path], in: tempDir)
 
         // Record the initial commit
-        let beforeSHA = gitOutput(["rev-parse", "HEAD"], in: repoDir)
+        let beforeSHA = gitOutput(["rev-parse", "refs/heads/main"], in: repoDir)
 
         // Add a new commit to remote
         git(["-c", "user.email=test@test.com", "-c", "user.name=Test",
              "commit", "--allow-empty", "-m", "second"], in: remoteDir)
 
-        // Update should fast-forward
-        GitOperations.updateDefaultBranch(at: repoDir.path)
+        // Fetch should update remote tracking ref but not local main
+        GitOperations.fetchDefaultBranch(at: repoDir.path)
 
-        let afterSHA = gitOutput(["rev-parse", "HEAD"], in: repoDir)
-        XCTAssertNotEqual(beforeSHA, afterSHA, "main should have advanced")
-    }
+        let afterSHA = gitOutput(["rev-parse", "refs/heads/main"], in: repoDir)
+        XCTAssertEqual(beforeSHA, afterSHA, "Local main should not have moved")
 
-    func testUpdateDefaultBranchSkipsResetWhenDirty() throws {
-        // Create a "remote" repo
-        let remoteDir = tempDir.appendingPathComponent("remote")
-        try FileManager.default.createDirectory(at: remoteDir, withIntermediateDirectories: true)
-        git(["init", "-b", "main"], in: remoteDir)
-        git(["-c", "user.email=test@test.com", "-c", "user.name=Test",
-             "commit", "--allow-empty", "-m", "init"], in: remoteDir)
-
-        // Clone it
-        let repoDir = tempDir.appendingPathComponent("local")
-        git(["clone", remoteDir.path, repoDir.path], in: tempDir)
-
-        // Make a local uncommitted change
-        let dirtyFile = repoDir.appendingPathComponent("dirty.txt")
-        try "local work".write(to: dirtyFile, atomically: true, encoding: .utf8)
-
-        // Add a new commit to remote
-        git(["-c", "user.email=test@test.com", "-c", "user.name=Test",
-             "commit", "--allow-empty", "-m", "second"], in: remoteDir)
-
-        GitOperations.updateDefaultBranch(at: repoDir.path)
-
-        // The dirty file should still be there
-        XCTAssertTrue(FileManager.default.fileExists(atPath: dirtyFile.path),
-                      "Local changes should be preserved")
-        XCTAssertTrue(GitOperations.hasUncommittedChanges(at: repoDir.path),
-                      "Working tree should still be dirty")
+        let remoteSHA = gitOutput(["rev-parse", "refs/remotes/origin/main"], in: repoDir)
+        XCTAssertNotEqual(beforeSHA, remoteSHA, "Remote tracking ref should have advanced")
     }
 
     // MARK: - pruneCleanWorktrees

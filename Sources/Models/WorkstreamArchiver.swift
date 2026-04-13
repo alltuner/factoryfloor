@@ -70,7 +70,7 @@ enum WorkstreamArchiver {
                 if let branchName {
                     GitOperations.deleteLocalBranch(at: projectDir, branchName: branchName)
                 }
-                GitOperations.updateDefaultBranch(at: projectDir)
+                GitOperations.fetchDefaultBranch(at: projectDir)
                 if let tmuxPath {
                     TmuxSession.killWorkstreamSessions(tmuxPath: tmuxPath, project: projName, workstream: wsName)
                 }
