@@ -1,5 +1,19 @@
 # Changelog
 
+## [0.1.75](https://github.com/alltuner/factoryfloor/compare/v0.1.74...v0.1.75) (2026-04-13)
+
+
+### Bug Fixes
+
+* **deps:** update dependency monaco-editor to v30.0.1 ([#434](https://github.com/alltuner/factoryfloor/issues/434)) ([972fa25](https://github.com/alltuner/factoryfloor/commit/972fa25353350dd9e484b555c50dd64894dd9587))
+* group Monaco VSCode packages in Renovate config ([#439](https://github.com/alltuner/factoryfloor/issues/439)) ([02e9569](https://github.com/alltuner/factoryfloor/commit/02e9569ad980d3c61070dd9b25da826353746b36)), closes [#436](https://github.com/alltuner/factoryfloor/issues/436)
+
+
+### Miscellaneous
+
+* **deps:** update actions/upload-pages-artifact action to v5 ([#437](https://github.com/alltuner/factoryfloor/issues/437)) ([5b2ad22](https://github.com/alltuner/factoryfloor/commit/5b2ad2242f293817aced382b3386d9b08ce26aa1))
+* **deps:** update dependency vite to v8 ([#435](https://github.com/alltuner/factoryfloor/issues/435)) ([4fac286](https://github.com/alltuner/factoryfloor/commit/4fac286452035f0e92f1f1ff9e325f9ee717a587))
+
 ## [0.1.74](https://github.com/alltuner/factoryfloor/compare/v0.1.73...v0.1.74) (2026-04-13)
 
 
