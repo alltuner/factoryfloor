@@ -290,6 +290,7 @@ struct TerminalContainerView: View {
     @State private var gitFileStatuses = GitFileStatusProvider()
     @State private var directoryWatcher: DirectoryWatcher?
     @State private var refreshGeneration = 0
+    @State private var refreshDebounceTask: Task<Void, Never>?
     @State private var cachedClaudeCommand: String?
     @State private var draggedCustomTab: WorkspaceTab?
     @StateObject private var portDetector: PortDetector
@@ -956,6 +957,15 @@ struct TerminalContainerView: View {
         guard directoryWatcher == nil else { return }
         refreshFileTree()
         directoryWatcher = DirectoryWatcher(path: workingDirectory) { [self] in
+            debounceRefreshFileTree()
+        }
+    }
+
+    private func debounceRefreshFileTree() {
+        refreshDebounceTask?.cancel()
+        refreshDebounceTask = Task {
+            try? await Task.sleep(for: .milliseconds(500))
+            guard !Task.isCancelled else { return }
             refreshFileTree()
         }
     }
