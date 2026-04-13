@@ -1,5 +1,5 @@
-// ABOUTME: Info panel for a workstream showing app branding, metadata, shortcuts, and docs.
-// ABOUTME: Default view when opening a workstream, dismissible with Cmd+Return.
+// ABOUTME: Info panel for a workstream showing metadata, environment, and docs.
+// ABOUTME: First tab in the workspace, combining project info with run script controls.
 
 import SwiftUI
 
@@ -10,6 +10,11 @@ struct WorkstreamInfoView: View {
     let projectName: String
     let projectDirectory: String
     var scriptConfig: ScriptConfig = .empty
+    var useTmux: Bool = false
+    var environmentVars: [String: String] = [:]
+    @Binding var runStoppedManually: Bool
+    @Binding var runStarted: Bool
+    var sessionMode: TerminalSessionMode = .standard
 
     @EnvironmentObject var appEnv: AppEnvironment
     @AppStorage("factoryfloor.defaultTerminal") private var defaultTerminal: String = ""
@@ -188,13 +193,40 @@ struct WorkstreamInfoView: View {
             }
             .formStyle(.grouped)
 
-            // Markdown content fills remaining space when a doc is selected
-            if let selected = selectedDoc,
-               let doc = docFiles.first(where: { $0.name == selected })
-            {
+            // Environment (run script) section
+            if scriptConfig.run != nil || scriptConfig.loadError != nil {
                 Divider()
-                MarkdownContentView(markdown: doc.content)
-                    .id(selected)
+                if sessionMode == .waitingForTools {
+                    VStack(spacing: 12) {
+                        ProgressView()
+                            .controlSize(.regular)
+                        Text("Checking terminal tools...")
+                            .font(.system(size: 13))
+                            .foregroundStyle(.secondary)
+                    }
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+                } else {
+                    EnvironmentTabView(
+                        workstreamID: workstreamID,
+                        workingDirectory: workingDirectory,
+                        projectName: projectName,
+                        workstreamName: workstreamName,
+                        scriptConfig: scriptConfig,
+                        useTmux: useTmux,
+                        environmentVars: environmentVars,
+                        runStoppedManually: $runStoppedManually,
+                        runStarted: $runStarted
+                    )
+                }
+            } else {
+                // Markdown content fills remaining space when a doc is selected
+                if let selected = selectedDoc,
+                   let doc = docFiles.first(where: { $0.name == selected })
+                {
+                    Divider()
+                    MarkdownContentView(markdown: doc.content)
+                        .id(selected)
+                }
             }
 
             // Doc tabs pinned to bottom

@@ -143,8 +143,7 @@ struct ContentView: View {
                 let scriptConfig = ScriptConfig.load(from: project.directory)
                 let initialTabState = startupWorkspaceTabState(
                     snapshot: surfaceCache.restoreTabSnapshot(for: workstreamID),
-                    savedTab: WorkspaceStateStore.load(for: workstreamID),
-                    hasEnvironmentTab: scriptConfig.run != nil
+                    savedTab: WorkspaceStateStore.load(for: workstreamID)
                 )
                 TerminalContainerView(
                     workstreamID: workstreamID,

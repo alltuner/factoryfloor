@@ -16,7 +16,6 @@ extension Notification.Name {
     static let closeTerminal = Notification.Name("factoryfloor.closeTerminal")
     static let nextTab = Notification.Name("factoryfloor.nextTab")
     static let prevTab = Notification.Name("factoryfloor.prevTab")
-    static let toggleEnvironment = Notification.Name("factoryfloor.toggleEnvironment")
     static let terminalTitleChanged = Notification.Name("factoryfloor.terminalTitleChanged")
 }
 
@@ -29,21 +28,17 @@ enum RestorableWorkspaceTab: String, Codable {
         switch activeTab {
         case .agent:
             self = .agent
-        case .environment:
-            self = .environment
         case .info, .terminal, .browser:
             self = .info
         }
     }
 
-    func workspaceTab(hasEnvironmentTab: Bool) -> WorkspaceTab {
+    func workspaceTab() -> WorkspaceTab {
         switch self {
-        case .info:
+        case .info, .environment:
             return .info
         case .agent:
             return .agent
-        case .environment:
-            return hasEnvironmentTab ? .environment : .info
         }
     }
 }
@@ -124,13 +119,12 @@ func reorderedCustomTabs(_ tabs: [WorkspaceTab], dragging draggedTab: WorkspaceT
 enum WorkspaceTab: Hashable {
     case info
     case agent
-    case environment
     case terminal(UUID)
     case browser(UUID)
 
     var isCloseable: Bool {
         switch self {
-        case .info, .agent, .environment: return false
+        case .info, .agent: return false
         case .terminal, .browser: return true
         }
     }
@@ -170,23 +164,30 @@ struct WorkspaceTabSnapshot {
     }
 }
 
-func startupWorkspaceTabState(snapshot: WorkspaceTabSnapshot?, savedTab: RestorableWorkspaceTab?, hasEnvironmentTab: Bool) -> WorkspaceTabSnapshot {
-    if var snapshot {
-        if hasEnvironmentTab && !snapshot.tabs.contains(.environment) {
-            snapshot.tabs.insert(.environment, at: min(2, snapshot.tabs.count))
+func startupWorkspaceTabState(snapshot: WorkspaceTabSnapshot?, savedTab: RestorableWorkspaceTab?) -> WorkspaceTabSnapshot {
+    if let snapshot {
+        // Filter out any persisted environment tabs from before the merge
+        let filteredTabs = snapshot.tabs.filter { tab in
+            if case .info = tab { return true }
+            if case .agent = tab { return true }
+            if case .terminal = tab { return true }
+            if case .browser = tab { return true }
+            return false
         }
-        return snapshot
+        var cleaned = snapshot
+        cleaned.tabs = filteredTabs
+        if !cleaned.tabs.contains(cleaned.activeTab) {
+            cleaned.activeTab = .info
+        }
+        return cleaned
     }
 
-    var tabs: [WorkspaceTab] = [.info, .agent]
-    if hasEnvironmentTab {
-        tabs.append(.environment)
-    }
+    let tabs: [WorkspaceTab] = [.info, .agent]
     return WorkspaceTabSnapshot(
         tabs: tabs,
         terminalCount: 0,
         browserCount: 0,
-        activeTab: (savedTab ?? .info).workspaceTab(hasEnvironmentTab: hasEnvironmentTab),
+        activeTab: (savedTab ?? .info).workspaceTab(),
         browserTitles: [:],
         terminalTitles: [:],
         runStarted: false,
@@ -284,7 +285,7 @@ struct TerminalContainerView: View {
         bypassPermissions: Bool,
         isActive: Bool,
         scriptConfig: ScriptConfig = .empty,
-        initialTabState: WorkspaceTabSnapshot = startupWorkspaceTabState(snapshot: nil, savedTab: nil, hasEnvironmentTab: false)
+        initialTabState: WorkspaceTabSnapshot = startupWorkspaceTabState(snapshot: nil, savedTab: nil)
     ) {
         self.workstreamID = workstreamID
         self.workingDirectory = workingDirectory
@@ -318,7 +319,6 @@ struct TerminalContainerView: View {
     }
 
     /// Surface IDs that should be rendering for the active tab.
-    /// Returns nil for the environment tab (env surface IDs are managed internally).
     private var visibleSurfaceIDs: Set<UUID>? {
         switch activeTab {
         case .agent:
@@ -328,7 +328,6 @@ struct TerminalContainerView: View {
             return [claudeID]
         case let .terminal(id): return [id]
         case .info, .browser: return []
-        case .environment: return nil
         }
     }
 
@@ -455,7 +454,7 @@ struct TerminalContainerView: View {
 
     private var tabBar: some View {
         HStack(spacing: 0) {
-            // Fixed tabs (Info, Agent, Environment)
+            // Fixed tabs (Info, Agent)
             ForEach(fixedTabs, id: \.self) { tab in
                 tabButton(for: tab)
             }
@@ -468,6 +467,13 @@ struct TerminalContainerView: View {
                     tabButton: { tab in tabButton(for: tab) }
                 )
             }
+
+            // Quick actions to add tabs
+            HStack(spacing: 2) {
+                TabBarActionButton(icon: "terminal", tooltip: "New Terminal (\u{2318}T)", action: addTerminal)
+                TabBarActionButton(icon: "globe", tooltip: "New Browser (\u{2318}B)", action: addBrowser)
+            }
+            .padding(.leading, 4)
 
             Spacer()
 
@@ -534,7 +540,12 @@ struct TerminalContainerView: View {
                 workingDirectory: workingDirectory,
                 projectName: projectName,
                 projectDirectory: projectDirectory,
-                scriptConfig: scriptConfig
+                scriptConfig: scriptConfig,
+                useTmux: useTmux,
+                environmentVars: terminalEnvVars,
+                runStoppedManually: $runStoppedManually,
+                runStarted: $runStarted,
+                sessionMode: sessionMode
             )
         case .agent:
             if setupGateState == .running {
@@ -568,22 +579,6 @@ struct TerminalContainerView: View {
             } else {
                 terminalLoadingView(message: "Preparing Coding Agent...")
             }
-        case .environment:
-            if sessionMode == .waitingForTools {
-                terminalLoadingView(message: "Checking terminal tools...")
-            } else {
-                EnvironmentTabView(
-                    workstreamID: workstreamID,
-                    workingDirectory: workingDirectory,
-                    projectName: projectName,
-                    workstreamName: workstreamName,
-                    scriptConfig: scriptConfig,
-                    useTmux: useTmux,
-                    environmentVars: terminalEnvVars,
-                    runStoppedManually: $runStoppedManually,
-                    runStarted: $runStarted
-                )
-            }
         case let .terminal(id):
             SingleTerminalView(
                 surfaceID: id,
@@ -616,13 +611,9 @@ struct TerminalContainerView: View {
                 guard isActive else { return }
                 activeTab = .agent
             }
-            .onReceive(NotificationCenter.default.publisher(for: .toggleEnvironment)) { _ in
-                guard isActive else { return }
-                if tabs.contains(.environment) { activeTab = .environment }
-            }
             .onReceive(NotificationCenter.default.publisher(for: .rerunScript)) { _ in
                 guard isActive else { return }
-                if tabs.contains(.environment) { activeTab = .environment }
+                activeTab = .info
             }
             .onReceive(NotificationCenter.default.publisher(for: .toggleTerminal)) { _ in
                 guard isActive else { return }
@@ -746,18 +737,6 @@ struct TerminalContainerView: View {
                             .help("Open on GitHub")
                         }
 
-                        Button(action: addTerminal) {
-                            Label(NSLocalizedString("Terminal", comment: ""), systemImage: "terminal")
-                                .labelStyle(.titleAndIcon)
-                        }
-                        .help("New Terminal (\u{2318}T)")
-
-                        Button(action: addBrowser) {
-                            Label(NSLocalizedString("Browser", comment: ""), systemImage: "globe")
-                                .labelStyle(.titleAndIcon)
-                        }
-                        .help("New Browser (\u{2318}B)")
-
                         GitHubActionMenu(
                             runner: quickActionRunner,
                             claudePath: appEnv.toolStatus.claude.path,
@@ -794,7 +773,6 @@ struct TerminalContainerView: View {
         switch tab {
         case .info: return NSLocalizedString("Info", comment: "")
         case .agent: return NSLocalizedString("Agent", comment: "")
-        case .environment: return NSLocalizedString("Environment", comment: "")
         case .terminal:
             return nil
         case let .browser(id):
@@ -808,7 +786,6 @@ struct TerminalContainerView: View {
         switch tab {
         case .info: return "info.circle"
         case .agent: return "sparkle"
-        case .environment: return "gearshape.2"
         case .terminal: return "terminal"
         case .browser: return "globe"
         }
@@ -836,8 +813,6 @@ struct TerminalContainerView: View {
             return "info"
         case .agent:
             return "agent"
-        case .environment:
-            return "environment"
         }
     }
 
@@ -963,15 +938,6 @@ struct TerminalContainerView: View {
     private func buildSetupGateCommand() -> String? {
         guard let setup = scriptConfig.setup else { return nil }
         return scriptCommand(script: setup, role: "setup")
-    }
-
-    private func buildEnvironmentCommand(script: String, role: String) -> String {
-        let command = scriptCommand(script: script, role: role)
-        if useTmux, let tmuxPath = appEnv.toolStatus.tmux.path {
-            let session = TmuxSession.sessionName(project: projectName, workstream: workstreamName, role: role)
-            return TmuxSession.wrapCommand(tmuxPath: tmuxPath, sessionName: session, command: command, environmentVars: terminalEnvVars)
-        }
-        return command
     }
 
     /// Env vars for plain terminal tabs. Clears tmux vars to prevent inheritance.
@@ -1125,6 +1091,28 @@ private struct WorkspaceTabButton: View {
         .contentShape(Rectangle())
         .onTapGesture(perform: onSelect)
         .onHover { isHovering = $0 }
+    }
+}
+
+private struct TabBarActionButton: View {
+    let icon: String
+    let tooltip: String
+    let action: () -> Void
+
+    @State private var isHovering = false
+
+    var body: some View {
+        Button(action: action) {
+            Image(systemName: icon)
+                .font(.system(size: 11))
+                .foregroundStyle(isHovering ? .primary : .tertiary)
+                .frame(width: 24, height: 24)
+                .background(isHovering ? Color.primary.opacity(0.08) : .clear)
+                .clipShape(RoundedRectangle(cornerRadius: 5))
+        }
+        .buttonStyle(.borderless)
+        .onHover { isHovering = $0 }
+        .help(tooltip)
     }
 }
 

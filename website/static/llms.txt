@@ -72,7 +72,7 @@ Workstream:
 - `Cmd+W` — close tab
 - `Cmd+L` — address bar (browser)
 - `Cmd+0` — back to project
-- `Cmd+1-9` — switch tab
+- `Cmd+1` — Info, `Cmd+2` — Coding Agent, `Cmd+3-9` — switch tab
 - `Ctrl+1-9` — switch workstream
 - `Cmd+Shift+[` / `]` — cycle tabs
 - `Ctrl+Shift+R` — rebuild setup

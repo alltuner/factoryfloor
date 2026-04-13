@@ -116,7 +116,7 @@ Terminals are GPU-rendered via [Ghostty](https://ghostty.org). They're fast.
 
 - **⌘T** — new terminal tab
 - **⌘W** — close tab (or Ctrl+D to exit the shell)
-- **⌘1-9** — switch between tabs
+- **⌘1** — Info, **⌘2** — Coding Agent, **⌘3-9** — switch between tabs
 - **⌘Shift+[** / **⌘Shift+]** — cycle through tabs
 
 You can drag files and text onto the terminal. Because sometimes the mouse is fine, actually.
@@ -157,7 +157,9 @@ Factory Floor is keyboard-first. Here's everything.
 
 | Shortcut | Action |
 |----------|--------|
-| ⌘1-9 | Switch tab |
+| ⌘1 | Info |
+| ⌘2 | Coding Agent |
+| ⌘3-9 | Switch tab |
 | ⌘Shift+[ | Previous tab |
 | ⌘Shift+] | Next tab |
 | ⌘Return | Focus Coding Agent |

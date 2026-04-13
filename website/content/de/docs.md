@@ -116,7 +116,7 @@ Terminals werden GPU-gerendert über [Ghostty](https://ghostty.org). Sie sind sc
 
 - **⌘T** — neuer Terminal-Tab
 - **⌘W** — Tab schließen (oder Ctrl+D zum Beenden der Shell)
-- **⌘1-9** — zwischen Tabs wechseln
+- **⌘1** — Info, **⌘2** — Coding Agent, **⌘3-9** — zwischen Tabs wechseln
 - **⌘Shift+[** / **⌘Shift+]** — durch Tabs blättern
 
 Du kannst Dateien und Text auf das Terminal ziehen. Weil manchmal die Maus völlig in Ordnung ist, ehrlich.
@@ -157,7 +157,9 @@ Factory Floor ist tastaturorientiert. Hier ist alles.
 
 | Kürzel | Aktion |
 |----------|--------|
-| ⌘1-9 | Tab wechseln |
+| ⌘1 | Info |
+| ⌘2 | Coding Agent |
+| ⌘3-9 | Tab wechseln |
 | ⌘Shift+[ | Vorheriger Tab |
 | ⌘Shift+] | Nächster Tab |
 | ⌘Return | Coding-Agent fokussieren |

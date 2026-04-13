@@ -116,7 +116,7 @@ Los terminals se renderizan por GPU con [Ghostty](https://ghostty.org). Son ráp
 
 - **⌘T** — nuevo terminal tab
 - **⌘W** — cerrar tab (o Ctrl+D para salir del shell)
-- **⌘1-9** — cambiar entre tabs
+- **⌘1** — Info, **⌘2** — Coding Agent, **⌘3-9** — cambiar entre tabs
 - **⌘Shift+[** / **⌘Shift+]** — recorrer tabs
 
 Puedes arrastrar archivos y texto al terminal. Porque a veces el ratón está bien, la verdad.
@@ -157,7 +157,9 @@ Factory Floor prioriza el teclado. Aquí está todo.
 
 | Atajo | Acción |
 |----------|--------|
-| ⌘1-9 | Cambiar tab |
+| ⌘1 | Info |
+| ⌘2 | Coding Agent |
+| ⌘3-9 | Cambiar tab |
 | ⌘Shift+[ | Tab anterior |
 | ⌘Shift+] | Tab siguiente |
 | ⌘Return | Foco en Coding Agent |
