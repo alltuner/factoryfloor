@@ -59,7 +59,7 @@ jobs:
 
       - run: hugo
 
-      - uses: actions/upload-pages-artifact@v4
+      - uses: actions/upload-pages-artifact@v5
         with:
           path: website/public
           retention-days: 1
