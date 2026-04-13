@@ -307,6 +307,12 @@ struct ContentView: View {
                 if newValue != .settings && newValue != .help {
                     newValue?.save()
                 }
+                // Auto-focus terminal when selecting a workstream
+                if case .workstream = newValue {
+                    DispatchQueue.main.async {
+                        NotificationCenter.default.post(name: .focusAgent, object: nil)
+                    }
+                }
             }
             .onKeyPress(.escape) {
                 if selection == .settings || selection == .help {
