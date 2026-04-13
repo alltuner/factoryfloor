@@ -243,6 +243,88 @@ final class GitOperationsTests: XCTestCase {
         XCTAssertNotEqual(beforeSHA, remoteSHA, "Remote tracking ref should have advanced")
     }
 
+    // MARK: - fileStatuses
+
+    func testFileStatusesReturnsModifiedForTrackedChanges() throws {
+        let repoDir = tempDir.appendingPathComponent("status-modified")
+        try FileManager.default.createDirectory(at: repoDir, withIntermediateDirectories: true)
+        git(["init", "-b", "main"], in: repoDir)
+
+        let filePath = repoDir.appendingPathComponent("tracked.txt")
+        try "original".write(to: filePath, atomically: true, encoding: .utf8)
+        git(["add", "tracked.txt"], in: repoDir)
+        git(["-c", "user.email=test@test.com", "-c", "user.name=Test",
+             "commit", "-m", "init"], in: repoDir)
+
+        try "changed".write(to: filePath, atomically: true, encoding: .utf8)
+
+        let statuses = GitOperations.fileStatuses(at: repoDir.path)
+        XCTAssertEqual(statuses["tracked.txt"], .modified)
+    }
+
+    func testFileStatusesReturnsUntrackedForNewFiles() throws {
+        let repoDir = tempDir.appendingPathComponent("status-untracked")
+        try FileManager.default.createDirectory(at: repoDir, withIntermediateDirectories: true)
+        git(["init", "-b", "main"], in: repoDir)
+        git(["-c", "user.email=test@test.com", "-c", "user.name=Test",
+             "commit", "--allow-empty", "-m", "init"], in: repoDir)
+
+        try "new file".write(
+            to: repoDir.appendingPathComponent("untracked.txt"),
+            atomically: true, encoding: .utf8
+        )
+
+        let statuses = GitOperations.fileStatuses(at: repoDir.path)
+        XCTAssertEqual(statuses["untracked.txt"], .untracked)
+    }
+
+    func testFileStatusesReturnsIgnoredForGitignored() throws {
+        let repoDir = tempDir.appendingPathComponent("status-ignored")
+        try FileManager.default.createDirectory(at: repoDir, withIntermediateDirectories: true)
+        git(["init", "-b", "main"], in: repoDir)
+
+        try "build/\n".write(
+            to: repoDir.appendingPathComponent(".gitignore"),
+            atomically: true, encoding: .utf8
+        )
+        let buildDir = repoDir.appendingPathComponent("build")
+        try FileManager.default.createDirectory(at: buildDir, withIntermediateDirectories: true)
+        try "artifact".write(
+            to: buildDir.appendingPathComponent("output.o"),
+            atomically: true, encoding: .utf8
+        )
+
+        let statuses = GitOperations.fileStatuses(at: repoDir.path)
+        XCTAssertEqual(statuses["build"], .ignored)
+    }
+
+    func testFileStatusesReturnsEmptyForNonGitDirectory() throws {
+        let plainDir = tempDir.appendingPathComponent("no-git")
+        try FileManager.default.createDirectory(at: plainDir, withIntermediateDirectories: true)
+
+        let statuses = GitOperations.fileStatuses(at: plainDir.path)
+        XCTAssertTrue(statuses.isEmpty)
+    }
+
+    func testFileStatusesHandlesRenames() throws {
+        let repoDir = tempDir.appendingPathComponent("status-rename")
+        try FileManager.default.createDirectory(at: repoDir, withIntermediateDirectories: true)
+        git(["init", "-b", "main"], in: repoDir)
+
+        try "content".write(
+            to: repoDir.appendingPathComponent("old.txt"),
+            atomically: true, encoding: .utf8
+        )
+        git(["add", "old.txt"], in: repoDir)
+        git(["-c", "user.email=test@test.com", "-c", "user.name=Test",
+             "commit", "-m", "init"], in: repoDir)
+
+        git(["mv", "old.txt", "new.txt"], in: repoDir)
+
+        let statuses = GitOperations.fileStatuses(at: repoDir.path)
+        XCTAssertEqual(statuses["new.txt"], .modified)
+    }
+
     // MARK: - pruneCleanWorktrees
 
     func testPruneCleanWorktreesPrunesOnlyRequestedPaths() throws {
