@@ -6,7 +6,7 @@
     "build": "vite build"
   },
   "dependencies": {
-    "@codingame/monaco-vscode-api": "30.0.0",
+    "@codingame/monaco-vscode-api": "30.0.1",
     "monaco-editor": "npm:@codingame/monaco-vscode-editor-api@30.0.0",
     "@codingame/monaco-vscode-textmate-service-override": "30.0.0",
     "@codingame/monaco-vscode-theme-service-override": "30.0.0",
