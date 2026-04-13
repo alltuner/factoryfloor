@@ -1,5 +1,37 @@
 # Changelog
 
+## [0.1.68](https://github.com/alltuner/factoryfloor/compare/v0.1.67...v0.1.68) (2026-04-13)
+
+
+### Features
+
+* add activity indicators and compact sidebar layout ([#406](https://github.com/alltuner/factoryfloor/issues/406)) ([e5fcb7e](https://github.com/alltuner/factoryfloor/commit/e5fcb7ee83c61e6eed3e8aa0456c1e9610738364)), closes [#399](https://github.com/alltuner/factoryfloor/issues/399)
+* add file editor with Monaco integration ([#389](https://github.com/alltuner/factoryfloor/issues/389)) ([969d5c1](https://github.com/alltuner/factoryfloor/commit/969d5c10e6d9f0b2f5405ed48e5f1b582ca20e8f))
+* consolidate GitHub actions into contextual dropdown ([#405](https://github.com/alltuner/factoryfloor/issues/405)) ([fbfaabf](https://github.com/alltuner/factoryfloor/commit/fbfaabff259af0a4e9dd8082131b803b7016f7ee)), closes [#398](https://github.com/alltuner/factoryfloor/issues/398)
+* credit contributors in release changelog entries ([#410](https://github.com/alltuner/factoryfloor/issues/410)) ([47817e9](https://github.com/alltuner/factoryfloor/commit/47817e954a90c0bf3b59004341a9986e2d4bf9ba))
+* reorganize workspace tabs with Info as first tab ([#407](https://github.com/alltuner/factoryfloor/issues/407)) ([83cacaa](https://github.com/alltuner/factoryfloor/commit/83cacaaa6c989e27d70c8a310fb353decb88674d)), closes [#400](https://github.com/alltuner/factoryfloor/issues/400)
+
+
+### Bug Fixes
+
+* auto-focus terminal when selecting workstream from sidebar ([#402](https://github.com/alltuner/factoryfloor/issues/402)) ([b87395c](https://github.com/alltuner/factoryfloor/commit/b87395c6cff7f4f33db05a7d6f31d4d092896df3)), closes [#394](https://github.com/alltuner/factoryfloor/issues/394)
+* **deps:** update dependency @codingame/monaco-vscode-all-language-default-extensions to v30.0.1 ([#408](https://github.com/alltuner/factoryfloor/issues/408)) ([5b7a85f](https://github.com/alltuner/factoryfloor/commit/5b7a85f79ce63fae62186ac968d98adae574c4e6))
+* **deps:** update dependency @codingame/monaco-vscode-api to v30.0.1 ([#409](https://github.com/alltuner/factoryfloor/issues/409)) ([a8e7f45](https://github.com/alltuner/factoryfloor/commit/a8e7f45786c779dab7dc0b2479deaf2898b06e33))
+* rename Abandon PR to Close PR to match GitHub terminology ([#403](https://github.com/alltuner/factoryfloor/issues/403)) ([061a6c3](https://github.com/alltuner/factoryfloor/commit/061a6c3e7bff1fb708e5c8c04faee8b6727275f3)), closes [#397](https://github.com/alltuner/factoryfloor/issues/397)
+* show correct shortcut numbers on closeable tabs ([#392](https://github.com/alltuner/factoryfloor/issues/392)) ([e9d4c3f](https://github.com/alltuner/factoryfloor/commit/e9d4c3fab3f6d8f55a904f952d75f5a437319459)), closes [#387](https://github.com/alltuner/factoryfloor/issues/387)
+* use remote tracking ref for worktree creation instead of updating local main ([#404](https://github.com/alltuner/factoryfloor/issues/404)) ([5da6b98](https://github.com/alltuner/factoryfloor/commit/5da6b98d8eca3903d624e85fc49b61cc3c1686a5)), closes [#393](https://github.com/alltuner/factoryfloor/issues/393)
+* **worktrees:** avoid prune prompt for newly created workstreams ([#384](https://github.com/alltuner/factoryfloor/issues/384)) ([a7d89d1](https://github.com/alltuner/factoryfloor/commit/a7d89d14aa5d79aca09124e16675de84300db41a))
+
+
+### Miscellaneous
+
+* **deps:** update actions/checkout action to v6 ([#390](https://github.com/alltuner/factoryfloor/issues/390)) ([327844d](https://github.com/alltuner/factoryfloor/commit/327844debdff94e6128ac768da378c2c3e5fcdf6))
+
+
+### Documentation
+
+* document tmux external access for [#396](https://github.com/alltuner/factoryfloor/issues/396) ([#401](https://github.com/alltuner/factoryfloor/issues/401)) ([16af5cf](https://github.com/alltuner/factoryfloor/commit/16af5cfa5b90fb799545464521a6abbb7ae1299d))
+
 ## [0.1.67](https://github.com/alltuner/factoryfloor/compare/v0.1.66...v0.1.67) (2026-04-08)
 
 
