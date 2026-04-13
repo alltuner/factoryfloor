@@ -162,7 +162,7 @@ targets:
         name: Build Monaco Editor
         inputFiles:
           - $(PROJECT_DIR)/editor/package.json
-          - $(PROJECT_DIR)/editor/package-lock.json
+          - $(PROJECT_DIR)/editor/bun.lock
           - $(PROJECT_DIR)/editor/src/main.js
           - $(PROJECT_DIR)/editor/index.html
           - $(PROJECT_DIR)/editor/vite.config.js

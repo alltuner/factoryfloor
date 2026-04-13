@@ -31,8 +31,6 @@ enum RestorableWorkspaceTab: String, Codable {
         switch activeTab {
         case .agent:
             self = .agent
-        case .environment:
-            self = .environment
         case .info, .terminal, .browser, .editor:
             self = .info
         }
@@ -130,7 +128,7 @@ enum WorkspaceTab: Hashable {
 
     var isCloseable: Bool {
         switch self {
-        case .info, .agent, .environment: return false
+        case .info, .agent: return false
         case .terminal, .browser, .editor: return true
         }
     }
@@ -198,7 +196,7 @@ func startupWorkspaceTabState(snapshot: WorkspaceTabSnapshot?, savedTab: Restora
         terminalCount: 0,
         browserCount: 0,
         editorCount: 0,
-        activeTab: (savedTab ?? .info).workspaceTab(hasEnvironmentTab: hasEnvironmentTab),
+        activeTab: (savedTab ?? .info).workspaceTab(),
         browserTitles: [:],
         terminalTitles: [:],
         editorFilePaths: [:],
@@ -363,7 +361,6 @@ struct TerminalContainerView: View {
             return [claudeID]
         case let .terminal(id): return [id]
         case .info, .browser, .editor: return []
-        case .environment: return nil
         }
     }
 
