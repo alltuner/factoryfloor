@@ -12,6 +12,7 @@ OUTPUT_MARKER="$OUTPUT_DIR/index.html"
 # Source files that trigger a rebuild
 SOURCE_FILES=(
   "$EDITOR_DIR/package.json"
+  "$EDITOR_DIR/package-lock.json"
   "$EDITOR_DIR/vite.config.js"
   "$EDITOR_DIR/index.html"
 )
@@ -36,7 +37,7 @@ needs_rebuild() {
 if needs_rebuild; then
   echo "Building Monaco editor bundle..."
   cd "$EDITOR_DIR"
-  npm install --prefer-offline 2>&1
+  npm ci 2>&1
   npm run build 2>&1
   echo "Monaco editor built to Resources/MonacoEditor/"
 else
