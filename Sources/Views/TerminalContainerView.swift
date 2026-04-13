@@ -758,7 +758,7 @@ struct TerminalContainerView: View {
                         }
                         .help("New Browser (\u{2318}B)")
 
-                        QuickActionButtons(
+                        GitHubActionMenu(
                             runner: quickActionRunner,
                             claudePath: appEnv.toolStatus.claude.path,
                             ghPath: appEnv.toolStatus.gh.path,
@@ -767,7 +767,7 @@ struct TerminalContainerView: View {
                             bypassPermissions: bypassPermissions,
                             worktreeState: appEnv.worktreeState(for: workingDirectory),
                             hasGitHubRemote: appEnv.hasGitHubRemote(projectDirectory),
-                            prState: branchPR?.state
+                            branchPR: branchPR
                         )
                     }
                 }
@@ -909,10 +909,10 @@ struct TerminalContainerView: View {
         quickActionRunner.onSuccess = { action in
             appEnv.refreshWorktreeState(for: workingDirectory, projectDirectory: projectDirectory)
             if let branch = appEnv.branchName(for: workingDirectory) {
-                if action == .abandonPR {
+                if action == .closePR {
                     appEnv.clearBranchPR(for: projectDirectory, branch: branch)
                 }
-                if action == .createPR || action == .abandonPR {
+                if action == .createPR || action == .closePR {
                     appEnv.refreshGitHubInfo(for: projectDirectory, branch: branch)
                 }
             }
@@ -1141,7 +1141,7 @@ private struct WorkspaceTabDropDelegate: DropDelegate {
     }
 }
 
-private struct QuickActionButtons: View {
+private struct GitHubActionMenu: View {
     @ObservedObject var runner: QuickActionRunner
     let claudePath: String?
     let ghPath: String?
@@ -1150,38 +1150,73 @@ private struct QuickActionButtons: View {
     let bypassPermissions: Bool
     let worktreeState: WorktreeState
     let hasGitHubRemote: Bool
-    let prState: String?
+    let branchPR: GitHubPR?
+
+    private var prState: String? {
+        branchPR?.state
+    }
 
     private var hasOpenPR: Bool {
         prState == "OPEN"
     }
 
-    private func isVisible(_ action: QuickAction) -> Bool {
-        switch action {
-        case .commit:
-            return worktreeState.hasUncommittedChanges
-        case .push:
-            return worktreeState.hasUnpushedCommits && worktreeState.hasRemote
-        case .createPR:
-            return hasGitHubRemote && worktreeState.hasBranchCommits && prState == nil
-        case .abandonPR:
-            return hasOpenPR
-        }
+    private var isMerged: Bool {
+        prState == "MERGED"
     }
 
-    private func disabledReason(for action: QuickAction) -> String? {
-        if action.usesLLM {
-            if claudePath == nil {
-                return NSLocalizedString("Claude Code is not installed.", comment: "")
+    /// The most relevant next action to move the workflow forward.
+    private var primaryAction: PrimaryAction? {
+        if isMerged {
+            return nil
+        }
+        if hasOpenPR {
+            if worktreeState.hasUncommittedChanges {
+                return .quickAction(.commit)
             }
-            if !bypassPermissions {
-                return NSLocalizedString("Enable \"Bypass permission prompts\" in Settings.", comment: "")
+            if worktreeState.hasUnpushedCommits, worktreeState.hasRemote {
+                return .quickAction(.push)
+            }
+            if let pr = branchPR {
+                return .openPR(pr)
             }
         }
-        if action == .abandonPR, ghPath == nil {
-            return NSLocalizedString("gh CLI is not installed.", comment: "")
+        if prState == nil, hasGitHubRemote, worktreeState.hasBranchCommits {
+            return .quickAction(.createPR)
+        }
+        if worktreeState.hasUncommittedChanges {
+            return .quickAction(.commit)
+        }
+        if worktreeState.hasUnpushedCommits, worktreeState.hasRemote {
+            return .quickAction(.push)
         }
         return nil
+    }
+
+    /// Secondary actions shown in the dropdown, excluding the primary.
+    private var secondaryActions: [PrimaryAction] {
+        guard let primary = primaryAction else { return [] }
+        var actions: [PrimaryAction] = []
+
+        if worktreeState.hasUncommittedChanges {
+            actions.append(.quickAction(.commit))
+        }
+        if worktreeState.hasUnpushedCommits, worktreeState.hasRemote {
+            actions.append(.quickAction(.push))
+        }
+        if prState == nil, hasGitHubRemote, worktreeState.hasBranchCommits {
+            actions.append(.quickAction(.createPR))
+        }
+        if let pr = branchPR, hasOpenPR {
+            actions.append(.openPR(pr))
+            actions.append(.quickAction(.closePR))
+        }
+
+        return actions.filter { $0 != primary }
+    }
+
+    private var isRunning: Bool {
+        if case .running = runner.state { return true }
+        return false
     }
 
     private func isRunningAction(_ action: QuickAction) -> Bool {
@@ -1197,18 +1232,19 @@ private struct QuickActionButtons: View {
         }
     }
 
-    var body: some View {
-        ForEach(QuickAction.allCases) { action in
-            if isVisible(action) {
-                QuickActionButton(
-                    action: action,
-                    isRunning: isRunningAction(action),
-                    resultState: resultState(for: action),
-                    disabledReason: disabledReason(for: action),
-                    onRun: { runAction(action) }
-                )
+    private func disabledReason(for action: QuickAction) -> String? {
+        if action.usesLLM {
+            if claudePath == nil {
+                return NSLocalizedString("Claude Code is not installed.", comment: "")
+            }
+            if !bypassPermissions {
+                return NSLocalizedString("Enable \"Bypass permission prompts\" in Settings.", comment: "")
             }
         }
+        if action == .closePR, ghPath == nil {
+            return NSLocalizedString("gh CLI is not installed.", comment: "")
+        }
+        return nil
     }
 
     private func runAction(_ action: QuickAction) {
@@ -1221,40 +1257,116 @@ private struct QuickActionButtons: View {
             branchName: branchName
         )
     }
-}
 
-private struct QuickActionButton: View {
-    let action: QuickAction
-    let isRunning: Bool
-    let resultState: QuickActionState?
-    let disabledReason: String?
-    let onRun: () -> Void
-
-    private var isDisabled: Bool {
-        disabledReason != nil || isRunning
+    private func executePrimary(_ action: PrimaryAction) {
+        guard !isRunning else { return }
+        switch action {
+        case let .quickAction(qa):
+            runAction(qa)
+        case let .openPR(pr):
+            if let url = URL(string: pr.url) {
+                NSWorkspace.shared.open(url)
+            }
+        }
     }
 
-    var body: some View {
-        Button(action: onRun) {
-            if isRunning {
+    @ViewBuilder
+    private func label(for action: PrimaryAction) -> some View {
+        switch action {
+        case let .quickAction(qa):
+            if isRunningAction(qa) {
                 ProgressView()
                     .controlSize(.mini)
-            } else if case .succeeded = resultState {
-                Label(action.label, systemImage: "checkmark.circle.fill")
+            } else if case .succeeded = resultState(for: qa) {
+                Label(qa.label, systemImage: "checkmark.circle.fill")
                     .labelStyle(.titleAndIcon)
                     .foregroundStyle(.green)
-            } else if case .failed = resultState {
-                Label(action.label, systemImage: "xmark.circle.fill")
+            } else if case .failed = resultState(for: qa) {
+                Label(qa.label, systemImage: "xmark.circle.fill")
                     .labelStyle(.titleAndIcon)
                     .foregroundStyle(.red)
             } else {
-                Label(action.label, systemImage: action.icon)
+                Label(qa.label, systemImage: qa.icon)
                     .labelStyle(.titleAndIcon)
             }
+        case let .openPR(pr):
+            Label(
+                String(format: NSLocalizedString("Open #%d", comment: ""), pr.number),
+                systemImage: "arrow.up.forward"
+            )
+            .labelStyle(.titleAndIcon)
         }
-        .disabled(isDisabled)
-        .help(disabledReason ?? action.label)
-        .accessibilityLabel(action.label)
+    }
+
+    var body: some View {
+        if let primary = primaryAction {
+            let secondary = secondaryActions
+            if secondary.isEmpty {
+                Button { executePrimary(primary) } label: { label(for: primary) }
+                    .disabled(isRunning || primaryDisabled(primary))
+                    .help(primaryHelp(primary))
+            } else {
+                Menu {
+                    ForEach(secondary) { action in
+                        switch action {
+                        case let .quickAction(qa):
+                            Button { runAction(qa) } label: {
+                                Label(qa.label, systemImage: qa.icon)
+                            }
+                            .disabled(isRunning || disabledReason(for: qa) != nil)
+                        case let .openPR(pr):
+                            Button {
+                                if let url = URL(string: pr.url) {
+                                    NSWorkspace.shared.open(url)
+                                }
+                            } label: {
+                                Label(
+                                    String(format: NSLocalizedString("Open #%d", comment: ""), pr.number),
+                                    systemImage: "arrow.up.forward"
+                                )
+                            }
+                        }
+                    }
+                } label: {
+                    label(for: primary)
+                } primaryAction: {
+                    executePrimary(primary)
+                }
+                .disabled(isRunning)
+                .menuIndicator(.hidden)
+                .help(primaryHelp(primary))
+            }
+        }
+    }
+
+    private func primaryDisabled(_ action: PrimaryAction) -> Bool {
+        if case let .quickAction(qa) = action {
+            return disabledReason(for: qa) != nil
+        }
+        return false
+    }
+
+    private func primaryHelp(_ action: PrimaryAction) -> String {
+        if case let .quickAction(qa) = action {
+            return disabledReason(for: qa) ?? qa.label
+        }
+        if case let .openPR(pr) = action {
+            return pr.title
+        }
+        return ""
+    }
+}
+
+/// Represents either a quick action or opening a PR in the browser.
+private enum PrimaryAction: Equatable, Identifiable {
+    case quickAction(QuickAction)
+    case openPR(GitHubPR)
+
+    var id: String {
+        switch self {
+        case let .quickAction(qa): return qa.id
+        case let .openPR(pr): return "openPR-\(pr.number)"
+        }
     }
 }
 

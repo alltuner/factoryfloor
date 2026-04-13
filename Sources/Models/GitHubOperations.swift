@@ -12,7 +12,7 @@ struct GitHubRepoInfo {
     let openIssues: Int
 }
 
-struct GitHubPR {
+struct GitHubPR: Equatable {
     let number: Int
     let title: String
     let state: String
