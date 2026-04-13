@@ -177,7 +177,7 @@ Current shortcuts:
 - **Cmd+Return**: Focus Coding Agent
 - **Cmd+T**: New Terminal
 - **Cmd+B**: New Browser
-- **Cmd+E**: New Editor
+- **Cmd+O**: New Editor
 - **Cmd+S**: Save (Editor)
 - **Cmd+Shift+S**: Save As (Editor)
 - **Cmd+W**: Close tab

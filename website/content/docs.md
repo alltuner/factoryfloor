@@ -70,7 +70,7 @@ The UI shows up instantly — worktree creation happens in the background.
 - **Environment** — setup and run script controls
 - **Terminal** (⌘T) — additional terminal tabs, as many as you want
 - **Browser** (⌘B) — embedded browser with auto-port detection
-- **Editor** (⌘E) — built-in Monaco code editor with syntax highlighting and IntelliSense
+- **Editor** (⌘O) — built-in Monaco code editor with syntax highlighting and IntelliSense
 
 #### Branch auto-rename
 
@@ -142,7 +142,7 @@ The browser shows a connection error page with a retry button if the server isn'
 
 ### The Editor
 
-Each workstream can have editor tabs (⌘E). The editor is Monaco — the same engine that powers VS Code.
+Each workstream can have editor tabs (⌘O). The editor is Monaco — the same engine that powers VS Code.
 
 
 ### Keyboard Shortcuts
@@ -171,7 +171,7 @@ Factory Floor is keyboard-first. Here's everything.
 | ⌘Return | Focus Coding Agent |
 | ⌘T | New Terminal |
 | ⌘B | New Browser |
-| ⌘E | New Editor |
+| ⌘O | New Editor |
 | ⌘S | Save (Editor) |
 | ⌘Shift+S | Save As (Editor) |
 | ⌘W | Close tab |
@@ -329,7 +329,7 @@ Enable **Bleeding edge updates** in Settings > Advanced for pre-release builds. 
 
 ### Full IDE
 
-Nope. There's a built-in editor (⌘E) for quick looks and small edits — but we're not building an IDE. For serious editing sessions, you should be using the tools you already love: [Zed](https://zed.dev), [VS Code](https://code.visualstudio.com), whatever. Factory Floor gives you a coding agent, a browser, a worktree, and just enough editor to not have to leave. Besides, who's writing code anymore?
+Nope. There's a built-in editor (⌘O) for quick looks and small edits — but we're not building an IDE. For serious editing sessions, you should be using the tools you already love: [Zed](https://zed.dev), [VS Code](https://code.visualstudio.com), whatever. Factory Floor gives you a coding agent, a browser, a worktree, and just enough editor to not have to leave. Besides, who's writing code anymore?
 
 ### Merge Viewer
 
