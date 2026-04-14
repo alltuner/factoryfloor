@@ -556,6 +556,32 @@ enum GitOperations {
             .trimmingCharacters(in: .whitespacesAndNewlines)
     }
 
+    // MARK: - Diff fingerprint (cache invalidation)
+
+    /// Fast fingerprint for the Changes view cache. Combines HEAD SHA with a
+    /// hash of `git diff --stat` so we can detect both committed and uncommitted
+    /// changes in ~10ms without reading file contents.
+    static func diffFingerprint(worktreePath: String, projectPath: String, mode: String) -> String {
+        let head = run(args: ["rev-parse", "HEAD"], in: worktreePath)?
+            .trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
+
+        let stat: String
+        if mode == "branch" {
+            let base = mergeBase(worktreePath: worktreePath, projectPath: projectPath) ?? "HEAD"
+            stat = run(args: ["diff", "--stat", base], in: worktreePath) ?? ""
+        } else {
+            // Uncommitted mode: diff against HEAD + untracked file list
+            let tracked = run(args: ["diff", "--stat", "HEAD"], in: worktreePath) ?? ""
+            let untracked = run(args: ["ls-files", "--others", "--exclude-standard"], in: worktreePath) ?? ""
+            stat = tracked + untracked
+        }
+
+        // Simple hash: combine head + stat length + first 200 chars of stat
+        // This is fast and sufficient — we don't need cryptographic strength,
+        // just enough to detect changes between tab visits.
+        return "\(head)|\(stat.count)|\(stat.prefix(200).hashValue)"
+    }
+
     // MARK: - Private
 
     /// Fetch the default branch from origin. Fails silently when there is no

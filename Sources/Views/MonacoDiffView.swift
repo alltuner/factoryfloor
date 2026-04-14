@@ -20,6 +20,20 @@ final class MonacoDiffBridge {
     /// Called when JS has finished computing all diffs and the view is fully rendered.
     var onContentReady: (() -> Void)?
 
+    /// Git fingerprint from the last successful setFiles() call.
+    /// Used by ChangesView to skip reloading when nothing changed.
+    var lastFingerprint: String?
+
+    /// The mode (branch/uncommitted) that was active for the last load.
+    var lastMode: String?
+
+    /// Number of files from the last setFiles() call.
+    /// Stored here (not @State) so it survives view re-creation on tab switch.
+    var lastFileCount = 0
+
+    /// Whether setFiles() has been called at least once (cached content exists in the WKWebView).
+    private(set) var hasContent = false
+
     // MARK: - WebView lifecycle
 
     func ensureWebView() -> EditorWebView {
@@ -59,6 +73,7 @@ final class MonacoDiffBridge {
     /// Set the files to display. Each file has original and modified content,
     /// plus optional review guide annotations and reason.
     func setFiles(_ files: [[String: Any]], reviewGuide: [String: String]? = nil) {
+        hasContent = true
         enqueue {
             guard let webView = self.webView else { return }
             guard let jsonData = try? JSONSerialization.data(withJSONObject: files),
