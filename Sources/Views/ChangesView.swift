@@ -203,8 +203,12 @@ struct ChangesView: View {
 
             DispatchQueue.main.async {
                 fileCount = filesPayload.count
+                // Defer hiding the loading overlay until JS signals all diffs are rendered.
+                // This prevents the flash of unstyled content (raw text without diff colors).
+                bridge.onContentReady = {
+                    isLoading = false
+                }
                 bridge.setFiles(filesPayload, reviewGuide: reviewMeta)
-                isLoading = false
             }
         }
     }

@@ -16,7 +16,8 @@
       overflow-y: auto;
       background: var(--vscode-editor-background, light-dark(#ffffff, #1e1e1e));
     }
-    /* Hide content until Monaco has applied the theme */
+    /* Hide content until all diff editors have computed their diffs.
+       The loading class stays on until diff.js calls reveal(). */
     body.loading #container {
       opacity: 0;
     }
@@ -25,6 +26,7 @@
       width: 100%;
       min-height: 100%;
       padding-bottom: 32px;
+      transition: opacity 0.12s ease-in;
     }
 
     #empty-state {

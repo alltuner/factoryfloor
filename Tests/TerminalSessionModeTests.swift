@@ -1,8 +1,8 @@
 // ABOUTME: Tests for startup terminal mode resolution.
 // ABOUTME: Verifies tmux-enabled sessions wait for tool detection before launching terminals.
 
-import XCTest
 @testable import FactoryFloor
+import XCTest
 
 final class TerminalSessionModeTests: XCTestCase {
     func testTmuxModeWaitsForToolDetection() {

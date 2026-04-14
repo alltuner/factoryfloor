@@ -20,6 +20,22 @@ const PADDING_LINES = 2
 // Disposables for annotation zone listeners (cleaned up in clearDiffs)
 let activeDisposables = []
 
+// --- Reveal control ---
+// Keep the page hidden (opacity: 0 via .loading class) until all diff editors
+// have computed their diffs. This prevents the jarring flash of unstyled content
+// (raw text without diff colors/folding) that occurs when Monaco is visible
+// before diff computation finishes.
+let revealed = false
+let revealTimer = null
+
+function reveal() {
+  if (revealed) return
+  revealed = true
+  if (revealTimer) { clearTimeout(revealTimer); revealTimer = null }
+  document.body.classList.remove('loading')
+  postToSwift({ type: 'contentReady' })
+}
+
 function statusLabel(status) {
   switch (status) {
     case 'A': return 'A'
@@ -79,13 +95,27 @@ function clearDiffs() {
  * @param {Array<{filePath: string, status: string, languageId: string, originalText: string, modifiedText: string}>} files
  */
 function setFiles(files, reviewGuide) {
+  // Reset reveal state and re-apply loading mask (hides content during rendering)
+  revealed = false
+  if (revealTimer) { clearTimeout(revealTimer); revealTimer = null }
+  document.body.classList.add('loading')
+
   clearDiffs()
 
   if (!files || files.length === 0) {
     emptyState.classList.add('visible')
+    reveal()
     return
   }
   emptyState.classList.remove('visible')
+
+  // Track pending diff computations — reveal only when all complete
+  let pendingCount = files.length
+
+  // Safety timeout: reveal after 5s even if some diffs haven't completed
+  revealTimer = setTimeout(() => {
+    if (!revealed) reveal()
+  }, 5000)
 
   // Render review guide summary at the top (scrolls with content)
   if (reviewGuide && reviewGuide.title) {
@@ -185,6 +215,11 @@ function setFiles(files, reviewGuide) {
         addAnnotationZones(diffEditor, file.annotations, editorContainer)
       }
       resizeDiffEditor(diffEditor, editorContainer)
+
+      pendingCount--
+      if (pendingCount <= 0) {
+        reveal()
+      }
     })
 
     activeDiffs.push({
@@ -344,6 +379,7 @@ window.diffAPI = {
   clear() {
     clearDiffs()
     emptyState.classList.add('visible')
+    reveal()
   },
 
   setTheme(isDark) {
@@ -358,8 +394,5 @@ window.diffAPI = {
   }
 }
 
-// Signal readiness to Swift
+// Signal readiness to Swift (JS API available, but content not yet rendered)
 postToSwift({ type: 'ready' })
-
-// Reveal after theme is painted
-setTimeout(() => document.body.classList.remove('loading'))

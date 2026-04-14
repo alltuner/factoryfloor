@@ -17,6 +17,9 @@ final class MonacoDiffBridge {
     private var coordinator: Coordinator?
     private var appearanceObserver: NSKeyValueObservation?
 
+    /// Called when JS has finished computing all diffs and the view is fully rendered.
+    var onContentReady: (() -> Void)?
+
     // MARK: - WebView lifecycle
 
     func ensureWebView() -> EditorWebView {
@@ -153,6 +156,8 @@ final class MonacoDiffBridge {
                 switch type {
                 case "ready":
                     self.bridge.markReady()
+                case "contentReady":
+                    self.bridge.onContentReady?()
                 case "error":
                     if let msg = body["message"] as? String {
                         print("[MonacoDiff] JS error: \(msg)")

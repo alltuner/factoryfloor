@@ -100,7 +100,7 @@ enum FFDesign {
         static let gitModified = Color(red: 0.886, green: 0.753, blue: 0.553) // #E2C08D
         static let gitUntracked = Color(red: 0.451, green: 0.788, blue: 0.569) // #73C991
 
-        // Update banner
+        /// Update banner
         static let updateBanner = Color(nsColor: NSColor(red: 0.55, green: 0.15, blue: 0.2, alpha: 1.0))
     }
 }
