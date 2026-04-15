@@ -135,6 +135,10 @@ enum GitOperations {
 
         addExcludeEntry(at: projectPath, pattern: ".factoryfloor-state/")
 
+        // Pre-create .factoryfloor-state directory so agent prompts can write directly
+        let stateDir = worktreeDir.appendingPathComponent(".factoryfloor-state", isDirectory: true)
+        try? FileManager.default.createDirectory(at: stateDir, withIntermediateDirectories: true)
+
         return worktreeDir.path
     }
 
@@ -424,6 +428,160 @@ enum GitOperations {
         return result
     }
 
+    // MARK: - Branch diff (for Changes view)
+
+    /// A single file changed between the current branch and the base branch.
+    struct DiffFile {
+        enum Status: String {
+            case added = "A"
+            case modified = "M"
+            case deleted = "D"
+            case renamed = "R"
+        }
+
+        let relativePath: String
+        let status: Status
+    }
+
+    /// List files changed between the worktree HEAD and the merge-base with the default branch.
+    /// Returns an empty array on failure or if there are no changes.
+    static func branchDiffFiles(worktreePath: String, projectPath: String) -> [DiffFile] {
+        let base = defaultBranch(at: projectPath)
+
+        // Find the merge-base so we only see the branch's own changes
+        guard let mergeBase = run(args: ["merge-base", base, "HEAD"], in: worktreePath)?
+            .trimmingCharacters(in: .whitespacesAndNewlines),
+            !mergeBase.isEmpty
+        else {
+            return []
+        }
+
+        // --diff-filter=AMDR: added, modified, deleted, renamed
+        // Include working tree changes by diffing merge-base against working tree (no HEAD)
+        guard let output = run(
+            args: ["diff", "--name-status", "--diff-filter=AMDR", "-M", mergeBase],
+            in: worktreePath
+        ) else {
+            return []
+        }
+
+        var files: [DiffFile] = []
+        for line in output.components(separatedBy: "\n") {
+            let trimmed = line.trimmingCharacters(in: .whitespaces)
+            guard !trimmed.isEmpty else { continue }
+
+            let parts = trimmed.split(separator: "\t", maxSplits: 2)
+            guard parts.count >= 2 else { continue }
+
+            let statusChar = parts[0].prefix(1)
+            let filePath: String
+            if parts.count >= 3 {
+                // Rename: "R100\told\tnew" — use the new path
+                filePath = String(parts[2])
+            } else {
+                filePath = String(parts[1])
+            }
+
+            let status: DiffFile.Status
+            switch statusChar {
+            case "A": status = .added
+            case "D": status = .deleted
+            case "R": status = .renamed
+            default: status = .modified
+            }
+            files.append(DiffFile(relativePath: filePath, status: status))
+        }
+
+        return files.sorted { $0.relativePath < $1.relativePath }
+    }
+
+    /// List uncommitted changes (staged + unstaged + untracked, compared to HEAD).
+    static func uncommittedDiffFiles(at path: String) -> [DiffFile] {
+        // Tracked files: diff HEAD against working tree
+        guard let output = run(
+            args: ["diff", "--name-status", "--diff-filter=AMDR", "-M", "HEAD"],
+            in: path
+        ) else {
+            return []
+        }
+
+        var files: [DiffFile] = []
+        for line in output.components(separatedBy: "\n") {
+            let trimmed = line.trimmingCharacters(in: .whitespaces)
+            guard !trimmed.isEmpty else { continue }
+
+            let parts = trimmed.split(separator: "\t", maxSplits: 2)
+            guard parts.count >= 2 else { continue }
+
+            let statusChar = parts[0].prefix(1)
+            let filePath: String
+            if parts.count >= 3 {
+                filePath = String(parts[2])
+            } else {
+                filePath = String(parts[1])
+            }
+
+            let status: DiffFile.Status
+            switch statusChar {
+            case "A": status = .added
+            case "D": status = .deleted
+            case "R": status = .renamed
+            default: status = .modified
+            }
+            files.append(DiffFile(relativePath: filePath, status: status))
+        }
+
+        // Untracked files show as added
+        if let untracked = run(args: ["ls-files", "--others", "--exclude-standard"], in: path) {
+            for line in untracked.components(separatedBy: "\n") {
+                let trimmed = line.trimmingCharacters(in: .whitespaces)
+                guard !trimmed.isEmpty else { continue }
+                files.append(DiffFile(relativePath: trimmed, status: .added))
+            }
+        }
+
+        return files.sorted { $0.relativePath < $1.relativePath }
+    }
+
+    /// Get the content of a file at a specific git ref (e.g. merge-base commit).
+    /// Returns nil if the file doesn't exist at that ref.
+    static func fileContent(at path: String, ref: String, filePath: String) -> String? {
+        return run(args: ["show", "\(ref):\(filePath)"], in: path)
+    }
+
+    /// Get the merge-base commit between HEAD and the default branch.
+    static func mergeBase(worktreePath: String, projectPath: String) -> String? {
+        let base = defaultBranch(at: projectPath)
+        return run(args: ["merge-base", base, "HEAD"], in: worktreePath)?
+            .trimmingCharacters(in: .whitespacesAndNewlines)
+    }
+
+    // MARK: - Diff fingerprint (cache invalidation)
+
+    /// Fast fingerprint for the Changes view cache. Combines HEAD SHA with a
+    /// hash of `git diff --stat` so we can detect both committed and uncommitted
+    /// changes in ~10ms without reading file contents.
+    static func diffFingerprint(worktreePath: String, projectPath: String, mode: String) -> String {
+        let head = run(args: ["rev-parse", "HEAD"], in: worktreePath)?
+            .trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
+
+        let stat: String
+        if mode == "branch" {
+            let base = mergeBase(worktreePath: worktreePath, projectPath: projectPath) ?? "HEAD"
+            stat = run(args: ["diff", "--stat", base], in: worktreePath) ?? ""
+        } else {
+            // Uncommitted mode: diff against HEAD + untracked file list
+            let tracked = run(args: ["diff", "--stat", "HEAD"], in: worktreePath) ?? ""
+            let untracked = run(args: ["ls-files", "--others", "--exclude-standard"], in: worktreePath) ?? ""
+            stat = tracked + untracked
+        }
+
+        // Simple hash: combine head + stat length + first 200 chars of stat
+        // This is fast and sufficient — we don't need cryptographic strength,
+        // just enough to detect changes between tab visits.
+        return "\(head)|\(stat.count)|\(stat.prefix(200).hashValue)"
+    }
+
     // MARK: - Private
 
     /// Fetch the default branch from origin. Fails silently when there is no
@@ -504,14 +662,17 @@ enum GitOperations {
         process.standardError = errPipe
         do {
             try process.run()
-            process.waitUntilExit()
+            // Read pipe data BEFORE waitUntilExit to prevent deadlock when
+            // output exceeds the ~64 KB macOS pipe buffer (e.g. git show on
+            // large files). The reads block until the process closes each fd.
+            let data = pipe.fileHandleForReading.readDataToEndOfFile()
             let errData = errPipe.fileHandleForReading.readDataToEndOfFile()
-            let errStr = String(data: errData, encoding: .utf8) ?? ""
+            process.waitUntilExit()
             guard process.terminationStatus == 0 else {
+                let errStr = String(data: errData, encoding: .utf8) ?? ""
                 logger.warning("[FF] git \(args.joined(separator: " "), privacy: .public) failed (exit \(process.terminationStatus, privacy: .public)): \(errStr, privacy: .public)")
                 return nil
             }
-            let data = pipe.fileHandleForReading.readDataToEndOfFile()
             return String(data: data, encoding: .utf8)
         } catch {
             logger.warning("[FF] git \(args.joined(separator: " "), privacy: .public) threw: \(error, privacy: .public)")

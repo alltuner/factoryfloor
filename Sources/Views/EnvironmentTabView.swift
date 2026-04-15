@@ -259,6 +259,7 @@ struct EnvironmentTabView: View {
                 bypassPermissions: false,
                 agentTeams: false,
                 autoRenameBranch: false,
+                reviewGuide: false,
                 allowOutsideWorktree: false
             ),
             shell: CommandBuilder.userShell

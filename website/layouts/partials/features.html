@@ -9,10 +9,13 @@
       {{ $features := slice
         (dict "icon" "&#9735;" "title" (T "feat_worktrees_title") "desc" (T "feat_worktrees_desc"))
         (dict "icon" "&#9672;" "title" (T "feat_claude_title") "desc" (T "feat_claude_desc"))
+        (dict "icon" "&#10070;" "title" (T "feat_review_title") "desc" (T "feat_review_desc"))
         (dict "icon" "&#9638;" "title" (T "feat_tmux_title") "desc" (T "feat_tmux_desc"))
         (dict "icon" "&#9881;" "title" (T "feat_scripts_title") "desc" (T "feat_scripts_desc"))
         (dict "icon" "&#9741;" "title" (T "feat_browser_title") "desc" (T "feat_browser_desc"))
         (dict "icon" "&#10022;" "title" (T "feat_github_title") "desc" (T "feat_github_desc"))
+        (dict "icon" "&#9998;" "title" (T "feat_editor_title") "desc" (T "feat_editor_desc"))
+        (dict "icon" "&#10023;" "title" (T "feat_soon_title") "desc" (T "feat_soon_desc"))
       }}
       {{ range $features }}
       <div class="p-8 bg-bg transition-colors hover:bg-bg-surface">

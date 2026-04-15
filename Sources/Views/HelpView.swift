@@ -86,15 +86,14 @@ struct HelpView: View {
                     }
 
                     Section {
-                        ShortcutRow(keys: "1", description: "Info")
-                        ShortcutRow(keys: "2", description: "Coding Agent")
-                        ShortcutRow(keys: "3-9", description: "Switch tab")
+                        ShortcutRow(keys: "1-9", description: "Switch tab")
                         ShortcutRow(keys: "[", shift: true, description: "Previous tab")
                         ShortcutRow(keys: "]", shift: true, description: "Next tab")
                         ShortcutRow(keys: "Return", description: "Focus Coding Agent")
                         ShortcutRow(keys: "T", description: "New Terminal")
                         ShortcutRow(keys: "B", description: "New Browser")
-                        ShortcutRow(keys: "O", description: "New Editor")
+                        ShortcutRow(keys: "E", description: "New Editor")
+                        ShortcutRow(keys: "D", description: "Changes")
                         ShortcutRow(keys: "S", description: "Save (Editor)")
                         ShortcutRow(keys: "S", shift: true, description: "Save As (Editor)")
                         ShortcutRow(keys: "W", description: "Close tab")

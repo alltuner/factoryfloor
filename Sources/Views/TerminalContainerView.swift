@@ -20,17 +20,21 @@ extension Notification.Name {
     static let toggleEditor = Notification.Name("factoryfloor.toggleEditor")
     static let saveEditor = Notification.Name("factoryfloor.saveEditor")
     static let saveEditorAs = Notification.Name("factoryfloor.saveEditorAs")
+    static let toggleChanges = Notification.Name("factoryfloor.toggleChanges")
 }
 
 enum RestorableWorkspaceTab: String, Codable {
     case info
     case agent
     case environment
+    case changes
 
     init(activeTab: WorkspaceTab) {
         switch activeTab {
         case .agent:
             self = .agent
+        case .changes:
+            self = .changes
         case .info, .terminal, .browser, .editor:
             self = .info
         }
@@ -42,6 +46,8 @@ enum RestorableWorkspaceTab: String, Codable {
             return .info
         case .agent:
             return .agent
+        case .changes:
+            return .changes
         }
     }
 }
@@ -122,13 +128,14 @@ func reorderedCustomTabs(_ tabs: [WorkspaceTab], dragging draggedTab: WorkspaceT
 enum WorkspaceTab: Hashable {
     case info
     case agent
+    case changes
     case terminal(UUID)
     case browser(UUID)
     case editor(UUID)
 
     var isCloseable: Bool {
         switch self {
-        case .info, .agent: return false
+        case .info, .agent, .changes: return false
         case .terminal, .browser, .editor: return true
         }
     }
@@ -173,24 +180,17 @@ struct WorkspaceTabSnapshot {
 }
 
 func startupWorkspaceTabState(snapshot: WorkspaceTabSnapshot?, savedTab: RestorableWorkspaceTab?) -> WorkspaceTabSnapshot {
-    if let snapshot {
-        // Filter out any persisted environment tabs from before the merge
-        let filteredTabs = snapshot.tabs.filter { tab in
-            if case .info = tab { return true }
-            if case .agent = tab { return true }
-            if case .terminal = tab { return true }
-            if case .browser = tab { return true }
-            return false
+    if var snapshot {
+        // Ensure changes tab is present (added in a later version)
+        if !snapshot.tabs.contains(.changes) {
+            let insertIndex = snapshot.tabs.firstIndex(of: .agent).map { $0 + 1 }
+                ?? min(2, snapshot.tabs.count)
+            snapshot.tabs.insert(.changes, at: insertIndex)
         }
-        var cleaned = snapshot
-        cleaned.tabs = filteredTabs
-        if !cleaned.tabs.contains(cleaned.activeTab) {
-            cleaned.activeTab = .info
-        }
-        return cleaned
+        return snapshot
     }
 
-    let tabs: [WorkspaceTab] = [.info, .agent]
+    let tabs: [WorkspaceTab] = [.info, .agent, .changes]
     return WorkspaceTabSnapshot(
         tabs: tabs,
         terminalCount: 0,
@@ -269,6 +269,7 @@ struct TerminalContainerView: View {
     @AppStorage("factoryfloor.tmuxMode") private var tmuxMode: Bool = false
     @AppStorage("factoryfloor.agentTeams") private var agentTeams: Bool = false
     @AppStorage("factoryfloor.autoRenameBranch") private var autoRenameBranch: Bool = false
+    @AppStorage("factoryfloor.reviewGuide") private var reviewGuide: Bool = true
     @AppStorage("factoryfloor.allowOutsideWorktree") private var allowOutsideWorktree: Bool = false
     @AppStorage("factoryfloor.quickActionDebug") private var quickActionDebug: Bool = false
     @AppStorage("factoryfloor.editorTabActive") private var editorTabActive: Bool = false
@@ -284,6 +285,7 @@ struct TerminalContainerView: View {
     @State private var editorFilePaths: [UUID: String] = [:]
     @State private var editorDirtyState: [UUID: Bool] = [:]
     @State private var editorBridge: MonacoEditorBridge?
+    @State private var diffBridge: MonacoDiffBridge?
     @State private var fileTree: [FileNode] = []
     @State private var gitFileStatuses = GitFileStatusProvider()
     @State private var directoryWatcher: DirectoryWatcher?
@@ -360,7 +362,7 @@ struct TerminalContainerView: View {
             }
             return [claudeID]
         case let .terminal(id): return [id]
-        case .info, .browser, .editor: return []
+        case .info, .browser, .editor, .changes: return []
         }
     }
 
@@ -408,6 +410,9 @@ struct TerminalContainerView: View {
         }
         if autoRenameBranch {
             systemPromptParts.append(SystemPrompts.autoRenameBranchPrompt)
+        }
+        if reviewGuide {
+            systemPromptParts.append(SystemPrompts.reviewGuidePrompt)
         }
         let combinedSystemPrompt = systemPromptParts.isEmpty ? nil : systemPromptParts.joined(separator: "\n\n")
 
@@ -465,6 +470,7 @@ struct TerminalContainerView: View {
                 bypassPermissions: bypassPermissions,
                 agentTeams: agentTeams,
                 autoRenameBranch: autoRenameBranch,
+                reviewGuide: reviewGuide,
                 allowOutsideWorktree: allowOutsideWorktree
             ),
             shell: CommandBuilder.userShell
@@ -660,6 +666,17 @@ struct TerminalContainerView: View {
                 ProgressView()
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
             }
+        case .changes:
+            if let bridge = diffBridge {
+                ChangesView(
+                    workingDirectory: workingDirectory,
+                    projectDirectory: projectDirectory,
+                    bridge: bridge
+                )
+            } else {
+                ProgressView()
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+            }
         }
     }
 
@@ -697,6 +714,10 @@ struct TerminalContainerView: View {
             .onReceive(NotificationCenter.default.publisher(for: .toggleEditor)) { _ in
                 guard isActive else { return }
                 openEditor()
+            }
+            .onReceive(NotificationCenter.default.publisher(for: .toggleChanges)) { _ in
+                guard isActive else { return }
+                addChanges()
             }
             .onReceive(NotificationCenter.default.publisher(for: .closeTerminal)) { _ in
                 guard isActive else { return }
@@ -875,6 +896,7 @@ struct TerminalContainerView: View {
             guard let path = editorFilePaths[id] else { return nil }
             let name = (path as NSString).lastPathComponent
             return name.count > 20 ? String(name.prefix(20)) + "..." : name
+        case .changes: return NSLocalizedString("Changes", comment: "")
         }
     }
 
@@ -885,6 +907,7 @@ struct TerminalContainerView: View {
         case .terminal: return "terminal"
         case .browser: return "globe"
         case .editor: return "doc.text"
+        case .changes: return "arrow.triangle.branch"
         }
     }
 
@@ -910,6 +933,8 @@ struct TerminalContainerView: View {
             return "info"
         case .agent:
             return "agent"
+        case .changes:
+            return "changes"
         }
     }
 
@@ -948,6 +973,15 @@ struct TerminalContainerView: View {
         activeTab = tab
         startFileTreeWatcherIfNeeded()
         saveTabSnapshot()
+    }
+
+    private func addChanges() {
+        activeTab = .changes
+    }
+
+    private func createDiffBridgeIfNeeded() {
+        guard diffBridge == nil else { return }
+        diffBridge = MonacoDiffBridge()
     }
 
     private func startFileTreeWatcherIfNeeded() {
@@ -1155,6 +1189,7 @@ struct TerminalContainerView: View {
         // an editor tab. The WKWebView is created lazily when MonacoEditorView
         // enters the tree (it needs a real container to avoid 0x0 initialization).
         createEditorBridgeIfNeeded()
+        createDiffBridgeIfNeeded()
         surfaceCache.updateOcclusion(visibleSurfaceIDs: visibleSurfaceIDs)
     }
 

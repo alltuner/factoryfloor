@@ -55,10 +55,22 @@ other = "Configure setup, run, and teardown scripts per project via .factoryfloo
 other = "Embedded Browser"
 [feat_browser_desc]
 other = "Embedded browser with auto-port detection. The run script's listening port is detected automatically and the browser navigates to it. Preview your app without leaving the workspace."
+[feat_review_title]
+other = "Review Guide"
+[feat_review_desc]
+other = "Review changes with confidence. The agent explains its reasoning with reading order and inline annotations across every worktree."
+[feat_editor_title]
+other = "Code Editor"
+[feat_editor_desc]
+other = "Built-in Monaco editor with syntax highlighting and language support. Quick edits without leaving the workspace."
 [feat_github_title]
 other = "GitHub Integration"
 [feat_github_desc]
 other = "See repo info, open PRs, and branch PR status directly in the project view. Powered by the gh CLI."
+[feat_soon_title]
+other = "More to come"
+[feat_soon_desc]
+other = "New features are in the works."
 
 # How it works
 [how_label]
