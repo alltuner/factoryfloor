@@ -33,7 +33,9 @@ enum TmuxSession {
         set -g history-limit 50000
         set -g escape-time 0
         set -g allow-passthrough on
+        set -g extended-keys on
         set -g default-terminal "xterm-256color"
+        set -ga terminal-features ',*:extkeys'
         set -ga terminal-overrides ',*:smcup@:rmcup@'
         set -g alternate-screen off
         set -g aggressive-resize on
