@@ -187,6 +187,9 @@ final class TerminalView: NSView {
             ghostty_surface_set_display_id(surface, screen.displayID)
         }
 
+        // Use backingScaleFactor directly here — the frame may still be the
+        // init placeholder (800×600) before Auto Layout runs, so deriving
+        // scale via convertToBacking(frame) would be unreliable.
         let scale = window?.backingScaleFactor ?? NSScreen.main?.backingScaleFactor ?? 2.0
         ghostty_surface_set_content_scale(surface, scale, scale)
 
@@ -225,9 +228,7 @@ final class TerminalView: NSView {
 
         // Scale changed so the framebuffer size changed — re-report.
         if contentSize.width > 0, contentSize.height > 0 {
-            let saved = contentSize
-            contentSize = .zero // reset so notifySizeChanged doesn't early-out
-            notifySizeChanged(saved)
+            reportSizeToSurface(contentSize)
         }
     }
 
@@ -264,13 +265,18 @@ final class TerminalView: NSView {
         ghostty_surface_set_occlusion(surface, visible)
     }
 
-    /// Notify the Ghostty surface of a size change.
-    /// Uses `convertToBacking()` for robust coordinate conversion, matching
-    /// Ghostty's own `sizeDidChange()` implementation.
+    /// Notify the Ghostty surface of a size change, skipping if the size
+    /// hasn't changed. Uses `convertToBacking()` for robust coordinate
+    /// conversion, matching Ghostty's own `sizeDidChange()` implementation.
     func notifySizeChanged(_ size: CGSize) {
-        guard let surface else { return }
         guard size != contentSize else { return }
         contentSize = size
+        reportSizeToSurface(size)
+    }
+
+    /// Push the framebuffer size to Ghostty unconditionally (no dedup).
+    private func reportSizeToSurface(_ size: CGSize) {
+        guard let surface else { return }
         let scaledSize = convertToBacking(size)
         let w = UInt32(scaledSize.width)
         let h = UInt32(scaledSize.height)
