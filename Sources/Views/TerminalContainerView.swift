@@ -1756,13 +1756,16 @@ struct SingleTerminalView: View {
                 surfaceCache.retrySurface(for: surfaceID)
             }
         } else {
-            TerminalSurfaceView(
-                surfaceID: surfaceID,
-                workingDirectory: workingDirectory,
-                command: command,
-                isFocused: isFocused,
-                environmentVars: environmentVars
-            )
+            GeometryReader { geo in
+                TerminalSurfaceView(
+                    surfaceID: surfaceID,
+                    workingDirectory: workingDirectory,
+                    command: command,
+                    isFocused: isFocused,
+                    environmentVars: environmentVars,
+                    size: geo.size
+                )
+            }
         }
     }
 }
@@ -1798,6 +1801,7 @@ private struct TerminalSurfaceView: NSViewRepresentable {
     var command: String?
     var isFocused: Bool = true
     var environmentVars: [String: String] = [:]
+    var size: CGSize
 
     @EnvironmentObject var surfaceCache: TerminalSurfaceCache
 
@@ -1829,6 +1833,14 @@ private struct TerminalSurfaceView: NSViewRepresentable {
                 terminalView.leadingAnchor.constraint(equalTo: container.leadingAnchor),
                 terminalView.trailingAnchor.constraint(equalTo: container.trailingAnchor),
             ])
+        }
+
+        // Explicitly push the SwiftUI-measured size to the Ghostty surface.
+        // SwiftUI does not reliably call NSView.setFrameSize on resize
+        // (see Ghostty SurfaceView.swift:613-616), so we drive it from
+        // the GeometryReader instead.
+        if terminalView.window != nil {
+            terminalView.notifySizeChanged(size)
         }
 
         if isFocused {

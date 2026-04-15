@@ -22,6 +22,10 @@ final class TerminalView: NSView {
 
     private(set) nonisolated(unsafe) var surface: ghostty_surface_t?
     nonisolated(unsafe) var workstreamID: UUID?
+    /// Last logical (point) size reported to the surface. Stored so
+    /// `viewDidChangeBackingProperties` can re-report the correct framebuffer
+    /// size after a scale factor change.
+    private var contentSize: CGSize = .zero
     private var trackingArea: NSTrackingArea?
     private var markedText = NSMutableAttributedString()
     private var keyTextAccumulator: [String]?
@@ -186,36 +190,50 @@ final class TerminalView: NSView {
         let scale = window?.backingScaleFactor ?? NSScreen.main?.backingScaleFactor ?? 2.0
         ghostty_surface_set_content_scale(surface, scale, scale)
 
+        if let window {
+            layer?.contentsScale = window.backingScaleFactor
+        }
+
         // Defer size reporting to let Auto Layout settle first.
         // Without this, surfaces added dynamically (e.g., new terminal splits)
         // report the init frame (800x600) instead of their actual layout size.
         DispatchQueue.main.async { [weak self] in
-            guard let self, let surface = self.surface else { return }
-            let currentScale = self.window?.backingScaleFactor ?? 2.0
+            guard let self else { return }
             let size = self.bounds.size
-            let w = UInt32(size.width * currentScale)
-            let h = UInt32(size.height * currentScale)
-            if w > 0, h > 0 {
-                ghostty_surface_set_size(surface, w, h)
+            if size.width > 0, size.height > 0 {
+                self.notifySizeChanged(size)
             }
         }
     }
 
     override func viewDidChangeBackingProperties() {
         super.viewDidChangeBackingProperties()
+
+        if let window {
+            CATransaction.begin()
+            CATransaction.setDisableActions(true)
+            layer?.contentsScale = window.backingScaleFactor
+            CATransaction.commit()
+        }
+
         guard let surface else { return }
-        let scale = window?.backingScaleFactor ?? 2.0
-        ghostty_surface_set_content_scale(surface, scale, scale)
+
+        let fbFrame = convertToBacking(frame)
+        let xScale = frame.size.width > 0 ? fbFrame.size.width / frame.size.width : 1.0
+        let yScale = frame.size.height > 0 ? fbFrame.size.height / frame.size.height : 1.0
+        ghostty_surface_set_content_scale(surface, xScale, yScale)
+
+        // Scale changed so the framebuffer size changed — re-report.
+        if contentSize.width > 0, contentSize.height > 0 {
+            let saved = contentSize
+            contentSize = .zero // reset so notifySizeChanged doesn't early-out
+            notifySizeChanged(saved)
+        }
     }
 
     override func setFrameSize(_ newSize: NSSize) {
         super.setFrameSize(newSize)
-        guard let surface else { return }
-        let scale = window?.backingScaleFactor ?? NSScreen.main?.backingScaleFactor ?? 2.0
-        let w = UInt32(newSize.width * scale)
-        let h = UInt32(newSize.height * scale)
-        guard w > 0, h > 0 else { return }
-        ghostty_surface_set_size(surface, w, h)
+        notifySizeChanged(newSize)
     }
 
     override func updateTrackingAreas() {
@@ -244,6 +262,20 @@ final class TerminalView: NSView {
     func setVisible(_ visible: Bool) {
         guard let surface else { return }
         ghostty_surface_set_occlusion(surface, visible)
+    }
+
+    /// Notify the Ghostty surface of a size change.
+    /// Uses `convertToBacking()` for robust coordinate conversion, matching
+    /// Ghostty's own `sizeDidChange()` implementation.
+    func notifySizeChanged(_ size: CGSize) {
+        guard let surface else { return }
+        guard size != contentSize else { return }
+        contentSize = size
+        let scaledSize = convertToBacking(size)
+        let w = UInt32(scaledSize.width)
+        let h = UInt32(scaledSize.height)
+        guard w > 0, h > 0 else { return }
+        ghostty_surface_set_size(surface, w, h)
     }
 
     func surfaceClosed() {
