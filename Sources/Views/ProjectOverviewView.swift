@@ -271,7 +271,7 @@ struct ProjectOverviewView: View {
 
     private var prunableWorktrees: [WorktreeInfo] {
         return worktrees.filter { worktree in
-            guard !worktree.isMain, !worktree.isDirty, !worktree.hasBranchCommits else { return false }
+            guard !worktree.isMain && !worktree.isDirty && !worktree.hasBranchCommits else { return false }
             return !workstreamPaths.contains(Self.standardizedPath(worktree.path))
         }
     }

@@ -23,15 +23,11 @@ func derivedUUID(from base: UUID, salt: String) -> UUID {
 }
 
 extension String: @retroactive Identifiable {
-    public var id: String {
-        self
-    }
+    public var id: String { self }
 }
 
 extension UUID: @retroactive Identifiable {
-    public var id: UUID {
-        self
-    }
+    public var id: UUID { self }
 }
 
 extension String {

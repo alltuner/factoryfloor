@@ -1,17 +1,17 @@
 // ABOUTME: Shared run-state types for ff-run and the app-side port monitor.
 // ABOUTME: Encodes detected localhost ports, selection rules, and state-file persistence.
 
-import Darwin
 import Foundation
+import Darwin
 
-enum RunStateStatus: String, Codable {
+enum RunStateStatus: String, Codable, Sendable {
     case starting
     case running
     case stopped
     case crashed
 }
 
-struct RunStateSnapshot: Codable {
+struct RunStateSnapshot: Codable, Sendable {
     let pid: Int32
     let status: RunStateStatus
     let detectedPorts: [Int]
@@ -19,12 +19,12 @@ struct RunStateSnapshot: Codable {
     let startedAt: Date
 }
 
-struct PortSelectionResult {
+struct PortSelectionResult: Sendable {
     let detectedPorts: [Int]
     let selectedPort: Int?
 }
 
-struct PortSelectionTracker {
+struct PortSelectionTracker: Sendable {
     let expectedPort: Int?
     private var lastCandidate: Int?
     private var candidateMatches = 0
@@ -43,9 +43,8 @@ struct PortSelectionTracker {
 
         let candidate = candidatePort(currentPorts: currentPorts)
 
-        if selectedPort == nil,
-           let candidate
-        {
+        if self.selectedPort == nil,
+           let candidate {
             if candidate == lastCandidate {
                 candidateMatches += 1
             } else {
@@ -55,7 +54,7 @@ struct PortSelectionTracker {
             if candidateMatches >= 2 {
                 selectedPort = candidate
             }
-        } else if selectedPort == nil {
+        } else if self.selectedPort == nil {
             lastCandidate = nil
             candidateMatches = 0
         }
@@ -72,8 +71,7 @@ struct PortSelectionTracker {
         }
         if currentPorts.count > 1,
            let expectedPort,
-           currentPorts.contains(expectedPort)
-        {
+           currentPorts.contains(expectedPort) {
             return expectedPort
         }
         return nil
@@ -83,8 +81,7 @@ struct PortSelectionTracker {
         let sortedPorts = currentPorts.sorted()
         guard let preferredPort,
               currentPorts.contains(preferredPort),
-              currentPorts.count > 1
-        else {
+              currentPorts.count > 1 else {
             return sortedPorts
         }
 
@@ -107,8 +104,7 @@ enum RunStateStore {
 
     static func loadValidated(for workstreamID: UUID) -> RunStateSnapshot? {
         guard let state = load(for: workstreamID),
-              isProcessRunning(pid: state.pid)
-        else {
+              isProcessRunning(pid: state.pid) else {
             return nil
         }
         return state
