@@ -89,9 +89,20 @@ enum DependencyInstaller {
             let output = String(data: outData, encoding: .utf8) ?? ""
             let errorOutput = String(data: errData, encoding: .utf8) ?? ""
 
-            let success = process.terminationStatus == 0
+            var success = process.terminationStatus == 0
             if success {
-                logger.info("Dependency install completed successfully")
+                // Verify node_modules was actually created. Some package managers
+                // (notably Yarn v1) can exit 0 even when the install was aborted
+                // (e.g. engine incompatibility), leaving no node_modules behind.
+                let nodeModulesPath = URL(fileURLWithPath: worktreeDir)
+                    .appendingPathComponent("node_modules").path
+                if !FileManager.default.fileExists(atPath: nodeModulesPath) {
+                    success = false
+                    let reason = errorOutput.isEmpty ? output : errorOutput
+                    logger.warning("Install exited 0 but node_modules missing. Output: \(reason.prefix(300), privacy: .public)")
+                } else {
+                    logger.info("Dependency install completed successfully")
+                }
             } else {
                 logger.warning("Dependency install failed (exit \(process.terminationStatus, privacy: .public)): \(errorOutput, privacy: .public)")
             }

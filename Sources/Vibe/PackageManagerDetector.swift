@@ -20,7 +20,8 @@ enum PackageManagerDetector {
         // If config explicitly specifies a package manager, use it
         if let pm = config?.packageManager {
             logger.info("Using package manager from config: \(pm.rawValue, privacy: .public)")
-            return Result(packageManager: pm, installCommand: pm.installCommand)
+            let command = yarnInstallCommand(pm: pm, directory: directory)
+            return Result(packageManager: pm, installCommand: command)
         }
 
         let lockFiles: [(String, VibeConfig.PackageManager)] = [
@@ -34,7 +35,8 @@ enum PackageManagerDetector {
             let path = URL(fileURLWithPath: directory).appendingPathComponent(lockFile).path
             if fm.fileExists(atPath: path) {
                 logger.info("Detected \(pm.rawValue, privacy: .public) from \(lockFile, privacy: .public)")
-                return Result(packageManager: pm, installCommand: pm.installCommand)
+                let command = yarnInstallCommand(pm: pm, directory: directory)
+                return Result(packageManager: pm, installCommand: command)
             }
         }
 
@@ -46,5 +48,27 @@ enum PackageManagerDetector {
         }
 
         return nil
+    }
+
+    /// Return the correct install command for yarn, adjusting flags for Yarn v1 (classic).
+    /// Yarn v1 uses --frozen-lockfile (not --immutable) and needs --ignore-engines
+    /// because engine check failures abort the install but still exit with code 0.
+    private static func yarnInstallCommand(pm: VibeConfig.PackageManager, directory: String) -> [String] {
+        guard pm == .yarn else { return pm.installCommand }
+        let lockPath = URL(fileURLWithPath: directory).appendingPathComponent("yarn.lock").path
+        if isYarnClassic(lockFilePath: lockPath) {
+            logger.info("Detected Yarn v1 (classic), using --frozen-lockfile --ignore-engines")
+            return ["yarn", "install", "--frozen-lockfile", "--ignore-engines"]
+        }
+        return pm.installCommand
+    }
+
+    /// Check whether a yarn.lock file belongs to Yarn v1 (classic) by reading its header.
+    private static func isYarnClassic(lockFilePath: String) -> Bool {
+        guard let handle = FileHandle(forReadingAtPath: lockFilePath) else { return false }
+        defer { handle.closeFile() }
+        let data = handle.readData(ofLength: 64)
+        let header = String(data: data, encoding: .utf8) ?? ""
+        return header.contains("yarn lockfile v1")
     }
 }
