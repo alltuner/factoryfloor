@@ -31,7 +31,7 @@ packages:
     from: "9.10.0"
   Sparkle:
     url: https://github.com/sparkle-project/Sparkle
-    from: "2.9.0"
+    from: "2.9.1"
 
 targets:
   FactoryFloor:
