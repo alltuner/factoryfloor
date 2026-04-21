@@ -15,7 +15,11 @@ final class Telemetry {
     private let hostname = "app.factory-floor.com"
 
     var isEnabled: Bool {
-        UserDefaults.standard.object(forKey: "factoryfloor.telemetryEnabled") as? Bool ?? true
+        #if DEBUG
+            return false
+        #else
+            return UserDefaults.standard.object(forKey: "factoryfloor.telemetryEnabled") as? Bool ?? true
+        #endif
     }
 
     /// Anonymous installation identifier, generated on first launch.
@@ -30,14 +34,15 @@ final class Telemetry {
     }
 
     func trackLaunch() {
-        track("app_launch", url: "/app/launch", data: systemInfo())
+        track("app_launch", url: "/app/launch", title: "App Launch", data: systemInfo())
     }
 
-    func track(_ event: String, url: String = "/app", data: [String: String] = [:]) {
+    func track(_ event: String, url: String = "/app", title: String? = nil, data: [String: String] = [:]) {
         guard isEnabled else { return }
 
         let screen = NSScreen.main?.frame.size
-        let version = AppConstants.version
+        let userAgent = Self.userAgent
+        let id = installationID
 
         Task.detached { [endpoint, websiteID, hostname, logger] in
             var payload: [String: Any] = [
@@ -46,7 +51,12 @@ final class Telemetry {
                 "url": url,
                 "website": websiteID,
                 "name": event,
+                "id": id,
             ]
+
+            if let title {
+                payload["title"] = title
+            }
 
             if let screen {
                 payload["screen"] = "\(Int(screen.width))x\(Int(screen.height))"
@@ -65,8 +75,9 @@ final class Telemetry {
 
             var request = URLRequest(url: endpoint)
             request.httpMethod = "POST"
+            request.timeoutInterval = 5
             request.setValue("application/json", forHTTPHeaderField: "Content-Type")
-            request.setValue("Mozilla/5.0 (Macintosh; macOS) FactoryFloor/\(version)", forHTTPHeaderField: "User-Agent")
+            request.setValue(userAgent, forHTTPHeaderField: "User-Agent")
             request.httpBody = jsonData
 
             do {
@@ -82,17 +93,24 @@ final class Telemetry {
 
     private func systemInfo() -> [String: String] {
         let os = ProcessInfo.processInfo.operatingSystemVersion
-        var info: [String: String] = [
+        return [
             "version": AppConstants.version,
             "os_version": "\(os.majorVersion).\(os.minorVersion).\(os.patchVersion)",
             "locale": Locale.current.identifier,
-            "installation_id": installationID,
         ]
-        #if DEBUG
-            info["build"] = "debug"
-        #else
-            info["build"] = "release"
-        #endif
-        return info
     }
+
+    private static let userAgent: String = {
+        let os = ProcessInfo.processInfo.operatingSystemVersion
+        let osVersion = "\(os.majorVersion).\(os.minorVersion).\(os.patchVersion)"
+        #if arch(arm64)
+            let arch = "arm64"
+        #elseif arch(x86_64)
+            let arch = "x86_64"
+        #else
+            let arch = "unknown"
+        #endif
+        let locale = Locale.current.identifier
+        return "FactoryFloor/\(AppConstants.version) (Macintosh; macOS \(osVersion); \(arch); \(locale))"
+    }()
 }
