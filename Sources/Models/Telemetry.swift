@@ -38,6 +38,7 @@ final class Telemetry {
 
         let screen = NSScreen.main?.frame.size
         let userAgent = Self.userAgent
+        let id = installationID
 
         Task.detached { [endpoint, websiteID, hostname, logger] in
             var payload: [String: Any] = [
@@ -46,6 +47,7 @@ final class Telemetry {
                 "url": url,
                 "website": websiteID,
                 "name": event,
+                "id": id,
             ]
 
             if let title {
@@ -91,7 +93,6 @@ final class Telemetry {
             "version": AppConstants.version,
             "os_version": "\(os.majorVersion).\(os.minorVersion).\(os.patchVersion)",
             "locale": Locale.current.identifier,
-            "installation_id": installationID,
         ]
         #if DEBUG
             info["build"] = "debug"
