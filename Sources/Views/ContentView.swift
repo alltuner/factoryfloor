@@ -412,6 +412,7 @@ struct ContentView: View {
                     ProjectStore.save(projects)
                     appEnvironment.refreshPathValidity(projects: projects)
                     logger.warning("[FF] workstreamWorktreeReady: updated \(workstreamID, privacy: .public) with path \(worktreePath, privacy: .public)")
+                    Telemetry.shared.track("workstream_created", url: "/workstream/create", title: "Workstream Created")
                     return
                 }
             }

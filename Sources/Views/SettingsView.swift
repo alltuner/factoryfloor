@@ -215,6 +215,14 @@ struct SettingsView: View {
                     description: "Coding Agent sessions persist across app restarts. The Terminal tab is not affected. Sessions are lost on system restart."
                 )
                 .disabled(!appEnv.toolStatus.tmux.isInstalled)
+                .onChange(of: tmuxMode) { _, newValue in
+                    Telemetry.shared.track(
+                        "setting_changed",
+                        url: "/settings/tmux-mode",
+                        title: "Tmux Mode Toggled",
+                        data: ["setting": "tmux_mode", "value": newValue ? "on" : "off"]
+                    )
+                }
 
                 if !appEnv.toolStatus.tmux.isInstalled {
                     Text("Requires tmux to be installed.")
