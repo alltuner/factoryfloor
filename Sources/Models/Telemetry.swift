@@ -30,10 +30,10 @@ final class Telemetry {
     }
 
     func trackLaunch() {
-        track("app_launch", url: "/app/launch", data: systemInfo())
+        track("app_launch", url: "/app/launch", title: "App Launch", data: systemInfo())
     }
 
-    func track(_ event: String, url: String = "/app", data: [String: String] = [:]) {
+    func track(_ event: String, url: String = "/app", title: String? = nil, data: [String: String] = [:]) {
         guard isEnabled else { return }
 
         let screen = NSScreen.main?.frame.size
@@ -47,6 +47,10 @@ final class Telemetry {
                 "website": websiteID,
                 "name": event,
             ]
+
+            if let title {
+                payload["title"] = title
+            }
 
             if let screen {
                 payload["screen"] = "\(Int(screen.width))x\(Int(screen.height))"
