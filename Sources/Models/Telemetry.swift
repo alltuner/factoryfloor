@@ -69,6 +69,7 @@ final class Telemetry {
 
             var request = URLRequest(url: endpoint)
             request.httpMethod = "POST"
+            request.timeoutInterval = 5
             request.setValue("application/json", forHTTPHeaderField: "Content-Type")
             request.setValue(userAgent, forHTTPHeaderField: "User-Agent")
             request.httpBody = jsonData
