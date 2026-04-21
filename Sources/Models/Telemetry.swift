@@ -15,7 +15,11 @@ final class Telemetry {
     private let hostname = "app.factory-floor.com"
 
     var isEnabled: Bool {
-        UserDefaults.standard.object(forKey: "factoryfloor.telemetryEnabled") as? Bool ?? true
+        #if DEBUG
+            return false
+        #else
+            return UserDefaults.standard.object(forKey: "factoryfloor.telemetryEnabled") as? Bool ?? true
+        #endif
     }
 
     /// Anonymous installation identifier, generated on first launch.
@@ -89,17 +93,11 @@ final class Telemetry {
 
     private func systemInfo() -> [String: String] {
         let os = ProcessInfo.processInfo.operatingSystemVersion
-        var info: [String: String] = [
+        return [
             "version": AppConstants.version,
             "os_version": "\(os.majorVersion).\(os.minorVersion).\(os.patchVersion)",
             "locale": Locale.current.identifier,
         ]
-        #if DEBUG
-            info["build"] = "debug"
-        #else
-            info["build"] = "release"
-        #endif
-        return info
     }
 
     private static let userAgent: String = {
