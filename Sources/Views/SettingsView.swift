@@ -10,6 +10,7 @@ struct SettingsView: View {
     @AppStorage("factoryfloor.allowOutsideWorktree") private var allowOutsideWorktree: Bool = false
     @AppStorage("factoryfloor.agentTeams") private var agentTeams: Bool = false
     @AppStorage("factoryfloor.autoRenameBranch") private var autoRenameBranch: Bool = false
+    @AppStorage("factoryfloor.reviewGuide") private var reviewGuide: Bool = true
     @AppStorage("factoryfloor.defaultTerminal") private var defaultTerminal: String = ""
     @AppStorage("factoryfloor.defaultBrowser") private var defaultBrowser: String = ""
     @AppStorage("factoryfloor.branchPrefix") private var branchPrefix: String = "ff"
@@ -207,6 +208,12 @@ struct SettingsView: View {
                     "Auto-rename branch",
                     isOn: $autoRenameBranch,
                     description: "On the first request, the agent renames the branch to match the task and writes a short description visible in the sidebar."
+                )
+
+                SettingToggle(
+                    "Review guide",
+                    isOn: $reviewGuide,
+                    description: "The agent maintains a review guide explaining design choices, reading order, and inline annotations visible in the Changes tab."
                 )
 
                 SettingToggle(

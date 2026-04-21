@@ -142,6 +142,8 @@
 "Enables experimental multi-agent coordination. Agents can spawn teammates, delegate tasks, and collaborate across workstreams." = "Aktiverar experimentell multi-agentkoordinering. Agenter kan skapa teammedlemmar, delegera uppgifter och samarbeta mellan arbetsflöden.";
 "Auto-rename branch" = "Byt namn på gren automatiskt";
 "On the first request, the agent renames the branch to match the task and writes a short description visible in the sidebar." = "Vid den första förfrågan byter agenten namn på grenen för att matcha uppgiften och skriver en kort beskrivning synlig i sidofältet.";
+"Review guide" = "Granskningsguide";
+"The agent maintains a review guide explaining design choices, reading order, and inline annotations visible in the Changes tab." = "Agenten upprätthåller en granskningsguide som förklarar designval, läsordning och inline-anteckningar synliga i fliken Ändringar.";
 "External Browser" = "Extern webbläsare";
 
 /* Settings - Advanced */
@@ -230,6 +232,15 @@
 /* Tab labels */
 "Info" = "Info";
 "Agent" = "Agent";
+"Changes" = "Ändringar";
+
+/* ChangesView */
+"%d file(s) changed" = "%d fil(er) ändrade";
+"No changes" = "Inga ändringar";
+"Loading changes..." = "Laddar ändringar...";
+"Refresh changes" = "Uppdatera ändringar";
+"Branch" = "Gren";
+"Uncommitted" = "Ej committade";
 
 /* ProjectSidebar - context menu */
 "New workstream (full permissions)" = "Nytt arbetsflöde (fulla behörigheter)";

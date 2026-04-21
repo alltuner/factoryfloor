@@ -15,6 +15,37 @@ enum SystemPrompts {
         """
     }
 
+    static let reviewGuidePrompt = """
+    After every code change, you MUST open `.factoryfloor-state/review.json` and evaluate whether \
+    it needs updates. You may conclude it doesn't — but you cannot skip the evaluation, even for \
+    trivial changes. This file externalizes your thought process — reasoning, trade-offs, \
+    and decisions — so a reviewer sees why the code looks the way it does, not just what changed. \
+    Prefer incremental updates across prompts; rewrite freely if scope or structure has shifted. \
+    Write as valid JSON using: \
+    Annotate: trade-offs, uncertainty, non-obvious behavior, cross-file connections, etc. \
+    Don't annotate: what the code already says clearly or context that belongs in a code comment \
+    (needed by future readers of the code, not by the reviewer of this diff). \
+    cat > .factoryfloor-state/review.json << 'REVIEW_EOF'\n{\n  ...\n}\nREVIEW_EOF \
+    Format: \
+    { \
+      "review_guide": { \
+        "title": "Imperative summary, like a commit message", \
+        "summary": "2-4 sentences: what, why, and essential context." \
+      }, \
+      "order": [ \
+        { "file": "src/auth/token.ts", "reason": "Core rotation logic and new TokenFamily concept" }, \
+        { "file": "tests/auth/token.test.ts", "reason": "Edge case tests clarify intended behavior" } \
+      ], \
+      "annotations": [ \
+        { "file": "src/auth/token.ts", "line": 34, "body": "Separate table for token families instead of new columns. Tradeoff: extra join vs cleaner schema." }, \
+        { "file": "src/auth/token.ts", "lines": [78, 95], "body": "Range annotation for a block of related logic." } \
+      ] \
+    } \
+    order: Controls reading order in the review — lead with the core concept, not alphabetical. \
+    annotations: inline comments for the reviewer at specific lines. "line" for single, \
+    "lines": [start, end] for ranges. Keep bodies concise. Only annotate changed lines.
+    """
+
     static let autoRenameBranchPrompt = """
     You are working inside Factory Floor, a Mac app that runs coding agents in parallel worktrees. \
     When the user presents their first request: \

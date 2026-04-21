@@ -1,4 +1,5 @@
 import { defineConfig } from 'vite'
+import { resolve } from 'path'
 
 export default defineConfig({
   base: './',
@@ -9,7 +10,13 @@ export default defineConfig({
     // Disable modulePreload — its wrapper factory destructures dynamic import results
     // incorrectly, breaking modules like _virtual/main that export namespace objects.
     // Preloading is unnecessary for a local bundle served from disk.
-    modulePreload: false
+    modulePreload: false,
+    rollupOptions: {
+      input: {
+        index: resolve(__dirname, 'index.html'),
+        diff: resolve(__dirname, 'diff.html')
+      }
+    }
   },
   worker: {
     format: 'es'
