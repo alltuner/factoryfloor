@@ -37,7 +37,7 @@ final class Telemetry {
         guard isEnabled else { return }
 
         let screen = NSScreen.main?.frame.size
-        let version = AppConstants.version
+        let userAgent = Self.userAgent
 
         Task.detached { [endpoint, websiteID, hostname, logger] in
             var payload: [String: Any] = [
@@ -66,7 +66,7 @@ final class Telemetry {
             var request = URLRequest(url: endpoint)
             request.httpMethod = "POST"
             request.setValue("application/json", forHTTPHeaderField: "Content-Type")
-            request.setValue("Mozilla/5.0 (Macintosh; macOS) FactoryFloor/\(version)", forHTTPHeaderField: "User-Agent")
+            request.setValue(userAgent, forHTTPHeaderField: "User-Agent")
             request.httpBody = jsonData
 
             do {
@@ -95,4 +95,18 @@ final class Telemetry {
         #endif
         return info
     }
+
+    private static let userAgent: String = {
+        let os = ProcessInfo.processInfo.operatingSystemVersion
+        let osVersion = "\(os.majorVersion).\(os.minorVersion).\(os.patchVersion)"
+        #if arch(arm64)
+            let arch = "arm64"
+        #elseif arch(x86_64)
+            let arch = "x86_64"
+        #else
+            let arch = "unknown"
+        #endif
+        let locale = Locale.current.identifier
+        return "FactoryFloor/\(AppConstants.version) (Macintosh; macOS \(osVersion); \(arch); \(locale))"
+    }()
 }
