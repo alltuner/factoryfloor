@@ -1,5 +1,31 @@
 # Changelog
 
+## [0.1.76](https://github.com/alltuner/factoryfloor/compare/v0.1.75...v0.1.76) (2026-04-22)
+
+
+### Features
+
+* **telemetry:** enrich Umami payloads and broaden tracked events ([#450](https://github.com/alltuner/factoryfloor/issues/450)) ([7648189](https://github.com/alltuner/factoryfloor/commit/7648189bd5caa57fa884d9d499d79ce448b89e43))
+
+
+### Bug Fixes
+
+* enable extended-keys in tmux config for Shift+Enter support ([#441](https://github.com/alltuner/factoryfloor/issues/441)) ([4e54e75](https://github.com/alltuner/factoryfloor/commit/4e54e75d46b9223f599fb8cded1d2e873695712f))
+* propagate window resize to Ghostty ([#443](https://github.com/alltuner/factoryfloor/issues/443)) ([93f4da1](https://github.com/alltuner/factoryfloor/commit/93f4da143fa6a3937e95509484b58a059111afb7))
+
+
+### Performance
+
+* reduce SwiftUI main-thread churn from AppEnvironment ([#453](https://github.com/alltuner/factoryfloor/issues/453)) ([6d16635](https://github.com/alltuner/factoryfloor/commit/6d1663532cc75f06bbc0597ef74510b747b74498))
+
+
+### Miscellaneous
+
+* **deps:** update astral-sh/setup-uv action to v8 ([#452](https://github.com/alltuner/factoryfloor/issues/452)) ([76752aa](https://github.com/alltuner/factoryfloor/commit/76752aa880890af7aab05ad6b243cd7f50b4b482))
+* **deps:** update dependency sentry to v9.10.0 ([#446](https://github.com/alltuner/factoryfloor/issues/446)) ([1917c85](https://github.com/alltuner/factoryfloor/commit/1917c85b6be8712bc344a8c5fbcbce0ad5bc2485))
+* **deps:** update dependency sparkle to v2.9.1 ([#445](https://github.com/alltuner/factoryfloor/issues/445)) ([18bcdd6](https://github.com/alltuner/factoryfloor/commit/18bcdd6782f23a6eeebf5197438cbcebfabf90ae))
+* **deps:** update dependency swift-cmark to v0.7.1 ([#447](https://github.com/alltuner/factoryfloor/issues/447)) ([b278da9](https://github.com/alltuner/factoryfloor/commit/b278da914d2d975dd84e36e27474d7dc97852624))
+
 ## [0.1.75](https://github.com/alltuner/factoryfloor/compare/v0.1.74...v0.1.75) (2026-04-13)
 
 
