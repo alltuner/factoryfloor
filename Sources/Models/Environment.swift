@@ -190,8 +190,21 @@ final class AppEnvironment: ObservableObject {
         worktreeStateCache[path] ?? WorktreeState()
     }
 
-    /// Refresh working tree state for a single worktree path.
+    private var worktreeStateTimestamps: [String: Date] = [:]
+    private static let worktreeStateRefreshInterval: TimeInterval = 5
+
+    /// Refresh working tree state for a single worktree path. Throttled to once
+    /// every `worktreeStateRefreshInterval` seconds per path so chatty terminal
+    /// activity doesn't spawn git subprocesses on every keystroke.
     func refreshWorktreeState(for worktreePath: String, projectDirectory: String) {
+        let now = Date()
+        if let last = worktreeStateTimestamps[worktreePath],
+           now.timeIntervalSince(last) < Self.worktreeStateRefreshInterval
+        {
+            return
+        }
+        worktreeStateTimestamps[worktreePath] = now
+
         let path = worktreePath
         let projectDir = projectDirectory
         Task.detached {
