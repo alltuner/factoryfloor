@@ -55,6 +55,7 @@ final class AppEnvironment: ObservableObject {
     /// Send a single `objectWillChange` notification around a batch of mutations.
     /// Callers should batch every coherent refresh cycle into one call so subscribers
     /// invalidate once per transaction rather than once per property.
+    @discardableResult
     private func commitChanges<T>(_ body: () -> T) -> T {
         objectWillChange.send()
         return body()
