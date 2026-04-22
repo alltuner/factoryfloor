@@ -15,52 +15,64 @@ struct WorktreeState {
 
 @MainActor
 final class AppEnvironment: ObservableObject {
-    @Published var toolStatus = ToolStatus()
-    @Published var installedTerminals: [AppInfo] = []
-    @Published var installedBrowsers: [AppInfo] = []
-    @Published var isDetecting = false
+    // Published backing values are mutated through `commitChanges` so a batch of
+    // cache updates produces a single `objectWillChange` notification.
+    var toolStatus = ToolStatus()
+    var installedTerminals: [AppInfo] = []
+    var installedBrowsers: [AppInfo] = []
+    var isDetecting = false
 
     // Cached repo info per directory, refreshed asynchronously
-    @Published private var repoInfoCache: [String: GitRepoInfo] = [:]
+    private var repoInfoCache: [String: GitRepoInfo] = [:]
     private var repoInfoTimestamps: [String: Date] = [:]
 
     /// Worktree path validity cache
-    @Published private var pathValidityCache: [String: Bool] = [:]
+    private var pathValidityCache: [String: Bool] = [:]
 
     /// Branch name cache per worktree path
-    @Published private var branchNameCache: [String: String] = [:]
+    private var branchNameCache: [String: String] = [:]
 
     /// Git repo detection cache per project directory
-    @Published private var gitRepoCache: [String: Bool] = [:]
+    private var gitRepoCache: [String: Bool] = [:]
 
     /// Working tree state cache per worktree path
-    @Published private var worktreeStateCache: [String: WorktreeState] = [:]
+    private var worktreeStateCache: [String: WorktreeState] = [:]
 
     /// Active port cache per workstream ID
-    @Published private var activePortCache: Set<UUID> = []
+    private var activePortCache: Set<UUID> = []
 
     /// Task description cache per worktree path
-    @Published private var taskDescriptionCache: [String: String] = [:]
+    private var taskDescriptionCache: [String: String] = [:]
 
     /// GitHub remote detection cache per project directory (lightweight git check)
-    @Published private var githubRemoteCache: [String: Bool] = [:]
+    private var githubRemoteCache: [String: Bool] = [:]
 
     // GitHub info cache
-    @Published private var githubRepoCache: [String: GitHubRepoInfo] = [:]
-    @Published private var githubPRCache: [String: [GitHubPR]] = [:]
-    @Published private var githubBranchPRCache: [String: GitHubPR] = [:] // key: "dir|branch"
+    private var githubRepoCache: [String: GitHubRepoInfo] = [:]
+    private var githubPRCache: [String: [GitHubPR]] = [:]
+    private var githubBranchPRCache: [String: GitHubPR] = [:] // key: "dir|branch"
+
+    /// Send a single `objectWillChange` notification around a batch of mutations.
+    /// Callers should batch every coherent refresh cycle into one call so subscribers
+    /// invalidate once per transaction rather than once per property.
+    private func commitChanges<T>(_ body: () -> T) -> T {
+        objectWillChange.send()
+        return body()
+    }
 
     func refresh() {
-        isDetecting = true
+        commitChanges { isDetecting = true }
         Task.detached {
             let tools = ToolStatus.detect()
             let terminals = AppInfo.detectTerminals()
             let browsers = AppInfo.detectBrowsers()
             await MainActor.run {
-                self.toolStatus = tools
-                self.installedTerminals = terminals
-                self.installedBrowsers = browsers
-                self.isDetecting = false
+                self.commitChanges {
+                    self.toolStatus = tools
+                    self.installedTerminals = terminals
+                    self.installedBrowsers = browsers
+                    self.isDetecting = false
+                }
             }
         }
     }
@@ -107,7 +119,9 @@ final class AppEnvironment: ObservableObject {
         Task.detached {
             let info = GitOperations.repoInfo(at: directory)
             await MainActor.run {
-                self.repoInfoCache[directory] = info
+                self.commitChanges {
+                    self.repoInfoCache[directory] = info
+                }
             }
         }
     }
@@ -131,7 +145,9 @@ final class AppEnvironment: ObservableObject {
             Task.detached {
                 let info = GitOperations.repoInfo(at: dir)
                 await MainActor.run {
-                    self.repoInfoCache[dir] = info
+                    self.commitChanges {
+                        self.repoInfoCache[dir] = info
+                    }
                 }
             }
         }
@@ -191,7 +207,9 @@ final class AppEnvironment: ObservableObject {
     private func deferWorktreeStateUpdate(_ state: WorktreeState, for path: String) {
         Task { @MainActor in
             try? await Task.sleep(nanoseconds: 50_000_000)
-            self.worktreeStateCache[path] = state
+            self.commitChanges {
+                self.worktreeStateCache[path] = state
+            }
         }
     }
 
@@ -205,7 +223,7 @@ final class AppEnvironment: ObservableObject {
     }
 
     /// Returns IDs of projects whose directories no longer exist.
-    @Published var missingProjectIDs: Set<UUID> = []
+    var missingProjectIDs: Set<UUID> = []
 
     func refreshPathValidity(projects: [Project]) {
         Task.detached {
@@ -306,14 +324,16 @@ final class AppEnvironment: ObservableObject {
             }
 
             await MainActor.run {
-                self.pathValidityCache.merge(results) { _, new in new }
-                self.branchNameCache.merge(branches) { _, new in new }
-                self.missingProjectIDs = missing
-                self.gitRepoCache.merge(gitRepoResults) { _, new in new }
-                self.githubRemoteCache.merge(githubRemoteResults) { _, new in new }
-                self.worktreeStateCache.merge(worktreeStates) { _, new in new }
-                self.activePortCache = portResults
-                self.taskDescriptionCache = descriptionResults
+                self.commitChanges {
+                    self.pathValidityCache.merge(results) { _, new in new }
+                    self.branchNameCache.merge(branches) { _, new in new }
+                    self.missingProjectIDs = missing
+                    self.gitRepoCache.merge(gitRepoResults) { _, new in new }
+                    self.githubRemoteCache.merge(githubRemoteResults) { _, new in new }
+                    self.worktreeStateCache.merge(worktreeStates) { _, new in new }
+                    self.activePortCache = portResults
+                    self.taskDescriptionCache = descriptionResults
+                }
             }
         }
     }
@@ -337,7 +357,9 @@ final class AppEnvironment: ObservableObject {
     }
 
     func clearBranchPR(for directory: String, branch: String) {
-        githubBranchPRCache.removeValue(forKey: "\(directory)|\(branch)")
+        commitChanges {
+            githubBranchPRCache.removeValue(forKey: "\(directory)|\(branch)")
+        }
     }
 
     func refreshGitHubInfo(for directory: String, branch: String? = nil) {
@@ -356,10 +378,12 @@ final class AppEnvironment: ObservableObject {
             }
 
             await MainActor.run {
-                if let repo { self.githubRepoCache[directory] = repo }
-                self.githubPRCache[directory] = prs
-                if let branch, let pr = branchPR {
-                    self.githubBranchPRCache["\(directory)|\(branch)"] = pr
+                self.commitChanges {
+                    if let repo { self.githubRepoCache[directory] = repo }
+                    self.githubPRCache[directory] = prs
+                    if let branch, let pr = branchPR {
+                        self.githubBranchPRCache["\(directory)|\(branch)"] = pr
+                    }
                 }
             }
         }
@@ -377,12 +401,14 @@ final class AppEnvironment: ObservableObject {
             let prs = GitHubOperations.openPRs(ghPath: ghPath, at: directory, limit: 100)
             let prsByBranch = Dictionary(prs.map { ($0.branch, $0) }, uniquingKeysWith: { first, _ in first })
             await MainActor.run {
-                for branch in branches {
-                    let key = "\(directory)|\(branch)"
-                    if let pr = prsByBranch[branch] {
-                        self.githubBranchPRCache[key] = pr
-                    } else {
-                        self.githubBranchPRCache.removeValue(forKey: key)
+                self.commitChanges {
+                    for branch in branches {
+                        let key = "\(directory)|\(branch)"
+                        if let pr = prsByBranch[branch] {
+                            self.githubBranchPRCache[key] = pr
+                        } else {
+                            self.githubBranchPRCache.removeValue(forKey: key)
+                        }
                     }
                 }
             }
@@ -446,18 +472,20 @@ final class AppEnvironment: ObservableObject {
                 let prsByBranch = Dictionary(prs.map { ($0.branch, $0) }, uniquingKeysWith: { first, _ in first })
 
                 await MainActor.run {
-                    for branch in branches {
-                        let key = "\(dir)|\(branch)"
-                        if let pr = prsByBranch[branch] {
-                            self.githubBranchPRCache[key] = pr
-                        } else if cachedStates[key] == "MERGED" {
-                            // Already cached as merged, no need to re-fetch
-                        } else if cachedStates[key] != nil {
-                            // Had an open PR that's no longer open, check if merged
-                            mergedLookups.append((dir: dir, branch: branch, key: key))
-                            self.githubBranchPRCache.removeValue(forKey: key)
-                        } else {
-                            // Never had a cached PR, nothing to do
+                    self.commitChanges {
+                        for branch in branches {
+                            let key = "\(dir)|\(branch)"
+                            if let pr = prsByBranch[branch] {
+                                self.githubBranchPRCache[key] = pr
+                            } else if cachedStates[key] == "MERGED" {
+                                // Already cached as merged, no need to re-fetch
+                            } else if cachedStates[key] != nil {
+                                // Had an open PR that's no longer open, check if merged
+                                mergedLookups.append((dir: dir, branch: branch, key: key))
+                                self.githubBranchPRCache.removeValue(forKey: key)
+                            } else {
+                                // Never had a cached PR, nothing to do
+                            }
                         }
                     }
                 }
@@ -475,7 +503,9 @@ final class AppEnvironment: ObservableObject {
                     for await (key, pr) in group {
                         if let pr {
                             await MainActor.run {
-                                self.githubBranchPRCache[key] = pr
+                                self.commitChanges {
+                                    self.githubBranchPRCache[key] = pr
+                                }
                             }
                         }
                     }
