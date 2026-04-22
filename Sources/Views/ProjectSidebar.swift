@@ -44,6 +44,7 @@ struct ProjectSidebar: View {
     @State private var purgeWarningMessage: String?
     @State private var expandedProjects: Set<UUID> = SidebarState.loadExpanded()
     @State private var cachedSortedIDs: [UUID] = []
+    @State private var cachedSortedWorkstreamIDs: [UUID: [UUID]] = [:]
     @State private var cachedProjectIndex: [UUID: Int] = [:]
     @State private var cachedWorkstreamIndex: [UUID: (Int, Int)] = [:]
     @State private var showWorktreeError = false
@@ -62,12 +63,21 @@ struct ProjectSidebar: View {
     private func rebuildIndices() {
         cachedProjectIndex = Dictionary(uniqueKeysWithValues: projects.enumerated().map { ($1.id, $0) })
         var wsIndex: [UUID: (Int, Int)] = [:]
+        var sortedWS: [UUID: [UUID]] = [:]
         for (pi, project) in projects.enumerated() {
             for (wi, ws) in project.workstreams.enumerated() {
                 wsIndex[ws.id] = (pi, wi)
             }
+            sortedWS[project.id] = project.workstreams
+                .sorted { $0.lastAccessedAt > $1.lastAccessedAt }
+                .map(\.id)
         }
         cachedWorkstreamIndex = wsIndex
+        cachedSortedWorkstreamIDs = sortedWS
+    }
+
+    private func totalWorkstreamCount() -> Int {
+        projects.reduce(0) { $0 + $1.workstreams.count }
     }
 
     private func projectBinding(for id: UUID) -> Binding<Project> {
@@ -135,27 +145,33 @@ struct ProjectSidebar: View {
             .tag(SidebarSelection.project(project.id))
 
             if hasChildren && expandedProjects.contains(project.id) {
-                let sortedWS = project.workstreams.sorted { $0.lastAccessedAt > $1.lastAccessedAt }
-                ForEach(sortedWS) { workstream in
-                    let branch = appEnv.branchName(for: workstream.worktreePath)
-                    let pr = branch.flatMap { appEnv.githubPR(for: project.directory, branch: $0) }
-                    WorkstreamRow(
-                        name: workstream.name,
-                        branchName: branch,
-                        worktreePath: workstream.worktreePath,
-                        isPathValid: appEnv.isPathValid(workstream.worktreePath),
-                        isActive: activityTracker.isActive(workstream.id),
-                        hasActivePort: appEnv.hasActivePort(workstream.id),
-                        githubURL: appEnv.githubURL(for: project.directory),
-                        taskDescription: appEnv.taskDescription(for: workstream.worktreePath),
-                        prTitle: pr?.title,
-                        prNumber: pr?.number,
-                        prState: pr?.state,
-                        onRemove: { workstreamToRemove = workstream.id },
-                        onPurge: { confirmPurge(workstream) }
-                    )
-                    .tag(SidebarSelection.workstream(workstream.id))
-                    .padding(.leading, 28)
+                let sortedWorkstreamIDs = cachedSortedWorkstreamIDs[project.id] ?? project.workstreams.map(\.id)
+                ForEach(sortedWorkstreamIDs, id: \.self) { workstreamID in
+                    if let (pIdx, wIdx) = cachedWorkstreamIndex[workstreamID],
+                       projects.indices.contains(pIdx),
+                       projects[pIdx].workstreams.indices.contains(wIdx)
+                    {
+                        let workstream = projects[pIdx].workstreams[wIdx]
+                        let branch = appEnv.branchName(for: workstream.worktreePath)
+                        let pr = branch.flatMap { appEnv.githubPR(for: project.directory, branch: $0) }
+                        WorkstreamRow(
+                            name: workstream.name,
+                            branchName: branch,
+                            worktreePath: workstream.worktreePath,
+                            isPathValid: appEnv.isPathValid(workstream.worktreePath),
+                            isActive: activityTracker.isActive(workstream.id),
+                            hasActivePort: appEnv.hasActivePort(workstream.id),
+                            githubURL: appEnv.githubURL(for: project.directory),
+                            taskDescription: appEnv.taskDescription(for: workstream.worktreePath),
+                            prTitle: pr?.title,
+                            prNumber: pr?.number,
+                            prState: pr?.state,
+                            onRemove: { workstreamToRemove = workstream.id },
+                            onPurge: { confirmPurge(workstream) }
+                        )
+                        .tag(SidebarSelection.workstream(workstream.id))
+                        .padding(.leading, 28)
+                    }
                 }
             }
         }
@@ -365,6 +381,9 @@ struct ProjectSidebar: View {
             onProjectsChanged()
             if sortOrder == .recent {
                 cachedSortedIDs = recomputeSortedIDs()
+                cachedSortedWorkstreamIDs[projects[pi].id] = projects[pi].workstreams
+                    .sorted { $0.lastAccessedAt > $1.lastAccessedAt }
+                    .map(\.id)
             }
         }
         .onAppear {
@@ -377,7 +396,7 @@ struct ProjectSidebar: View {
             cachedSortedIDs = recomputeSortedIDs()
             rebuildIndices()
         }
-        .onChange(of: projects.flatMap(\.workstreams).map(\.id)) { _, _ in
+        .onChange(of: totalWorkstreamCount()) { _, _ in
             rebuildIndices()
         }
         .overlay {
