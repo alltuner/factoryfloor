@@ -28,7 +28,7 @@ packages:
     from: "0.7.1"
   Sentry:
     url: https://github.com/getsentry/sentry-cocoa
-    from: "9.10.0"
+    from: "9.11.0"
   Sparkle:
     url: https://github.com/sparkle-project/Sparkle
     from: "2.9.1"
