@@ -303,15 +303,29 @@ final class TerminalView: NSView {
         keyTextAccumulator = []
         defer { keyTextAccumulator = nil }
 
+        // Track whether we were already composing before this event so we can
+        // detect when a dead key / IME composition ends.
+        let markedTextBefore = markedText.length > 0
+
         interpretKeyEvents([event])
 
+        // Sync preedit state with libghostty so it can render the compose
+        // indicator. Only clear a previous preedit if we had one before.
+        syncPreedit(clearIfNeeded: markedTextBefore)
+
         if let textList = keyTextAccumulator, !textList.isEmpty {
+            // Composition resolved — send the composed text as real input.
             for text in textList {
                 _ = sendKeyEvent(action, event: event, text: text)
             }
         } else {
+            // No composed text. Mark as composing if we're in a preedit state
+            // or just exited one (e.g. backspace cancelling a dead key).
             let text = Self.ghosttyCharacters(for: event)
-            _ = sendKeyEvent(action, event: event, text: text)
+            _ = sendKeyEvent(
+                action, event: event, text: text,
+                composing: markedText.length > 0 || markedTextBefore
+            )
         }
 
         reportActivity()
@@ -341,7 +355,8 @@ final class TerminalView: NSView {
     private func sendKeyEvent(
         _ action: ghostty_input_action_e,
         event: NSEvent,
-        text: String? = nil
+        text: String? = nil,
+        composing: Bool = false
     ) -> Bool {
         guard let surface else { return false }
 
@@ -367,7 +382,7 @@ final class TerminalView: NSView {
         }
 
         keyEv.text = nil
-        keyEv.composing = false
+        keyEv.composing = composing
 
         // For text, only pass it if it's not a control character (>= 0x20).
         // Ghostty's KeyEncoder handles ctrl character mapping internally.
@@ -474,6 +489,22 @@ final class TerminalView: NSView {
 
     override func doCommand(by _: Selector) {
         // Let the input system handle commands we don't care about
+    }
+
+    /// Sync the preedit (dead key / IME compose) state with libghostty.
+    private func syncPreedit(clearIfNeeded: Bool = true) {
+        guard let surface else { return }
+        if markedText.length > 0 {
+            let str = markedText.string
+            let len = str.utf8CString.count
+            if len > 0 {
+                str.withCString { ptr in
+                    ghostty_surface_preedit(surface, ptr, UInt(len - 1))
+                }
+            }
+        } else if clearIfNeeded {
+            ghostty_surface_preedit(surface, nil, 0)
+        }
     }
 
     // MARK: - Drag and drop
