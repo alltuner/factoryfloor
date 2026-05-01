@@ -348,7 +348,50 @@ final class TerminalView: NSView {
     }
 
     override func flagsChanged(with event: NSEvent) {
-        _ = sendKeyEvent(GHOSTTY_ACTION_PRESS, event: event)
+        let mod: UInt32
+        switch event.keyCode {
+        case 0x39: mod = GHOSTTY_MODS_CAPS.rawValue
+        case 0x38, 0x3C: mod = GHOSTTY_MODS_SHIFT.rawValue
+        case 0x3B, 0x3E: mod = GHOSTTY_MODS_CTRL.rawValue
+        case 0x3A, 0x3D: mod = GHOSTTY_MODS_ALT.rawValue
+        case 0x37, 0x36: mod = GHOSTTY_MODS_SUPER.rawValue
+        default: return
+        }
+
+        // Don't send modifier events during IME composition.
+        if hasMarkedText() { return }
+
+        let mods = Self.eventMods(event)
+
+        // If the modifier bit is active it might be a press — but for
+        // right-side keys we also check the device-specific mask so that
+        // releasing right-Shift while left-Shift is held is correctly
+        // detected as a release.
+        var action = GHOSTTY_ACTION_RELEASE
+        if mods.rawValue & mod != 0 {
+            let sidePressed: Bool
+            switch event.keyCode {
+            case 0x3C:
+                sidePressed = event.modifierFlags.rawValue
+                    & UInt(NX_DEVICERSHIFTKEYMASK) != 0
+            case 0x3E:
+                sidePressed = event.modifierFlags.rawValue
+                    & UInt(NX_DEVICERCTLKEYMASK) != 0
+            case 0x3D:
+                sidePressed = event.modifierFlags.rawValue
+                    & UInt(NX_DEVICERALTKEYMASK) != 0
+            case 0x36:
+                sidePressed = event.modifierFlags.rawValue
+                    & UInt(NX_DEVICERCMDKEYMASK) != 0
+            default:
+                sidePressed = true
+            }
+            if sidePressed {
+                action = GHOSTTY_ACTION_PRESS
+            }
+        }
+
+        _ = sendKeyEvent(action, event: event)
     }
 
     /// Build and send a ghostty_input_key_s from an NSEvent.
@@ -427,6 +470,9 @@ final class TerminalView: NSView {
         default: return
         }
 
+        // If insertText is called, our preedit must be over.
+        unmarkText()
+
         if var acc = keyTextAccumulator {
             acc.append(chars)
             keyTextAccumulator = acc
@@ -446,10 +492,19 @@ final class TerminalView: NSView {
         case let v as String: markedText = NSMutableAttributedString(string: v)
         default: return
         }
+        // If we're not inside a keyDown, sync immediately. This handles external
+        // preedit updates, e.g. changing keyboard layout while composing.
+        if keyTextAccumulator == nil {
+            syncPreedit()
+        }
     }
 
     func unmarkText() {
+        guard markedText.length > 0 else { return }
         markedText.mutableString.setString("")
+        // Notify libghostty the preedit ended (e.g. app-switch triggering
+        // commitComposition, or a programmatic unmark from an input method).
+        syncPreedit()
     }
 
     func selectedRange() -> NSRange {
