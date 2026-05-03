@@ -26,6 +26,7 @@ jobs:
             perf
             ci
             build
+            revert
           requireScope: false
           subjectPattern: ^.+$
           subjectPatternError: |
