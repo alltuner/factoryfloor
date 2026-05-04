@@ -363,23 +363,35 @@ final class TerminalView: NSView {
 
         let mods = Self.eventMods(event)
 
-        // If the modifier bit is active it might be a press — but for
-        // right-side keys we also check the device-specific mask so that
-        // releasing right-Shift while left-Shift is held is correctly
+        // If the modifier bit is active it might be a press — but we
+        // also check the device-specific mask so that releasing one side
+        // of a modifier while the other side is held is correctly
         // detected as a release.
         var action = GHOSTTY_ACTION_RELEASE
         if mods.rawValue & mod != 0 {
             let sidePressed: Bool
             switch event.keyCode {
+            case 0x38:
+                sidePressed = event.modifierFlags.rawValue
+                    & UInt(NX_DEVICELSHIFTKEYMASK) != 0
             case 0x3C:
                 sidePressed = event.modifierFlags.rawValue
                     & UInt(NX_DEVICERSHIFTKEYMASK) != 0
+            case 0x3B:
+                sidePressed = event.modifierFlags.rawValue
+                    & UInt(NX_DEVICELCTLKEYMASK) != 0
             case 0x3E:
                 sidePressed = event.modifierFlags.rawValue
                     & UInt(NX_DEVICERCTLKEYMASK) != 0
+            case 0x3A:
+                sidePressed = event.modifierFlags.rawValue
+                    & UInt(NX_DEVICELALTKEYMASK) != 0
             case 0x3D:
                 sidePressed = event.modifierFlags.rawValue
                     & UInt(NX_DEVICERALTKEYMASK) != 0
+            case 0x37:
+                sidePressed = event.modifierFlags.rawValue
+                    & UInt(NX_DEVICELCMDKEYMASK) != 0
             case 0x36:
                 sidePressed = event.modifierFlags.rawValue
                     & UInt(NX_DEVICERCMDKEYMASK) != 0
