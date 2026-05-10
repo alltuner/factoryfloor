@@ -81,4 +81,23 @@ final class PortDetectionTests: XCTestCase {
             connectionError: false
         ))
     }
+
+    func testInferExpectedPortFromRunCommand() {
+        XCTAssertEqual(RunLauncher.inferExpectedPort(runCommand: "python3 -m flask run --port 5001", projectDirectory: "/tmp"), 5001)
+        XCTAssertEqual(RunLauncher.inferExpectedPort(runCommand: "next dev -p 3000", projectDirectory: "/tmp"), 3000)
+        XCTAssertEqual(RunLauncher.inferExpectedPort(runCommand: "uvicorn app:app --port 8000", projectDirectory: "/tmp"), 8000)
+        XCTAssertEqual(RunLauncher.inferExpectedPort(runCommand: "PORT=8080 node server.js", projectDirectory: "/tmp"), 8080)
+        XCTAssertNil(RunLauncher.inferExpectedPort(runCommand: "npm run start", projectDirectory: "/tmp"))
+    }
+
+    func testInferExpectedPortFromEnvFile() {
+        let tempDir = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
+        try? FileManager.default.createDirectory(at: tempDir, withIntermediateDirectories: true)
+        defer { try? FileManager.default.removeItem(at: tempDir) }
+        
+        let envURL = tempDir.appendingPathComponent(".env")
+        try? "PORT=7777".write(to: envURL, atomically: true, encoding: .utf8)
+        
+        XCTAssertEqual(RunLauncher.inferExpectedPort(runCommand: "npm run start", projectDirectory: tempDir.path), 7777)
+    }
 }

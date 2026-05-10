@@ -20,6 +20,7 @@ func scriptCommand(script: String, role: String, shell: String = CommandBuilder.
 struct EnvironmentTabView: View {
     let workstreamID: UUID
     let workingDirectory: String
+    let projectDirectory: String
     let projectName: String
     let workstreamName: String
     let scriptConfig: ScriptConfig
@@ -231,7 +232,8 @@ struct EnvironmentTabView: View {
         let baseCommand: String
         let ffRunPath = RunLauncher.executableURL()?.path
         if role == "run", let launcherPath = ffRunPath {
-            baseCommand = runScriptCommand(script: script, workstreamID: workstreamID, launcherPath: launcherPath)
+            let expectedPort = scriptConfig.expectedPort ?? RunLauncher.inferExpectedPort(runCommand: script, projectDirectory: projectDirectory)
+            baseCommand = runScriptCommand(script: script, workstreamID: workstreamID, launcherPath: launcherPath, expectedPort: expectedPort)
         } else {
             baseCommand = scriptCommand(script: script, role: role)
         }
