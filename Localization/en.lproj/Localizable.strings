@@ -305,3 +305,11 @@
 "No GitHub remote found for this project." = "No GitHub remote found for this project.";
 "Quick action debug" = "Quick action debug";
 "Show a debug panel with command output from quick actions (Create PR, Commit & Push)." = "Show a debug panel with command output from quick actions (Create PR, Commit & Push).";
+
+/* Workstream Info Git Stats */
+"Ahead" = "Ahead";
+"Uncommitted" = "Uncommitted";
+"Base" = "Base";
+"Worktree Age" = "Worktree Age";
+"Clean" = "Clean";
+"Created today" = "Created today";

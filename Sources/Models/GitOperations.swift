@@ -219,6 +219,30 @@ enum GitOperations {
     }
 
     /// Check if a remote exists for this repository.
+    /// Get the count of commits ahead of the default branch.
+    static func commitsAhead(at path: String, projectPath: String) -> Int {
+        let base = defaultBranch(at: projectPath)
+        guard let output = run(args: ["rev-list", "--count", "\(base)..HEAD"], in: path) else { return 0 }
+        return Int(output.trimmingCharacters(in: .whitespacesAndNewlines)) ?? 0
+    }
+
+    /// Get the count of uncommitted (modified/untracked) files.
+    static func uncommittedCount(at path: String) -> Int {
+        guard let status = run(args: ["status", "--porcelain", "--ignore-submodules=dirty"], in: path) else { return 0 }
+        let lines = status.components(separatedBy: .newlines).filter { !$0.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty }
+        return lines.count
+    }
+
+    /// Get the branch creation date (approximated as the oldest commit in base..HEAD).
+    static func branchCreatedDate(at path: String, projectPath: String) -> Date? {
+        let base = defaultBranch(at: projectPath)
+        guard let output = run(args: ["log", "--format=%ct", "\(base)..HEAD"], in: path) else { return nil }
+        let lines = output.components(separatedBy: .newlines).filter { !$0.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty }
+        guard let lastLine = lines.last, let timestamp = TimeInterval(lastLine) else { return nil }
+        return Date(timeIntervalSince1970: timestamp)
+    }
+
+    /// Check if a remote exists for this repository.
     static func hasRemote(at path: String) -> Bool {
         guard let output = run(args: ["remote"], in: path) else { return false }
         return !output.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty

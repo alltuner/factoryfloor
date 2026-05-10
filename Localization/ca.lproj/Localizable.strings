@@ -305,3 +305,11 @@
 "No GitHub remote found for this project." = "No s'ha trobat cap remot de GitHub per a aquest projecte.";
 "Quick action debug" = "Depuració d'accions ràpides";
 "Show a debug panel with command output from quick actions (Create PR, Commit & Push)." = "Mostra un panell de depuració amb la sortida de les accions ràpides (Crear PR, Commit i Push).";
+
+/* Workstream Info Git Stats */
+"Ahead" = "Ahead";
+"Uncommitted" = "Uncommitted";
+"Base" = "Base";
+"Worktree Age" = "Worktree Age";
+"Clean" = "Clean";
+"Created today" = "Created today";
