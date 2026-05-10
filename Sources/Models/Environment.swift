@@ -316,7 +316,7 @@ final class AppEnvironment: ObservableObject {
     // MARK: - GitHub
 
     var ghAvailable: Bool {
-        toolStatus.gh.isInstalled && toolStatus.ghAuthDetail != "Not authenticated"
+        toolStatus.gh.isInstalled 
     }
 
     func githubRepo(for directory: String) -> GitHubRepoInfo? {
