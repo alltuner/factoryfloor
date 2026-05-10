@@ -296,3 +296,8 @@
 "Worktree Age" = "Worktree Age";
 "Clean" = "Clean";
 "Created today" = "Created today";
+
+/* Split Panes */
+"Split Agent" = "Dividir tauler de l'agent";
+"Split Terminal" = "Dividir tauler del terminal";
+"Split Browser" = "Dividir tauler del navegador";

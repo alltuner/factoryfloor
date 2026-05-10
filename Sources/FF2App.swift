@@ -294,10 +294,20 @@ struct FF2App: App {
                 }
                 .keyboardShortcut("t", modifiers: .command)
 
+                Button("Split Terminal") {
+                    NotificationCenter.default.post(name: .splitTerminal, object: nil)
+                }
+                .keyboardShortcut("t", modifiers: [.command, .shift])
+
                 Button("Toggle Browser") {
                     NotificationCenter.default.post(name: .toggleBrowser, object: nil)
                 }
                 .keyboardShortcut("b", modifiers: .command)
+
+                Button("Split Browser") {
+                    NotificationCenter.default.post(name: .splitBrowser, object: nil)
+                }
+                .keyboardShortcut("b", modifiers: [.command, .shift])
 
                 Button("Next Tab") {
                     NotificationCenter.default.post(name: .nextTab, object: nil)
@@ -318,6 +328,11 @@ struct FF2App: App {
                     NotificationCenter.default.post(name: .focusAgent, object: nil)
                 }
                 .keyboardShortcut(.return, modifiers: .command)
+
+                Button("Split Agent") {
+                    NotificationCenter.default.post(name: .splitAgent, object: nil)
+                }
+                .keyboardShortcut(.return, modifiers: [.command, .shift])
 
                 Button("Open in External Browser") {
                     NotificationCenter.default.post(name: .openExternalBrowser, object: nil)

@@ -86,10 +86,13 @@ struct HelpView: View {
 
                     Section {
                         ShortcutRow(keys: "Return", description: "Focus Coding Agent")
+                        ShortcutRow(keys: "Return", shift: true, description: "Split Agent pane")
                         ShortcutRow(keys: "I", description: "Info panel")
                         ShortcutRow(keys: "E", description: "Environment")
                         ShortcutRow(keys: "T", description: "New Terminal")
+                        ShortcutRow(keys: "T", shift: true, description: "Split Terminal pane")
                         ShortcutRow(keys: "B", description: "New Browser")
+                        ShortcutRow(keys: "B", shift: true, description: "Split Browser pane")
                         ShortcutRow(keys: "W", description: "Close tab")
                         ShortcutRow(keys: "L", description: "Address bar")
                         ShortcutRow(keys: "0", description: "Back to project")

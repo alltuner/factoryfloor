@@ -106,10 +106,13 @@ Every workstream terminal has access to:
 | Shortcut | Action |
 |---|---|
 | `Cmd+Return` | Focus Coding Agent |
+| `Cmd+Shift+Return` | Split Agent pane |
 | `Cmd+I` | Info panel |
 | `Cmd+E` | Environment |
 | `Cmd+T` | New Terminal |
+| `Cmd+Shift+T` | Split Terminal pane |
 | `Cmd+B` | New Browser |
+| `Cmd+Shift+B` | Split Browser pane |
 | `Cmd+W` | Close tab |
 | `Cmd+L` | Address bar (browser) |
 | `Cmd+0` | Back to project |
