@@ -439,6 +439,7 @@ struct TerminalContainerView: View {
                 EnvironmentTabView(
                     workstreamID: workstreamID,
                     workingDirectory: workingDirectory,
+                    projectDirectory: projectDirectory,
                     projectName: projectName,
                     workstreamName: workstreamName,
                     scriptConfig: scriptConfig,

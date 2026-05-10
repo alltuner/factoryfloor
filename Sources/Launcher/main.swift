@@ -35,12 +35,16 @@ private func launchCommand(configuration: Configuration) throws {
     }
     let selfPath = String(decoding: pathBuf.prefix(while: { $0 != 0 }).map { UInt8(bitPattern: $0) }, as: UTF8.self)
 
-    let monitorArgs = [
+    var monitorArgs = [
         selfPath,
         "--monitor",
         "--pid", "\(commandPID)",
         "--workstream-id", configuration.workstreamID.uuidString.lowercased(),
     ]
+    if let expectedPort = configuration.expectedPort {
+        monitorArgs.append("--expected-port")
+        monitorArgs.append("\(expectedPort)")
+    }
     var monitorPID: pid_t = 0
     let argv = monitorArgs.map { strdup($0) } + [nil]
     defer { argv.forEach { free($0) } }
@@ -267,6 +271,7 @@ private struct Configuration {
         var commandStartIndex: Int?
         var monitorMode = false
         var monitorPID: Int32?
+        var expectedPortArg: Int?
         var index = 1
 
         while index < arguments.count {
@@ -302,6 +307,17 @@ private struct Configuration {
                 index += 2
                 continue
             }
+            if argument == "--expected-port" {
+                let valueIndex = index + 1
+                guard valueIndex < arguments.count,
+                      let port = Int(arguments[valueIndex])
+                else {
+                    throw LauncherError(exitCode: 2, message: "ff-run requires a valid port for --expected-port")
+                }
+                expectedPortArg = port
+                index += 2
+                continue
+            }
             throw LauncherError(exitCode: 2, message: "Unknown option: \(argument)")
         }
 
@@ -312,7 +328,7 @@ private struct Configuration {
         self.monitorMode = monitorMode
         self.monitorPID = monitorPID
         self.workstreamID = workstreamID
-        expectedPort = ProcessInfo.processInfo.environment["FF_PORT"].flatMap(Int.init)
+        expectedPort = expectedPortArg ?? ProcessInfo.processInfo.environment["FF_PORT"].flatMap(Int.init)
         startedAt = Date()
 
         if monitorMode {

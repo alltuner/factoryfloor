@@ -23,9 +23,35 @@ enum WorkstreamEnvironment {
             "FF_WORKTREE_DIR": workingDirectory,
             "FF_PORT": "\(port)",
         ]
+        
         if codingCLI == .claude, agentTeams {
             vars["CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS"] = "1"
         }
+        
+        var pathsToPrepend: [String] = []
+        let fileManager = FileManager.default
+        let projectURL = URL(fileURLWithPath: projectDirectory)
+        
+        let venvBin = projectURL.appendingPathComponent("venv/bin").path
+        let dotVenvBin = projectURL.appendingPathComponent(".venv/bin").path
+        let nodeBin = projectURL.appendingPathComponent("node_modules/.bin").path
+        
+        if fileManager.fileExists(atPath: venvBin + "/activate") {
+            pathsToPrepend.append(venvBin)
+        } else if fileManager.fileExists(atPath: dotVenvBin + "/activate") {
+            pathsToPrepend.append(dotVenvBin)
+        }
+        
+        var isDir: ObjCBool = false
+        if fileManager.fileExists(atPath: nodeBin, isDirectory: &isDir), isDir.boolValue {
+            pathsToPrepend.append(nodeBin)
+        }
+        
+        if !pathsToPrepend.isEmpty {
+            let currentPath = ProcessInfo.processInfo.environment["PATH"] ?? ""
+            vars["PATH"] = (pathsToPrepend + [currentPath]).filter { !$0.isEmpty }.joined(separator: ":")
+        }
+        
         return vars
     }
 }
