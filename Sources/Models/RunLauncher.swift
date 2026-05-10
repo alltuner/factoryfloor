@@ -23,6 +23,17 @@ enum RunLauncher {
         logger.warning("ff-run helper not found, port detection will be unavailable")
         return nil
     }
+static func wrapWithVenv(_ script: String, projectDirectory: String) -> String {
+    let fm = FileManager.default
+    for candidate in ["venv/bin/activate", ".venv/bin/activate"] {
+        let path = (projectDirectory as NSString).appendingPathComponent(candidate)
+        if fm.fileExists(atPath: path) {
+            return "source \(CommandBuilder.shellQuote(path)) && \(script)"
+        }
+    }
+    return script
+}
+
 static func inferExpectedPort(runCommand: String, projectDirectory: String) -> Int? {
     let envURL = URL(fileURLWithPath: projectDirectory).appendingPathComponent(".env")
     if let envString = try? String(contentsOf: envURL, encoding: .utf8) {
