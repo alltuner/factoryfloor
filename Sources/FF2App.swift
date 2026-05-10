@@ -318,11 +318,35 @@ struct FF2App: App {
                 }
                 .keyboardShortcut("t", modifiers: .command)
 
+                Button("Split Terminal") {
+                    NotificationCenter.default.post(name: .splitTerminal, object: nil)
+                }
+                .keyboardShortcut("t", modifiers: [.command, .shift])
+
                 Button("New Browser") {
                     NotificationCenter.default.post(name: .toggleBrowser, object: nil)
                 }
                 .keyboardShortcut("b", modifiers: .command)
 
+                Button("Split Browser") {
+                    NotificationCenter.default.post(name: .splitBrowser, object: nil)
+                }
+                .keyboardShortcut("b", modifiers: [.command, .shift])
+
+                Button("New Editor") {
+                    NotificationCenter.default.post(name: .toggleEditor, object: nil)
+                }
+                .keyboardShortcut("o", modifiers: .command)
+
+                Button("Start/Rerun") {
+                    NotificationCenter.default.post(name: .rerunScript, object: nil)
+                }
+                .keyboardShortcut(.return, modifiers: [.command, .shift])
+                    NotificationCenter.default.post(name: .toggleBrowser, object: nil)
+                }
+                .keyboardShortcut("b", modifiers: .command)
+
+<<<<<<< HEAD
                 Button("New Editor") {
                     NotificationCenter.default.post(name: .toggleEditor, object: nil)
                 }
@@ -334,6 +358,12 @@ struct FF2App: App {
                 .keyboardShortcut(.return, modifiers: [.command, .shift])
 
                 Divider()
+=======
+                Button("Split Browser") {
+                    NotificationCenter.default.post(name: .splitBrowser, object: nil)
+                }
+                .keyboardShortcut("b", modifiers: [.command, .shift])
+>>>>>>> 20b764c (feat: add keyboard-driven split pane (Cmd+Shift+T/B/Return toggles))
 
                 Button("Next Tab") {
                     NotificationCenter.default.post(name: .nextTab, object: nil)
@@ -373,6 +403,11 @@ struct FF2App: App {
                 .keyboardShortcut(.upArrow, modifiers: .command)
 
                 Divider()
+
+                Button("Split Agent") {
+                    NotificationCenter.default.post(name: .splitAgent, object: nil)
+                }
+                .keyboardShortcut(.return, modifiers: [.command, .shift])
 
                 Button("Open in External Browser") {
                     NotificationCenter.default.post(name: .openExternalBrowser, object: nil)

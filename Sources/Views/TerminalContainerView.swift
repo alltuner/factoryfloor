@@ -13,6 +13,9 @@ extension Notification.Name {
     static let toggleTerminal = Notification.Name("factoryfloor.toggleTerminal")
     static let toggleBrowser = Notification.Name("factoryfloor.toggleBrowser")
     static let focusAgent = Notification.Name("factoryfloor.focusAgent")
+    static let splitAgent = Notification.Name("factoryfloor.splitAgent")
+    static let splitTerminal = Notification.Name("factoryfloor.splitTerminal")
+    static let splitBrowser = Notification.Name("factoryfloor.splitBrowser")
     static let closeTerminal = Notification.Name("factoryfloor.closeTerminal")
     static let nextTab = Notification.Name("factoryfloor.nextTab")
     static let prevTab = Notification.Name("factoryfloor.prevTab")
@@ -275,6 +278,7 @@ struct TerminalContainerView: View {
     @AppStorage("factoryfloor.editorTabActive") private var editorTabActive: Bool = false
     @AppStorage("factoryfloor.editorFileDirty") private var editorFileDirty: Bool = false
     @State private var activeTab: WorkspaceTab = .info
+    @State private var splitTab: WorkspaceTab?
     @State private var tabs: [WorkspaceTab] = [.info, .agent]
     @State private var terminalCount = 0
     @State private var browserCount = 0
@@ -362,15 +366,26 @@ struct TerminalContainerView: View {
 
     /// Surface IDs that should be rendering for the active tab.
     private var visibleSurfaceIDs: Set<UUID>? {
-        switch activeTab {
-        case .agent:
-            if setupGateState == .running || setupGateState == .failed {
-                return [setupGateID]
+        if activeTab == .info || splitTab == .info { return nil }
+        
+        var ids: Set<UUID> = []
+        let tabsToCheck = splitTab == nil ? [activeTab] : [activeTab, splitTab!]
+        
+        for tab in tabsToCheck {
+            switch tab {
+            case .agent: 
+                if setupGateState == .running || setupGateState == .failed {
+                    ids.insert(setupGateID)
+                } else {
+                    ids.insert(agentID)
+                }
+            case let .terminal(id): ids.insert(id)
+            case .info, .browser, .editor: break
             }
-            return [agentID]
-        case let .terminal(id): return [id]
-        case .info, .browser, .editor: return []
         }
+        return ids
+        }
+        return ids
     }
 
     private var sessionMode: TerminalSessionMode {
@@ -552,8 +567,8 @@ struct TerminalContainerView: View {
     }
 
     @ViewBuilder
-    private var tabContent: some View {
-        switch activeTab {
+    private func paneContent(for tab: WorkspaceTab) -> some View {
+        switch tab {
         case .info:
             WorkstreamInfoView(
                 workstreamID: workstreamID,
@@ -687,13 +702,25 @@ struct TerminalContainerView: View {
                 guard isActive else { return }
                 if activeTab.isCloseable { closeTab(activeTab) }
             }
+            .onReceive(NotificationCenter.default.publisher(for: .splitAgent)) { _ in toggleSplit(for: .agent) }
+            .onReceive(NotificationCenter.default.publisher(for: .splitTerminal)) { _ in toggleSplit(for: .terminal) }
+            .onReceive(NotificationCenter.default.publisher(for: .splitBrowser)) { _ in toggleSplit(for: .browser) }
     }
 
     private var mainLayout: some View {
         VStack(spacing: 0) {
             tabBar
             Divider()
-            tabContent
+            if let splitTab {
+                HSplitView {
+                    paneContent(for: activeTab)
+                        .frame(minWidth: 200, maxWidth: .infinity, maxHeight: .infinity)
+                    paneContent(for: splitTab)
+                        .frame(minWidth: 200, maxWidth: .infinity, maxHeight: .infinity)
+                }
+            } else {
+                paneContent(for: activeTab)
+            }
             if quickActionDebug {
                 Divider()
                 QuickActionDebugView(runner: quickActionRunner)
@@ -917,6 +944,52 @@ struct TerminalContainerView: View {
             return "info"
         case .agent:
             return "agent"
+        }
+    }
+
+
+    private enum SplitTargetType {
+        case agent, terminal, browser
+    }
+
+    private func toggleSplit(for tabType: SplitTargetType) {
+        var target: WorkspaceTab?
+        switch tabType {
+        case .agent:
+            target = .agent
+        case .terminal:
+            if let lastTerminal = tabs.last(where: { if case .terminal = $0 { return true }; return false }) {
+                target = lastTerminal
+            } else {
+                terminalCount += 1
+                let id = derivedUUID(from: workstreamID, salt: "terminal-\(terminalCount)")
+                target = .terminal(id)
+                tabs.append(target!)
+                saveTabSnapshot()
+            }
+        case .browser:
+            if let lastBrowser = tabs.last(where: { if case .browser = $0 { return true }; return false }) {
+                target = lastBrowser
+            } else {
+                browserCount += 1
+                let id = derivedUUID(from: workstreamID, salt: "browser-\(browserCount)")
+                target = .browser(id)
+                tabs.append(target!)
+                saveTabSnapshot()
+            }
+        }
+
+        guard let target else { return }
+
+        if splitTab == target {
+            splitTab = nil
+        } else if activeTab == target {
+            if let split = splitTab {
+                activeTab = split
+                splitTab = nil
+            }
+        } else {
+            splitTab = target
         }
     }
 
@@ -1256,14 +1329,10 @@ struct TerminalContainerView: View {
             projectDirectory: projectDirectory,
             workingDirectory: workingDirectory,
             port: workstreamPort,
-<<<<<<< HEAD
+            codingCLI: selectedCodingCLI,
             agentTeams: agentTeams,
             defaultBranch: defaultBranch,
             scriptSource: scriptConfig.source
-=======
-            codingCLI: selectedCodingCLI,
-            agentTeams: agentTeams
->>>>>>> ba1d090 (feat: add selectable coding CLI support)
         )
     }
 

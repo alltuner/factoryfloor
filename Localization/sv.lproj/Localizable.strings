@@ -313,3 +313,8 @@
 "Worktree Age" = "Worktree Age";
 "Clean" = "Clean";
 "Created today" = "Created today";
+
+/* Split Panes */
+"Split Agent" = "Dela Agent-panel";
+"Split Terminal" = "Dela Terminal-panel";
+"Split Browser" = "Dela Webbläsare-panel";

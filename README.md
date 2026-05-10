@@ -128,15 +128,19 @@ Every workstream terminal has access to:
 | `Cmd+3-9` | Switch tab |
 | `Cmd+Shift+[` / `]` | Cycle tabs |
 | `Cmd+Return` | Focus Coding Agent |
+| `Cmd+Shift+Return` | Split Agent pane |
+| `Cmd+I` | Info panel |
+| `Cmd+E` | Environment |
 | `Cmd+T` | New Terminal |
+| `Cmd+Shift+T` | Split Terminal pane |
 | `Cmd+B` | New Browser |
+| `Cmd+Shift+B` | Split Browser pane |
 | `Cmd+O` | New Editor |
 | `Cmd+S` | Save (Editor) |
 | `Cmd+Shift+S` | Save As (Editor) |
 | `Cmd+W` | Close tab |
 | `Cmd+Shift+W` | Archive workstream |
 | `Cmd+L` | Address bar (browser) |
-| `Cmd+Shift+Return` | Start/Rerun |
 
 #### Navigation
 
