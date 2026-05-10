@@ -308,7 +308,8 @@ struct EnvironmentTabView: View {
         let ffRunPath = RunLauncher.executableURL()?.path
         if role == "run", let launcherPath = ffRunPath {
             let expectedPort = scriptConfig.expectedPort ?? RunLauncher.inferExpectedPort(runCommand: script, projectDirectory: projectDirectory)
-            baseCommand = runScriptCommand(script: script, workstreamID: workstreamID, launcherPath: launcherPath, expectedPort: expectedPort)
+            let wrappedScript = RunLauncher.wrapWithVenv(script, projectDirectory: projectDirectory)
+            baseCommand = runScriptCommand(script: wrappedScript, workstreamID: workstreamID, launcherPath: launcherPath, expectedPort: expectedPort)
         } else {
             baseCommand = scriptCommand(script: script, role: role)
         }
