@@ -764,6 +764,10 @@ struct TerminalContainerView: View {
             if tabs.contains(where: { if case .editor = $0 { return true } else { return false } }) {
                 startFileTreeWatcherIfNeeded()
             }
+            splitTab = surfaceCache.splitTabs[workstreamID]
+        }
+        .onChange(of: splitTab) { _, newValue in
+            surfaceCache.splitTabs[workstreamID] = newValue
         }
         .onDisappear {
             if isActive {
@@ -2070,6 +2074,7 @@ final class TerminalSurfaceCache: ObservableObject {
     private(set) var failedSurfaces: [UUID: String] = [:]
     /// Tracks when each surface was created, for detecting immediate process death.
     private var creationTimes: [UUID: Date] = [:]
+    var splitTabs: [UUID: WorkspaceTab] = [:]
     /// Surfaces that died within this interval after creation are treated as launch failures.
     private static let healthCheckWindow: TimeInterval = 2.0
 
