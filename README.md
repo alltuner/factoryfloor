@@ -140,6 +140,8 @@ Every workstream terminal has access to:
 | `Cmd+Shift+S` | Save As (Editor) |
 | `Cmd+W` | Close tab |
 | `Cmd+Shift+W` | Archive workstream |
+| `Cmd+R` | Reload browser |
+| `Cmd+Shift+R` | Hard reload browser (bypass cache) |
 | `Cmd+L` | Address bar (browser) |
 
 #### Navigation

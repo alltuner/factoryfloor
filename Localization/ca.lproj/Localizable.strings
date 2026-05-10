@@ -318,3 +318,9 @@
 "Split Agent" = "Dividir tauler de l'agent";
 "Split Terminal" = "Dividir tauler del terminal";
 "Split Browser" = "Dividir tauler del navegador";
+
+/* Browser */
+"Reload" = "Recarregar";
+"Hard Reload" = "Recarregar (sense memòria cau)";
+"Reload browser" = "Recarregar el navegador";
+"Hard reload browser" = "Recarregar el navegador (sense memòria cau)";

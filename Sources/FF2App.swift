@@ -338,15 +338,11 @@ struct FF2App: App {
                 }
                 .keyboardShortcut("o", modifiers: .command)
 
-                Button("Start/Rerun") {
-                    NotificationCenter.default.post(name: .rerunScript, object: nil)
+                Button("Split Browser") {
+                    NotificationCenter.default.post(name: .splitBrowser, object: nil)
                 }
-                .keyboardShortcut(.return, modifiers: [.command, .shift])
-                    NotificationCenter.default.post(name: .toggleBrowser, object: nil)
-                }
-                .keyboardShortcut("b", modifiers: .command)
+                .keyboardShortcut("b", modifiers: [.command, .shift])
 
-<<<<<<< HEAD
                 Button("New Editor") {
                     NotificationCenter.default.post(name: .toggleEditor, object: nil)
                 }
@@ -358,10 +354,6 @@ struct FF2App: App {
                 .keyboardShortcut(.return, modifiers: [.command, .shift])
 
                 Divider()
-=======
-                Button("Split Browser") {
-                    NotificationCenter.default.post(name: .splitBrowser, object: nil)
-                }
                 .keyboardShortcut("b", modifiers: [.command, .shift])
 >>>>>>> 20b764c (feat: add keyboard-driven split pane (Cmd+Shift+T/B/Return toggles))
 
@@ -375,8 +367,24 @@ struct FF2App: App {
                 }
                 .keyboardShortcut("[", modifiers: [.command, .shift])
 
+                Button("Reload") {
+                    NotificationCenter.default.post(name: .browserReload, object: nil)
+                }
+                .keyboardShortcut("r", modifiers: .command)
+
+                Button("Hard Reload") {
+                    NotificationCenter.default.post(name: .browserHardReload, object: nil)
+                }
+                .keyboardShortcut("r", modifiers: [.command, .shift])
+
                 Button("Back to Project") {
                     NotificationCenter.default.post(name: .switchToProject, object: nil)
+                }
+                .keyboardShortcut("[", modifiers: [.command, .shift])
+
+                Button("Address Bar") {
+                    NotificationCenter.default.post(name: .focusAddressBar, object: nil)
+>>>>>>> ab12073 (feat: add Cmd+R / Cmd+Shift+R browser reload shortcuts)
                 }
                 .keyboardShortcut("0", modifiers: .command)
 
