@@ -301,3 +301,9 @@
 "Split Agent" = "Split Agent";
 "Split Terminal" = "Split Terminal";
 "Split Browser" = "Split Browser";
+
+/* Browser */
+"Reload" = "Reload";
+"Hard Reload" = "Hard Reload";
+"Reload browser" = "Reload browser";
+"Hard reload browser" = "Hard reload browser";

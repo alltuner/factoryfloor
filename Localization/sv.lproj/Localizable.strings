@@ -301,3 +301,9 @@
 "Split Agent" = "Dela Agent-panel";
 "Split Terminal" = "Dela Terminal-panel";
 "Split Browser" = "Dela Webbläsare-panel";
+
+/* Browser */
+"Reload" = "Ladda om";
+"Hard Reload" = "Ladda om (rensa cache)";
+"Reload browser" = "Ladda om webbläsaren";
+"Hard reload browser" = "Ladda om webbläsaren (rensa cache)";

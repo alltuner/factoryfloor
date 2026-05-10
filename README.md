@@ -114,6 +114,8 @@ Every workstream terminal has access to:
 | `Cmd+B` | New Browser |
 | `Cmd+Shift+B` | Split Browser pane |
 | `Cmd+W` | Close tab |
+| `Cmd+R` | Reload browser |
+| `Cmd+Shift+R` | Hard reload browser (bypass cache) |
 | `Cmd+L` | Address bar (browser) |
 | `Cmd+0` | Back to project |
 | `Cmd+1-9` | Switch tab |

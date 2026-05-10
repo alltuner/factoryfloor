@@ -94,6 +94,8 @@ struct HelpView: View {
                         ShortcutRow(keys: "B", description: "New Browser")
                         ShortcutRow(keys: "B", shift: true, description: "Split Browser pane")
                         ShortcutRow(keys: "W", description: "Close tab")
+                        ShortcutRow(keys: "R", description: "Reload browser")
+                        ShortcutRow(keys: "R", shift: true, description: "Hard reload browser")
                         ShortcutRow(keys: "L", description: "Address bar")
                         ShortcutRow(keys: "0", description: "Back to project")
                         ShortcutRow(keys: "1-9", description: "Switch tab")

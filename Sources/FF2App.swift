@@ -319,6 +319,16 @@ struct FF2App: App {
                 }
                 .keyboardShortcut("[", modifiers: [.command, .shift])
 
+                Button("Reload") {
+                    NotificationCenter.default.post(name: .browserReload, object: nil)
+                }
+                .keyboardShortcut("r", modifiers: .command)
+
+                Button("Hard Reload") {
+                    NotificationCenter.default.post(name: .browserHardReload, object: nil)
+                }
+                .keyboardShortcut("r", modifiers: [.command, .shift])
+
                 Button("Address Bar") {
                     NotificationCenter.default.post(name: .focusAddressBar, object: nil)
                 }
