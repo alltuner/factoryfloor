@@ -496,15 +496,14 @@ struct TerminalContainerView: View {
         VStack(spacing: 0) {
             tabBar
             Divider()
-            if let splitTab {
-                HSplitView {
-                    paneContent(for: activeTab)
-                        .frame(minWidth: 200, maxWidth: .infinity, maxHeight: .infinity)
-                    paneContent(for: splitTab)
-                        .frame(minWidth: 200, maxWidth: .infinity, maxHeight: .infinity)
-                }
-            } else {
+            HStack(spacing: 0) {
                 paneContent(for: activeTab)
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+                if let splitTab {
+                    Divider()
+                    paneContent(for: splitTab)
+                        .frame(maxWidth: .infinity, maxHeight: .infinity)
+                }
             }
             if quickActionDebug {
                 Divider()
