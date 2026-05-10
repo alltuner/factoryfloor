@@ -62,10 +62,19 @@ struct SettingsView: View {
                     version: appEnv.toolStatus.codexVersion
                 )
                 ToolRow(
+                    name: "opencode",
+                    status: appEnv.toolStatus.opencode,
+                    version: appEnv.toolStatus.opencodeVersion
+                )
+                ToolRow(
+                    name: "gemini",
+                    status: appEnv.toolStatus.gemini,
+                    version: appEnv.toolStatus.geminiVersion
+                )
+                ToolRow(
                     name: "gh",
                     status: appEnv.toolStatus.gh,
                     version: appEnv.toolStatus.ghVersion,
-                    detail: appEnv.toolStatus.ghAuthDetail
                 )
                 ToolRow(
                     name: "git",
@@ -500,9 +509,12 @@ struct ToolStatus {
     var claudeSupportsSessionName: Bool = false
     var codex: BinaryStatus = .notFound
     var codexVersion: String?
+    var opencode: BinaryStatus = .notFound
+    var opencodeVersion: String?
+    var gemini: BinaryStatus = .notFound
+    var geminiVersion: String?
     var gh: BinaryStatus = .notFound
     var ghVersion: String?
-    var ghAuthDetail: String?
     var git: BinaryStatus = .notFound
     var gitVersion: String?
 
@@ -525,10 +537,19 @@ struct ToolStatus {
             status.codexVersion = runForVersion(path, args: ["--version"])
         }
 
+        status.opencode = findBinary("opencode")
+        if let path = status.opencode.path {
+            status.opencodeVersion = runForVersion(path, args: ["--version"])
+        }
+
+        status.gemini = findBinary("gemini")
+        if let path = status.gemini.path {
+            status.geminiVersion = runForVersion(path, args: ["--version"])
+        }
+
         status.gh = findBinary("gh")
         if let path = status.gh.path {
             status.ghVersion = runForVersion(path, args: ["--version"])
-            status.ghAuthDetail = checkGhAuth(path)
         }
 
         status.git = findBinary("git")
@@ -538,7 +559,6 @@ struct ToolStatus {
 
         return status
     }
-
     private static func findBinary(_ name: String) -> BinaryStatus {
         guard let path = CommandLineTools.path(for: name) else { return .notFound }
         return .found(path)

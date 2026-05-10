@@ -103,6 +103,8 @@ struct CommandBuilder {
 enum CodingCLI: String, CaseIterable, Identifiable {
     case claude
     case codex
+    case opencode
+    case gemini
 
     var id: String { rawValue }
 
@@ -116,6 +118,10 @@ enum CodingCLI: String, CaseIterable, Identifiable {
             return NSLocalizedString("Claude Code", comment: "")
         case .codex:
             return NSLocalizedString("Codex", comment: "")
+        case .opencode:
+            return NSLocalizedString("OpenCode", comment: "")
+        case .gemini:
+            return NSLocalizedString("Gemini CLI", comment: "")
         }
     }
 
@@ -125,6 +131,10 @@ enum CodingCLI: String, CaseIterable, Identifiable {
             return URL(string: "https://docs.anthropic.com/en/docs/claude-code/overview")!
         case .codex:
             return URL(string: "https://developers.openai.com/codex")!
+        case .opencode:
+            return URL(string: "https://github.com/opencode")!
+        case .gemini:
+            return URL(string: "https://github.com/google/gemini-cli")!
         }
     }
 
@@ -134,6 +144,10 @@ enum CodingCLI: String, CaseIterable, Identifiable {
             return NSLocalizedString("Claude Code not found", comment: "")
         case .codex:
             return NSLocalizedString("Codex not found", comment: "")
+        case .opencode:
+            return NSLocalizedString("OpenCode not found", comment: "")
+        case .gemini:
+            return NSLocalizedString("Gemini CLI not found", comment: "")
         }
     }
 
@@ -143,6 +157,10 @@ enum CodingCLI: String, CaseIterable, Identifiable {
             return NSLocalizedString("Install Claude Code to use the Coding Agent.", comment: "")
         case .codex:
             return NSLocalizedString("Install Codex to use the Coding Agent.", comment: "")
+        case .opencode:
+            return NSLocalizedString("Install OpenCode to use the Coding Agent.", comment: "")
+        case .gemini:
+            return NSLocalizedString("Install Gemini CLI to use the Coding Agent.", comment: "")
         }
     }
 
@@ -152,6 +170,10 @@ enum CodingCLI: String, CaseIterable, Identifiable {
             return NSLocalizedString("Install Claude Code", comment: "")
         case .codex:
             return NSLocalizedString("Install Codex", comment: "")
+        case .opencode:
+            return NSLocalizedString("Install OpenCode", comment: "")
+        case .gemini:
+            return NSLocalizedString("Install Gemini CLI", comment: "")
         }
     }
 
@@ -161,6 +183,10 @@ enum CodingCLI: String, CaseIterable, Identifiable {
             return NSLocalizedString("Claude Code is not installed.", comment: "")
         case .codex:
             return NSLocalizedString("Codex is not installed.", comment: "")
+        case .opencode:
+            return NSLocalizedString("OpenCode is not installed.", comment: "")
+        case .gemini:
+            return NSLocalizedString("Gemini CLI is not installed.", comment: "")
         }
     }
 
@@ -169,7 +195,7 @@ enum CodingCLI: String, CaseIterable, Identifiable {
     }
 
     var supportsAutoRenameBranch: Bool {
-        self == .claude
+        self == .claude || self == .opencode
     }
 }
 
@@ -180,6 +206,10 @@ extension ToolStatus {
             return claude
         case .codex:
             return codex
+        case .opencode:
+            return opencode
+        case .gemini:
+            return gemini
         }
     }
 
@@ -189,6 +219,10 @@ extension ToolStatus {
             return claudeVersion
         case .codex:
             return codexVersion
+        case .opencode:
+            return opencodeVersion
+        case .gemini:
+            return geminiVersion
         }
     }
 
@@ -200,7 +234,7 @@ extension ToolStatus {
         switch cli {
         case .claude:
             return claudeSupportsSessionName
-        case .codex:
+        case .codex, .opencode, .gemini:
             return false
         }
     }
@@ -211,6 +245,12 @@ extension ToolStatus {
         }
         if claude.isInstalled {
             return .claude
+        }
+        if opencode.isInstalled {
+            return .opencode
+        }
+        if gemini.isInstalled {
+            return .gemini
         }
         if codex.isInstalled {
             return .codex
@@ -268,6 +308,11 @@ enum CodingCLICommandBuilder {
                 bypassPermissions: bypassPermissions,
                 allowOutsideWorktree: allowOutsideWorktree
             )
+        case .opencode, .gemini:
+            command = buildGenericAgentCommand(
+                cliPath: cliPath,
+                workingDirectory: workingDirectory
+            )
         }
 
         if useTmux, let tmuxPath {
@@ -315,6 +360,11 @@ enum CodingCLICommandBuilder {
             command.flag("--json")
             command.flag("--dangerously-bypass-approvals-and-sandbox")
             command.option("-C", workingDirectory)
+            command.arg(CommandBuilder.shellQuote(prompt))
+            innerCommand = command.command
+            parseJSON = false
+        case .opencode, .gemini:
+            var command = CommandBuilder(cliPath)
             command.arg(CommandBuilder.shellQuote(prompt))
             innerCommand = command.command
             parseJSON = false
@@ -427,6 +477,18 @@ enum CodingCLICommandBuilder {
         return AgentLaunchCommand(
             finalCommand: finalCommand,
             intermediateCommands: [resume.command, fresh.command, finalCommand]
+        )
+    }
+
+    private static func buildGenericAgentCommand(
+        cliPath: String,
+        workingDirectory: String
+    ) -> AgentLaunchCommand {
+        let fresh = CommandBuilder(cliPath)
+        
+        return AgentLaunchCommand(
+            finalCommand: fresh.command,
+            intermediateCommands: [fresh.command]
         )
     }
 

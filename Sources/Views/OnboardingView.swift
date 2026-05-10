@@ -64,7 +64,7 @@ struct OnboardingView: View {
                             label: "GitHub CLI",
                             status: toolStatus.gh,
                             version: toolStatus.ghVersion,
-                            detail: toolStatus.ghAuthDetail
+
                         )
                         PrerequisiteRow(
                             name: "git",
