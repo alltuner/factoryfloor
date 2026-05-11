@@ -79,12 +79,15 @@ case "${1:-build}" in
     ;;
   release)
     RELEASE_DIR="build/release-local/derived"
+    COMMIT_HASH=$(git rev-parse --short HEAD 2>/dev/null || echo "dev")
     ensure_ghostty_resources
     ensure_monaco_editor
     xcodegen generate
     xcodebuild -project "$PROJECT" -scheme "$SCHEME" -configuration Release \
       -derivedDataPath "$RELEASE_DIR" -clonedSourcePackagesDirPath "$SPM_CACHE" \
       -skipPackagePluginValidation \
+      CURRENT_PROJECT_VERSION="$COMMIT_HASH" \
+      MARKETING_VERSION="$COMMIT_HASH" \
       CODE_SIGN_IDENTITY="-" \
       CODE_SIGN_STYLE=Manual \
       ENABLE_HARDENED_RUNTIME=YES \
