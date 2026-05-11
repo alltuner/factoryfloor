@@ -1,13 +1,13 @@
 #!/usr/bin/env bash
-# ABOUTME: Development convenience script for Factory Floor.
-# ABOUTME: Usage: ./scripts/dev.sh [build|run|test|clean]
+# ABOUTME: Development convenience script for Dockyard.
+# ABOUTME: Usage: ./scripts/dev.sh [build|run|test|clean|release|install]
 
 set -e
 
 PROJECT="FactoryFloor.xcodeproj"
 SCHEME="FactoryFloor"
 TEST_SCHEME="FactoryFloorTests"
-APP_NAME="Factory Floor Debug"
+APP_NAME="Dockyard Debug"
 BUILD_DIR="build/debug/derived"
 APP_PATH="$BUILD_DIR/Build/Products/Debug/$APP_NAME.app"
 SPM_CACHE="$HOME/Library/Caches/factoryfloor/spm"
@@ -95,25 +95,25 @@ case "${1:-build}" in
       CODE_SIGN_ENTITLEMENTS=Resources/ff2-local.entitlements \
       OTHER_CODE_SIGN_FLAGS="--options=runtime" \
       build
-    APP_BUNDLE="$RELEASE_DIR/Build/Products/Release/Factory Floor.app"
+    APP_BUNDLE="$RELEASE_DIR/Build/Products/Release/Dockyard.app"
     echo "==> Release build at: $APP_BUNDLE"
     if [ "${2:-}" = "--run" ]; then
-      pkill -xf ".*/Contents/MacOS/Factory Floor" 2>/dev/null || true
+      pkill -xf ".*/Contents/MacOS/Dockyard" 2>/dev/null || true
       sleep 0.5
-      open "$RELEASE_DIR/Build/Products/Release/Factory Floor.app"
+      open "$RELEASE_DIR/Build/Products/Release/Dockyard.app"
     fi
     ;;
   install)
     # 1. Build a local release version
     "$0" release
     
-    APP_BUNDLE="build/release-local/derived/Build/Products/Release/Factory Floor.app"
-    TARGET_DIR="/Applications/Factory Floor.app"
+    APP_BUNDLE="build/release-local/derived/Build/Products/Release/Dockyard.app"
+    TARGET_DIR="/Applications/Dockyard.app"
     
     echo "==> Installing local build to $TARGET_DIR..."
     
     # 2. Kill the app if it's currently running
-    pkill -xf ".*/Contents/MacOS/Factory Floor" 2>/dev/null || true
+    pkill -xf ".*/Contents/MacOS/Dockyard" 2>/dev/null || true
     sleep 0.5
     
     # 3. Remove the old app and copy the new one over
@@ -121,7 +121,7 @@ case "${1:-build}" in
     cp -R "$APP_BUNDLE" "/Applications/"
     
     echo "==> Installed successfully!"
-    echo "==> Launching Factory Floor..."
+    echo "==> Launching Dockyard..."
     open "$TARGET_DIR"
     ;;
   clean)
