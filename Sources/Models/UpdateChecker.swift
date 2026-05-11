@@ -26,6 +26,10 @@ class UpdateChecker: ObservableObject {
         #if DEBUG
             return
         #else
+            // Skip update check for local builds that use a git hash as version
+            guard currentVersion.range(of: "^[0-9]+\\.[0-9]+\\.[0-9]+$", options: .regularExpression) != nil else {
+                return
+            }
             Task.detached { [currentVersion, logger] in
                 do {
                     let (data, _) = try await URLSession.shared.data(from: Self.appcastURL)
