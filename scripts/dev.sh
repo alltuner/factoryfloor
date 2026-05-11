@@ -100,6 +100,27 @@ case "${1:-build}" in
       open "$RELEASE_DIR/Build/Products/Release/Factory Floor.app"
     fi
     ;;
+  install)
+    # 1. Build a local release version
+    "$0" release
+    
+    APP_BUNDLE="build/release-local/derived/Build/Products/Release/Factory Floor.app"
+    TARGET_DIR="/Applications/Factory Floor.app"
+    
+    echo "==> Installing local build to $TARGET_DIR..."
+    
+    # 2. Kill the app if it's currently running
+    pkill -xf ".*/Contents/MacOS/Factory Floor" 2>/dev/null || true
+    sleep 0.5
+    
+    # 3. Remove the old app and copy the new one over
+    rm -rf "$TARGET_DIR"
+    cp -R "$APP_BUNDLE" "/Applications/"
+    
+    echo "==> Installed successfully!"
+    echo "==> Launching Factory Floor..."
+    open "$TARGET_DIR"
+    ;;
   clean)
     xcodebuild -project "$PROJECT" -scheme "$SCHEME" -configuration Debug clean 2>/dev/null || true
     rm -rf build/debug build/release-local "$SPM_CACHE"
@@ -113,6 +134,7 @@ case "${1:-build}" in
     echo "  test     Run tests"
     echo "  release  Build Release matching CI (hardened runtime)"
     echo "  release --run  Build and run Release"
+    echo "  install  Build local release, install to /Applications, and run"
     echo "  clean    Clean build artifacts"
     ;;
 esac
