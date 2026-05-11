@@ -34,9 +34,9 @@ enum AppConstants {
 
     static let appName: String = {
         #if DEBUG
-            "Factory Floor Debug"
+            "Dockyard Debug"
         #else
-            "Factory Floor"
+            "Dockyard"
         #endif
     }()
 
