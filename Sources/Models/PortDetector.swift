@@ -13,7 +13,7 @@ final class PortDetector: ObservableObject, @unchecked Sendable {
 
     init(workstreamID: UUID) {
         self.workstreamID = workstreamID
-        self.queue = DispatchQueue(label: "factoryfloor.port-detector.\(workstreamID.uuidString.lowercased())")
+        queue = DispatchQueue(label: "factoryfloor.port-detector.\(workstreamID.uuidString.lowercased())")
         start()
     }
 

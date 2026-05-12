@@ -2,8 +2,8 @@
 // ABOUTME: Verifies AppKit mouse positions are translated to Ghostty's top-left Y axis.
 
 import Cocoa
-import XCTest
 @testable import FactoryFloor
+import XCTest
 
 @MainActor
 final class TerminalViewTests: XCTestCase {
