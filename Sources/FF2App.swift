@@ -126,6 +126,13 @@ final class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCent
 
     func applicationWillTerminate(_: Notification) {
         guard !isRunningXCTest() else { return }
+        let tmuxPath = ToolStatus.detect().tmux.path
+        if let tmuxPath {
+            // Run kill-server asynchronously so it doesn't block the main thread and sluggishly delay app closing.
+            DispatchQueue.global(qos: .userInitiated).async {
+                TmuxSession.killAllSessions(tmuxPath: tmuxPath)
+            }
+        }
     }
 
     func applicationShouldTerminate(_: NSApplication) -> NSApplication.TerminateReply {
