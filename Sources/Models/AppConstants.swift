@@ -57,15 +57,7 @@ enum AppConstants {
     }
 
     static var displayVersion: String {
-        #if DEBUG
-            let build = Bundle.main.infoDictionary?["CFBundleVersion"] as? String
-            if let build, build != "1", build != version {
-                return "\(version) (\(build))"
-            }
-            return "\(version) (Debug)"
-        #else
-            return version
-        #endif
+        return "\(version) (\(AppCommit.hash))"
     }
 
     /// Config directory: ~/.config/factoryfloor/ (respects XDG_CONFIG_HOME).

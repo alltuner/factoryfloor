@@ -52,9 +52,6 @@ final class TerminalView: NSView {
     init(app: ghostty_app_t, workingDirectory: String? = nil, command: String? = nil, initialInput: String? = nil, environmentVars: [String: String] = [:], waitAfterCommand: Bool = true) {
         super.init(frame: NSRect(x: 0, y: 0, width: 800, height: 600))
 
-        wantsLayer = true
-        layer?.isOpaque = true
-
         registerForDraggedTypes(Array(Self.dropTypes))
 
         var config = ghostty_surface_config_new()
@@ -195,6 +192,10 @@ final class TerminalView: NSView {
 
         if let window {
             layer?.contentsScale = window.backingScaleFactor
+            // Ensure we claim focus if we were created with it but didn't have a window yet
+            if let delegate = window.firstResponder, delegate !== self {
+                window.makeFirstResponder(self)
+            }
         }
 
         // Defer size reporting to let Auto Layout settle first.

@@ -193,6 +193,11 @@ struct ProjectSidebar: View {
             }
             #endif
 
+            Text(AppConstants.displayVersion)
+                .font(.system(size: 10, design: .monospaced))
+                .foregroundStyle(.tertiary)
+                .padding(.bottom, 4)
+
             // Credit
             VStack(spacing: 2) {
                 HStack(spacing: 0) {
