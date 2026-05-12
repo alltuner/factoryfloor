@@ -1225,12 +1225,12 @@ struct TerminalContainerView: View {
             }
         }
         appEnv.refreshWorktreeState(for: workingDirectory, projectDirectory: projectDirectory)
-        cachedClaudeCommand = buildClaudeCommand()
+        cachedAgentCommand = buildAgentCommand()
         if scriptConfig.setup != nil, !SetupStateStore.isCompleted(for: workstreamID) {
             setupGateState = .running
         } else {
             setupGateState = .notNeeded
-            surfaceCache.respawnableIDs.insert(claudeID)
+            surfaceCache.respawnableIDs.insert(agentID)
         }
         preloadSurfaces()
         // Eagerly create the Monaco bridge so it's ready when the user opens
@@ -1268,44 +1268,6 @@ struct TerminalContainerView: View {
                     environmentVars: envVars
                 )
             }
-        }
-    }
-        }
-        } else {
-            // Agent surface
-            if let cmd = cachedClaudeCommand {
-                _ = surfaceCache.surface(
-                    for: claudeID,
-                    app: app,
-                    workingDirectory: workingDirectory,
-                    command: cmd,
-                    environmentVars: envVars
-                )
-            }
-=======
-        // Agent surface
-        if let cmd = cachedAgentCommand {
-            _ = surfaceCache.surface(
-                for: agentID,
-                app: app,
-                workingDirectory: workingDirectory,
-                command: cmd,
-                environmentVars: envVars
-            )
-        }
-
-        // Environment script surfaces
-        if let setup = scriptConfig.setup {
-            let setupID = derivedUUID(from: workstreamID, salt: "env-setup-0")
-            let cmd = buildEnvironmentCommand(script: setup, role: "setup")
-            _ = surfaceCache.surface(
-                for: setupID,
-                app: app,
-                workingDirectory: workingDirectory,
-                command: cmd,
-                environmentVars: terminalEnvVars
-            )
->>>>>>> ba1d090 (feat: add selectable coding CLI support)
         }
     }
 
@@ -1610,8 +1572,8 @@ private struct GitHubActionMenu: View {
 
     private func disabledReason(for action: QuickAction) -> String? {
         if action.usesLLM {
-            if claudePath == nil {
-                return NSLocalizedString("Claude Code is not installed.", comment: "")
+            if codingCLIPath == nil {
+                return codingCLI.quickActionNotInstalledMessage
             }
             if !bypassPermissions {
                 return NSLocalizedString("Enable \"Bypass permission prompts\" in Settings.", comment: "")

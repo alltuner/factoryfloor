@@ -389,7 +389,6 @@ struct DockyardApp: App {
 
                 Button("Address Bar") {
                     NotificationCenter.default.post(name: .focusAddressBar, object: nil)
->>>>>>> ab12073 (feat: add Cmd+R / Cmd+Shift+R browser reload shortcuts)
                 }
                 .keyboardShortcut("0", modifiers: .command)
 

@@ -195,7 +195,7 @@ Lege eine `.dockyard.json` in dein Projektstammverzeichnis, um den Workstream-Le
 ```json
 {
   "setup": "npm install",
-  "run": "PORT=$FF_PORT npm run dev",
+  "run": "PORT=$DY_PORT npm run dev",
   "teardown": "docker-compose down"
 }
 ```
@@ -222,16 +222,16 @@ Jedes Terminal, Setup-Skript und Run-Kommando in einem Workstream hat diese Vari
 
 | Variable | Was es ist | Beispiel |
 |----------|-----------|---------|
-| `FF_PROJECT` | Projektname | `my-app` |
-| `FF_WORKSTREAM` | Workstream-Name | `coral-tidal-reef` |
-| `FF_PROJECT_DIR` | Hauptrepository-Pfad | `/Users/you/my-app` |
-| `FF_WORKTREE_DIR` | Worktree-Pfad | `~/.dockyard/worktrees/my-app/coral-tidal-reef` |
-| `FF_PORT` | Deterministischer Port (40001-49999) | `42847` |
-| `FF_DEFAULT_BRANCH` | Standard-Branch (main, master, etc.) | `main` |
+| `DY_PROJECT` | Projektname | `my-app` |
+| `DY_WORKSTREAM` | Workstream-Name | `coral-tidal-reef` |
+| `DY_PROJECT_DIR` | Hauptrepository-Pfad | `/Users/you/my-app` |
+| `DY_WORKTREE_DIR` | Worktree-Pfad | `~/.dockyard/worktrees/my-app/coral-tidal-reef` |
+| `DY_PORT` | Deterministischer Port (40001-49999) | `42847` |
+| `DY_DEFAULT_BRANCH` | Standard-Branch (main, master, etc.) | `main` |
 
-#### Über FF_PORT {#about-ff_port}
+#### Über DY_PORT {#about-dy_port}
 
-Jeder Workstream bekommt einen deterministischen Port basierend auf einem Hash des Worktree-Pfads. Gleicher Workstream, gleicher Port, jedes Mal. Keine Port-Konflikte zwischen Workstreams. Verwende ihn in deinem Run-Skript: `PORT=$FF_PORT npm run dev`. Falls du tausende Workstreams gleichzeitig laufen lässt, bekommst du vielleicht eine Kollision 🎲, aber hoffentlich geht dir vorher der Speicher aus.
+Jeder Workstream bekommt einen deterministischen Port basierend auf einem Hash des Worktree-Pfads. Gleicher Workstream, gleicher Port, jedes Mal. Keine Port-Konflikte zwischen Workstreams. Verwende ihn in deinem Run-Skript: `PORT=$DY_PORT npm run dev`. Falls du tausende Workstreams gleichzeitig laufen lässt, bekommst du vielleicht eine Kollision 🎲, aber hoffentlich geht dir vorher der Speicher aus.
 
 #### .env-Symlink {#env-symlink}
 
@@ -344,7 +344,7 @@ Dockyard erkennt Tools aus deiner Login-Shell. Wenn `claude`, `gh`, `git` oder `
 
 #### Port nicht erkannt {#port-not-detected}
 
-- Stelle sicher, dass dein Run-Skript `$FF_PORT` verwendet (oder der Port aus dem Prozessbaum erkannt wird)
+- Stelle sicher, dass dein Run-Skript `$DY_PORT` verwendet (oder der Port aus dem Prozessbaum erkannt wird)
 - Der `dy-run`-Launcher umhüllt das Run-Skript — er überwacht Kindprozesse nach lauschenden TCP-Ports
 - Prüfe Settings > Advanced > Detailed logging für Debug-Ausgaben
 

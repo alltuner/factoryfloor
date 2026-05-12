@@ -96,7 +96,7 @@ struct ScriptConfig {
         let run = scripts["run"] as? String
         let teardown = scripts["teardown"] as? String
         guard setup != nil || run != nil || teardown != nil else { return .empty }
-        return ScriptConfig(setup: nonEmpty(setup), run: nonEmpty(run), teardown: nonEmpty(teardown), source: ".emdash.json", loadError: nil)
+        return ScriptConfig(setup: nonEmpty(setup), run: nonEmpty(run), teardown: nonEmpty(teardown), expectedPort: nil, source: ".emdash.json", loadError: nil)
     }
 
     /// conductor.json: { "scripts": { "setup": "cmd", "run": "cmd", "archive": "cmd" } }

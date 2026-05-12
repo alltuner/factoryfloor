@@ -1,5 +1,5 @@
 // ABOUTME: Builds environment variables injected into workstream terminals.
-// ABOUTME: Centralizes FF_* vars, default branch, and compatibility aliases for external tools.
+// ABOUTME: Centralizes DY_* vars, default branch, and compatibility aliases for external tools.
 
 import Foundation
 
@@ -26,17 +26,17 @@ enum WorkstreamEnvironment {
         let portString = "\(finalPort)"
 
         var vars = [
-            "FF_WORKSTREAM_ID": id,
-            "FF_PROJECT": projectName,
-            "FF_WORKSTREAM": workstreamName,
-            "FF_PROJECT_DIR": projectDirectory,
-            "FF_WORKTREE_DIR": workingDirectory,
-            "FF_PORT": portString,
-            "FF_DEFAULT_BRANCH": defaultBranch,
+            "DY_WORKSTREAM_ID": id,
+            "DY_PROJECT": projectName,
+            "DY_WORKSTREAM": workstreamName,
+            "DY_PROJECT_DIR": projectDirectory,
+            "DY_WORKTREE_DIR": workingDirectory,
+            "DY_PORT": portString,
+            "DY_DEFAULT_BRANCH": defaultBranch,
         ]
 
         if let inferredVenv {
-            vars["FF_VENV_DIR"] = inferredVenv
+            vars["DY_VENV_DIR"] = inferredVenv
         }
         
         if codingCLI == .claude, agentTeams {
@@ -65,33 +65,6 @@ enum WorkstreamEnvironment {
             break
         }
 
-        return vars
-    }
-<<<<<<< HEAD
-
-        switch scriptSource {
-        case "conductor.json":
-            vars["CONDUCTOR_WORKSPACE_NAME"] = workstreamName
-            vars["CONDUCTOR_ROOT_PATH"] = projectDirectory
-            vars["CONDUCTOR_WORKSPACE_PATH"] = workingDirectory
-            vars["CONDUCTOR_PORT"] = portString
-            vars["CONDUCTOR_DEFAULT_BRANCH"] = defaultBranch
-        case ".emdash.json":
-            vars["EMDASH_TASK_ID"] = id
-            vars["EMDASH_TASK_NAME"] = workstreamName
-            vars["EMDASH_TASK_PATH"] = workingDirectory
-            vars["EMDASH_ROOT_PATH"] = projectDirectory
-            vars["EMDASH_PORT"] = portString
-            vars["EMDASH_DEFAULT_BRANCH"] = defaultBranch
-        case ".superset/config.json":
-            vars["SUPERSET_WORKSPACE_NAME"] = workstreamName
-            vars["SUPERSET_ROOT_PATH"] = projectDirectory
-            vars["SUPERSET_PORT_BASE"] = portString
-        default:
-            break
-        }
-
-=======
         
         var pathsToPrepend: [String] = []
         let fileManager = FileManager.default
@@ -117,7 +90,6 @@ enum WorkstreamEnvironment {
             vars["PATH"] = (pathsToPrepend + [currentPath]).filter { !$0.isEmpty }.joined(separator: ":")
         }
         
->>>>>>> 9b66959 (feat: auto-detect venv on PATH and infer port from .env and run command flags)
         return vars
     }
 }

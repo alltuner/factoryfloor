@@ -195,7 +195,7 @@ Coloca un `.dockyard.json` en la raíz de tu proyecto para automatizar el ciclo 
 ```json
 {
   "setup": "npm install",
-  "run": "PORT=$FF_PORT npm run dev",
+  "run": "PORT=$DY_PORT npm run dev",
   "teardown": "docker-compose down"
 }
 ```
@@ -222,16 +222,16 @@ Cada terminal, setup script y comando run en un workstream tiene estas variables
 
 | Variable | Qué es | Ejemplo |
 |----------|-----------|---------|
-| `FF_PROJECT` | Nombre del proyecto | `my-app` |
-| `FF_WORKSTREAM` | Nombre del workstream | `coral-tidal-reef` |
-| `FF_PROJECT_DIR` | Ruta del repositorio principal | `/Users/you/my-app` |
-| `FF_WORKTREE_DIR` | Ruta del worktree | `~/.dockyard/worktrees/my-app/coral-tidal-reef` |
-| `FF_PORT` | Port determinista (40001-49999) | `42847` |
-| `FF_DEFAULT_BRANCH` | Rama por defecto (main, master, etc.) | `main` |
+| `DY_PROJECT` | Nombre del proyecto | `my-app` |
+| `DY_WORKSTREAM` | Nombre del workstream | `coral-tidal-reef` |
+| `DY_PROJECT_DIR` | Ruta del repositorio principal | `/Users/you/my-app` |
+| `DY_WORKTREE_DIR` | Ruta del worktree | `~/.dockyard/worktrees/my-app/coral-tidal-reef` |
+| `DY_PORT` | Port determinista (40001-49999) | `42847` |
+| `DY_DEFAULT_BRANCH` | Rama por defecto (main, master, etc.) | `main` |
 
-#### Sobre FF_PORT {#about-ff_port}
+#### Sobre DY_PORT {#about-dy_port}
 
-Cada workstream recibe un port determinista basado en un hash de la ruta del worktree. Mismo workstream, mismo port, siempre. Sin conflictos de port entre workstreams. Úsalo en tu run script: `PORT=$FF_PORT npm run dev`. Si lo tuyo es ejecutar miles de workstreams simultáneamente, puede que tengas una colisión 🎲 pero esperemos que te quedes sin memoria antes.
+Cada workstream recibe un port determinista basado en un hash de la ruta del worktree. Mismo workstream, mismo port, siempre. Sin conflictos de port entre workstreams. Úsalo en tu run script: `PORT=$DY_PORT npm run dev`. Si lo tuyo es ejecutar miles de workstreams simultáneamente, puede que tengas una colisión 🎲 pero esperemos que te quedes sin memoria antes.
 
 #### .env symlink {#env-symlink}
 
@@ -344,7 +344,7 @@ Dockyard detecta herramientas desde tu login shell. Si `claude`, `gh`, `git` o `
 
 #### Port no detectado {#port-not-detected}
 
-- Asegúrate de que tu run script usa `$FF_PORT` (o que el port se detecta del árbol de procesos)
+- Asegúrate de que tu run script usa `$DY_PORT` (o que el port se detecta del árbol de procesos)
 - El launcher `dy-run` envuelve el run script, monitoriza los procesos hijos buscando ports TCP en escucha
 - Revisa Settings > Advanced > Detailed logging para salida de depuración
 

@@ -195,7 +195,7 @@ Posa un `.dockyard.json` a l'arrel del teu projecte per automatitzar el cicle de
 ```json
 {
   "setup": "npm install",
-  "run": "PORT=$FF_PORT npm run dev",
+  "run": "PORT=$DY_PORT npm run dev",
   "teardown": "docker-compose down"
 }
 ```
@@ -222,16 +222,16 @@ Cada terminal, setup script, i comanda run d'un workstream té aquestes variable
 
 | Variable | Què és | Exemple |
 |----------|-----------|---------|
-| `FF_PROJECT` | Nom del projecte | `my-app` |
-| `FF_WORKSTREAM` | Nom del workstream | `coral-tidal-reef` |
-| `FF_PROJECT_DIR` | Ruta del repositori principal | `/Users/you/my-app` |
-| `FF_WORKTREE_DIR` | Ruta del worktree | `~/.dockyard/worktrees/my-app/coral-tidal-reef` |
-| `FF_PORT` | Port determinista (40001-49999) | `42847` |
-| `FF_DEFAULT_BRANCH` | Branca per defecte (main, master, etc.) | `main` |
+| `DY_PROJECT` | Nom del projecte | `my-app` |
+| `DY_WORKSTREAM` | Nom del workstream | `coral-tidal-reef` |
+| `DY_PROJECT_DIR` | Ruta del repositori principal | `/Users/you/my-app` |
+| `DY_WORKTREE_DIR` | Ruta del worktree | `~/.dockyard/worktrees/my-app/coral-tidal-reef` |
+| `DY_PORT` | Port determinista (40001-49999) | `42847` |
+| `DY_DEFAULT_BRANCH` | Branca per defecte (main, master, etc.) | `main` |
 
-#### Sobre FF_PORT {#about-ff_port}
+#### Sobre DY_PORT {#about-dy_port}
 
-Cada workstream obté un port determinista basat en un hash de la ruta del worktree. Mateix workstream, mateix port, sempre. Sense conflictes de port entre workstreams. Usa'l al teu run script: `PORT=$FF_PORT npm run dev`. Si el teu rotllo és executar milers de workstreams simultàniament, potser et trobes una col·lisió 🎲 però amb sort et quedes sense memòria abans.
+Cada workstream obté un port determinista basat en un hash de la ruta del worktree. Mateix workstream, mateix port, sempre. Sense conflictes de port entre workstreams. Usa'l al teu run script: `PORT=$DY_PORT npm run dev`. Si el teu rotllo és executar milers de workstreams simultàniament, potser et trobes una col·lisió 🎲 però amb sort et quedes sense memòria abans.
 
 #### .env symlink {#env-symlink}
 
@@ -344,7 +344,7 @@ Dockyard detecta les eines des del teu shell de login. Si `claude`, `gh`, `git`,
 
 #### Port no detectat {#port-not-detected}
 
-- Assegura't que el teu run script utilitza `$FF_PORT` (o que el port es detecta des de l'arbre de processos)
+- Assegura't que el teu run script utilitza `$DY_PORT` (o que el port es detecta des de l'arbre de processos)
 - El llançador `dy-run` embolcalla el run script, monitoritza els processos fills per trobar listeners TCP
 - Comprova Settings > Advanced > Detailed logging per a sortida de depuració
 

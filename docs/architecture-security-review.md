@@ -88,7 +88,7 @@ Run scripts (.dockyard.json)
 | File | Lines | Purpose |
 |------|-------|---------|
 | `Project.swift` | 64 | Codable data structures for projects and workstreams |
-| `WorkstreamEnvironment.swift` | 28 | Builds env var maps for terminal sessions (FF_PROJECT, FF_WORKSTREAM, etc.) |
+| `WorkstreamEnvironment.swift` | 28 | Builds env var maps for terminal sessions (DY_PROJECT, DY_WORKSTREAM, etc.) |
 | `GitOperations.swift` | 263 | Git repo detection, worktree create/remove, branch info, .env symlink injection |
 | `GitHubOperations.swift` | 100 | Integrates with `gh` CLI for repo info, PR lists |
 | `RunLauncher.swift` | 29 | Locates dy-run helper, builds wrapped run-script commands |
@@ -337,7 +337,7 @@ Developer ID Application: ALL TUNER LABS S.L. (J5TAY75Q3F)
 ### 7.8 Environment Variable Injection
 
 `WorkstreamEnvironment.variables()` builds a controlled set:
-- `FF_PROJECT`, `FF_WORKSTREAM`, `FF_PROJECT_DIR`, `FF_WORKTREE_DIR`, `FF_PORT`
+- `DY_PROJECT`, `DY_WORKSTREAM`, `DY_PROJECT_DIR`, `DY_WORKTREE_DIR`, `DY_PORT`
 - Optional: `CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS`
 - No user input directly injected into env vars
 - C environment array properly lifetime-managed in TerminalView

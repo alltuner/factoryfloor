@@ -82,7 +82,7 @@ Add a `.dockyard.json` to your project root to automate your workstream lifecycl
 ```json
 {
   "setup": "npm install",
-  "run": "PORT=$FF_PORT npm run dev",
+  "run": "PORT=$DY_PORT npm run dev",
   "teardown": "docker-compose down"
 }
 ```
@@ -101,11 +101,11 @@ Every workstream terminal has access to:
 
 | Variable | Description |
 |---|---|
-| `FF_PROJECT` | Project name |
-| `FF_WORKSTREAM` | Workstream name |
-| `FF_PROJECT_DIR` | Main repository path |
-| `FF_WORKTREE_DIR` | Worktree path for this workstream |
-| `FF_PORT` | Deterministic port (40001-49999) |
+| `DY_PROJECT` | Project name |
+| `DY_WORKSTREAM` | Workstream name |
+| `DY_PROJECT_DIR` | Main repository path |
+| `DY_WORKTREE_DIR` | Worktree path for this workstream |
+| `DY_PORT` | Deterministic port (40001-49999) |
 
 ### Keyboard Shortcuts
 

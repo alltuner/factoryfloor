@@ -174,7 +174,7 @@ final class WorkspaceTabSnapshotTests: XCTestCase {
             scriptSource: "conductor.json"
         )
 
-        XCTAssertEqual(vars["FF_DEFAULT_BRANCH"], "develop")
+        XCTAssertEqual(vars["DY_DEFAULT_BRANCH"], "develop")
         XCTAssertEqual(vars["CONDUCTOR_DEFAULT_BRANCH"], "develop")
     }
 }

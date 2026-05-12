@@ -23,12 +23,12 @@ builds the environment injected into every workstream terminal:
 
 | Variable | Value |
 |----------|-------|
-| `FF_PROJECT` | Project name |
-| `FF_WORKSTREAM` | Workstream name |
-| `FF_PROJECT_DIR` | Project root directory |
-| `FF_WORKTREE_DIR` | Worktree / working directory |
-| `FF_PORT` | Port number derived from working directory |
-| `FF_DEFAULT_BRANCH` | Default branch (main, master, etc.) |
+| `DY_PROJECT` | Project name |
+| `DY_WORKSTREAM` | Workstream name |
+| `DY_PROJECT_DIR` | Project root directory |
+| `DY_WORKTREE_DIR` | Worktree / working directory |
+| `DY_PORT` | Port number derived from working directory |
+| `DY_DEFAULT_BRANCH` | Default branch (main, master, etc.) |
 | `CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS` | `1` if agent teams flag is on |
 
 For non-tmux terminal tabs, `TMUX` and `TMUX_PANE` are explicitly cleared to

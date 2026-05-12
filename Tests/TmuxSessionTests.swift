@@ -50,12 +50,12 @@ final class TmuxSessionTests: XCTestCase {
             tmuxPath: "/opt/homebrew/bin/tmux",
             sessionName: "proj/ws/agent",
             command: "echo hello",
-            environmentVars: ["FF_PROJECT": "My Project"],
+            environmentVars: ["DY_PROJECT": "My Project"],
             shell: "/bin/zsh"
         )
 
         // The value must be double-quoted so the shell keeps it as one token
-        XCTAssertTrue(command.contains("-e \"FF_PROJECT=My Project\""))
+        XCTAssertTrue(command.contains("-e \"DY_PROJECT=My Project\""))
     }
 
     func testWrapCommandQuotesEnvVarValuesWithSpecialChars() {
@@ -63,14 +63,14 @@ final class TmuxSessionTests: XCTestCase {
             tmuxPath: "/opt/homebrew/bin/tmux",
             sessionName: "proj/ws/agent",
             command: "echo hello",
-            environmentVars: ["FF_PROJECT": "client's \"best\" $project"],
+            environmentVars: ["DY_PROJECT": "client's \"best\" $project"],
             shell: "/bin/zsh"
         )
 
         // Single quotes, double quotes, and dollar signs must survive nested quoting.
         // The two-layer shell wrapping (login shell -> sh) applies shellEscape twice,
         // so we verify the key and double-quote-escaped value appear at the inner level.
-        XCTAssertTrue(command.contains("FF_PROJECT"))
+        XCTAssertTrue(command.contains("DY_PROJECT"))
         XCTAssertTrue(command.contains("client"))
         XCTAssertTrue(command.contains("best"))
         XCTAssertTrue(command.contains("\\$project"))
@@ -134,9 +134,9 @@ final class TmuxSessionTests: XCTestCase {
             sessionName: "dockyard/my-project/deploy-auth-fix/agent",
             command: "/opt/homebrew/bin/claude --resume a1b2c3d4 --name 'deploy auth fix'",
             environmentVars: [
-                "FF_PROJECT": "My Project",
-                "FF_WORKSTREAM": "deploy-auth-fix",
-                "FF_DIR": "/Users/test/repos/my project's dir",
+                "DY_PROJECT": "My Project",
+                "DY_WORKSTREAM": "deploy-auth-fix",
+                "DY_DIR": "/Users/test/repos/my project's dir",
             ],
             respawnOnExit: true,
             shell: shell

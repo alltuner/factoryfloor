@@ -1,5 +1,5 @@
 // ABOUTME: Tests for WorkstreamEnvironment env var construction.
-// ABOUTME: Validates FF_* vars, default branch, and compatibility aliases for external tools.
+// ABOUTME: Validates DY_* vars, default branch, and compatibility aliases for external tools.
 
 @testable import Dockyard
 import XCTest
@@ -15,7 +15,7 @@ final class WorkstreamEnvironmentTests: XCTestCase {
         false
     )
 
-    // MARK: - Core FF_* variables
+    // MARK: - Core DY_* variables
 
     func testCoreVariables() {
         let vars = WorkstreamEnvironment.variables(
@@ -29,13 +29,13 @@ final class WorkstreamEnvironmentTests: XCTestCase {
             defaultBranch: "main",
             scriptSource: nil
         )
-        XCTAssertEqual(vars["FF_WORKSTREAM_ID"], "12345678-1234-1234-1234-123456789abc")
-        XCTAssertEqual(vars["FF_PROJECT"], "my-project")
-        XCTAssertEqual(vars["FF_WORKSTREAM"], "coral-reef")
-        XCTAssertEqual(vars["FF_PROJECT_DIR"], "/Users/test/my-project")
-        XCTAssertEqual(vars["FF_WORKTREE_DIR"], "/Users/test/.dockyard/worktrees/my-project/coral-reef")
-        XCTAssertEqual(vars["FF_PORT"], "42847")
-        XCTAssertEqual(vars["FF_DEFAULT_BRANCH"], "main")
+        XCTAssertEqual(vars["DY_WORKSTREAM_ID"], "12345678-1234-1234-1234-123456789abc")
+        XCTAssertEqual(vars["DY_PROJECT"], "my-project")
+        XCTAssertEqual(vars["DY_WORKSTREAM"], "coral-reef")
+        XCTAssertEqual(vars["DY_PROJECT_DIR"], "/Users/test/my-project")
+        XCTAssertEqual(vars["DY_WORKTREE_DIR"], "/Users/test/.dockyard/worktrees/my-project/coral-reef")
+        XCTAssertEqual(vars["DY_PORT"], "42847")
+        XCTAssertEqual(vars["DY_DEFAULT_BRANCH"], "main")
         XCTAssertNil(vars["CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS"])
     }
 

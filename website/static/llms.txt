@@ -38,7 +38,7 @@ Add a `.dockyard.json` to your project root:
 ```json
 {
   "setup": "npm install",
-  "run": "PORT=$FF_PORT npm run dev",
+  "run": "PORT=$DY_PORT npm run dev",
   "teardown": "docker-compose down"
 }
 ```
@@ -47,11 +47,11 @@ Add a `.dockyard.json` to your project root:
 
 Every workstream terminal has access to:
 
-- `FF_PROJECT` — project name
-- `FF_WORKSTREAM` — workstream name
-- `FF_PROJECT_DIR` — main repository path
-- `FF_WORKTREE_DIR` — worktree path for this workstream
-- `FF_PORT` — deterministic port (40001-49999)
+- `DY_PROJECT` — project name
+- `DY_WORKSTREAM` — workstream name
+- `DY_PROJECT_DIR` — main repository path
+- `DY_WORKTREE_DIR` — worktree path for this workstream
+- `DY_PORT` — deterministic port (40001-49999)
 
 ## Keyboard Shortcuts
 

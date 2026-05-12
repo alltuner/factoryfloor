@@ -1,1 +1,1 @@
-enum AppCommit { static let hash = "a582cc2" }
+enum AppCommit { static let hash = "d0189e4" }

@@ -120,7 +120,7 @@
 
 ### Features
 
-* add emdash config support, FF_DEFAULT_BRANCH, and compatibility env var aliases ([#367](https://github.com/barnolacesc/dockyard/issues/367)) ([1bd820c](https://github.com/barnolacesc/dockyard/commit/1bd820c20e85f04b20c649764ce3f2670c590233))
+* add emdash config support, DY_DEFAULT_BRANCH, and compatibility env var aliases ([#367](https://github.com/barnolacesc/dockyard/issues/367)) ([1bd820c](https://github.com/barnolacesc/dockyard/commit/1bd820c20e85f04b20c649764ce3f2670c590233))
 * add setting to restrict agent filesystem writes to worktree ([#358](https://github.com/barnolacesc/dockyard/issues/358)) ([188d1ec](https://github.com/barnolacesc/dockyard/commit/188d1ecc1bf80fe6f7b201dcb2b6a66a7b204a13))
 * redesign workstream info page with native macOS grouped form ([#360](https://github.com/barnolacesc/dockyard/issues/360)) ([6ed3ac9](https://github.com/barnolacesc/dockyard/commit/6ed3ac951944ec612e6afaeb21b7f7c3d97cda2f))
 * show workstream description tooltip on sidebar hover ([#350](https://github.com/barnolacesc/dockyard/issues/350)) ([a89d090](https://github.com/barnolacesc/dockyard/commit/a89d090e42d35786840de2d211693dddbb47a71a))

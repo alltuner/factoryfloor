@@ -205,7 +205,7 @@ Drop a `.dockyard.json` in your project root to automate the workstream lifecycl
 ```json
 {
   "setup": "npm install",
-  "run": "PORT=$FF_PORT npm run dev",
+  "run": "PORT=$DY_PORT npm run dev",
   "teardown": "docker-compose down"
 }
 ```
@@ -232,16 +232,16 @@ Every terminal, setup script, and run command in a workstream has these variable
 
 | Variable | What it is | Example |
 |----------|-----------|---------|
-| `FF_PROJECT` | Project name | `my-app` |
-| `FF_WORKSTREAM` | Workstream name | `coral-tidal-reef` |
-| `FF_PROJECT_DIR` | Main repository path | `/Users/you/my-app` |
-| `FF_WORKTREE_DIR` | Worktree path | `~/.dockyard/worktrees/my-app/coral-tidal-reef` |
-| `FF_PORT` | Deterministic port (40001-49999) | `42847` |
-| `FF_DEFAULT_BRANCH` | Default branch (main, master, etc.) | `main` |
+| `DY_PROJECT` | Project name | `my-app` |
+| `DY_WORKSTREAM` | Workstream name | `coral-tidal-reef` |
+| `DY_PROJECT_DIR` | Main repository path | `/Users/you/my-app` |
+| `DY_WORKTREE_DIR` | Worktree path | `~/.dockyard/worktrees/my-app/coral-tidal-reef` |
+| `DY_PORT` | Deterministic port (40001-49999) | `42847` |
+| `DY_DEFAULT_BRANCH` | Default branch (main, master, etc.) | `main` |
 
-#### About FF_PORT
+#### About DY_PORT
 
-Each workstream gets a deterministic port based on a hash of the worktree path. Same workstream, same port, every time. No port conflicts between workstreams. Use it in your run script: `PORT=$FF_PORT npm run dev`. If your thing is running thousands of workstreams simultaneously, you might get a collision 🎲 but hopefully you run out of memory first.
+Each workstream gets a deterministic port based on a hash of the worktree path. Same workstream, same port, every time. No port conflicts between workstreams. Use it in your run script: `PORT=$DY_PORT npm run dev`. If your thing is running thousands of workstreams simultaneously, you might get a collision 🎲 but hopefully you run out of memory first.
 
 #### .env symlink
 
@@ -354,7 +354,7 @@ Dockyard detects tools from your login shell. If `claude`, `codex`, `gh`, `git`,
 
 #### Port not detected
 
-- Make sure your run script uses `$FF_PORT` (or the port gets detected from the process tree)
+- Make sure your run script uses `$DY_PORT` (or the port gets detected from the process tree)
 - The `dy-run` launcher wraps the run script — it monitors child processes for listening TCP ports
 - Check Settings > Advanced > Detailed logging for debug output
 

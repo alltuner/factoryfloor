@@ -195,7 +195,7 @@ Lägg en `.dockyard.json` i projektets rotkatalog för att automatisera workstre
 ```json
 {
   "setup": "npm install",
-  "run": "PORT=$FF_PORT npm run dev",
+  "run": "PORT=$DY_PORT npm run dev",
   "teardown": "docker-compose down"
 }
 ```
@@ -222,16 +222,16 @@ Varje terminal, setup-script och run-kommando i en workstream har dessa variable
 
 | Variabel | Vad det är | Exempel |
 |----------|-----------|---------|
-| `FF_PROJECT` | Projektnamn | `my-app` |
-| `FF_WORKSTREAM` | Workstream-namn | `coral-tidal-reef` |
-| `FF_PROJECT_DIR` | Huvudrepots sökväg | `/Users/you/my-app` |
-| `FF_WORKTREE_DIR` | Worktree-sökväg | `~/.dockyard/worktrees/my-app/coral-tidal-reef` |
-| `FF_PORT` | Deterministisk port (40001-49999) | `42847` |
-| `FF_DEFAULT_BRANCH` | Standardgren (main, master, etc.) | `main` |
+| `DY_PROJECT` | Projektnamn | `my-app` |
+| `DY_WORKSTREAM` | Workstream-namn | `coral-tidal-reef` |
+| `DY_PROJECT_DIR` | Huvudrepots sökväg | `/Users/you/my-app` |
+| `DY_WORKTREE_DIR` | Worktree-sökväg | `~/.dockyard/worktrees/my-app/coral-tidal-reef` |
+| `DY_PORT` | Deterministisk port (40001-49999) | `42847` |
+| `DY_DEFAULT_BRANCH` | Standardgren (main, master, etc.) | `main` |
 
-#### Om FF_PORT {#about-ff_port}
+#### Om DY_PORT {#about-dy_port}
 
-Varje workstream får en deterministisk port baserad på en hash av worktree-sökvägen. Samma workstream, samma port, varje gång. Inga portkonflikter mellan workstreams. Använd den i ditt run-script: `PORT=$FF_PORT npm run dev`. Om du kör tusentals workstreams samtidigt kanske du får en kollision 🎲 men förhoppningsvis tar minnet slut först.
+Varje workstream får en deterministisk port baserad på en hash av worktree-sökvägen. Samma workstream, samma port, varje gång. Inga portkonflikter mellan workstreams. Använd den i ditt run-script: `PORT=$DY_PORT npm run dev`. Om du kör tusentals workstreams samtidigt kanske du får en kollision 🎲 men förhoppningsvis tar minnet slut först.
 
 #### .env symlink {#env-symlink}
 
@@ -344,7 +344,7 @@ Dockyard upptäcker verktyg från ditt login shell. Om `claude`, `gh`, `git` ell
 
 #### Port inte upptäckt {#port-not-detected}
 
-- Se till att ditt run-script använder `$FF_PORT` (eller att porten upptäcks från processträdet)
+- Se till att ditt run-script använder `$DY_PORT` (eller att porten upptäcks från processträdet)
 - `dy-run`-launchern kapslar run-scriptet, den övervakar barnprocesser efter lyssnande TCP-portar
 - Kolla Settings > Advanced > Detailed logging för debug-utdata
 

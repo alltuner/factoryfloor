@@ -36,7 +36,7 @@
 - [x] Auto-rename branch via --append-system-prompt
 - [x] Per-workstream permission mode (bypass prompts, context menu on +)
 - [x] Agent Teams setting (CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS)
-- [x] Deterministic port allocation per workstream (FF_PORT env var, DJB2 hash)
+- [x] Deterministic port allocation per workstream (DY_PORT env var, DJB2 hash)
 - [x] Dynamic workspace tabs (Info + Agent + Environment, Terminal/Browser on demand)
 - [x] Terminal tabs auto-close on shell exit, agent respawns
 - [x] Multi-terminal support with proper Ghostty focus management

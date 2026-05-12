@@ -328,7 +328,7 @@ private struct Configuration {
         self.monitorMode = monitorMode
         self.monitorPID = monitorPID
         self.workstreamID = workstreamID
-        expectedPort = expectedPortArg ?? ProcessInfo.processInfo.environment["FF_PORT"].flatMap(Int.init)
+        expectedPort = expectedPortArg ?? ProcessInfo.processInfo.environment["DY_PORT"].flatMap(Int.init)
         startedAt = Date()
 
         if monitorMode {
