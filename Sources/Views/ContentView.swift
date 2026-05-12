@@ -5,14 +5,14 @@ import AppKit
 import OSLog
 import SwiftUI
 
-private let logger = Logger(subsystem: "factoryfloor", category: "content-view")
+private let logger = Logger(subsystem: "dockyard", category: "content-view")
 
 extension Notification.Name {
-    static let workstreamCreated = Notification.Name("factoryfloor.workstreamCreated")
-    static let workstreamWorktreeReady = Notification.Name("factoryfloor.workstreamWorktreeReady")
-    static let workstreamCreationFailed = Notification.Name("factoryfloor.workstreamCreationFailed")
-    static let projectCreated = Notification.Name("factoryfloor.projectCreated")
-    static let purgeWorkstream = Notification.Name("factoryfloor.purgeWorkstream")
+    static let workstreamCreated = Notification.Name("dockyard.workstreamCreated")
+    static let workstreamWorktreeReady = Notification.Name("dockyard.workstreamWorktreeReady")
+    static let workstreamCreationFailed = Notification.Name("dockyard.workstreamCreationFailed")
+    static let projectCreated = Notification.Name("dockyard.projectCreated")
+    static let purgeWorkstream = Notification.Name("dockyard.purgeWorkstream")
 }
 
 final class ProjectList: ObservableObject {
@@ -94,7 +94,7 @@ struct ContentView: View {
     @State private var workstreamToPurge: UUID?
     @State private var purgeWarningMessage: String?
     @State private var removedProjectNames: [String] = []
-    @AppStorage("factoryfloor.sortOrder") private var sortOrder: ProjectSortOrder = .recent
+    @AppStorage("dockyard.sortOrder") private var sortOrder: ProjectSortOrder = .recent
     @State private var keyMonitorInstalled = false
 
     private static func initialSelection() -> SidebarSelection? {
@@ -361,7 +361,7 @@ struct ContentView: View {
             appEnvironment.fetchOrigin(projects: projects)
             updateChecker.check()
             // Apply saved appearance
-            switch UserDefaults.standard.string(forKey: "factoryfloor.appearance") ?? "system" {
+            switch UserDefaults.standard.string(forKey: "dockyard.appearance") ?? "system" {
             case "light": NSApp.appearance = NSAppearance(named: .aqua)
             case "dark": NSApp.appearance = NSAppearance(named: .darkAqua)
             default: NSApp.appearance = nil
@@ -473,7 +473,7 @@ struct ContentView: View {
             dir = nil
         }
         guard let dir else { return }
-        let terminalBundleID = UserDefaults.standard.string(forKey: "factoryfloor.defaultTerminal") ?? ""
+        let terminalBundleID = UserDefaults.standard.string(forKey: "dockyard.defaultTerminal") ?? ""
         if !terminalBundleID.isEmpty,
            let appURL = NSWorkspace.shared.urlForApplication(withBundleIdentifier: terminalBundleID)
         {
@@ -570,7 +570,7 @@ struct ContentView: View {
 }
 
 enum ProjectStore {
-    private static let userDefaultsKey = "factoryfloor.projects"
+    private static let userDefaultsKey = "dockyard.projects"
 
     static func load(defaults: UserDefaults = .standard) -> [Project] {
         guard let data = defaults.data(forKey: userDefaultsKey),

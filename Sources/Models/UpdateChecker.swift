@@ -1,4 +1,4 @@
-// ABOUTME: Checks factory-floor.com/appcast.xml for available updates.
+// ABOUTME: Checks francesc.barnola.net/appcast.xml for available updates.
 // ABOUTME: Sidebar badge for Homebrew users; Sparkle handles DMG auto-updates.
 
 import Foundation
@@ -24,7 +24,7 @@ class UpdateChecker: ObservableObject {
 
     private let currentVersion: String
     private let logger = Logger(subsystem: AppConstants.appID, category: "UpdateChecker")
-    private static let appcastURL = URL(string: "https://factory-floor.com/appcast.xml")!
+    private static let appcastURL = URL(string: "https://francesc.barnola.net/appcast.xml")!
 
     init() {
         currentVersion = AppConstants.version

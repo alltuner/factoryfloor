@@ -1,7 +1,7 @@
 // ABOUTME: Tests for tmux session configuration and command composition.
 // ABOUTME: Verifies respawn behavior is scoped to agent sessions, not global.
 
-@testable import FactoryFloor
+@testable import Dockyard
 import XCTest
 
 final class TmuxSessionTests: XCTestCase {
@@ -131,7 +131,7 @@ final class TmuxSessionTests: XCTestCase {
     private func realisticTmuxCommand(shell: String) -> String {
         TmuxSession.wrapCommand(
             tmuxPath: "/opt/homebrew/bin/tmux",
-            sessionName: "factoryfloor/my-project/deploy-auth-fix/agent",
+            sessionName: "dockyard/my-project/deploy-auth-fix/agent",
             command: "/opt/homebrew/bin/claude --resume a1b2c3d4 --name 'deploy auth fix'",
             environmentVars: [
                 "FF_PROJECT": "My Project",

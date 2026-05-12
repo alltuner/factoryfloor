@@ -4,7 +4,7 @@
 import Foundation
 import OSLog
 
-private let logger = Logger(subsystem: "factoryfloor", category: "git")
+private let logger = Logger(subsystem: "dockyard", category: "git")
 
 struct GitRepoInfo {
     let isRepo: Bool
@@ -100,7 +100,7 @@ enum GitOperations {
 
     /// Create a git worktree for a workstream, branching off the default branch.
     /// Returns the worktree path on success, nil on failure.
-    static func createWorktree(projectPath: String, projectName: String, workstreamName: String, branchPrefix: String = "ff", symlinkEnv: Bool = true) -> String? {
+    static func createWorktree(projectPath: String, projectName: String, workstreamName: String, branchPrefix: String = "dy", symlinkEnv: Bool = true) -> String? {
         let worktreeDir = AppConstants.worktreesDirectory
             .appendingPathComponent(sanitize(projectName))
             .appendingPathComponent(sanitize(workstreamName))
@@ -133,7 +133,7 @@ enum GitOperations {
             symlinkEnvFiles(from: projectPath, to: worktreeDir.path)
         }
 
-        addExcludeEntry(at: projectPath, pattern: ".factoryfloor-state/")
+        addExcludeEntry(at: projectPath, pattern: ".dockyard-state/")
 
         return worktreeDir.path
     }

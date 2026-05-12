@@ -1,7 +1,7 @@
 // ABOUTME: Tests for LaunchLogger per-workstream debug log file writing.
 // ABOUTME: Validates log entry serialization, gating on detailedLogging, append behavior, and cleanup.
 
-@testable import FactoryFloor
+@testable import Dockyard
 import XCTest
 
 final class LaunchLoggerTests: XCTestCase {
@@ -14,12 +14,12 @@ final class LaunchLoggerTests: XCTestCase {
         // Ensure clean state
         try? FileManager.default.removeItem(at: testLogsDir)
         // Enable detailed logging for tests
-        UserDefaults.standard.set(true, forKey: "factoryfloor.detailedLogging")
+        UserDefaults.standard.set(true, forKey: "dockyard.detailedLogging")
     }
 
     override func tearDown() {
         try? FileManager.default.removeItem(at: testLogsDir)
-        UserDefaults.standard.removeObject(forKey: "factoryfloor.detailedLogging")
+        UserDefaults.standard.removeObject(forKey: "dockyard.detailedLogging")
         super.tearDown()
     }
 
@@ -81,7 +81,7 @@ final class LaunchLoggerTests: XCTestCase {
     }
 
     func testLogSkipsWhenDisabled() {
-        UserDefaults.standard.set(false, forKey: "factoryfloor.detailedLogging")
+        UserDefaults.standard.set(false, forKey: "dockyard.detailedLogging")
 
         let entry = makeEntry(event: "agent-start")
         LaunchLogger.log(entry)

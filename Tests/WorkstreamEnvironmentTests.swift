@@ -1,7 +1,7 @@
 // ABOUTME: Tests for WorkstreamEnvironment env var construction.
 // ABOUTME: Validates FF_* vars, default branch, and compatibility aliases for external tools.
 
-@testable import FactoryFloor
+@testable import Dockyard
 import XCTest
 
 final class WorkstreamEnvironmentTests: XCTestCase {
@@ -10,7 +10,7 @@ final class WorkstreamEnvironmentTests: XCTestCase {
         "my-project",
         "coral-reef",
         "/Users/test/my-project",
-        "/Users/test/.factoryfloor/worktrees/my-project/coral-reef",
+        "/Users/test/.dockyard/worktrees/my-project/coral-reef",
         42847,
         false
     )
@@ -33,7 +33,7 @@ final class WorkstreamEnvironmentTests: XCTestCase {
         XCTAssertEqual(vars["FF_PROJECT"], "my-project")
         XCTAssertEqual(vars["FF_WORKSTREAM"], "coral-reef")
         XCTAssertEqual(vars["FF_PROJECT_DIR"], "/Users/test/my-project")
-        XCTAssertEqual(vars["FF_WORKTREE_DIR"], "/Users/test/.factoryfloor/worktrees/my-project/coral-reef")
+        XCTAssertEqual(vars["FF_WORKTREE_DIR"], "/Users/test/.dockyard/worktrees/my-project/coral-reef")
         XCTAssertEqual(vars["FF_PORT"], "42847")
         XCTAssertEqual(vars["FF_DEFAULT_BRANCH"], "main")
         XCTAssertNil(vars["CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS"])
@@ -70,7 +70,7 @@ final class WorkstreamEnvironmentTests: XCTestCase {
         )
         XCTAssertEqual(vars["CONDUCTOR_WORKSPACE_NAME"], "coral-reef")
         XCTAssertEqual(vars["CONDUCTOR_ROOT_PATH"], "/Users/test/my-project")
-        XCTAssertEqual(vars["CONDUCTOR_WORKSPACE_PATH"], "/Users/test/.factoryfloor/worktrees/my-project/coral-reef")
+        XCTAssertEqual(vars["CONDUCTOR_WORKSPACE_PATH"], "/Users/test/.dockyard/worktrees/my-project/coral-reef")
         XCTAssertEqual(vars["CONDUCTOR_PORT"], "42847")
         XCTAssertEqual(vars["CONDUCTOR_DEFAULT_BRANCH"], "main")
     }
@@ -91,7 +91,7 @@ final class WorkstreamEnvironmentTests: XCTestCase {
         )
         XCTAssertEqual(vars["EMDASH_TASK_ID"], "12345678-1234-1234-1234-123456789abc")
         XCTAssertEqual(vars["EMDASH_TASK_NAME"], "coral-reef")
-        XCTAssertEqual(vars["EMDASH_TASK_PATH"], "/Users/test/.factoryfloor/worktrees/my-project/coral-reef")
+        XCTAssertEqual(vars["EMDASH_TASK_PATH"], "/Users/test/.dockyard/worktrees/my-project/coral-reef")
         XCTAssertEqual(vars["EMDASH_ROOT_PATH"], "/Users/test/my-project")
         XCTAssertEqual(vars["EMDASH_PORT"], "42847")
         XCTAssertEqual(vars["EMDASH_DEFAULT_BRANCH"], "develop")
@@ -118,7 +118,7 @@ final class WorkstreamEnvironmentTests: XCTestCase {
 
     // MARK: - No aliases for native config
 
-    func testNoAliasesForFactoryFloorConfig() {
+    func testNoAliasesForDockyardConfig() {
         let vars = WorkstreamEnvironment.variables(
             workstreamID: baseParams.0,
             projectName: baseParams.1,
@@ -128,7 +128,7 @@ final class WorkstreamEnvironmentTests: XCTestCase {
             port: baseParams.5,
             agentTeams: baseParams.6,
             defaultBranch: "main",
-            scriptSource: ".factoryfloor.json"
+            scriptSource: ".dockyard.json"
         )
         XCTAssertNil(vars["CONDUCTOR_WORKSPACE_NAME"])
         XCTAssertNil(vars["EMDASH_TASK_NAME"])

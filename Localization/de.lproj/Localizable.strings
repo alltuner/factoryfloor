@@ -109,13 +109,13 @@
 "Symlink .env and .env.local from the main repository into new worktrees." = ".env und .env.local aus dem Hauptrepository in neue Worktrees verknüpfen.";
 
 /* Quit confirmation */
-"Quit Factory Floor?" = "Factory Floor beenden?";
+"Quit Dockyard?" = "Dockyard beenden?";
 "Active workstreams will be stopped." = "Aktive Workstreams werden gestoppt.";
 "Quit" = "Beenden";
 "Confirm before quitting" = "Vor dem Beenden bestätigen";
 "Show a confirmation dialog when quitting with active workstreams." = "Zeige einen Bestätigungsdialog beim Beenden mit aktiven Workstreams.";
 "Launch at login" = "Beim Anmelden starten";
-"Automatically open Factory Floor when you log in." = "Factory Floor automatisch beim Anmelden öffnen.";
+"Automatically open Dockyard when you log in." = "Dockyard automatisch beim Anmelden öffnen.";
 "Detailed logging" = "Ausführliche Protokollierung";
 "Log setup, run, and teardown script output to files for debugging." = "Setup-, Run- und Teardown-Skriptausgaben zur Fehlersuche in Dateien protokollieren.";
 "Open Logs Directory" = "Protokollverzeichnis öffnen";
@@ -147,7 +147,7 @@
 /* Settings - Advanced */
 "Advanced" = "Erweitert";
 "Usage analytics" = "Nutzungsanalyse";
-"Send anonymous usage data to help improve Factory Floor. We collect: app version, build type, macOS version, locale, and screen resolution. No project names, file contents, or personal data." = "Sende anonyme Nutzungsdaten, um Factory Floor zu verbessern. Wir erfassen: App-Version, Build-Typ, macOS-Version, Sprache und Bildschirmauflösung. Keine Projektnamen, Dateiinhalte oder persönliche Daten.";
+"Send anonymous usage data to help improve Dockyard. We collect: app version, build type, macOS version, locale, and screen resolution. No project names, file contents, or personal data." = "Sende anonyme Nutzungsdaten, um Dockyard zu verbessern. Wir erfassen: App-Version, Build-Typ, macOS-Version, Sprache und Bildschirmauflösung. Keine Projektnamen, Dateiinhalte oder persönliche Daten.";
 "Crash reports" = "Absturzberichte";
 "Send crash reports and performance data. Requires restart to take effect." = "Absturzberichte und Leistungsdaten senden. Erfordert einen Neustart.";
 "Bleeding edge" = "Vorabversionen";
@@ -215,7 +215,7 @@
 "Description" = "Beschreibung";
 
 /* Initialization errors */
-"Factory Floor cannot start" = "Factory Floor kann nicht gestartet werden";
+"Dockyard cannot start" = "Dockyard kann nicht gestartet werden";
 "The terminal engine (Ghostty) failed to initialize. This may indicate a system compatibility issue." = "Die Terminal-Engine (Ghostty) konnte nicht initialisiert werden. Dies könnte auf ein Systemkompatibilitätsproblem hindeuten.";
 
 /* EnvironmentTabView */
@@ -224,8 +224,8 @@
 "Restart %@ script" = "%@-Skript neustarten";
 "Start %@ script" = "%@-Skript starten";
 "No %@ script configured" = "Kein %@-Skript konfiguriert";
-"Add a %@ field to .factoryfloor.json:" = "Füge ein %@-Feld zu .factoryfloor.json hinzu:";
-"Also supports .factoryfloor/config.json." = "Unterstützt auch .factoryfloor/config.json.";
+"Add a %@ field to .dockyard.json:" = "Füge ein %@-Feld zu .dockyard.json hinzu:";
+"Also supports .dockyard/config.json." = "Unterstützt auch .dockyard/config.json.";
 
 /* Tab labels */
 "Info" = "Info";

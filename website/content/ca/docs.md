@@ -15,9 +15,9 @@ Necessites dues coses: un Mac i la vaga sensació que el teu flux de treball pod
 brew install --cask factory-floor
 ```
 
-<a href="https://github.com/alltuner/factoryfloor/releases/latest/download/FactoryFloor.dmg" class="docs-download"><svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg> Download DMG</a>
+<a href="https://github.com/barnolacesc/dockyard/releases/latest/download/Dockyard.dmg" class="docs-download"><svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg> Download DMG</a>
 
-Factory Floor funciona millor quan tens instal·lat el següent (t'avisarà si falta alguna cosa):
+Dockyard funciona millor quan tens instal·lat el següent (t'avisarà si falta alguna cosa):
 
 - **[Claude Code](https://docs.anthropic.com/en/docs/claude-code/overview)** — la raó de ser, bàsicament
 - **git** — probablement ja el tens
@@ -26,12 +26,12 @@ Factory Floor funciona millor quan tens instal·lat el següent (t'avisarà si f
 
 #### Els teus primers 30 segons {#your-first-30-seconds}
 
-1. Obre Factory Floor
+1. Obre Dockyard
 2. Arrossega un repositori git cap al sidebar (o fes clic a **+** per triar-ne un)
 3. Prem **⌘N** per crear un workstream
 4. Ja està. Ja estàs programant amb IA.
 
-No cal cap fitxer de configuració. Factory Floor detecta automàticament la teva configuració de git, les eines instal·lades i les connexions amb GitHub.
+No cal cap fitxer de configuració. Dockyard detecta automàticament la teva configuració de git, les eines instal·lades i les connexions amb GitHub.
 
 ---
 
@@ -41,7 +41,7 @@ Les tres coses amb les quals interactuaràs cada dia.
 
 ### Projectes {#projects}
 
-Un projecte és un repositori git. Arrossega un directori al sidebar o fes clic al botó **+**. Factory Floor comprova si és un repositori git (i t'ofereix inicialitzar-ne un si no ho és).
+Un projecte és un repositori git. Arrossega un directori al sidebar o fes clic al botó **+**. Dockyard comprova si és un repositori git (i t'ofereix inicialitzar-ne un si no ho és).
 
 La vista general del projecte mostra informació del repositori, detalls de GitHub (estrelles, forks, issues obertes), fins a 5 PRs recents, i documentació markdown detectada automàticament del teu repositori.
 
@@ -73,14 +73,14 @@ La interfície apareix a l'instant, la creació del worktree passa en segon pla.
 
 #### Branch auto-rename {#branch-auto-rename}
 
-Amb **Auto-rename branch** activat a la configuració, el coding agent canvia el nom de la teva branch per coincidir amb la tasca al primer prompt. Així `ff/coral-tidal-reef` es converteix en `ff/fix-login-timeout`.
+Amb **Auto-rename branch** activat a la configuració, el coding agent canvia el nom de la teva branch per coincidir amb la tasca al primer prompt. Així `dy/coral-tidal-reef` es converteix en `dy/fix-login-timeout`.
 
 #### Eliminar vs. purgar {#removing-vs-purging}
 
 - **Remove** — mata terminals i agent, però el worktree es queda al disc
 - **Purge** — elimina permanentment el worktree i la branch (demana confirmació si hi ha canvis sense commit)
 
-Quan un PR es fusiona, Factory Floor mostra un badge "Purge" perquè sàpigues que pots netejar tranquil·lament.
+Quan un PR es fusiona, Dockyard mostra un badge "Purge" perquè sàpigues que pots netejar tranquil·lament.
 
 ### El Coding Agent {#the-coding-agent}
 
@@ -129,7 +129,7 @@ Cada workstream pot tenir pestanyes de navegador (⌘B). El navegador és integr
 
 #### Port detection {#port-detection}
 
-Quan el teu run script inicia un servidor de desenvolupament, Factory Floor detecta automàticament el port en escolta i hi navega el navegador. No cal configurar res. El llançador `ff-run` monitoritza l'arbre de processos per trobar listeners TCP.
+Quan el teu run script inicia un servidor de desenvolupament, Dockyard detecta automàticament el port en escolta i hi navega el navegador. No cal configurar res. El llançador `dy-run` monitoritza l'arbre de processos per trobar listeners TCP.
 
 #### Navegació {#navigation}
 
@@ -141,7 +141,7 @@ El navegador mostra una pàgina d'error de connexió amb un botó de reintentar 
 
 ### Dreceres de teclat {#keyboard-shortcuts}
 
-Factory Floor prioritza el teclat. Aquí tens tot.
+Dockyard prioritza el teclat. Aquí tens tot.
 
 #### Global {#global}
 
@@ -190,7 +190,7 @@ Com automatitzar les parts avorrides.
 
 ### Scripts i cicle de vida {#scripts--lifecycle}
 
-Posa un `.factoryfloor.json` a l'arrel del teu projecte per automatitzar el cicle de vida dels workstreams.
+Posa un `.dockyard.json` a l'arrel del teu projecte per automatitzar el cicle de vida dels workstreams.
 
 ```json
 {
@@ -203,12 +203,12 @@ Posa un `.factoryfloor.json` a l'arrel del teu projecte per automatitzar el cicl
 | Hook | Quan s'executa |
 |------|-------------|
 | `setup` | Un cop, quan es crea un workstream. Instal·la dependències, executa migracions, el que sigui. |
-| `run` | Sota demanda des del tab Environment. Embolcallat amb `ff-run` per a port detection. |
+| `run` | Sota demanda des del tab Environment. Embolcallat amb `dy-run` per a port detection. |
 | `teardown` | Quan un workstream s'arxiva o es purga. Atura contenidors, neteja. |
 
-Tots els camps són opcionals. Els scripts s'executen al directori del workstream usant el teu shell de login. Sí, fins i tot [fish](https://github.com/alltuner/factoryfloor/pull/324). No preguntis quant de temps va costar.
+Tots els camps són opcionals. Els scripts s'executen al directori del workstream usant el teu shell de login. Sí, fins i tot [fish](https://github.com/barnolacesc/dockyard/pull/324). No preguntis quant de temps va costar.
 
-Factory Floor també llegeix `.emdash.json`, `conductor.json` i `.superset/config.json` si `.factoryfloor.json` no existeix. Perquè la compatibilitat és de bona educació. (Hora d'un [estàndard](https://xkcd.com/927/)?) Quan s'usa una configuració de compatibilitat, Factory Floor injecta variables d'entorn de compatibilitat perquè els scripts funcionin sense modificació (p. ex. `CONDUCTOR_PORT`, `EMDASH_PORT`, `SUPERSET_PORT_BASE`).
+Dockyard també llegeix `.emdash.json`, `conductor.json` i `.superset/config.json` si `.dockyard.json` no existeix. Perquè la compatibilitat és de bona educació. (Hora d'un [estàndard](https://xkcd.com/927/)?) Quan s'usa una configuració de compatibilitat, Dockyard injecta variables d'entorn de compatibilitat perquè els scripts funcionin sense modificació (p. ex. `CONDUCTOR_PORT`, `EMDASH_PORT`, `SUPERSET_PORT_BASE`).
 
 #### El tab Environment {#the-environment-tab}
 
@@ -225,7 +225,7 @@ Cada terminal, setup script, i comanda run d'un workstream té aquestes variable
 | `FF_PROJECT` | Nom del projecte | `my-app` |
 | `FF_WORKSTREAM` | Nom del workstream | `coral-tidal-reef` |
 | `FF_PROJECT_DIR` | Ruta del repositori principal | `/Users/you/my-app` |
-| `FF_WORKTREE_DIR` | Ruta del worktree | `~/.factoryfloor/worktrees/my-app/coral-tidal-reef` |
+| `FF_WORKTREE_DIR` | Ruta del worktree | `~/.dockyard/worktrees/my-app/coral-tidal-reef` |
 | `FF_PORT` | Port determinista (40001-49999) | `42847` |
 | `FF_DEFAULT_BRANCH` | Branca per defecte (main, master, etc.) | `main` |
 
@@ -235,7 +235,7 @@ Cada workstream obté un port determinista basat en un hash de la ruta del workt
 
 #### .env symlink {#env-symlink}
 
-Quan està activat (Settings > General), Factory Floor fa symlink de `.env` i `.env.local` des del teu repositori principal a cada worktree. Així els teus secrets et segueixen sense haver de copiar i enganxar. Parlant de secrets, t'hem parlat de [Vaultuner](https://vaultuner.alltuner.com)?
+Quan està activat (Settings > General), Dockyard fa symlink de `.env` i `.env.local` des del teu repositori principal a cada worktree. Així els teus secrets et segueixen sense haver de copiar i enganxar. Parlant de secrets, t'hem parlat de [Vaultuner](https://vaultuner.barnolacesc.com)?
 
 ### Configuració {#settings}
 
@@ -249,7 +249,7 @@ Obre amb **⌘,** o fes clic a la icona d'engranatge.
 - **Theme** — Sistema, Clar, o Fosc
 - **Language** — Per defecte del sistema, anglès, català, castellà o suec
 - **Confirm before quitting** — pregunta abans de tancar amb workstreams actius
-- **Launch at login** — inicia Factory Floor en arrencar
+- **Launch at login** — inicia Dockyard en arrencar
 
 #### Coding Agent {#coding-agent}
 
@@ -276,7 +276,7 @@ Obre amb **⌘,** o fes clic a la icona d'engranatge.
 
 ## Integracions {#integrations}
 
-Connectant Factory Floor amb tot el demés.
+Connectant Dockyard amb tot el demés.
 
 ### CLI {#cli}
 
@@ -286,7 +286,7 @@ Instal·la la comanda `ff` des de Settings > Environment > Install CLI. Després
 ff /path/to/your/project
 ```
 
-Obre el directori a Factory Floor. Això és tot el que fa, i és tot el que necessita fer.
+Obre el directori a Dockyard. Això és tot el que fa, i és tot el que necessita fer.
 
 ### GitHub {#github}
 
@@ -302,7 +302,7 @@ Des del sidebar, executa operacions d'un sol clic: **Create PR** (títol i descr
 
 ### Actualitzacions {#updates}
 
-Factory Floor mostra un badge al sidebar quan hi ha una versió més nova disponible. També pots comprovar-ho manualment des de **Factory Floor > Check for Updates...**
+Dockyard mostra un badge al sidebar quan hi ha una versió més nova disponible. També pots comprovar-ho manualment des de **Dockyard > Check for Updates...**
 
 **Usuaris de Homebrew:**
 
@@ -310,7 +310,7 @@ Factory Floor mostra un badge al sidebar quan hi ha una versió més nova dispon
 brew upgrade factory-floor
 ```
 
-**Usuaris de DMG:** les actualitzacions es gestionen automàticament via [Sparkle](https://sparkle-project.org). Comprova manualment des del menú: **Factory Floor > Check for Updates...**
+**Usuaris de DMG:** les actualitzacions es gestionen automàticament via [Sparkle](https://sparkle-project.org). Comprova manualment des del menú: **Dockyard > Check for Updates...**
 
 Activa **Bleeding edge updates** a Settings > Advanced per a builds de pre-llançament. Per als que els agrada viure al límit i enviar informes d'errors.
 
@@ -320,7 +320,7 @@ Activa **Bleeding edge updates** a Settings > Advanced per a builds de pre-llan�
 
 ### Editor de codi {#code-editor}
 
-No. Sense ressaltat de sintaxi, sense autocompletar, sense minimapa. Els nostres VCs inexistents no han estat imposant cap agenda corporativa. La intenció és que facis servir les eines que ja t'agraden: [Zed](https://zed.dev), [VS Code](https://code.visualstudio.com), el que sigui. Factory Floor et dóna un coding agent, un navegador, i un worktree. A més, qui escriu codi avui en dia?
+No. Sense ressaltat de sintaxi, sense autocompletar, sense minimapa. Els nostres VCs inexistents no han estat imposant cap agenda corporativa. La intenció és que facis servir les eines que ja t'agraden: [Zed](https://zed.dev), [VS Code](https://code.visualstudio.com), el que sigui. Dockyard et dóna un coding agent, un navegador, i un worktree. A més, qui escriu codi avui en dia?
 
 ### Visor de merge {#merge-viewer}
 
@@ -332,7 +332,7 @@ Tampoc. El teu client de git ja ho fa millor del que nosaltres mai podríem. Nos
 
 #### "Tools not found" {#tools-not-found}
 
-Factory Floor detecta les eines des del teu shell de login. Si `claude`, `gh`, `git`, o `tmux` no apareixen:
+Dockyard detecta les eines des del teu shell de login. Si `claude`, `gh`, `git`, o `tmux` no apareixen:
 
 - Assegura't que estan al PATH del teu shell
 - Usuaris de Fish 4.0 i Nix: l'app gestiona aquests entorns, però si alguna cosa no va bé, comprova Settings > Environment
@@ -340,16 +340,16 @@ Factory Floor detecta les eines des del teu shell de login. Si `claude`, `gh`, `
 #### Les sessions de tmux no persisteixen {#tmux-sessions-not-persisting}
 
 - Verifica que tmux està instal·lat i detectat (Settings > Environment)
-- Factory Floor utilitza el seu propi socket de tmux (`-L factoryfloor`), així que la teva configuració personal de tmux no interferirà
+- Dockyard utilitza el seu propi socket de tmux (`-L dockyard`), així que la teva configuració personal de tmux no interferirà
 
 #### Port no detectat {#port-not-detected}
 
 - Assegura't que el teu run script utilitza `$FF_PORT` (o que el port es detecta des de l'arbre de processos)
-- El llançador `ff-run` embolcalla el run script, monitoritza els processos fills per trobar listeners TCP
+- El llançador `dy-run` embolcalla el run script, monitoritza els processos fills per trobar listeners TCP
 - Comprova Settings > Advanced > Detailed logging per a sortida de depuració
 
 #### Alguna altra cosa no funciona? {#something-else-broken}
 
-- [Informa'ns d'un error](https://github.com/alltuner/factoryfloor/issues/new?template=bug_report.yml) — explica'ns què ha anat malament
-- [Envia un fix prompt](https://github.com/alltuner/factoryfloor/issues/new?template=fix_prompt.yml) — escriu el prompt, deixarem que l'agent ho intenti
-- [Alguna altra cosa](https://github.com/alltuner/factoryfloor/issues/new) — idees, preguntes, dubtes existencials
+- [Informa'ns d'un error](https://github.com/barnolacesc/dockyard/issues/new?template=bug_report.yml) — explica'ns què ha anat malament
+- [Envia un fix prompt](https://github.com/barnolacesc/dockyard/issues/new?template=fix_prompt.yml) — escriu el prompt, deixarem que l'agent ho intenti
+- [Alguna altra cosa](https://github.com/barnolacesc/dockyard/issues/new) — idees, preguntes, dubtes existencials

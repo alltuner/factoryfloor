@@ -2,7 +2,7 @@
 // ABOUTME: Verifies only fixed tabs are restored and custom tabs reorder deterministically.
 
 import AppKit
-@testable import FactoryFloor
+@testable import Dockyard
 import XCTest
 
 final class WorkspaceTabSnapshotTests: XCTestCase {

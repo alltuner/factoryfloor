@@ -2,7 +2,7 @@
 
 ## Overview
 
-Two improvements to the Factory Floor workspace view:
+Two improvements to the Dockyard workspace view:
 1. Keyboard-driven split pane — toggle any tab type into a side-by-side split with a single shortcut
 2. Info tab git stats — expand the existing git section with worktree and branch metadata
 
@@ -48,7 +48,7 @@ When `splitTab` is non-nil, the view renders as an HSplitView: primary on left (
 - `TerminalSurfaceCache` already keeps all terminal surfaces alive in memory. Entering/leaving split is a pure layout change — no terminal processes are created or destroyed.
 - The split divider should be draggable (AppKit HSplitView handles this natively).
 - Split state is per-workstream and ephemeral (not persisted across app restarts).
-- Update `FF2App.swift` menu commands, `TerminalContainerView.swift` keyboard handling, `HelpView.swift` shortcut reference, and `README.md` shortcut table.
+- Update `DockyardApp.swift` menu commands, `TerminalContainerView.swift` keyboard handling, `HelpView.swift` shortcut reference, and `README.md` shortcut table.
 - Localize any new user-facing strings (en, ca, es, sv).
 
 ---
@@ -63,7 +63,7 @@ Expand the existing git/path section of `WorkstreamInfoView` with additional row
 
 | Label | Value | Colour hint |
 |---|---|---|
-| Branch | `ff/my-feature` | accent (purple) |
+| Branch | `dy/my-feature` | accent (purple) |
 | Ahead | `↑ 4 commits` (vs base branch) | primary text |
 | Uncommitted | `2 files` / `Clean` | yellow if >0, muted if 0 |
 | Base | `main · branched May 7` | muted |

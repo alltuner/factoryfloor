@@ -2,7 +2,7 @@
 // ABOUTME: Verifies dark appearance detection across standard AppKit appearance names.
 
 import Cocoa
-@testable import FactoryFloor
+@testable import Dockyard
 import XCTest
 
 final class NSAppearanceTests: XCTestCase {

@@ -4,7 +4,7 @@
 import OSLog
 import SwiftUI
 
-private let logger = Logger(subsystem: "factoryfloor", category: "environment")
+private let logger = Logger(subsystem: "dockyard", category: "environment")
 
 struct WorktreeState {
     var hasUncommittedChanges: Bool = false
@@ -283,7 +283,7 @@ final class AppEnvironment: ObservableObject {
                     if valid {
                         validPaths.append(path)
                         let descURL = URL(fileURLWithPath: path)
-                            .appendingPathComponent(".factoryfloor-state/description")
+                            .appendingPathComponent(".dockyard-state/description")
                         if let data = try? Data(contentsOf: descURL),
                            let text = String(data: data, encoding: .utf8)
                         {

@@ -1,7 +1,7 @@
 // ABOUTME: Tests for ScriptConfig loading from multiple config file formats.
-// ABOUTME: Validates priority order and parsing of factoryfloor, emdash, conductor, and superset configs.
+// ABOUTME: Validates priority order and parsing of dockyard, emdash, conductor, and superset configs.
 
-@testable import FactoryFloor
+@testable import Dockyard
 import XCTest
 
 final class ScriptConfigTests: XCTestCase {
@@ -29,33 +29,33 @@ final class ScriptConfigTests: XCTestCase {
         XCTAssertFalse(config.hasAnyScript)
     }
 
-    // MARK: - .factoryfloor.json (primary)
+    // MARK: - .dockyard.json (primary)
 
-    func testFactoryFloorJSON() {
-        writeJSON(".factoryfloor.json", ["setup": "npm install", "run": "npm start"])
+    func testDockyardJSON() {
+        writeJSON(".dockyard.json", ["setup": "npm install", "run": "npm start"])
         let config = ScriptConfig.load(from: tmpDir.path)
         XCTAssertEqual(config.setup, "npm install")
         XCTAssertEqual(config.run, "npm start")
         XCTAssertNil(config.teardown)
-        XCTAssertEqual(config.source, ".factoryfloor.json")
+        XCTAssertEqual(config.source, ".dockyard.json")
     }
 
-    func testFactoryFloorTakesPriorityOverConductor() {
-        writeJSON(".factoryfloor.json", ["run": "ff-run"])
+    func testDockyardTakesPriorityOverConductor() {
+        writeJSON(".dockyard.json", ["run": "dy-run"])
         writeJSON("conductor.json", ["scripts": ["run": "conductor-run"]])
         let config = ScriptConfig.load(from: tmpDir.path)
-        XCTAssertEqual(config.run, "ff-run")
-        XCTAssertEqual(config.source, ".factoryfloor.json")
+        XCTAssertEqual(config.run, "dy-run")
+        XCTAssertEqual(config.source, ".dockyard.json")
     }
 
-    func testFactoryFloorTakesPriorityOverSuperset() throws {
-        writeJSON(".factoryfloor.json", ["run": "ff-run"])
+    func testDockyardTakesPriorityOverSuperset() throws {
+        writeJSON(".dockyard.json", ["run": "dy-run"])
         let supersetDir = tmpDir.appendingPathComponent(".superset")
         try FileManager.default.createDirectory(at: supersetDir, withIntermediateDirectories: true)
         writeJSON(".superset/config.json", ["run": ["superset-run"]])
         let config = ScriptConfig.load(from: tmpDir.path)
-        XCTAssertEqual(config.run, "ff-run")
-        XCTAssertEqual(config.source, ".factoryfloor.json")
+        XCTAssertEqual(config.run, "dy-run")
+        XCTAssertEqual(config.source, ".dockyard.json")
     }
 
     // MARK: - conductor.json (fallback)
@@ -139,12 +139,12 @@ final class ScriptConfigTests: XCTestCase {
         XCTAssertFalse(config.hasAnyScript)
     }
 
-    func testFactoryFloorTakesPriorityOverEmdash() {
-        writeJSON(".factoryfloor.json", ["run": "ff-run"])
+    func testDockyardTakesPriorityOverEmdash() {
+        writeJSON(".dockyard.json", ["run": "dy-run"])
         writeJSON(".emdash.json", ["scripts": ["run": "emdash-run"]])
         let config = ScriptConfig.load(from: tmpDir.path)
-        XCTAssertEqual(config.run, "ff-run")
-        XCTAssertEqual(config.source, ".factoryfloor.json")
+        XCTAssertEqual(config.run, "dy-run")
+        XCTAssertEqual(config.source, ".dockyard.json")
     }
 
     func testEmdashTakesPriorityOverConductor() {
@@ -166,11 +166,11 @@ final class ScriptConfigTests: XCTestCase {
     // MARK: - Error handling
 
     func testInvalidJSONReportsError() {
-        let path = tmpDir.appendingPathComponent(".factoryfloor.json").path
+        let path = tmpDir.appendingPathComponent(".dockyard.json").path
         FileManager.default.createFile(atPath: path, contents: "not json".data(using: .utf8))
         let config = ScriptConfig.load(from: tmpDir.path)
         XCTAssertNotNil(config.loadError)
-        XCTAssertEqual(config.source, ".factoryfloor.json")
+        XCTAssertEqual(config.source, ".dockyard.json")
     }
 
     func testInvalidConductorJSONReportsError() {

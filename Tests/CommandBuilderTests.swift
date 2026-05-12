@@ -1,7 +1,7 @@
 // ABOUTME: Tests for CommandBuilder shell command composition and quoting.
 // ABOUTME: Validates escaping of special characters, spaces, quotes, and nested commands.
 
-@testable import FactoryFloor
+@testable import Dockyard
 import XCTest
 
 final class CommandBuilderTests: XCTestCase {
@@ -299,7 +299,7 @@ final class CommandBuilderTests: XCTestCase {
             cli: .codex,
             cliPath: "/usr/local/bin/codex",
             workingDirectory: "/tmp/worktree",
-            projectName: "factoryfloor",
+            projectName: "dockyard",
             workstreamName: "switch-cli",
             workstreamID: workstreamID,
             tmuxPath: nil,

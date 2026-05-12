@@ -8,7 +8,7 @@ struct HelpView: View {
         { page in
             let lang = Locale.current.language.languageCode?.identifier ?? "en"
             let path = lang == "en" ? "/\(page)" : "/\(lang)/\(page)"
-            return URL(string: "https://factory-floor.com\(path)")!
+            return URL(string: "https://francesc.barnola.net\(path)")!
         }
     }
 
@@ -61,10 +61,10 @@ struct HelpView: View {
                     Link(destination: localizedURL("sponsor")) {
                         Label("Sponsor", systemImage: "heart")
                     }
-                    Link(destination: URL(string: "https://github.com/alltuner/factoryfloor/issues/new?template=bug_report.yml")!) {
+                    Link(destination: URL(string: "https://github.com/barnolacesc/dockyard/issues/new?template=bug_report.yml")!) {
                         Label("Report a Bug", systemImage: "ladybug")
                     }
-                    Link(destination: URL(string: "https://github.com/alltuner/factoryfloor/issues/new?template=feature_request.yml")!) {
+                    Link(destination: URL(string: "https://github.com/barnolacesc/dockyard/issues/new?template=feature_request.yml")!) {
                         Label("Request a Feature", systemImage: "lightbulb")
                     }
                 }
@@ -145,7 +145,7 @@ struct HelpView: View {
                         Text("with the support of")
                             .font(.caption)
                             .foregroundStyle(.tertiary)
-                        Link("All Tuner Labs", destination: URL(string: "https://alltuner.com")!)
+                        Link("David Poblador i Garcia", destination: URL(string: "https://barnolacesc.com")!)
                             .font(.caption)
                     }
                     Link("davidpoblador.com", destination: URL(string: "https://davidpoblador.com")!)

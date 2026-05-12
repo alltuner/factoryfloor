@@ -4,13 +4,13 @@
 
 set -e
 
-PROJECT="FactoryFloor.xcodeproj"
-SCHEME="FactoryFloor"
-TEST_SCHEME="FactoryFloorTests"
+PROJECT="Dockyard.xcodeproj"
+SCHEME="Dockyard"
+TEST_SCHEME="DockyardTests"
 APP_NAME="Dockyard Debug"
 BUILD_DIR="build/debug/derived"
 APP_PATH="$BUILD_DIR/Build/Products/Debug/$APP_NAME.app"
-SPM_CACHE="$HOME/Library/Caches/factoryfloor/spm"
+SPM_CACHE="$HOME/Library/Caches/dockyard/spm"
 BRANCH=$(git branch --show-current 2>/dev/null || echo "unknown")
 GHOSTTY_RESOURCES="ghostty/zig-out/share"
 MONACO_OUTPUT="Resources/MonacoEditor/index.html"

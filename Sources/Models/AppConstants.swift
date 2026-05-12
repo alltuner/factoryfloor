@@ -30,9 +30,9 @@ func isRunningXCTest(environment: [String: String] = ProcessInfo.processInfo.env
 enum AppConstants {
     static let appID: String = {
         #if DEBUG
-            "factoryfloor-debug"
+            "dockyard-debug"
         #else
-            "factoryfloor"
+            "dockyard"
         #endif
     }()
 
@@ -46,9 +46,9 @@ enum AppConstants {
 
     static let urlScheme: String = {
         #if DEBUG
-            "factoryfloor-debug"
+            "dockyard-debug"
         #else
-            "factoryfloor"
+            "dockyard"
         #endif
     }()
 
@@ -60,31 +60,31 @@ enum AppConstants {
         return "\(version) (\(AppCommit.hash))"
     }
 
-    /// Config directory: ~/.config/factoryfloor/ (respects XDG_CONFIG_HOME).
-    /// XCTest uses ~/.config/factoryfloor-tests/ to keep test data isolated.
+    /// Config directory: ~/.config/dockyard/ (respects XDG_CONFIG_HOME).
+    /// XCTest uses ~/.config/dockyard-tests/ to keep test data isolated.
     static var configDirectory: URL {
         resolvedConfigDirectory(
-            configDirectoryName: "factoryfloor",
+            configDirectoryName: "dockyard",
             environment: ProcessInfo.processInfo.environment,
             defaultConfigBase: FileManager.default.homeDirectoryForCurrentUser.appendingPathComponent(".config"),
             isRunningTests: isRunningXCTest()
         )
     }
 
-    /// Cache directory: ~/Library/Caches/factoryfloor/.
+    /// Cache directory: ~/Library/Caches/dockyard/.
     /// Used for transient files like run-state and tmux config.
     static var cacheDirectory: URL {
         let base = FileManager.default.urls(for: .cachesDirectory, in: .userDomainMask).first!
         let dirName = isRunningXCTest()
-            ? "factoryfloor-tests"
-            : "factoryfloor"
+            ? "dockyard-tests"
+            : "dockyard"
         return base.appendingPathComponent(dirName)
     }
 
     /// Worktrees are always shared between debug and release builds.
     static var worktreesDirectory: URL {
         FileManager.default.homeDirectoryForCurrentUser
-            .appendingPathComponent(".factoryfloor")
+            .appendingPathComponent(".dockyard")
             .appendingPathComponent("worktrees")
     }
 }

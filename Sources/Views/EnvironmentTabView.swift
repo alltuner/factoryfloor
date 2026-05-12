@@ -44,7 +44,7 @@ struct EnvironmentTabView: View {
                 configErrorBanner(error: error)
                 Divider()
             }
-            if let source = scriptConfig.source, source != ".factoryfloor.json" {
+            if let source = scriptConfig.source, source != ".dockyard.json" {
                 configSourceBanner(source: source)
                 Divider()
             }
@@ -106,7 +106,7 @@ struct EnvironmentTabView: View {
                     Text("No port detection")
                         .font(.system(size: 9))
                         .foregroundStyle(.orange)
-                        .help("ff-run helper not found. Run scripts will work but port detection is unavailable.")
+                        .help("dy-run helper not found. Run scripts will work but port detection is unavailable.")
                 }
 
                 Spacer()
@@ -181,7 +181,7 @@ struct EnvironmentTabView: View {
             Image(systemName: "exclamationmark.triangle.fill")
                 .foregroundStyle(.yellow)
             VStack(alignment: .leading, spacing: 2) {
-                Text("Failed to load .factoryfloor.json")
+                Text("Failed to load .dockyard.json")
                     .font(.system(size: 12, weight: .semibold))
                 Text(error)
                     .font(.system(size: 11, design: .monospaced))
@@ -214,7 +214,7 @@ struct EnvironmentTabView: View {
             Text(String(format: NSLocalizedString("No %@ script configured", comment: ""), title.lowercased()))
                 .font(.system(size: 13))
                 .foregroundStyle(.secondary)
-            Text(String(format: NSLocalizedString("Add a %@ field to .factoryfloor.json:", comment: ""), title.lowercased()))
+            Text(String(format: NSLocalizedString("Add a %@ field to .dockyard.json:", comment: ""), title.lowercased()))
                 .font(.system(size: 11))
                 .foregroundStyle(.tertiary)
             Text("{ \"\(title.lowercased())\": \"your-command\" }")
@@ -321,7 +321,7 @@ struct EnvironmentTabView: View {
 }
 
 extension Notification.Name {
-    static let rerunScript = Notification.Name("factoryfloor.rerunScript")
+    static let rerunScript = Notification.Name("dockyard.rerunScript")
 }
 
 private struct EnvActionButton: View {

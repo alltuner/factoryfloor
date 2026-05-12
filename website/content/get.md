@@ -1,5 +1,5 @@
 ---
-title: Get Factory Floor
+title: Get Dockyard
 translationKey: get
 hideInstall: true
 layout: get

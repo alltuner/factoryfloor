@@ -1,5 +1,5 @@
 ---
-title: Stöd Factory Floor
+title: Stöd Dockyard
 translationKey: sponsor
 hideInstall: true
 ---

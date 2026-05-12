@@ -1,7 +1,7 @@
 // ABOUTME: Tests for resolving absolute paths to app-launched command line tools.
 // ABOUTME: Guards against debug and release builds using different command lookup behavior.
 
-@testable import FactoryFloor
+@testable import Dockyard
 import XCTest
 
 final class CommandLineToolsTests: XCTestCase {

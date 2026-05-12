@@ -4,10 +4,10 @@
 import Cocoa
 import os
 
-private let logger = Logger(subsystem: "factoryfloor", category: "terminal-view")
+private let logger = Logger(subsystem: "dockyard", category: "terminal-view")
 
 extension Notification.Name {
-    static let terminalChildExited = Notification.Name("factoryfloor.terminalChildExited")
+    static let terminalChildExited = Notification.Name("dockyard.terminalChildExited")
     static let terminalActivity = Notification.Name("ff2.terminalActivity")
 }
 

@@ -4,25 +4,25 @@
 import SwiftUI
 
 struct SettingsView: View {
-    @AppStorage("factoryfloor.languageOverride") private var languageOverride: String = ""
-    @AppStorage("factoryfloor.codingCLI") private var codingCLIRaw: String = ""
-    @AppStorage("factoryfloor.tmuxMode") private var tmuxMode: Bool = false
-    @AppStorage("factoryfloor.bypassPermissions") private var bypassPermissions: Bool = false
-    @AppStorage("factoryfloor.allowOutsideWorktree") private var allowOutsideWorktree: Bool = false
-    @AppStorage("factoryfloor.agentTeams") private var agentTeams: Bool = false
-    @AppStorage("factoryfloor.autoRenameBranch") private var autoRenameBranch: Bool = false
-    @AppStorage("factoryfloor.defaultTerminal") private var defaultTerminal: String = ""
-    @AppStorage("factoryfloor.defaultBrowser") private var defaultBrowser: String = ""
-    @AppStorage("factoryfloor.branchPrefix") private var branchPrefix: String = "ff"
-    @AppStorage("factoryfloor.appearance") private var appearance: String = "system"
-    @AppStorage("factoryfloor.symlinkEnv") private var symlinkEnv: Bool = true
-    @AppStorage("factoryfloor.confirmQuit") private var confirmQuit: Bool = true
-    @AppStorage("factoryfloor.telemetryEnabled") private var telemetryEnabled: Bool = true
-    @AppStorage("factoryfloor.crashReportingEnabled") private var crashReportingEnabled: Bool = true
-    @AppStorage("factoryfloor.detailedLogging") private var detailedLogging: Bool = false
-    @AppStorage("factoryfloor.quickActionDebug") private var quickActionDebug: Bool = false
-    @AppStorage("factoryfloor.bleedingEdge") private var bleedingEdge: Bool = false
-    @AppStorage("factoryfloor.baseDirectory") private var baseDirectory: String = NSSearchPathForDirectoriesInDomains(.documentDirectory, .userDomainMask, true).first ?? ""
+    @AppStorage("dockyard.languageOverride") private var languageOverride: String = ""
+    @AppStorage("dockyard.codingCLI") private var codingCLIRaw: String = ""
+    @AppStorage("dockyard.tmuxMode") private var tmuxMode: Bool = false
+    @AppStorage("dockyard.bypassPermissions") private var bypassPermissions: Bool = false
+    @AppStorage("dockyard.allowOutsideWorktree") private var allowOutsideWorktree: Bool = false
+    @AppStorage("dockyard.agentTeams") private var agentTeams: Bool = false
+    @AppStorage("dockyard.autoRenameBranch") private var autoRenameBranch: Bool = false
+    @AppStorage("dockyard.defaultTerminal") private var defaultTerminal: String = ""
+    @AppStorage("dockyard.defaultBrowser") private var defaultBrowser: String = ""
+    @AppStorage("dockyard.branchPrefix") private var branchPrefix: String = "dy"
+    @AppStorage("dockyard.appearance") private var appearance: String = "system"
+    @AppStorage("dockyard.symlinkEnv") private var symlinkEnv: Bool = true
+    @AppStorage("dockyard.confirmQuit") private var confirmQuit: Bool = true
+    @AppStorage("dockyard.telemetryEnabled") private var telemetryEnabled: Bool = true
+    @AppStorage("dockyard.crashReportingEnabled") private var crashReportingEnabled: Bool = true
+    @AppStorage("dockyard.detailedLogging") private var detailedLogging: Bool = false
+    @AppStorage("dockyard.quickActionDebug") private var quickActionDebug: Bool = false
+    @AppStorage("dockyard.bleedingEdge") private var bleedingEdge: Bool = false
+    @AppStorage("dockyard.baseDirectory") private var baseDirectory: String = NSSearchPathForDirectoriesInDomains(.documentDirectory, .userDomainMask, true).first ?? ""
 
     @State private var launchAtLogin = LaunchAtLogin.isEnabled
 
@@ -31,7 +31,7 @@ struct SettingsView: View {
     #if DEBUG
         private static let cliName = "ff-debug"
     #else
-        private static let cliName = "ff"
+        private static let cliName = "dy"
     #endif
     @State private var cliInstalled = Self.isCliCorrectlyInstalled()
 
@@ -155,7 +155,7 @@ struct SettingsView: View {
                         .textFieldStyle(.roundedBorder)
                         .frame(maxWidth: 150)
                     }
-                    Text("e.g. \(branchPrefix.isEmpty ? "ff" : branchPrefix)/deploy-ludicrous-speed")
+                    Text("e.g. \(branchPrefix.isEmpty ? "dy" : branchPrefix)/deploy-ludicrous-speed")
                         .font(.system(.caption, design: .monospaced))
                         .foregroundStyle(.tertiary)
                 }
@@ -199,7 +199,7 @@ struct SettingsView: View {
                 SettingToggle(
                     "Launch at login",
                     isOn: $launchAtLogin,
-                    description: "Automatically open Factory Floor when you log in."
+                    description: "Automatically open Dockyard when you log in."
                 )
                 .onChange(of: launchAtLogin) { _, newValue in
                     LaunchAtLogin.setEnabled(newValue)
@@ -319,7 +319,7 @@ struct SettingsView: View {
                 SettingToggle(
                     "Usage analytics",
                     isOn: $telemetryEnabled,
-                    description: "Send anonymous usage data to help improve Factory Floor. We collect: app version, build type, macOS version, locale, and screen resolution. No project names, file contents, or personal data."
+                    description: "Send anonymous usage data to help improve Dockyard. We collect: app version, build type, macOS version, locale, and screen resolution. No project names, file contents, or personal data."
                 )
 
                 SettingToggle(

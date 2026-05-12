@@ -4,7 +4,7 @@
 import Foundation
 import OSLog
 
-private let logger = Logger(subsystem: "factoryfloor", category: "sidebar-selection")
+private let logger = Logger(subsystem: "dockyard", category: "sidebar-selection")
 
 enum SidebarSelection: Hashable, Codable {
     case project(UUID)
@@ -24,7 +24,7 @@ enum SidebarSelection: Hashable, Codable {
 
     // MARK: - Persistence
 
-    private static let userDefaultsKey = "factoryfloor.selection"
+    private static let userDefaultsKey = "dockyard.selection"
 
     static func loadSaved() -> SidebarSelection? {
         guard let data = UserDefaults.standard.data(forKey: userDefaultsKey),
@@ -40,7 +40,7 @@ enum SidebarSelection: Hashable, Codable {
 }
 
 enum SidebarState {
-    private static let userDefaultsKey = "factoryfloor.expandedProjects"
+    private static let userDefaultsKey = "dockyard.expandedProjects"
 
     static func loadExpanded() -> Set<UUID> {
         guard let data = UserDefaults.standard.data(forKey: userDefaultsKey),

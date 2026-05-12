@@ -17,7 +17,7 @@ struct WorkstreamInfoView: View {
     var sessionMode: TerminalSessionMode = .standard
 
     @EnvironmentObject var appEnv: AppEnvironment
-    @AppStorage("factoryfloor.defaultTerminal") private var defaultTerminal: String = ""
+    @AppStorage("dockyard.defaultTerminal") private var defaultTerminal: String = ""
     @State private var branchName: String?
     @State private var copiedBranch = false
     @State private var copiedPath = false

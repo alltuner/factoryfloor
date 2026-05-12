@@ -5,10 +5,10 @@ import SwiftUI
 import WebKit
 
 extension Notification.Name {
-    static let focusAddressBar = Notification.Name("factoryfloor.focusAddressBar")
-    static let browserTitleChanged = Notification.Name("factoryfloor.browserTitleChanged")
-    static let browserReload = Notification.Name("factoryfloor.browserReload")
-    static let browserHardReload = Notification.Name("factoryfloor.browserHardReload")
+    static let focusAddressBar = Notification.Name("dockyard.focusAddressBar")
+    static let browserTitleChanged = Notification.Name("dockyard.browserTitleChanged")
+    static let browserReload = Notification.Name("dockyard.browserReload")
+    static let browserHardReload = Notification.Name("dockyard.browserHardReload")
 }
 
 /// Hides the "Open Link in New Window" context menu item since the app is single-window.

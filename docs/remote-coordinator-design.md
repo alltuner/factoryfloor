@@ -7,19 +7,19 @@ and takes credit for the results. Ships as a Docker container because even manag
 needs to be containerized these days.
 
 **Name**: Corner Office
-- Docker image: `factoryfloor/corner-office`
-- Hosted URL: `corner-office.factory-floor.com`
+- Docker image: `dockyard/corner-office`
+- Hosted URL: `corner-office.francesc.barnola.net`
 - In-app setting: "Connect to Corner Office"
 
 ## Architecture
 
 ```
-[Web UI] --> [Coordinator Container] <--poll-- [Factory Floor A]
-                                     <--poll-- [Factory Floor B]
+[Web UI] --> [Coordinator Container] <--poll-- [Dockyard A]
+                                     <--poll-- [Dockyard B]
 ```
 
 - **Coordinator**: thin REST API + minimal web UI. No terminal views, no agent runtime.
-- **Factory Floor instances**: the workers. They do everything they already do (worktrees,
+- **Dockyard instances**: the workers. They do everything they already do (worktrees,
   agents, terminals). They poll the coordinator for jobs and push status updates.
 - **Web UI**: fire new workstreams, check status. Lightweight dashboard, not a full client.
 
@@ -49,13 +49,13 @@ go to the office you will see what the factory has built."
 No passwords, no API keys, no config files. Uses the device authorization pattern
 (same UX as Netflix on a TV, GitHub CLI, Apple TV):
 
-1. User enters the Corner Office URL in Factory Floor settings
-   (e.g., `localhost:8080` or `corner-office.factory-floor.com`)
-2. Factory Floor connects and receives a 6-character pairing code + QR code
-3. Factory Floor displays both prominently in a pairing screen
+1. User enters the Corner Office URL in Dockyard settings
+   (e.g., `localhost:8080` or `corner-office.francesc.barnola.net`)
+2. Dockyard connects and receives a 6-character pairing code + QR code
+3. Dockyard displays both prominently in a pairing screen
 4. User opens the Corner Office web UI (or scans the QR code), enters the code
 5. Corner Office confirms the pairing and issues a token
-6. Factory Floor stores the token locally, uses it for all subsequent connections
+6. Dockyard stores the token locally, uses it for all subsequent connections
 7. Pairing code expires after 5 minutes, single use
 
 This is the only auth mechanism. Same code path for self-hosted and hosted. An exposed
@@ -63,7 +63,7 @@ Corner Office URL is useless until someone physically confirms a pairing code.
 
 Re-pairing (after a token reset or new instance) is just: show a new code, confirm again.
 
-### Factory Floor UX for connecting
+### Dockyard UX for connecting
 
 The connection setup needs to be polished, first-class UI:
 
@@ -71,7 +71,7 @@ The connection setup needs to be polished, first-class UI:
   (placeholder: `localhost:8080`). Clear labeling, not buried in advanced settings.
 - **Connection status**: visible indicator (connected / disconnected / pairing) in the
   sidebar or status bar.
-- **Pairing screen**: when first connecting to a new coordinator, Factory Floor shows a
+- **Pairing screen**: when first connecting to a new coordinator, Dockyard shows a
   dedicated pairing view with the code in large text and a QR code. Not a modal, not a
   toast, a full screen that guides the user through the process.
 - **QR code**: encodes the Corner Office web UI URL with the code pre-filled, so scanning
@@ -87,7 +87,7 @@ The connection setup needs to be polished, first-class UI:
 
 ## API surface (sketch)
 
-### Factory Floor → Coordinator
+### Dockyard → Coordinator
 
 - `POST /api/register` — announce instance (UUID, machine name, project names)
 - `GET  /api/jobs?instance={uuid}` — poll for pending jobs (fallback transport)
@@ -109,10 +109,10 @@ Docker container users deploy wherever they want. No auth (on-prem trust model: 
 can reach it, you're authorized).
 
 ```bash
-docker run -p 8080:8080 factoryfloor/coordinator
+docker run -p 8080:8080 dockyard/coordinator
 ```
 
-Factory Floor connects to `localhost:8080` or the container's network address.
+Dockyard connects to `localhost:8080` or the container's network address.
 
 Remote access is the user's responsibility. Documented recipes for:
 
@@ -125,16 +125,16 @@ Remote access is the user's responsibility. Documented recipes for:
 - **ngrok**: easiest setup (one token), but free tier has 20 conn/min rate limit and
   one static domain per account.
 
-### Hosted coordinator (factory-floor.com)
+### Hosted coordinator (francesc.barnola.net)
 
-Managed service for users who want zero infrastructure. Factory Floor instances connect
-outbound to `coordinator.factory-floor.com` (HTTPS, works through any firewall).
+Managed service for users who want zero infrastructure. Dockyard instances connect
+outbound to `coordinator.francesc.barnola.net` (HTTPS, works through any firewall).
 
 Onboarding flow:
-1. Sign in with GitHub/Google at coordinator.factory-floor.com
+1. Sign in with GitHub/Google at coordinator.francesc.barnola.net
 2. Get a pairing code
-3. Paste code into Factory Floor settings
-4. Factory Floor connects outbound. Done.
+3. Paste code into Dockyard settings
+4. Dockyard connects outbound. Done.
 
 Auth: OAuth with GitHub/Google. No passwords, no signup forms.
 
@@ -143,7 +143,7 @@ Auth: OAuth with GitHub/Google. No passwords, no signup forms.
 The app stays free and open-source. The hosted coordinator is the paid product.
 
 **Free tier**
-- 1 Factory Floor instance
+- 1 Dockyard instance
 - Limited workstreams/month (enough to evaluate)
 - Status dashboard
 
@@ -154,7 +154,7 @@ The app stays free and open-source. The hosted coordinator is the paid product.
 - Port forwarding for dev servers (ngrok-style)
 
 Self-hosted coordinator always has full feature parity. No artificial gating. Competing
-on convenience, not captivity. Self-hosters are still evangelists who bring Factory Floor
+on convenience, not captivity. Self-hosters are still evangelists who bring Dockyard
 to teams that will pay for hosted.
 
 ## Coordinator implementation
@@ -198,12 +198,12 @@ Job statuses:
 - **Failed** — instance reported failure (with error details)
 - **Interrupted** — was running when the instance disconnected ("go check your Mac")
 
-On reconnect, Factory Floor reports its actual state and Corner Office reconciles
+On reconnect, Dockyard reports its actual state and Corner Office reconciles
 (interrupted jobs may become running or completed).
 
 ### Project identity
 - Corner Office knows project names and instance names. Nothing about git, paths, or
-  worktrees. Factory Floor announces its registered projects by name.
+  worktrees. Dockyard announces its registered projects by name.
 - If a job targets a project no connected instance has, reject it.
 - If multiple instances have the same project name, routing strategy TBD (user picks
   instance, round-robin, least loaded).
@@ -219,14 +219,14 @@ On reconnect, Factory Floor reports its actual state and Corner Office reconcile
 - Corner Office is dumb by design. It relays and stores messages it doesn't fully
   understand. New fields in status updates get stored and displayed even if Corner Office
   doesn't know what they are. New job parameters get passed through.
-- Factory Floor is the smart one that evolves. Corner Office barely changes because it
+- Dockyard is the smart one that evolves. Corner Office barely changes because it
   barely does anything. Backwards compatibility effort falls on keeping Corner Office's
   thin protocol stable, which is easy because the protocol is thin.
-- Common case: Factory Floor updates frequently (auto-update), Corner Office sits at an
+- Common case: Dockyard updates frequently (auto-update), Corner Office sits at an
   old Docker tag for months. This is fine because Corner Office is a passthrough.
 
 ### User model
-- No organizations, no teams, no permissions. A user connects 1..N Factory Floor
+- No organizations, no teams, no permissions. A user connects 1..N Dockyard
   instances and sees all of them. Each user sees only their own instances and jobs.
 - Self-hosted: single implicit user (no login needed, everything is yours).
 - Hosted: user identity via OAuth (GitHub/Google). One user account, all their
@@ -238,14 +238,14 @@ If there's only one instance, skip the instance level and show projects directly
 The instance is implicit. Switch to the grouped view when a second instance connects.
 
 - **Instances**: name, status (online/busy/disconnected), last seen
-- **Projects** (per instance): name, description (from `.factoryfloor.json`)
+- **Projects** (per instance): name, description (from `.dockyard.json`)
 - **Workstreams** (per project, optional): status, branch, prompt snippet, metadata.
   Remote jobs (pushed from Corner Office) are visually distinct from local ones.
 - **Push a task**: pick a project, write a prompt, send. Minimal form.
 - **Pairing**: in settings/gear, not taking space in the main view.
 
-### Remote work in Factory Floor
-Factory Floor needs a concept of "remote work": workstreams dispatched from Corner
+### Remote work in Dockyard
+Dockyard needs a concept of "remote work": workstreams dispatched from Corner
 Office are tagged so the user can see "these were pushed remotely" vs "these I started
 locally." Visible in the sidebar or workstream info.
 
@@ -255,11 +255,11 @@ locally." Visible in the sidebar or workstream info.
 
 ### Project metadata
 - Corner Office needs project names and descriptions to display in the web UI.
-- Source of truth: `.factoryfloor.json` in the project directory (already has setup/run/
+- Source of truth: `.dockyard.json` in the project directory (already has setup/run/
   teardown). Add `name` and `description` fields.
-- Factory Floor reads the file, shows it locally (sidebar, info panel), and announces
+- Dockyard reads the file, shows it locally (sidebar, info panel), and announces
   it to Corner Office.
-- Editable from Factory Floor UI (writes back to file). Power users edit JSON directly.
+- Editable from Dockyard UI (writes back to file). Power users edit JSON directly.
 - This is useful standalone (sidebar tooltips) and a prerequisite for Corner Office.
 
 ## Related documents
@@ -270,5 +270,5 @@ locally." Visible in the sidebar or workstream info.
 
 - Multi-instance job routing: if multiple instances have the same project, how to pick
   one? (Round-robin? Least loaded? User picks?)
-- Reconnection reconciliation: when a Factory Floor instance reconnects after a drop, does
+- Reconnection reconciliation: when a Dockyard instance reconnects after a drop, does
   the coordinator ask "what are you running?" to rebuild state?

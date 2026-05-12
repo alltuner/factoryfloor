@@ -76,9 +76,9 @@ def build_appcast(
     rss.set("xmlns:dc", "http://purl.org/dc/elements/1.1/")
 
     channel = ET.SubElement(rss, "channel")
-    ET.SubElement(channel, "title").text = "Factory Floor"
-    ET.SubElement(channel, "link").text = "https://factory-floor.com"
-    ET.SubElement(channel, "description").text = "Factory Floor updates"
+    ET.SubElement(channel, "title").text = "Dockyard"
+    ET.SubElement(channel, "link").text = "https://francesc.barnola.net"
+    ET.SubElement(channel, "description").text = "Dockyard updates"
     ET.SubElement(channel, "language").text = "en"
 
     # New release item
@@ -86,7 +86,7 @@ def build_appcast(
     ET.SubElement(item, "title").text = f"Version {version}"
     ET.SubElement(
         item, "link"
-    ).text = f"https://github.com/alltuner/factoryfloor/releases/tag/v{version}"
+    ).text = f"https://github.com/barnolacesc/dockyard/releases/tag/v{version}"
     ET.SubElement(item, "pubDate").text = datetime.datetime.now(
         datetime.timezone.utc
     ).strftime("%a, %d %b %Y %H:%M:%S %z")

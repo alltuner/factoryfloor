@@ -1,5 +1,5 @@
 ---
-title: Support Factory Floor
+title: Support Dockyard
 translationKey: sponsor
 hideInstall: true
 ---

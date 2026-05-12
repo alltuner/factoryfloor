@@ -1,7 +1,7 @@
 // ABOUTME: Tests for AppDelegate startup behaviors that interact with system callbacks.
 // ABOUTME: Verifies notification authorization results are handled on the main thread.
 
-@testable import FactoryFloor
+@testable import Dockyard
 import UserNotifications
 import XCTest
 

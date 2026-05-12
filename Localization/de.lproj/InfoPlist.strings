@@ -1,44 +1,44 @@
 /* Privacy - AppleScript */
-"NSAppleEventsUsageDescription" = "Ein Programm in Factory Floor möchte AppleScript verwenden.";
+"NSAppleEventsUsageDescription" = "Ein Programm in Dockyard möchte AppleScript verwenden.";
 
 /* Privacy - Audio */
-"NSAudioCaptureUsageDescription" = "Ein Programm in Factory Floor möchte auf das Audio deines Systems zugreifen.";
+"NSAudioCaptureUsageDescription" = "Ein Programm in Dockyard möchte auf das Audio deines Systems zugreifen.";
 
 /* Privacy - Bluetooth */
-"NSBluetoothAlwaysUsageDescription" = "Ein Programm in Factory Floor möchte Bluetooth verwenden.";
+"NSBluetoothAlwaysUsageDescription" = "Ein Programm in Dockyard möchte Bluetooth verwenden.";
 
 /* Privacy - Calendars */
-"NSCalendarsUsageDescription" = "Ein Programm in Factory Floor möchte auf deinen Kalender zugreifen.";
+"NSCalendarsUsageDescription" = "Ein Programm in Dockyard möchte auf deinen Kalender zugreifen.";
 
 /* Privacy - Camera */
-"NSCameraUsageDescription" = "Ein Programm in Factory Floor möchte die Kamera verwenden.";
+"NSCameraUsageDescription" = "Ein Programm in Dockyard möchte die Kamera verwenden.";
 
 /* Privacy - Contacts */
-"NSContactsUsageDescription" = "Ein Programm in Factory Floor möchte auf deine Kontakte zugreifen.";
+"NSContactsUsageDescription" = "Ein Programm in Dockyard möchte auf deine Kontakte zugreifen.";
 
 /* Privacy - Local Network */
-"NSLocalNetworkUsageDescription" = "Ein Programm in Factory Floor möchte auf das lokale Netzwerk zugreifen.";
+"NSLocalNetworkUsageDescription" = "Ein Programm in Dockyard möchte auf das lokale Netzwerk zugreifen.";
 
 /* Privacy - Location (Temporary) */
-"NSLocationTemporaryUsageDescriptionDictionary" = "Ein Programm in Factory Floor möchte vorübergehend deinen Standort verwenden.";
+"NSLocationTemporaryUsageDescriptionDictionary" = "Ein Programm in Dockyard möchte vorübergehend deinen Standort verwenden.";
 
 /* Privacy - Location */
-"NSLocationUsageDescription" = "Ein Programm in Factory Floor möchte auf deine Standortinformationen zugreifen.";
+"NSLocationUsageDescription" = "Ein Programm in Dockyard möchte auf deine Standortinformationen zugreifen.";
 
 /* Privacy - Microphone */
-"NSMicrophoneUsageDescription" = "Ein Programm in Factory Floor möchte dein Mikrofon verwenden.";
+"NSMicrophoneUsageDescription" = "Ein Programm in Dockyard möchte dein Mikrofon verwenden.";
 
 /* Privacy - Motion */
-"NSMotionUsageDescription" = "Ein Programm in Factory Floor möchte auf Bewegungsdaten zugreifen.";
+"NSMotionUsageDescription" = "Ein Programm in Dockyard möchte auf Bewegungsdaten zugreifen.";
 
 /* Privacy - Photos */
-"NSPhotoLibraryUsageDescription" = "Ein Programm in Factory Floor möchte auf deine Fotomediathek zugreifen.";
+"NSPhotoLibraryUsageDescription" = "Ein Programm in Dockyard möchte auf deine Fotomediathek zugreifen.";
 
 /* Privacy - Reminders */
-"NSRemindersUsageDescription" = "Ein Programm in Factory Floor möchte auf deine Erinnerungen zugreifen.";
+"NSRemindersUsageDescription" = "Ein Programm in Dockyard möchte auf deine Erinnerungen zugreifen.";
 
 /* Privacy - Speech Recognition */
-"NSSpeechRecognitionUsageDescription" = "Ein Programm in Factory Floor möchte die Spracherkennung verwenden.";
+"NSSpeechRecognitionUsageDescription" = "Ein Programm in Dockyard möchte die Spracherkennung verwenden.";
 
 /* Privacy - System Administration */
-"NSSystemAdministrationUsageDescription" = "Ein Programm in Factory Floor benötigt erhöhte Berechtigungen.";
+"NSSystemAdministrationUsageDescription" = "Ein Programm in Dockyard benötigt erhöhte Berechtigungen.";

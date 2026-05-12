@@ -1,7 +1,7 @@
 // ABOUTME: Tests for WorkstreamActivityTracker.
 // ABOUTME: Validates activity tracking, expiration, and query behavior.
 
-@testable import FactoryFloor
+@testable import Dockyard
 import XCTest
 
 @MainActor

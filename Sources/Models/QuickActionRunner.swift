@@ -4,7 +4,7 @@
 import Foundation
 import os
 
-private let logger = Logger(subsystem: "factoryfloor", category: "quick-action")
+private let logger = Logger(subsystem: "dockyard", category: "quick-action")
 
 enum QuickAction: String, CaseIterable, Identifiable {
     case commit
@@ -157,7 +157,7 @@ final class QuickActionRunner: ObservableObject {
     }
 
     private func runClosePR(ghPath: String, branchName: String, workingDirectory: String) {
-        let command = "\(ghPath) pr close \(branchName) --comment 'Closed from Factory Floor'"
+        let command = "\(ghPath) pr close \(branchName) --comment 'Closed from Dockyard'"
 
         appendLog(action: .closePR, command: command)
         logger.info("Quick action closePR starting in \(workingDirectory)")
@@ -169,7 +169,7 @@ final class QuickActionRunner: ObservableObject {
             let process = Process()
             let pipe = Pipe()
             process.executableURL = URL(fileURLWithPath: path)
-            process.arguments = ["pr", "close", branch, "--comment", "Closed from Factory Floor"]
+            process.arguments = ["pr", "close", branch, "--comment", "Closed from Dockyard"]
             process.currentDirectoryURL = URL(fileURLWithPath: dir)
             process.standardOutput = pipe
             process.standardError = pipe

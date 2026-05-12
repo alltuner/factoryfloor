@@ -1,26 +1,26 @@
-// ABOUTME: Resolves the bundled ff-run helper and builds wrapped run-script commands.
+// ABOUTME: Resolves the bundled dy-run helper and builds wrapped run-script commands.
 // ABOUTME: Keeps Environment tab command assembly small and consistent across tmux modes.
 
 import Foundation
 import os
 
-private let logger = Logger(subsystem: "factoryfloor", category: "run-launcher")
+private let logger = Logger(subsystem: "dockyard", category: "run-launcher")
 
 enum RunLauncher {
     static func executableURL(bundle: Bundle = .main) -> URL? {
-        let helperURL = bundle.bundleURL.appendingPathComponent("Contents/Helpers/ff-run")
+        let helperURL = bundle.bundleURL.appendingPathComponent("Contents/Helpers/dy-run")
         if FileManager.default.isExecutableFile(atPath: helperURL.path) {
             return helperURL
         }
 
         if let executableURL = bundle.executableURL {
-            let siblingURL = executableURL.deletingLastPathComponent().appendingPathComponent("ff-run")
+            let siblingURL = executableURL.deletingLastPathComponent().appendingPathComponent("dy-run")
             if FileManager.default.isExecutableFile(atPath: siblingURL.path) {
                 return siblingURL
             }
         }
 
-        logger.warning("ff-run helper not found, port detection will be unavailable")
+        logger.warning("dy-run helper not found, port detection will be unavailable")
         return nil
     }
 static func wrapWithVenv(_ script: String, projectDirectory: String) -> String {

@@ -1,34 +1,34 @@
 // ABOUTME: Tests for config-directory resolution across app, debug, and test contexts.
 // ABOUTME: Keeps XCTest persistence isolated from the app's real project roster.
 
-@testable import FactoryFloor
+@testable import Dockyard
 import XCTest
 
 final class AppConstantsTests: XCTestCase {
     func testDebugBuildUsesReleaseConfigDirectory() {
-        let base = URL(fileURLWithPath: "/tmp/factoryfloor-config")
+        let base = URL(fileURLWithPath: "/tmp/dockyard-config")
 
         let resolved = resolvedConfigDirectory(
-            configDirectoryName: "factoryfloor",
+            configDirectoryName: "dockyard",
             environment: [:],
             defaultConfigBase: base,
             isRunningTests: false
         )
 
-        XCTAssertEqual(resolved, base.appendingPathComponent("factoryfloor"))
+        XCTAssertEqual(resolved, base.appendingPathComponent("dockyard"))
     }
 
     func testTestsUseDedicatedConfigDirectoryWithoutFallback() {
-        let base = URL(fileURLWithPath: "/tmp/factoryfloor-config")
+        let base = URL(fileURLWithPath: "/tmp/dockyard-config")
 
         let resolved = resolvedConfigDirectory(
-            configDirectoryName: "factoryfloor",
+            configDirectoryName: "dockyard",
             environment: [:],
             defaultConfigBase: base,
             isRunningTests: true
         )
 
-        XCTAssertEqual(resolved, base.appendingPathComponent("factoryfloor-tests"))
+        XCTAssertEqual(resolved, base.appendingPathComponent("dockyard-tests"))
     }
 
     func testDetectsXCTestEnvironment() {

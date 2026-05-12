@@ -1,5 +1,5 @@
 ---
-title: Apoya Factory Floor
+title: Apoya Dockyard
 translationKey: sponsor
 hideInstall: true
 ---

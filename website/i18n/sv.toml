@@ -47,7 +47,7 @@ other = "Agent sessions överlever restarts via tmux på en dedicerad socket. In
 [feat_scripts_title]
 other = "Setup & run scripts"
 [feat_scripts_desc]
-other = "Konfigurera setup, run och teardown scripts per projekt via .factoryfloor.json."
+other = "Konfigurera setup, run och teardown scripts per projekt via .dockyard.json."
 [feat_browser_title]
 other = "Inbyggd browser"
 [feat_browser_desc]
@@ -66,7 +66,7 @@ other = "Från repo till körande workstream på sekunder. Varje workstream isol
 [step1_title]
 other = "Lägg till ett projekt"
 [step1_desc]
-other = "Dra en directory till sidebaren eller skapa en ny. Factory Floor detekterar git repos, installerade tools och GitHub-kopplingar automatiskt."
+other = "Dra en directory till sidebaren eller skapa en ny. Dockyard detekterar git repos, installerade tools och GitHub-kopplingar automatiskt."
 [step2_title]
 other = "Skapa en workstream"
 [step2_desc]
@@ -93,7 +93,7 @@ other = "När det körs"
 [config_setup_desc]
 other = "En gång, när en workstream skapas. För att installera dependencies eller bygga."
 [config_run_desc]
-other = "On demand via Environment-tabben. Wrappat i ff-run för automatisk portdetektering."
+other = "On demand via Environment-tabben. Wrappat i dy-run för automatisk portdetektering."
 [config_teardown_desc]
 other = "När en workstream arkiveras. För att städa resurser som att stoppa containrar."
 [config_optional_note]
@@ -178,7 +178,7 @@ other = "Open Source"
 [oss_title]
 other = "Gratis och open source."
 [oss_desc]
-other = "Factory Floor är MIT-licensierad och gratis. Källkoden finns på GitHub. Bidrag, bug reports och feature requests välkomnas."
+other = "Dockyard är MIT-licensierad och gratis. Källkoden finns på GitHub. Bidrag, bug reports och feature requests välkomnas."
 [oss_view]
 other = "Visa på GitHub"
 [oss_star]
@@ -189,7 +189,7 @@ other = "Byggd med ❤️ i Poblenou, Barcelona 🇪🇺"
 
 # Sponsor
 [sponsor_intro]
-other = "Factory Floor är gratis och open source."
+other = "Dockyard är gratis och open source."
 [sponsor_intro_2]
 other = "Ditt stöd hjälper till att finansiera fortsatt utveckling och nya funktioner."
 [sponsor_financial]
@@ -207,7 +207,7 @@ other = "Snabb engångsbidrag."
 [sponsor_star]
 other = "Ge en stjärna på GitHub"
 [sponsor_star_desc]
-other = "Stjärnor hjälper andra att upptäcka Factory Floor."
+other = "Stjärnor hjälper andra att upptäcka Dockyard."
 [sponsor_issues]
 other = "Rapportera problem"
 [sponsor_issues_desc]
@@ -219,15 +219,15 @@ other = "Pull requests för buggfixar och funktioner är välkomna."
 [sponsor_translate]
 other = "Översätt appen eller webbplatsen"
 [sponsor_translate_desc]
-other = "Hjälp till att göra Factory Floor tillgängligt på fler språk."
+other = "Hjälp till att göra Dockyard tillgängligt på fler språk."
 [sponsor_ghostty]
 other = "Stöd Ghostty"
 [sponsor_ghostty_desc]
-other = "Factory Floor är byggt på Ghosttys GPU-renderade terminal."
+other = "Dockyard är byggt på Ghosttys GPU-renderade terminal."
 
 # Get
 [get_title]
-other = "Skaffa Factory Floor"
+other = "Skaffa Dockyard"
 [get_desc]
 other = "Installera via Homebrew eller ladda ner senaste versionen."
 [get_install]
@@ -245,4 +245,4 @@ other = "Allt du behöver veta, inget du inte behöver."
 
 # Changelog
 [changelog_subtitle]
-other = "Versionshistorik för Factory Floor"
+other = "Versionshistorik för Dockyard"

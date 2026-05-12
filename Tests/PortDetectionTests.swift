@@ -1,7 +1,7 @@
 // ABOUTME: Tests for run-script port detection and browser retargeting behavior.
 // ABOUTME: Covers launcher command building, port selection stabilization, and browser navigation policy.
 
-@testable import FactoryFloor
+@testable import Dockyard
 import XCTest
 
 final class PortDetectionTests: XCTestCase {
@@ -11,13 +11,13 @@ final class PortDetectionTests: XCTestCase {
         let command = runScriptCommand(
             script: "just dev",
             workstreamID: workstreamID,
-            launcherPath: "/Applications/Factory Floor.app/Contents/Helpers/ff-run",
+            launcherPath: "/Applications/Dockyard.app/Contents/Helpers/dy-run",
             shell: "/bin/zsh"
         )
 
         XCTAssertEqual(
             command,
-            "'/Applications/Factory Floor.app/Contents/Helpers/ff-run' --workstream-id 12345678-1234-1234-1234-123456789abc -- /bin/zsh -lic 'just dev'"
+            "'/Applications/Dockyard.app/Contents/Helpers/dy-run' --workstream-id 12345678-1234-1234-1234-123456789abc -- /bin/zsh -lic 'just dev'"
         )
     }
 
