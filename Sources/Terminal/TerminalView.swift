@@ -30,6 +30,7 @@ final class TerminalView: NSView {
     private var markedText = NSMutableAttributedString()
     private var keyTextAccumulator: [String]?
     private var activityDebounceWork: DispatchWorkItem?
+    private var windowScreenChangeObserver: NSObjectProtocol?
 
     /// Characters that need backslash-escaping when dropping paths into a terminal.
     private static let shellEscapeCharacters = "\\ ()[]{}<>\"'`!#$&;|*?\t"
@@ -181,21 +182,23 @@ final class TerminalView: NSView {
 
     override func viewDidMoveToWindow() {
         super.viewDidMoveToWindow()
-        guard let surface else { return }
-
-        if let screen = window?.screen {
-            ghostty_surface_set_display_id(surface, screen.displayID)
+        
+        if let observer = windowScreenChangeObserver {
+            NotificationCenter.default.removeObserver(observer)
+            windowScreenChangeObserver = nil
         }
-
-        // Use backingScaleFactor directly here — the frame may still be the
-        // init placeholder (800×600) before Auto Layout runs, so deriving
-        // scale via convertToBacking(frame) would be unreliable.
-        let scale = window?.backingScaleFactor ?? NSScreen.main?.backingScaleFactor ?? 2.0
-        ghostty_surface_set_content_scale(surface, scale, scale)
 
         if let window {
-            layer?.contentsScale = window.backingScaleFactor
+            windowScreenChangeObserver = NotificationCenter.default.addObserver(
+                forName: NSWindow.didChangeScreenNotification,
+                object: window,
+                queue: .main
+            ) { [weak self] _ in
+                self?.updateScreenProperties()
+            }
         }
+        
+        updateScreenProperties()
 
         // Defer size reporting to let Auto Layout settle first.
         // Without this, surfaces added dynamically (e.g., new terminal splits)
@@ -208,9 +211,16 @@ final class TerminalView: NSView {
             }
         }
     }
+    
+    private func updateScreenProperties() {
+        guard let surface else { return }
 
-    override func viewDidChangeBackingProperties() {
-        super.viewDidChangeBackingProperties()
+        if let screen = window?.screen {
+            ghostty_surface_set_display_id(surface, screen.displayID)
+        }
+
+        let scale = window?.backingScaleFactor ?? NSScreen.main?.backingScaleFactor ?? 2.0
+        ghostty_surface_set_content_scale(surface, scale, scale)
 
         if let window {
             CATransaction.begin()
@@ -218,18 +228,15 @@ final class TerminalView: NSView {
             layer?.contentsScale = window.backingScaleFactor
             CATransaction.commit()
         }
-
-        guard let surface else { return }
-
-        let fbFrame = convertToBacking(frame)
-        let xScale = frame.size.width > 0 ? fbFrame.size.width / frame.size.width : 1.0
-        let yScale = frame.size.height > 0 ? fbFrame.size.height / frame.size.height : 1.0
-        ghostty_surface_set_content_scale(surface, xScale, yScale)
-
-        // Scale changed so the framebuffer size changed — re-report.
+        
         if contentSize.width > 0, contentSize.height > 0 {
             reportSizeToSurface(contentSize)
         }
+    }
+
+    override func viewDidChangeBackingProperties() {
+        super.viewDidChangeBackingProperties()
+        updateScreenProperties()
     }
 
     override func setFrameSize(_ newSize: NSSize) {
