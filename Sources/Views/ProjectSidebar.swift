@@ -179,13 +179,10 @@ struct ProjectSidebar: View {
 
     private var bottomBar: some View {
         VStack(spacing: 4) {
-            if let version = updateChecker.availableVersion {
-                UpdateBanner(
-                    version: version,
-                    pendingReleases: updateChecker.pendingReleases,
-                    updater: updater
-                )
-            }
+            Text(AppConstants.displayVersion)
+                .font(.system(size: 10, design: .monospaced))
+                .foregroundStyle(.tertiary)
+                .padding(.bottom, 4)
 
             // Credit
             VStack(spacing: 2) {

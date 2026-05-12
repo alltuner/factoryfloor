@@ -182,13 +182,18 @@ targets:
   FFRun:
     type: tool
     platform: macOS
+    preBuildScripts:
+      - script: |
+          set -e
+          HASH=$(git rev-parse --short HEAD || echo "unknown")
+          echo "enum AppCommit { static let hash = \"$HASH\" }" > "${PROJECT_DIR}/Sources/Models/AppCommit.swift"
+        name: Generate AppCommit
     sources:
-      - path: Sources
-        includes:
-          - Launcher/**
-          - Models/AppConstants.swift
-          - Models/FilePersistence.swift
-          - Models/RunState.swift
+      - path: Sources/Launcher
+      - path: Sources/Models/AppConstants.swift
+      - path: Sources/Models/AppCommit.swift
+      - path: Sources/Models/FilePersistence.swift
+      - path: Sources/Models/RunState.swift
     settings:
       base:
         PRODUCT_NAME: ff-run

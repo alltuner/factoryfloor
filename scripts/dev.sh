@@ -38,7 +38,7 @@ case "${1:-build}" in
     xcodebuild -project "$PROJECT" -scheme "$SCHEME" -configuration Debug \
       -derivedDataPath "$BUILD_DIR" -clonedSourcePackagesDirPath "$SPM_CACHE" \
       -skipPackagePluginValidation \
-      CURRENT_PROJECT_VERSION="$BRANCH" build
+      CURRENT_PROJECT_VERSION="$(git rev-parse --short HEAD)" build
     ;;
   run)
     shift 2>/dev/null || true
@@ -59,7 +59,7 @@ case "${1:-build}" in
     xcodebuild -project "$PROJECT" -scheme "$SCHEME" -configuration Debug \
       -derivedDataPath "$BUILD_DIR" -clonedSourcePackagesDirPath "$SPM_CACHE" \
       -skipPackagePluginValidation \
-      CURRENT_PROJECT_VERSION="$BRANCH" build
+      CURRENT_PROJECT_VERSION="$(git rev-parse --short HEAD)" build
     pkill -xf ".*/Contents/MacOS/$APP_NAME" 2>/dev/null || true
     sleep 0.5
     if [ -n "${1:-}" ]; then
