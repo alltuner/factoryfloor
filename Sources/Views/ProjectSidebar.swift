@@ -34,6 +34,10 @@ struct ProjectSidebar: View {
     @State private var showNotGitRepoError = false
     @AppStorage("factoryfloor.sortOrder") private var sortOrder: ProjectSortOrder = .recent
 
+    private var currentVersionLooksLikeRelease: Bool {
+        AppConstants.version.range(of: "^[0-9]+\\.[0-9]+\\.[0-9]+$", options: .regularExpression) != nil
+    }
+
     private func recomputeSortedIDs() -> [UUID] {
         switch sortOrder {
         case .recent:
@@ -123,25 +127,23 @@ struct ProjectSidebar: View {
 
     private var bottomBar: some View {
         VStack(spacing: 4) {
-            if let version = updateChecker.availableVersion {
+            #if !DEBUG
+            if currentVersionLooksLikeRelease, let version = updateChecker.availableVersion {
                 UpdateBanner(version: version, releaseNotesURL: updateChecker.releaseNotesURL, updater: updater)
             }
+            #endif
 
             // Credit
             VStack(spacing: 2) {
                 HStack(spacing: 0) {
-                    Text("by ")
+                    Text("from ")
                         .foregroundStyle(.tertiary)
-                    Link("David Poblador i Garcia.", destination: URL(string: "https://davidpoblador.com/")!)
+                    Link("alltunerlabs", destination: URL(string: "https://davidpoblador.com/")!)
                         .foregroundStyle(.secondary)
-                }
-                HStack(spacing: 0) {
-                    Text("Help ")
+                    Text(", tuned by ")
                         .foregroundStyle(.tertiary)
-                    Link("supporting", destination: sponsorURL)
+                    Link("barnolacesc", destination: URL(string: "https://github.com/barnolacesc")!)
                         .foregroundStyle(.secondary)
-                    Text(" the development.")
-                        .foregroundStyle(.tertiary)
                 }
             }
             .font(.system(size: 10))

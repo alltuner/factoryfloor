@@ -50,7 +50,7 @@ targets:
           NSAllowsArbitraryLoads: true
         SUPublicEDKey: "grC1rloxT0gFZ2mQVIuDTZlkNFXwXLZhn9+xs4YGuXo="
         SUFeedURL: https://factory-floor.com/appcast.xml
-        SUEnableAutomaticChecks: true
+        SUEnableAutomaticChecks: false
         CFBundleURLTypes:
           - CFBundleURLName: com.alltuner.factoryfloor.open
             CFBundleURLSchemes:

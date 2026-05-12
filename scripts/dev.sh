@@ -104,6 +104,10 @@ case "${1:-build}" in
     rm -rf "$TARGET_DIR"
     cp -R "$APP_BUNDLE" "/Applications/"
     
+    # 4. Force Spotlight reindexing so Cmd+Space finds it instantly
+    touch "$TARGET_DIR"
+    mdimport "$TARGET_DIR" || true
+    
     echo "==> Installed successfully!"
     echo "==> Launching Dockyard..."
     open "$TARGET_DIR"
