@@ -193,16 +193,6 @@ struct ProjectSidebar: View {
 
     private var bottomBar: some View {
         VStack(spacing: 4) {
-            #if !DEBUG
-            if currentVersionLooksLikeRelease, let version = updateChecker.availableVersion {
-                UpdateBanner(
-                    version: version,
-                    pendingReleases: updateChecker.pendingReleases,
-                    updater: updater
-                )
-            }
-            #endif
-
             Text(AppConstants.displayVersion)
                 .font(.system(size: 10, design: .monospaced))
                 .foregroundStyle(.tertiary)
