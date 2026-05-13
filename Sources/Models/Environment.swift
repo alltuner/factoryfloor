@@ -180,15 +180,21 @@ final class AppEnvironment: ObservableObject {
     }
 
     /// Browser-openable GitHub URL for a project directory.
-    /// Prefers the canonical URL from `gh`, falls back to converting the git remote URL.
-    func githubURL(for directory: String) -> URL? {
-        if let ghURL = githubRepoCache[directory]?.url {
-            return URL(string: ghURL)
-        }
+    /// Prefers the `origin` remote URL to ensure forks are opened instead of upstream base repos.
+    func githubURL(for directory: String, branch: String? = nil) -> URL? {
+        var base: String?
         if let remoteURL = repoInfoCache[directory]?.remoteURL {
-            return GitHubOperations.browserURL(from: remoteURL)
+            base = GitHubOperations.browserURL(from: remoteURL)?.absoluteString
+        } else if let ghURL = githubRepoCache[directory]?.url {
+            base = ghURL
         }
-        return nil
+        
+        guard let base else { return nil }
+        if let branch, !branch.isEmpty {
+            let encodedBranch = branch.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed) ?? branch
+            return URL(string: "\(base)/tree/\(encodedBranch)")
+        }
+        return URL(string: base)
     }
 
     func worktreeState(for path: String) -> WorktreeState {

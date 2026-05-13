@@ -850,7 +850,7 @@ struct TerminalContainerView: View {
             .toolbar {
                 if isActive {
                     ToolbarItemGroup(placement: .primaryAction) {
-                        if let githubURL = appEnv.githubURL(for: projectDirectory) {
+                        if let githubURL = appEnv.githubURL(for: projectDirectory, branch: appEnv.branchName(for: workingDirectory)) {
                             Button {
                                 NSWorkspace.shared.open(githubURL)
                             } label: {

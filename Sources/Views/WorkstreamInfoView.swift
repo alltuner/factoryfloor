@@ -151,7 +151,7 @@ struct WorkstreamInfoView: View {
                             ) {
                                 openInTerminal(path: workingDirectory)
                             }
-                            if let githubURL = appEnv.githubURL(for: projectDirectory) {
+                            if let githubURL = appEnv.githubURL(for: projectDirectory, branch: appEnv.branchName(for: workingDirectory)) {
                                 DirectoryActionButton(
                                     assetIcon: "github",
                                     tooltip: "Open on GitHub"

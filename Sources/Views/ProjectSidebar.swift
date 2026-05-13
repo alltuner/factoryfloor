@@ -166,7 +166,7 @@ struct ProjectSidebar: View {
                             isActive: activityTracker.isActive(workstream.id),
                             needsAttention: activityTracker.needsAttention(workstream.id),
                             hasActivePort: appEnv.hasActivePort(workstream.id),
-                            githubURL: appEnv.githubURL(for: project.directory),
+                            githubURL: appEnv.githubURL(for: project.directory, branch: branch),
                             taskDescription: appEnv.taskDescription(for: workstream.worktreePath),
                             prTitle: pr?.title,
                             prNumber: pr?.number,
