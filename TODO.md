@@ -22,10 +22,10 @@
 - [ ] External Chrome integration: launch with --remote-debugging-port for WebMCP/CDP
 - [ ] PR management: create and manage PRs from workstreams (currently view-only)
 - [ ] Horizontal terminal splits within a tab (ghostty C API supports splits)
-- [ ] System notifications when agent needs attention (bell/urgency from Ghostty)
 
 ## Done
 
+- [x] System notifications when agent needs attention (bell/urgency from Ghostty)
 - [x] Embedded Ghostty terminals (Metal GPU-rendered via libghostty)
 - [x] Project and workstream management with sidebar tree
 - [x] Git worktrees for workstreams (branch off default branch)

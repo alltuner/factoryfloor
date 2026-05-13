@@ -84,7 +84,21 @@ private func handleTerminalAction(
                 object: wsID
             )
         }
-        sendDesktopNotification(title: AppConstants.appName, body: "Terminal bell", suppressWhenActive: true)
+        
+        var projectName: String?
+        var workstreamName: String?
+        let projects = ProjectStore.load()
+        for project in projects {
+            if let workstream = project.workstreams.first(where: { $0.id == wsID }) {
+                projectName = project.name
+                workstreamName = workstream.name
+                break
+            }
+        }
+        
+        let title = projectName ?? AppConstants.appName
+        let body = workstreamName != nil ? "Agent needs attention in \(workstreamName!)" : "Terminal bell"
+        sendDesktopNotification(title: title, body: body, suppressWhenActive: true)
         return true
     case GHOSTTY_ACTION_SHOW_CHILD_EXITED:
         let exitCode = action.action.child_exited.exit_code
