@@ -30,25 +30,25 @@ func isRunningXCTest(environment: [String: String] = ProcessInfo.processInfo.env
 enum AppConstants {
     static let appID: String = {
         #if DEBUG
-            "factoryfloor-debug"
+            "dockyard-debug"
         #else
-            "factoryfloor"
+            "dockyard"
         #endif
     }()
 
     static let appName: String = {
         #if DEBUG
-            "Factory Floor Debug"
+            "Dockyard Debug"
         #else
-            "Factory Floor"
+            "Dockyard"
         #endif
     }()
 
     static let urlScheme: String = {
         #if DEBUG
-            "factoryfloor-debug"
+            "dockyard-debug"
         #else
-            "factoryfloor"
+            "dockyard"
         #endif
     }()
 
