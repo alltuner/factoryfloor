@@ -76,7 +76,29 @@ private func handleTerminalAction(
         sendDesktopNotification(title: title, body: body, suppressWhenActive: false)
         return true
     case GHOSTTY_ACTION_RING_BELL:
-        sendDesktopNotification(title: AppConstants.appName, body: "Terminal bell", suppressWhenActive: true)
+        guard let view = TerminalView.view(for: target.target.surface),
+              let wsID = view.workstreamID else { return false }
+        DispatchQueue.main.async {
+            NotificationCenter.default.post(
+                name: .terminalNeedsAttention,
+                object: wsID
+            )
+        }
+        
+        var projectName: String?
+        var workstreamName: String?
+        let projects = ProjectStore.load()
+        for project in projects {
+            if let workstream = project.workstreams.first(where: { $0.id == wsID }) {
+                projectName = project.name
+                workstreamName = workstream.name
+                break
+            }
+        }
+        
+        let title = projectName ?? AppConstants.appName
+        let body = workstreamName != nil ? "Agent needs attention in \(workstreamName!)" : "Terminal bell"
+        sendDesktopNotification(title: title, body: body, suppressWhenActive: true)
         return true
     case GHOSTTY_ACTION_SHOW_CHILD_EXITED:
         let exitCode = action.action.child_exited.exit_code

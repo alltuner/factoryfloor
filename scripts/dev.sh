@@ -34,7 +34,7 @@ case "${1:-build}" in
   build)
     ensure_ghostty_resources
     ensure_monaco_editor
-    xcodegen generate
+    [ -x "$(command -v xcodegen)" ] && xcodegen generate
     xcodebuild -project "$PROJECT" -scheme "$SCHEME" -configuration Debug \
       -derivedDataPath "$BUILD_DIR" -clonedSourcePackagesDirPath "$SPM_CACHE" \
       -skipPackagePluginValidation \
@@ -42,31 +42,62 @@ case "${1:-build}" in
     ;;
   run)
     shift 2>/dev/null || true
-    pkill -xf ".*/Contents/MacOS/$APP_NAME" 2>/dev/null || true
+    pkill -xf ".*/Contents/MacOS/Factory Floor Debug" 2>/dev/null || true
+    pkill -xf ".*/Contents/MacOS/Dockyard Debug" 2>/dev/null || true
     sleep 0.5
+    
+    # Try local dev build first, fall back to xcode default
+    if [ -f "$APP_PATH" ]; then
+        TARGET_APP="$APP_PATH"
+    else
+        LATEST_DERIVED=$(ls -td "$HOME/Library/Developer/Xcode/DerivedData"/FactoryFloor-*/Build/Products/Debug 2>/dev/null | head -n 1)
+        if [ -n "$LATEST_DERIVED" ] && [ -d "$LATEST_DERIVED/Dockyard Debug.app" ]; then
+            TARGET_APP="$LATEST_DERIVED/Dockyard Debug.app"
+        elif [ -n "$LATEST_DERIVED" ] && [ -d "$LATEST_DERIVED/Factory Floor Debug.app" ]; then
+            TARGET_APP="$LATEST_DERIVED/Factory Floor Debug.app"
+        else
+            TARGET_APP="$APP_PATH"
+        fi
+    fi
+    
     if [ -n "${1:-}" ]; then
       DIR=$(cd "$1" && pwd)
-      open "$APP_PATH" --args "$DIR"
+      open "$TARGET_APP" --args "$DIR"
     else
-      open "$APP_PATH"
+      open "$TARGET_APP"
     fi
     ;;
   br)
     shift 2>/dev/null || true
     ensure_ghostty_resources
     ensure_monaco_editor
-    xcodegen generate
+    [ -x "$(command -v xcodegen)" ] && xcodegen generate
     xcodebuild -project "$PROJECT" -scheme "$SCHEME" -configuration Debug \
       -derivedDataPath "$BUILD_DIR" -clonedSourcePackagesDirPath "$SPM_CACHE" \
       -skipPackagePluginValidation \
       CURRENT_PROJECT_VERSION="$(git rev-parse --short HEAD)" build
     pkill -xf ".*/Contents/MacOS/$APP_NAME" 2>/dev/null || true
     sleep 0.5
+    
+    # Try local dev build first, fall back to xcode default
+    if [ -f "$APP_PATH" ]; then
+        TARGET_APP="$APP_PATH"
+    else
+        LATEST_DERIVED=$(ls -td "$HOME/Library/Developer/Xcode/DerivedData"/FactoryFloor-*/Build/Products/Debug 2>/dev/null | head -n 1)
+        if [ -n "$LATEST_DERIVED" ] && [ -d "$LATEST_DERIVED/Dockyard Debug.app" ]; then
+            TARGET_APP="$LATEST_DERIVED/Dockyard Debug.app"
+        elif [ -n "$LATEST_DERIVED" ] && [ -d "$LATEST_DERIVED/Factory Floor Debug.app" ]; then
+            TARGET_APP="$LATEST_DERIVED/Factory Floor Debug.app"
+        else
+            TARGET_APP="$APP_PATH"
+        fi
+    fi
+    
     if [ -n "${1:-}" ]; then
       DIR=$(cd "$1" && pwd)
-      open "$APP_PATH" --args "$DIR"
+      open "$TARGET_APP" --args "$DIR"
     else
-      open "$APP_PATH"
+      open "$TARGET_APP"
     fi
     ;;
   test)

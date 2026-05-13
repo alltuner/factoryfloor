@@ -135,14 +135,16 @@ targets:
           - -framework Carbon
       configs:
         Debug:
+        Debug:
           PRODUCT_BUNDLE_IDENTIFIER: com.barnolacesc.dockyard.debug
           PRODUCT_NAME: Dockyard Debug
           ASSETCATALOG_COMPILER_APPICON_NAME: AppIconDebug
           SWIFT_ACTIVE_COMPILATION_CONDITIONS: DEBUG
-          DY_URL_SCHEME: dockyard-debug
+          FF_URL_SCHEME: dockyard-debug
         Release:
           PRODUCT_BUNDLE_IDENTIFIER: com.barnolacesc.dockyard
           PRODUCT_NAME: Dockyard
+          FF_URL_SCHEME: dockyard
           DY_URL_SCHEME: dockyard
           DEBUG_INFORMATION_FORMAT: dwarf-with-dsym
     dependencies:

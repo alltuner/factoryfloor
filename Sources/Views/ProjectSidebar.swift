@@ -164,6 +164,7 @@ struct ProjectSidebar: View {
                             worktreePath: workstream.worktreePath,
                             isPathValid: appEnv.isPathValid(workstream.worktreePath),
                             isActive: activityTracker.isActive(workstream.id),
+                            needsAttention: activityTracker.needsAttention(workstream.id),
                             hasActivePort: appEnv.hasActivePort(workstream.id),
                             githubURL: appEnv.githubURL(for: project.directory),
                             taskDescription: appEnv.taskDescription(for: workstream.worktreePath),
@@ -175,6 +176,15 @@ struct ProjectSidebar: View {
                         )
                         .tag(SidebarSelection.workstream(workstream.id))
                         .padding(.leading, 28)
+                        .listRowBackground(
+                            Group {
+                                if activityTracker.needsAttention(workstream.id) && selection != .workstream(workstream.id) {
+                                    Color.accentColor.opacity(0.15)
+                                        .clipShape(RoundedRectangle(cornerRadius: 6))
+                                        .padding(.horizontal, 4)
+                                }
+                            }
+                        )
                     }
                 }
             }
@@ -778,6 +788,7 @@ private struct WorkstreamRow: View {
     var worktreePath: String?
     let isPathValid: Bool
     var isActive: Bool = false
+    var needsAttention: Bool = false
     var hasActivePort: Bool = false
     var githubURL: URL?
     var taskDescription: String?
@@ -812,14 +823,14 @@ private struct WorkstreamRow: View {
 
     var body: some View {
         HStack(spacing: 4) {
-            ActivityIndicator(isActive: isActive, isPathValid: isPathValid)
+            ActivityIndicator(isActive: isActive, isPathValid: isPathValid, needsAttention: needsAttention)
 
             VStack(alignment: .leading, spacing: 0) {
                 HStack(spacing: 4) {
                     Text(headline)
                         .font(.system(size: 12))
                         .strikethrough(!isPathValid)
-                        .foregroundStyle(isPathValid ? .primary : .secondary)
+                        .foregroundStyle(needsAttention ? AnyShapeStyle(Color.accentColor) : (isPathValid ? AnyShapeStyle(.primary) : AnyShapeStyle(.secondary)))
                         .lineLimit(1)
                     if hasActivePort {
                         Image(systemName: "circle.fill")
@@ -838,7 +849,7 @@ private struct WorkstreamRow: View {
                             .lineLimit(1)
                     }
                     .font(.system(size: 9, design: .monospaced))
-                    .foregroundStyle(prState == "MERGED" ? AnyShapeStyle(.purple) : AnyShapeStyle(.tertiary))
+                    .foregroundStyle(needsAttention ? AnyShapeStyle(Color.accentColor.opacity(0.8)) : (prState == "MERGED" ? AnyShapeStyle(.purple) : AnyShapeStyle(.tertiary)))
                 }
             }
 
@@ -903,6 +914,7 @@ private struct WorkstreamRow: View {
 private struct ActivityIndicator: View {
     let isActive: Bool
     let isPathValid: Bool
+    var needsAttention: Bool = false
 
     @State private var isPulsing = false
 
@@ -912,6 +924,13 @@ private struct ActivityIndicator: View {
                 Image(systemName: "exclamationmark.triangle")
                     .foregroundStyle(.orange)
                     .font(.system(size: 10))
+            } else if needsAttention {
+                Circle()
+                    .fill(Color.accentColor)
+                    .frame(width: 6, height: 6)
+                    .opacity(isPulsing ? 0.4 : 1.0)
+                    .animation(.easeInOut(duration: 0.6).repeatForever(autoreverses: true), value: isPulsing)
+                    .onAppear { isPulsing = true }
             } else if isActive {
                 Circle()
                     .fill(.green)
