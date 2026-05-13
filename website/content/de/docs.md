@@ -121,7 +121,7 @@ Terminals werden GPU-gerendert über [Ghostty](https://ghostty.org). Sie sind sc
 
 Du kannst Dateien und Text auf das Terminal ziehen. Weil manchmal die Maus völlig in Ordnung ist, ehrlich.
 
-**⌘Shift+E** öffnet das Workstream-Verzeichnis in deiner bevorzugten externen Terminal-App.
+**⌘Option+T** öffnet das Workstream-Verzeichnis in deiner bevorzugten externen Terminal-App.
 
 ### Der Browser {#the-browser}
 
@@ -134,7 +134,7 @@ Wenn dein Run-Skript einen Dev-Server startet, erkennt Factory Floor den lausche
 #### Navigation {#navigation}
 
 - **⌘L** — Adressleiste fokussieren
-- **⌘Shift+O** — aktuelle URL in externem Browser öffnen
+- **⌘Option+B** — aktuelle URL in externem Browser öffnen
 - **⌘Click** — öffnet Links in deinem externen Browser
 
 Der Browser zeigt eine Verbindungsfehler-Seite mit einem Retry-Button, wenn der Server noch nicht bereit ist. Er navigiert automatisch, sobald der Port erkannt wird.
@@ -260,8 +260,8 @@ Wenn aktiviert (Settings > General), erstellt Factory Floor Symlinks für `.env`
 
 #### Apps {#apps}
 
-- **External Terminal** — welche Terminal-App mit ⌘Shift+E geöffnet wird
-- **External Browser** — welcher Browser für ⌘Shift+O und ⌘Click
+- **External Terminal** — welche Terminal-App mit ⌘Option+T geöffnet wird
+- **External Browser** — welcher Browser für ⌘Option+B und ⌘Click
 
 #### Erweitert {#advanced}
 

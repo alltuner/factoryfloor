@@ -121,7 +121,7 @@ Terminals är GPU-renderade via [Ghostty](https://ghostty.org). De är snabba.
 
 Du kan dra filer och text till terminal. För ibland är musen helt okej, faktiskt.
 
-**⌘Shift+E** öppnar workstream-katalogen i din föredragna externa terminal-app.
+**⌘Option+T** öppnar workstream-katalogen i din föredragna externa terminal-app.
 
 ### Browser {#the-browser}
 
@@ -134,7 +134,7 @@ När ditt run-script startar en dev-server upptäcker Factory Floor den lyssnand
 #### Navigering {#navigation}
 
 - **⌘L** — fokusera adressfältet
-- **⌘Shift+O** — öppna aktuell URL i din externa browser
+- **⌘Option+B** — öppna aktuell URL i din externa browser
 - **⌘Click** — öppnar länkar i din externa browser
 
 Browser visar en anslutningsfel-sida med en retry-knapp om servern inte är redo ännu. Den auto-navigerar när porten upptäcks.
@@ -260,8 +260,8 @@ När aktiverat (Settings > General) skapar Factory Floor symlinks för `.env` oc
 
 #### Appar {#apps}
 
-- **External Terminal** — vilken terminal-app som öppnas med ⌘Shift+E
-- **External Browser** — vilken browser för ⌘Shift+O och ⌘Click
+- **External Terminal** — vilken terminal-app som öppnas med ⌘Option+T
+- **External Browser** — vilken browser för ⌘Option+B och ⌘Click
 
 #### Avancerat {#advanced}
 

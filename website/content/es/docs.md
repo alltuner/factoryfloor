@@ -121,7 +121,7 @@ Los terminals se renderizan por GPU con [Ghostty](https://ghostty.org). Son ráp
 
 Puedes arrastrar archivos y texto al terminal. Porque a veces el ratón está bien, la verdad.
 
-**⌘Shift+E** abre el directorio del workstream en tu aplicación de terminal externa preferida.
+**⌘Option+T** abre el directorio del workstream en tu aplicación de terminal externa preferida.
 
 ### El navegador {#the-browser}
 
@@ -134,7 +134,7 @@ Cuando tu run script inicia un servidor de desarrollo, Factory Floor detecta el 
 #### Navegación {#navigation}
 
 - **⌘L** — foco en la barra de direcciones
-- **⌘Shift+O** — abrir URL actual en tu navegador externo
+- **⌘Option+B** — abrir URL actual en tu navegador externo
 - **⌘Click** — abre enlaces en tu navegador externo
 
 El navegador muestra una página de error de conexión con un botón de reintentar si el servidor aún no está listo. Navegará automáticamente cuando se detecte el port.
@@ -260,8 +260,8 @@ Abre con **⌘,** o haz clic en el icono del engranaje.
 
 #### Apps {#apps}
 
-- **External Terminal** — qué aplicación de terminal abrir con ⌘Shift+E
-- **External Browser** — qué navegador para ⌘Shift+O y ⌘Click
+- **External Terminal** — qué aplicación de terminal abrir con ⌘Option+T
+- **External Browser** — qué navegador para ⌘Option+B y ⌘Click
 
 #### Advanced {#advanced}
 

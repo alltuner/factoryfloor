@@ -121,7 +121,7 @@ Els terminals es renderitzen per GPU via [Ghostty](https://ghostty.org). Són r�
 
 Pots arrossegar fitxers i text sobre el terminal. Perquè de vegades el ratolí està bé, la veritat.
 
-**⌘Shift+E** obre el directori del workstream a la teva aplicació de terminal externa preferida.
+**⌘Option+T** obre el directori del workstream a la teva aplicació de terminal externa preferida.
 
 ### El navegador {#the-browser}
 
@@ -134,7 +134,7 @@ Quan el teu run script inicia un servidor de desenvolupament, Factory Floor dete
 #### Navegació {#navigation}
 
 - **⌘L** — focus a la barra d'adreces
-- **⌘Shift+O** — obre la URL actual al teu navegador extern
+- **⌘Option+B** — obre la URL actual al teu navegador extern
 - **⌘Click** — obre els enllaços al teu navegador extern
 
 El navegador mostra una pàgina d'error de connexió amb un botó de reintentar si el servidor encara no està llest. Navegarà automàticament quan es detecti el port.
@@ -260,8 +260,8 @@ Obre amb **⌘,** o fes clic a la icona d'engranatge.
 
 #### Apps {#apps}
 
-- **External Terminal** — quina aplicació de terminal obrir amb ⌘Shift+E
-- **External Browser** — quin navegador per a ⌘Shift+O i ⌘Click
+- **External Terminal** — quina aplicació de terminal obrir amb ⌘Option+T
+- **External Browser** — quin navegador per a ⌘Option+B i ⌘Click
 
 #### Avançat {#advanced}
 
