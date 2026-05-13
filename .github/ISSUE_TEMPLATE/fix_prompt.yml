@@ -10,7 +10,7 @@ body:
     id: prompt
     attributes:
       label: The prompt
-      description: Write it as if you're talking to Claude Code in a Factory Floor workstream. Be specific about files, behavior, and expected outcome.
+      description: Write it as if you're talking to Claude Code in a Dockyard workstream. Be specific about files, behavior, and expected outcome.
       placeholder: |
         In Sources/Views/BrowserView.swift, the address bar doesn't auto-focus
         when opening a new browser tab with ⌘B. The focus should move to the

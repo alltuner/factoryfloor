@@ -45,14 +45,14 @@ jobs:
           cd ghostty
           zig build -Demit-xcframework=true -Dxcframework-target=aarch64-macos -Doptimize=ReleaseFast
 
-      - name: Build Factory Floor
+      - name: Build Dockyard
         run: |
           xcodegen generate
-          xcodebuild -project FactoryFloor.xcodeproj -scheme FactoryFloor -configuration Debug -destination 'generic/platform=macOS' build
+          xcodebuild -project Dockyard.xcodeproj -scheme Dockyard -configuration Debug -destination 'generic/platform=macOS' build
 
       - name: Run tests
         run: |
-          xcodebuild -project FactoryFloor.xcodeproj -scheme FactoryFloorTests -configuration Debug -destination 'generic/platform=macOS' test
+          xcodebuild -project Dockyard.xcodeproj -scheme DockyardTests -configuration Debug -destination 'generic/platform=macOS' test
 
       - name: Report
         if: always()

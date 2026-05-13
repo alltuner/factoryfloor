@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# ABOUTME: Claude Code worktree-create hook for Factory Floor.
+# ABOUTME: Claude Code worktree-create hook for Dockyard.
 # ABOUTME: Initializes ghostty submodule, symlinks build artifacts, and runs a build so SourceKit resolves symbols.
 set -euo pipefail
 
@@ -23,4 +23,4 @@ fi
 # Xcode build index for cross-file type resolution.
 # Runs in background to avoid blocking worktree creation.
 cd "$WORKTREE_DIR"
-nohup bash -c './scripts/dev.sh build && command -v xcode-build-server >/dev/null && xcode-build-server config -project FactoryFloor.xcodeproj -scheme FactoryFloor --build_root build/debug/derived' >/dev/null 2>&1 &
+nohup bash -c './scripts/dev.sh build && command -v xcode-build-server >/dev/null && xcode-build-server config -project Dockyard.xcodeproj -scheme Dockyard --build_root build/debug/derived' >/dev/null 2>&1 &

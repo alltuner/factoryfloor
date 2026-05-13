@@ -12,7 +12,7 @@ Estem al 2026. Construïm sobre tmux (2007), git worktrees (2015), terminals (19
 Necessites dues coses: un Mac i la vaga sensació que el teu flux de treball podria ser millor.
 
 ```
-brew install --cask factory-floor
+brew install --cask dockyard
 ```
 
 <a href="https://github.com/barnolacesc/dockyard/releases/latest/download/Dockyard.dmg" class="docs-download"><svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg> Download DMG</a>
@@ -266,7 +266,6 @@ Obre amb **⌘,** o fes clic a la icona d'engranatge.
 #### Avançat {#advanced}
 
 - **Usage analytics** — telemetry respectuosa amb la privacitat (només versió de l'app, SO, i locale)
-- **Crash reports** — informes d'errors basats en Sentry
 - **Detailed logging** — registra la sortida dels scripts per a depuració
 - **Quick action debug mode** — mostra la sortida en brut de les quick actions
 - **Bleeding edge updates** — opta per builds de pre-llançament
@@ -307,7 +306,7 @@ Dockyard mostra un badge al sidebar quan hi ha una versió més nova disponible.
 **Usuaris de Homebrew:**
 
 ```
-brew upgrade factory-floor
+brew upgrade dockyard
 ```
 
 **Usuaris de DMG:** les actualitzacions es gestionen automàticament via [Sparkle](https://sparkle-project.org). Comprova manualment des del menú: **Dockyard > Check for Updates...**

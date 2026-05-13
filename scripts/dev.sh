@@ -42,24 +42,21 @@ case "${1:-build}" in
     ;;
   run)
     shift 2>/dev/null || true
-    pkill -xf ".*/Contents/MacOS/Factory Floor Debug" 2>/dev/null || true
     pkill -xf ".*/Contents/MacOS/Dockyard Debug" 2>/dev/null || true
     sleep 0.5
-    
+
     # Try local dev build first, fall back to xcode default
     if [ -f "$APP_PATH" ]; then
         TARGET_APP="$APP_PATH"
     else
-        LATEST_DERIVED=$(ls -td "$HOME/Library/Developer/Xcode/DerivedData"/FactoryFloor-*/Build/Products/Debug 2>/dev/null | head -n 1)
+        LATEST_DERIVED=$(ls -td "$HOME/Library/Developer/Xcode/DerivedData"/Dockyard-*/Build/Products/Debug 2>/dev/null | head -n 1)
         if [ -n "$LATEST_DERIVED" ] && [ -d "$LATEST_DERIVED/Dockyard Debug.app" ]; then
             TARGET_APP="$LATEST_DERIVED/Dockyard Debug.app"
-        elif [ -n "$LATEST_DERIVED" ] && [ -d "$LATEST_DERIVED/Factory Floor Debug.app" ]; then
-            TARGET_APP="$LATEST_DERIVED/Factory Floor Debug.app"
         else
             TARGET_APP="$APP_PATH"
         fi
     fi
-    
+
     if [ -n "${1:-}" ]; then
       DIR=$(cd "$1" && pwd)
       open "$TARGET_APP" --args "$DIR"
@@ -83,11 +80,9 @@ case "${1:-build}" in
     if [ -f "$APP_PATH" ]; then
         TARGET_APP="$APP_PATH"
     else
-        LATEST_DERIVED=$(ls -td "$HOME/Library/Developer/Xcode/DerivedData"/FactoryFloor-*/Build/Products/Debug 2>/dev/null | head -n 1)
+        LATEST_DERIVED=$(ls -td "$HOME/Library/Developer/Xcode/DerivedData"/Dockyard-*/Build/Products/Debug 2>/dev/null | head -n 1)
         if [ -n "$LATEST_DERIVED" ] && [ -d "$LATEST_DERIVED/Dockyard Debug.app" ]; then
             TARGET_APP="$LATEST_DERIVED/Dockyard Debug.app"
-        elif [ -n "$LATEST_DERIVED" ] && [ -d "$LATEST_DERIVED/Factory Floor Debug.app" ]; then
-            TARGET_APP="$LATEST_DERIVED/Factory Floor Debug.app"
         else
             TARGET_APP="$APP_PATH"
         fi
@@ -123,7 +118,7 @@ case "${1:-build}" in
       CODE_SIGN_STYLE=Manual \
       ENABLE_HARDENED_RUNTIME=YES \
       CODE_SIGN_INJECT_BASE_ENTITLEMENTS=NO \
-      CODE_SIGN_ENTITLEMENTS=Resources/ff2-local.entitlements \
+      CODE_SIGN_ENTITLEMENTS=Resources/dy-local.entitlements \
       OTHER_CODE_SIGN_FLAGS="--options=runtime" \
       build
     APP_BUNDLE="$RELEASE_DIR/Build/Products/Release/Dockyard.app"

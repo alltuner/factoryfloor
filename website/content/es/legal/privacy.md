@@ -19,26 +19,6 @@ Dockyard es una aplicación nativa de macOS que se ejecuta completamente en tu o
 
 Todos los datos de proyecto (nombres, directorios, configuraciones de flujos de trabajo) se almacenan localmente en tu ordenador en `~/.config/dockyard/`.
 
-## Informes de error
-
-Dockyard utiliza [Sentry](https://sentry.io/) para recoger informes de error anónimos. Esto nos ayuda a identificar y corregir problemas de estabilidad, especialmente en el motor de terminal integrado.
-
-**Qué se recoge:**
-
-- Trazas de pila de errores y mensajes de error
-- Versión de la aplicación y tipo de compilación (producción o desarrollo)
-- Versión de macOS y arquitectura de hardware
-- Detección de bloqueos de la aplicación (hilo principal bloqueado >5 segundos)
-
-**Qué NO se recoge:**
-
-- Capturas de pantalla ni contenido del terminal
-- Rutas de archivos, nombres de proyectos ni código
-- Información personal (nombres, correos electrónicos, direcciones IP)
-- Pulsaciones de teclas, contenido del portapapeles ni actividad de navegación
-
-Los datos de error se procesan por Sentry en la UE (Frankfurt). Puedes consultar la [política de privacidad de Sentry](https://sentry.io/privacy/).
-
 ## Servicios de terceros
 
 Dockyard se integra con herramientas que tú instalas y configuras:

@@ -153,8 +153,6 @@
 "Advanced" = "Avanzado";
 "Usage analytics" = "Analíticas de uso";
 "Send anonymous usage data to help improve Dockyard. We collect: app version, build type, macOS version, locale, and screen resolution. No project names, file contents, or personal data." = "Envía datos de uso anónimos para ayudar a mejorar Dockyard. Recopilamos: versión de la aplicación, tipo de compilación, versión de macOS, idioma y resolución de pantalla. Sin nombres de proyectos, contenidos de archivos ni datos personales.";
-"Crash reports" = "Informes de errores";
-"Send crash reports and performance data. Requires restart to take effect." = "Envía informes de errores y datos de rendimiento. Requiere reiniciar la aplicación.";
 "Bleeding edge" = "Últimas novedades";
 "Receive pre-release builds with the latest features. These may be less stable." = "Recibe versiones preliminares con las últimas funciones. Pueden ser menos estables.";
 "Clear project list" = "Borrar lista de proyectos";

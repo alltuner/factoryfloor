@@ -19,26 +19,6 @@ Dockyard is a native macOS application that runs entirely on your computer. It d
 
 All project data (names, directories, workstream configurations) is stored locally on your machine in `~/.config/dockyard/`.
 
-## Crash reporting
-
-Dockyard uses [Sentry](https://sentry.io/) to collect anonymous crash reports. This helps us identify and fix stability issues, especially in the embedded terminal engine.
-
-**What is collected:**
-
-- Crash stack traces and error messages
-- App version and build type (release or development)
-- macOS version and hardware architecture
-- App hang detection (main thread blocked >5 seconds)
-
-**What is NOT collected:**
-
-- Screenshots or terminal content
-- File paths, project names, or code
-- Personal information (names, emails, IP addresses)
-- Keystrokes, clipboard content, or browsing activity
-
-Crash data is processed by Sentry in the EU (Frankfurt). You can review [Sentry's privacy policy](https://sentry.io/privacy/).
-
 ## Third-party services
 
 Dockyard integrates with tools you install and configure yourself:

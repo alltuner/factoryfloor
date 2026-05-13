@@ -12,7 +12,7 @@ Vi skriver 2026. Vi bygger på tmux (2007), git worktrees (2015), terminals (197
 Du behöver två saker: en Mac och en vag känsla av att ditt nuvarande arbetsflöde kunde vara bättre.
 
 ```
-brew install --cask factory-floor
+brew install --cask dockyard
 ```
 
 <a href="https://github.com/barnolacesc/dockyard/releases/latest/download/Dockyard.dmg" class="docs-download"><svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg> Ladda ner DMG</a>
@@ -266,7 +266,6 @@ När aktiverat (Settings > General) skapar Dockyard symlinks för `.env` och `.e
 #### Avancerat {#advanced}
 
 - **Usage analytics** — integritetsvänlig telemetry (bara appversion, OS, locale)
-- **Crash reports** — Sentry-baserad crash reporting
 - **Detailed logging** — loggar script-utdata för felsökning
 - **Quick action debug mode** — visar rå utdata från quick actions
 - **Bleeding edge updates** — välj att ta emot förhandsversioner
@@ -307,7 +306,7 @@ Dockyard visar en badge i sidebar när en nyare version finns tillgänglig. Du k
 **Homebrew-användare:**
 
 ```
-brew upgrade factory-floor
+brew upgrade dockyard
 ```
 
 **DMG-användare:** uppdateringar hanteras automatiskt via [Sparkle](https://sparkle-project.org). Kontrollera manuellt från menyn: **Dockyard > Check for Updates...**

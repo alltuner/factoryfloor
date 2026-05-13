@@ -19,26 +19,6 @@ Dockyard ist eine native macOS-Anwendung, die vollständig auf deinem Computer l
 
 Alle Projektdaten (Namen, Verzeichnisse, Workstream-Konfigurationen) werden lokal auf deinem Computer in `~/.config/dockyard/` gespeichert.
 
-## Absturzberichte
-
-Dockyard verwendet [Sentry](https://sentry.io/) zum Sammeln anonymer Absturzberichte. Dies hilft uns, Stabilitätsprobleme zu identifizieren und zu beheben, insbesondere in der integrierten Terminal-Engine.
-
-**Was gesammelt wird:**
-
-- Absturz-Stacktraces und Fehlermeldungen
-- App-Version und Build-Typ (Release oder Entwicklung)
-- macOS-Version und Hardware-Architektur
-- Erkennung von App-Hängern (Hauptthread blockiert >5 Sekunden)
-
-**Was NICHT gesammelt wird:**
-
-- Screenshots oder Terminal-Inhalte
-- Dateipfade, Projektnamen oder Code
-- Persönliche Informationen (Namen, E-Mail-Adressen, IP-Adressen)
-- Tastatureingaben, Zwischenablage-Inhalte oder Surfaktivitäten
-
-Absturzdaten werden von Sentry innerhalb der EU (Frankfurt) verarbeitet. Du kannst [Sentrys Datenschutzerklärung](https://sentry.io/privacy/) einsehen.
-
 ## Drittanbieterdienste
 
 Dockyard integriert sich mit Tools, die du selbst installierst und konfigurierst:
@@ -51,7 +31,7 @@ Dockyard agiert nicht als Vermittler für diese Dienste. Deine API-Schlüssel un
 
 ## Diese Website
 
-Die Factory-Floor-Website (francesc.barnola.net) verwendet [Umami](https://umami.is/) für datenschutzfreundliche Analyse. Umami verwendet keine Cookies, sammelt keine personenbezogenen Daten und entspricht DSGVO, CCPA und PECR. Alle Daten sind aggregiert und anonym.
+Die Dockyard-Website (francesc.barnola.net) verwendet [Umami](https://umami.is/) für datenschutzfreundliche Analyse. Umami verwendet keine Cookies, sammelt keine personenbezogenen Daten und entspricht DSGVO, CCPA und PECR. Alle Daten sind aggregiert und anonym.
 
 Keine weiteren Tracking-Skripte, Werbenetzwerke oder Drittanbieter-Analysen werden auf dieser Website verwendet.
 

@@ -12,7 +12,7 @@ The year is 2026. We build on tmux (2007), git worktrees (2015), terminals (1978
 You need two things: a Mac and a vague sense that your current workflow could be better.
 
 ```
-brew install --cask factory-floor
+brew install --cask dockyard
 ```
 
 <a href="https://github.com/barnolacesc/dockyard/releases/latest/download/Dockyard.dmg" class="docs-download"><svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg> Download DMG</a>
@@ -281,7 +281,6 @@ Open with **⌘,** or click the gear icon.
 #### Advanced
 
 - **Usage analytics** — privacy-friendly telemetry (app version, OS, locale only)
-- **Crash reports** — Sentry-based crash reporting
 - **Detailed logging** — logs script output for debugging
 - **Quick action debug mode** — shows raw output from quick actions
 - **Bleeding edge updates** — opt into pre-release builds
@@ -322,7 +321,7 @@ Dockyard shows a badge in the sidebar when a newer version is available. You can
 **Homebrew users:**
 
 ```
-brew upgrade factory-floor
+brew upgrade dockyard
 ```
 
 **DMG users:** updates are handled automatically via [Sparkle](https://sparkle-project.org). Check manually from the menu: **Dockyard > Check for Updates...**

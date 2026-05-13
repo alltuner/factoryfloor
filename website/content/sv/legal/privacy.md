@@ -19,26 +19,6 @@ Dockyard är en inbyggd macOS-applikation som körs helt på din dator. Den:
 
 All projektdata (namn, kataloger, arbetsflödeskonfigurationer) lagras lokalt på din dator i `~/.config/dockyard/`.
 
-## Kraschrapportering
-
-Dockyard använder [Sentry](https://sentry.io/) för att samla in anonyma kraschrapporter. Detta hjälper oss att identifiera och åtgärda stabilitetsproblem, särskilt i den inbyggda terminalmotorn.
-
-**Vad som samlas in:**
-
-- Kraschstackspår och felmeddelanden
-- Appversion och byggtyp (produktion eller utveckling)
-- macOS-version och hårdvaruarkitektur
-- Detektering av appfrysningar (huvudtråd blockerad >5 sekunder)
-
-**Vad som INTE samlas in:**
-
-- Skärmdumpar eller terminalinnehåll
-- Filsökvägar, projektnamn eller kod
-- Personlig information (namn, e-postadresser, IP-adresser)
-- Tangenttryckningar, urklippsinnehåll eller surfaktivitet
-
-Kraschdata bearbetas av Sentry inom EU (Frankfurt). Du kan läsa [Sentrys integritetspolicy](https://sentry.io/privacy/).
-
 ## Tredjepartstjänster
 
 Dockyard integrerar med verktyg som du själv installerar och konfigurerar:

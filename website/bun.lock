@@ -3,7 +3,7 @@
   "configVersion": 1,
   "workspaces": {
     "": {
-      "name": "factory-floor-website",
+      "name": "dockyard-website",
       "devDependencies": {
         "@tailwindcss/cli": "^4.2.1",
         "daisyui": "^5.5.19",

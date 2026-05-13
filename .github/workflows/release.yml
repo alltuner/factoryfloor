@@ -31,9 +31,9 @@ jobs:
       actions: write
     env:
       SIGNING_IDENTITY: "Developer ID Application: ALL TUNER LABS S.L. (J5TAY75Q3F)"
-      APP_NAME: "Factory Floor"
-      SCHEME: "FactoryFloor"
-      PROJECT: "FactoryFloor.xcodeproj"
+      APP_NAME: "Dockyard"
+      SCHEME: "Dockyard"
+      PROJECT: "Dockyard.xcodeproj"
       SPARKLE_VERSION: "2.9.0"
     steps:
       - uses: actions/checkout@v6
@@ -124,21 +124,6 @@ jobs:
             OTHER_CODE_SIGN_FLAGS="--timestamp --options=runtime" \
             build
 
-      - name: Upload debug symbols to Sentry
-        continue-on-error: true
-        env:
-          SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
-        run: |
-          if [ -z "$SENTRY_AUTH_TOKEN" ]; then
-            echo "::warning::SENTRY_AUTH_TOKEN not set, skipping dSYM upload"
-            exit 0
-          fi
-          brew install getsentry/tools/sentry-cli
-          sentry-cli debug-files upload \
-            --org all-tuner-labs \
-            --project factory-floor \
-            build/derived/Build/Products/Release/*.dSYM
-
       - name: Package and sign
         env:
           VERSION: ${{ needs.release-please.outputs.version }}
@@ -177,7 +162,7 @@ jobs:
 
           # Sign the main app binary (not --deep, nested code is already signed above)
           codesign --force --sign "$SIGNING_IDENTITY" --timestamp --options=runtime \
-            --entitlements Resources/ff2.entitlements "$APP"
+            --entitlements Resources/dy.entitlements "$APP"
 
           codesign --verify --verbose=2 --deep --strict "$APP"
 
@@ -268,7 +253,7 @@ jobs:
             gh release download "$PREV_TAG" --repo "$GITHUB_REPOSITORY" --pattern "appcast.xml" --output existing-appcast.xml || true
           fi
 
-          DMG_URL="https://github.com/alltuner/factoryfloor/releases/download/v${VERSION}/${DMG_NAME}"
+          DMG_URL="https://github.com/barnolacesc/dockyard/releases/download/v${VERSION}/${DMG_NAME}"
           python3 scripts/generate_appcast.py \
             --version "$VERSION" \
             --signature "$SIGNATURE" \
@@ -302,39 +287,39 @@ jobs:
           GH_TOKEN: ${{ secrets.HOMEBREW_TAP_TOKEN }}
           VERSION: ${{ needs.release-please.outputs.version }}
         run: |
-          DMG_URL="https://github.com/alltuner/factoryfloor/releases/download/v${VERSION}/${DMG_NAME}"
+          DMG_URL="https://github.com/barnolacesc/dockyard/releases/download/v${VERSION}/${DMG_NAME}"
           SHA256=$(shasum -a 256 "build/release/$DMG_NAME" | awk '{print $1}')
 
-          CASK_SHA=$(gh api repos/alltuner/homebrew-tap/contents/Casks/factoryfloor.rb \
+          CASK_SHA=$(gh api repos/barnolacesc/homebrew-tap/contents/Casks/dockyard.rb \
             --method GET -q '.sha')
 
           CASK_CONTENT=$(cat <<RUBY
-          cask "factoryfloor" do
+          cask "dockyard" do
             version "${VERSION}"
             sha256 "${SHA256}"
 
             url "${DMG_URL}"
-            name "Factory Floor"
+            name "Dockyard"
             desc "AI-powered development workspace for macOS"
-            homepage "https://factory-floor.com"
+            homepage "https://francesc.barnola.net"
 
             depends_on macos: ">= :sonoma"
 
-            app "Factory Floor.app"
-            binary "#{appdir}/Factory Floor.app/Contents/Resources/ff", target: "ff"
+            app "Dockyard.app"
+            binary "#{appdir}/Dockyard.app/Contents/Resources/dy", target: "dy"
 
             zap trash: [
-              "~/.config/factoryfloor",
-              "~/.factoryfloor",
-              "~/Library/Preferences/com.alltuner.factoryfloor.plist",
+              "~/.config/dockyard",
+              "~/.dockyard",
+              "~/Library/Preferences/com.barnolacesc.dockyard.plist",
             ]
           end
           RUBY
           )
 
-          gh api repos/alltuner/homebrew-tap/contents/Casks/factoryfloor.rb \
+          gh api repos/barnolacesc/homebrew-tap/contents/Casks/dockyard.rb \
             --method PUT \
-            -f message="chore: update factoryfloor to v${VERSION}" \
+            -f message="chore: update dockyard to v${VERSION}" \
             -f content="$(echo "$CASK_CONTENT" | base64)" \
             -f sha="$CASK_SHA"
 

@@ -5,7 +5,7 @@ import Sparkle
 
 /// Suppresses modal error alerts from Sparkle update checks.
 /// Errors (e.g. network failures) are silently acknowledged instead of
-/// blocking the main thread with NSAlert.runModal(). (Fixes FACTORY-FLOOR-7)
+/// blocking the main thread with NSAlert.runModal(). (Fixes DOCKYARD-7)
 private class SilentErrorUserDriver: SPUStandardUserDriver {
     override func showUpdaterError(_: Error, acknowledgement: @escaping () -> Void) {
         acknowledgement()

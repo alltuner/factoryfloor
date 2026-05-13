@@ -16,7 +16,7 @@ body:
       label: Steps to reproduce
       description: How can we make it happen again?
       placeholder: |
-        1. Open Factory Floor
+        1. Open Dockyard
         2. Create a workstream
         3. ...
     validations:

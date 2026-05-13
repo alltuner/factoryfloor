@@ -18,7 +18,6 @@ struct SettingsView: View {
     @AppStorage("dockyard.symlinkEnv") private var symlinkEnv: Bool = true
     @AppStorage("dockyard.confirmQuit") private var confirmQuit: Bool = true
     @AppStorage("dockyard.telemetryEnabled") private var telemetryEnabled: Bool = true
-    @AppStorage("dockyard.crashReportingEnabled") private var crashReportingEnabled: Bool = true
     @AppStorage("dockyard.detailedLogging") private var detailedLogging: Bool = false
     @AppStorage("dockyard.quickActionDebug") private var quickActionDebug: Bool = false
     @AppStorage("dockyard.bleedingEdge") private var bleedingEdge: Bool = false
@@ -320,12 +319,6 @@ struct SettingsView: View {
                     "Usage analytics",
                     isOn: $telemetryEnabled,
                     description: "Send anonymous usage data to help improve Dockyard. We collect: app version, build type, macOS version, locale, and screen resolution. No project names, file contents, or personal data."
-                )
-
-                SettingToggle(
-                    "Crash reports",
-                    isOn: $crashReportingEnabled,
-                    description: "Send crash reports and performance data. Requires restart to take effect."
                 )
 
                 Toggle(isOn: $detailedLogging) {
