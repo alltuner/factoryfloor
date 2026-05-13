@@ -4,7 +4,7 @@
 import Foundation
 import os
 
-private let logger = Logger(subsystem: "factoryfloor", category: "tmux")
+private let logger = Logger(subsystem: "dockyard", category: "tmux")
 
 enum TmuxSession {
     /// Path to the tmux stderr log file in the cache directory.
@@ -18,10 +18,10 @@ enum TmuxSession {
     }
 
     /// Config strips all UI chrome (status bar, prefix key, keybindings) so tmux is
-    /// invisible inside Factory Floor, which manages the terminal directly.
+    /// invisible inside Dockyard, which manages the terminal directly.
     /// Sessions are still accessible from external terminals via:
-    ///   tmux -L factoryfloor list-sessions
-    ///   tmux -L factoryfloor attach-session -t <name>
+    ///   tmux -L dockyard list-sessions
+    ///   tmux -L dockyard attach-session -t <name>
     static var configContents: String {
         """
         # Managed by \(AppConstants.appID). Do not edit.
@@ -129,7 +129,7 @@ enum TmuxSession {
         killSession(tmuxPath: tmuxPath, sessionName: agentSession)
     }
 
-    /// Kill the entire tmux server on the factoryfloor socket.
+    /// Kill the entire tmux server on the dockyard socket.
     /// Call on app termination to prevent orphaned sessions.
     static func killAllSessions(tmuxPath: String) {
         logger.detailed("Killing tmux server on socket \(socketName)")

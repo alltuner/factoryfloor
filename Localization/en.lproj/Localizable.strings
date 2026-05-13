@@ -109,13 +109,13 @@
 "Symlink .env and .env.local from the main repository into new worktrees." = "Symlink .env and .env.local from the main repository into new worktrees.";
 
 /* Quit confirmation */
-"Quit Factory Floor?" = "Quit Factory Floor?";
+"Quit Dockyard?" = "Quit Dockyard?";
 "Active workstreams will be stopped." = "Active workstreams will be stopped.";
 "Quit" = "Quit";
 "Confirm before quitting" = "Confirm before quitting";
 "Show a confirmation dialog when quitting with active workstreams." = "Show a confirmation dialog when quitting with active workstreams.";
 "Launch at login" = "Launch at login";
-"Automatically open Factory Floor when you log in." = "Automatically open Factory Floor when you log in.";
+"Automatically open Dockyard when you log in." = "Automatically open Dockyard when you log in.";
 "Detailed logging" = "Detailed logging";
 "Log setup, run, and teardown script output to files for debugging." = "Log setup, run, and teardown script output to files for debugging.";
 "Open Logs Directory" = "Open Logs Directory";
@@ -138,16 +138,21 @@
 "Dark" = "Dark";
 
 /* Settings - Coding Agent */
+"Claude Code" = "Claude Code";
+"Codex" = "Codex";
+"Coding CLI" = "Coding CLI";
 "Agent Teams" = "Agent Teams";
 "Enables experimental multi-agent coordination. Agents can spawn teammates, delegate tasks, and collaborate across workstreams." = "Enables experimental multi-agent coordination. Agents can spawn teammates, delegate tasks, and collaborate across workstreams.";
+"Agent Teams is only available with Claude Code." = "Agent Teams is only available with Claude Code.";
 "Auto-rename branch" = "Auto-rename branch";
 "On the first request, the agent renames the branch to match the task and writes a short description visible in the sidebar." = "On the first request, the agent renames the branch to match the task and writes a short description visible in the sidebar.";
+"Auto-rename branch is only available with Claude Code." = "Auto-rename branch is only available with Claude Code.";
 "External Browser" = "External Browser";
 
 /* Settings - Advanced */
 "Advanced" = "Advanced";
 "Usage analytics" = "Usage analytics";
-"Send anonymous usage data to help improve Factory Floor. We collect: app version, build type, macOS version, locale, and screen resolution. No project names, file contents, or personal data." = "Send anonymous usage data to help improve Factory Floor. We collect: app version, build type, macOS version, locale, and screen resolution. No project names, file contents, or personal data.";
+"Send anonymous usage data to help improve Dockyard. We collect: app version, build type, macOS version, locale, and screen resolution. No project names, file contents, or personal data." = "Send anonymous usage data to help improve Dockyard. We collect: app version, build type, macOS version, locale, and screen resolution. No project names, file contents, or personal data.";
 "Crash reports" = "Crash reports";
 "Send crash reports and performance data. Requires restart to take effect." = "Send crash reports and performance data. Requires restart to take effect.";
 "Bleeding edge" = "Bleeding edge";
@@ -196,6 +201,9 @@
 "Claude Code not found" = "Claude Code not found";
 "Install Claude Code to use the Coding Agent." = "Install Claude Code to use the Coding Agent.";
 "Install Claude Code" = "Install Claude Code";
+"Codex not found" = "Codex not found";
+"Install Codex to use the Coding Agent." = "Install Codex to use the Coding Agent.";
+"Install Codex" = "Install Codex";
 
 /* BrowserView */
 "Server not responding" = "Server not responding";
@@ -215,7 +223,7 @@
 "Description" = "Description";
 
 /* Initialization errors */
-"Factory Floor cannot start" = "Factory Floor cannot start";
+"Dockyard cannot start" = "Dockyard cannot start";
 "The terminal engine (Ghostty) failed to initialize. This may indicate a system compatibility issue." = "The terminal engine (Ghostty) failed to initialize. This may indicate a system compatibility issue.";
 
 /* EnvironmentTabView */
@@ -224,8 +232,8 @@
 "Restart %@ script" = "Restart %@ script";
 "Start %@ script" = "Start %@ script";
 "No %@ script configured" = "No %@ script configured";
-"Add a %@ field to .factoryfloor.json:" = "Add a %@ field to .factoryfloor.json:";
-"Also supports .factoryfloor/config.json." = "Also supports .factoryfloor/config.json.";
+"Add a %@ field to .dockyard.json:" = "Add a %@ field to .dockyard.json:";
+"Also supports .dockyard/config.json." = "Also supports .dockyard/config.json.";
 
 /* Tab labels */
 "Info" = "Info";
@@ -291,7 +299,28 @@
 "This branch has been merged." = "This branch has been merged.";
 "gh CLI is not installed." = "gh CLI is not installed.";
 "Claude Code is not installed." = "Claude Code is not installed.";
+"Codex is not installed." = "Codex is not installed.";
+"Install Claude Code or Codex to use the Coding Agent." = "Install Claude Code or Codex to use the Coding Agent.";
 "Enable \"Bypass permission prompts\" in Settings." = "Enable \"Bypass permission prompts\" in Settings.";
 "No GitHub remote found for this project." = "No GitHub remote found for this project.";
 "Quick action debug" = "Quick action debug";
 "Show a debug panel with command output from quick actions (Create PR, Commit & Push)." = "Show a debug panel with command output from quick actions (Create PR, Commit & Push).";
+
+/* Workstream Info Git Stats */
+"Ahead" = "Ahead";
+"Uncommitted" = "Uncommitted";
+"Base" = "Base";
+"Worktree Age" = "Worktree Age";
+"Clean" = "Clean";
+"Created today" = "Created today";
+
+/* Split Panes */
+"Split Agent" = "Split Agent";
+"Split Terminal" = "Split Terminal";
+"Split Browser" = "Split Browser";
+
+/* Browser */
+"Reload" = "Reload";
+"Hard Reload" = "Hard Reload";
+"Reload browser" = "Reload browser";
+"Hard reload browser" = "Hard reload browser";

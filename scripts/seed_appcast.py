@@ -11,7 +11,7 @@ import changelog
 SPARKLE_NS = "https://www.andymatuschak.org/xml-namespaces/sparkle"
 ET.register_namespace("sparkle", SPARKLE_NS)
 
-REPO_URL = "https://github.com/alltuner/factoryfloor"
+REPO_URL = "https://github.com/barnolacesc/dockyard"
 
 
 def main() -> None:
@@ -29,9 +29,9 @@ def main() -> None:
     rss.set("xmlns:dc", "http://purl.org/dc/elements/1.1/")
 
     channel = ET.SubElement(rss, "channel")
-    ET.SubElement(channel, "title").text = "Factory Floor"
-    ET.SubElement(channel, "link").text = "https://factory-floor.com"
-    ET.SubElement(channel, "description").text = "Factory Floor updates"
+    ET.SubElement(channel, "title").text = "Dockyard"
+    ET.SubElement(channel, "link").text = "https://francesc.barnola.net"
+    ET.SubElement(channel, "description").text = "Dockyard updates"
     ET.SubElement(channel, "language").text = "en"
 
     for release in releases:

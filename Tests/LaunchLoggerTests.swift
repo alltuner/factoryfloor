@@ -1,7 +1,7 @@
 // ABOUTME: Tests for LaunchLogger per-workstream debug log file writing.
 // ABOUTME: Validates log entry serialization, gating on detailedLogging, append behavior, and cleanup.
 
-@testable import FactoryFloor
+@testable import Dockyard
 import XCTest
 
 final class LaunchLoggerTests: XCTestCase {
@@ -14,12 +14,12 @@ final class LaunchLoggerTests: XCTestCase {
         // Ensure clean state
         try? FileManager.default.removeItem(at: testLogsDir)
         // Enable detailed logging for tests
-        UserDefaults.standard.set(true, forKey: "factoryfloor.detailedLogging")
+        UserDefaults.standard.set(true, forKey: "dockyard.detailedLogging")
     }
 
     override func tearDown() {
         try? FileManager.default.removeItem(at: testLogsDir)
-        UserDefaults.standard.removeObject(forKey: "factoryfloor.detailedLogging")
+        UserDefaults.standard.removeObject(forKey: "dockyard.detailedLogging")
         super.tearDown()
     }
 
@@ -31,9 +31,9 @@ final class LaunchLoggerTests: XCTestCase {
             event: "agent-start",
             finalCommand: "/bin/zsh -lic 'claude --resume abc'",
             intermediateCommands: ["claude --resume abc", "tmux new-session -A -s test claude --resume abc"],
-            environmentVariables: ["FF_PROJECT": "myproject"],
+            environmentVariables: ["DY_PROJECT": "myproject"],
             workingDirectory: "/tmp/test",
-            toolPaths: LaunchLogEntry.ToolPaths(claude: "/usr/local/bin/claude", tmux: "/usr/bin/tmux", ffRun: nil),
+            toolPaths: LaunchLogEntry.ToolPaths(agentCLI: "claude", claude: "/usr/local/bin/claude", codex: nil, tmux: "/usr/bin/tmux", ffRun: nil),
             settings: LaunchLogEntry.Settings(tmuxMode: true, bypassPermissions: false, agentTeams: false, autoRenameBranch: true, allowOutsideWorktree: false),
             shell: "/bin/zsh"
         )
@@ -47,7 +47,9 @@ final class LaunchLoggerTests: XCTestCase {
         XCTAssertEqual(decoded.intermediateCommands, entry.intermediateCommands)
         XCTAssertEqual(decoded.environmentVariables, entry.environmentVariables)
         XCTAssertEqual(decoded.workingDirectory, "/tmp/test")
+        XCTAssertEqual(decoded.toolPaths.agentCLI, "claude")
         XCTAssertEqual(decoded.toolPaths.claude, "/usr/local/bin/claude")
+        XCTAssertNil(decoded.toolPaths.codex)
         XCTAssertEqual(decoded.toolPaths.tmux, "/usr/bin/tmux")
         XCTAssertNil(decoded.toolPaths.ffRun)
         XCTAssertTrue(decoded.settings.tmuxMode)
@@ -79,7 +81,7 @@ final class LaunchLoggerTests: XCTestCase {
     }
 
     func testLogSkipsWhenDisabled() {
-        UserDefaults.standard.set(false, forKey: "factoryfloor.detailedLogging")
+        UserDefaults.standard.set(false, forKey: "dockyard.detailedLogging")
 
         let entry = makeEntry(event: "agent-start")
         LaunchLogger.log(entry)
@@ -127,7 +129,7 @@ final class LaunchLoggerTests: XCTestCase {
             intermediateCommands: [],
             environmentVariables: [:],
             workingDirectory: "/tmp",
-            toolPaths: LaunchLogEntry.ToolPaths(claude: nil, tmux: nil, ffRun: nil),
+            toolPaths: LaunchLogEntry.ToolPaths(agentCLI: nil, claude: nil, codex: nil, tmux: nil, ffRun: nil),
             settings: LaunchLogEntry.Settings(tmuxMode: false, bypassPermissions: false, agentTeams: false, autoRenameBranch: false, allowOutsideWorktree: false),
             shell: "/bin/zsh"
         )
@@ -177,9 +179,9 @@ final class LaunchLoggerTests: XCTestCase {
             event: event,
             finalCommand: "/bin/zsh -lic 'claude --resume abc'",
             intermediateCommands: ["claude --resume abc"],
-            environmentVariables: ["FF_PROJECT": "test"],
+            environmentVariables: ["DY_PROJECT": "test"],
             workingDirectory: "/tmp/test",
-            toolPaths: LaunchLogEntry.ToolPaths(claude: "/usr/local/bin/claude", tmux: nil, ffRun: nil),
+            toolPaths: LaunchLogEntry.ToolPaths(agentCLI: "claude", claude: "/usr/local/bin/claude", codex: nil, tmux: nil, ffRun: nil),
             settings: LaunchLogEntry.Settings(tmuxMode: false, bypassPermissions: false, agentTeams: false, autoRenameBranch: false, allowOutsideWorktree: false),
             shell: "/bin/zsh"
         )

@@ -1,4 +1,4 @@
-// ABOUTME: Watches ff-run state files and publishes the selected port for a workstream.
+// ABOUTME: Watches dy-run state files and publishes the selected port for a workstream.
 // ABOUTME: Uses filesystem events instead of polling so browser targets update immediately.
 
 import Foundation
@@ -13,7 +13,7 @@ final class PortDetector: ObservableObject, @unchecked Sendable {
 
     init(workstreamID: UUID) {
         self.workstreamID = workstreamID
-        self.queue = DispatchQueue(label: "factoryfloor.port-detector.\(workstreamID.uuidString.lowercased())")
+        self.queue = DispatchQueue(label: "dockyard.port-detector.\(workstreamID.uuidString.lowercased())")
         start()
     }
 

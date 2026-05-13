@@ -1,27 +1,28 @@
 // ABOUTME: Loads setup/run/teardown script configuration from project config files.
-// ABOUTME: Resolves from .factoryfloor.json, .emdash.json, conductor.json, or .superset/config.json.
+// ABOUTME: Resolves from .dockyard.json, .emdash.json, conductor.json, or .superset/config.json.
 
 import Foundation
 import os
 
-private let logger = Logger(subsystem: "factoryfloor", category: "script-config")
+private let logger = Logger(subsystem: "dockyard", category: "script-config")
 
 struct ScriptConfig {
     let setup: String?
     let run: String?
     let teardown: String?
+    let expectedPort: Int?
     let source: String?
     let loadError: String?
 
-    static let empty = ScriptConfig(setup: nil, run: nil, teardown: nil, source: nil, loadError: nil)
+    static let empty = ScriptConfig(setup: nil, run: nil, teardown: nil, expectedPort: nil, source: nil, loadError: nil)
 
     /// Load script config for a project directory.
-    /// Checks .factoryfloor.json first, then .emdash.json, conductor.json, then .superset/config.json.
+    /// Checks .dockyard.json first, then .emdash.json, conductor.json, then .superset/config.json.
     static func load(from directory: String) -> ScriptConfig {
         let dir = URL(fileURLWithPath: directory)
 
         let candidates: [(path: String, source: String, loader: (String) throws -> ScriptConfig)] = [
-            (dir.appendingPathComponent(".factoryfloor.json").path, ".factoryfloor.json", loadFF2),
+            (dir.appendingPathComponent(".dockyard.json").path, ".dockyard.json", loadDockyard),
             (dir.appendingPathComponent(".emdash.json").path, ".emdash.json", loadEmdash),
             (dir.appendingPathComponent("conductor.json").path, "conductor.json", loadConductor),
             (dir.appendingPathComponent(".superset/config.json").path, ".superset/config.json", loadSuperset),
@@ -33,7 +34,7 @@ struct ScriptConfig {
                 return try candidate.loader(candidate.path)
             } catch {
                 logger.error("Failed to load \(candidate.path): \(error.localizedDescription)")
-                return ScriptConfig(setup: nil, run: nil, teardown: nil, source: candidate.source, loadError: error.localizedDescription)
+                return ScriptConfig(setup: nil, run: nil, teardown: nil, expectedPort: nil, source: candidate.source, loadError: error.localizedDescription)
             }
         }
 
@@ -75,15 +76,16 @@ struct ScriptConfig {
     }
 
     /// { "setup": "cmd", "run": "cmd", "teardown": "cmd" }
-    private static func loadFF2(_ path: String) throws -> ScriptConfig {
+    private static func loadDockyard(_ path: String) throws -> ScriptConfig {
         let dict = try loadJSON(path)
         let setup = dict["setup"] as? String
         let run = dict["run"] as? String
         let teardown = dict["teardown"] as? String
-        guard setup != nil || run != nil || teardown != nil else {
+        let expectedPort = dict["expectedPort"] as? Int
+        guard setup != nil || run != nil || teardown != nil || expectedPort != nil else {
             return .empty
         }
-        return ScriptConfig(setup: nonEmpty(setup), run: nonEmpty(run), teardown: nonEmpty(teardown), source: URL(fileURLWithPath: path).lastPathComponent, loadError: nil)
+        return ScriptConfig(setup: nonEmpty(setup), run: nonEmpty(run), teardown: nonEmpty(teardown), expectedPort: expectedPort, source: URL(fileURLWithPath: path).lastPathComponent, loadError: nil)
     }
 
     /// .emdash.json: { "scripts": { "setup": "cmd", "run": "cmd", "teardown": "cmd" } }
@@ -94,7 +96,7 @@ struct ScriptConfig {
         let run = scripts["run"] as? String
         let teardown = scripts["teardown"] as? String
         guard setup != nil || run != nil || teardown != nil else { return .empty }
-        return ScriptConfig(setup: nonEmpty(setup), run: nonEmpty(run), teardown: nonEmpty(teardown), source: ".emdash.json", loadError: nil)
+        return ScriptConfig(setup: nonEmpty(setup), run: nonEmpty(run), teardown: nonEmpty(teardown), expectedPort: nil, source: ".emdash.json", loadError: nil)
     }
 
     /// conductor.json: { "scripts": { "setup": "cmd", "run": "cmd", "archive": "cmd" } }
@@ -105,7 +107,7 @@ struct ScriptConfig {
         let run = scripts["run"] as? String
         let teardown = scripts["archive"] as? String
         guard setup != nil || run != nil || teardown != nil else { return .empty }
-        return ScriptConfig(setup: nonEmpty(setup), run: nonEmpty(run), teardown: nonEmpty(teardown), source: "conductor.json", loadError: nil)
+        return ScriptConfig(setup: nonEmpty(setup), run: nonEmpty(run), teardown: nonEmpty(teardown), expectedPort: nil, source: "conductor.json", loadError: nil)
     }
 
     /// .superset/config.json: { "setup": ["cmd1", "cmd2"], "run": ["cmd"], "teardown": ["cmd"] }
@@ -115,7 +117,7 @@ struct ScriptConfig {
         let run = joinCommands(dict["run"])
         let teardown = joinCommands(dict["teardown"])
         guard setup != nil || run != nil || teardown != nil else { return .empty }
-        return ScriptConfig(setup: setup, run: run, teardown: teardown, source: ".superset/config.json", loadError: nil)
+        return ScriptConfig(setup: setup, run: run, teardown: teardown, expectedPort: nil, source: ".superset/config.json", loadError: nil)
     }
 
     // MARK: - Helpers

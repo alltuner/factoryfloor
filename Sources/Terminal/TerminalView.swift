@@ -4,10 +4,10 @@
 import Cocoa
 import os
 
-private let logger = Logger(subsystem: "factoryfloor", category: "terminal-view")
+private let logger = Logger(subsystem: "dockyard", category: "terminal-view")
 
 extension Notification.Name {
-    static let terminalChildExited = Notification.Name("factoryfloor.terminalChildExited")
+    static let terminalChildExited = Notification.Name("dockyard.terminalChildExited")
     static let terminalActivity = Notification.Name("ff2.terminalActivity")
 }
 
@@ -52,9 +52,6 @@ final class TerminalView: NSView {
 
     init(app: ghostty_app_t, workingDirectory: String? = nil, command: String? = nil, initialInput: String? = nil, environmentVars: [String: String] = [:], waitAfterCommand: Bool = true) {
         super.init(frame: NSRect(x: 0, y: 0, width: 800, height: 600))
-
-        wantsLayer = true
-        layer?.isOpaque = true
 
         registerForDraggedTypes(Array(Self.dropTypes))
 
@@ -189,6 +186,15 @@ final class TerminalView: NSView {
         }
 
         if let window {
+            layer?.contentsScale = window.backingScaleFactor
+            // Ensure we claim focus if we were created with it but didn't have a window yet
+            if let delegate = window.firstResponder, delegate !== self {
+                // If it's a TerminalView we're fine, but if it's the AppKit default we want our focus
+                if !(delegate is TerminalView) {
+                    window.makeFirstResponder(self)
+                }
+            }
+
             windowScreenChangeObserver = NotificationCenter.default.addObserver(
                 forName: NSWindow.didChangeScreenNotification,
                 object: window,

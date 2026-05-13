@@ -5,7 +5,7 @@ the terminal spawning stack.
 
 ## Problem
 
-The terminal spawning pipeline (ghostty surface, tmux wrapping, ff-run launcher)
+The terminal spawning pipeline (ghostty surface, tmux wrapping, dy-run launcher)
 has multiple layers that independently swallow errors. When something goes wrong,
 the user sees a blank or broken terminal with no diagnostics and no recovery path.
 
@@ -19,7 +19,7 @@ the user sees a blank or broken terminal with no diagnostics and no recovery pat
 ## Non-goals
 
 - Automatic retry without user awareness
-- Changing the fundamental layering (ghostty -> tmux -> ff-run)
+- Changing the fundamental layering (ghostty -> tmux -> dy-run)
 
 ---
 
@@ -73,7 +73,7 @@ produces zero diagnostics.
 - On session cleanup, remove the log file
 - Surface errors in a "tmux diagnostics" view or in the terminal error state
 
-**Proposed:** Add `killAllSessions()` via `tmux -L factoryfloor kill-server`
+**Proposed:** Add `killAllSessions()` via `tmux -L dockyard kill-server`
 on app termination to prevent orphaned sessions.
 
 **Open questions:**
@@ -84,7 +84,7 @@ on app termination to prevent orphaned sessions.
 
 ## 4. ScriptConfig error surfacing
 
-**Current behavior:** `try?` everywhere. Malformed `.factoryfloor.json` silently
+**Current behavior:** `try?` everywhere. Malformed `.dockyard.json` silently
 produces empty config. User thinks scripts aren't configured.
 
 **Proposed:**
@@ -107,7 +107,7 @@ produces empty config. User thinks scripts aren't configured.
 **Proposed:**
 - Redirect stderr to a temp file instead of /dev/null
 - If the fallback fires, print a diagnostic line to the terminal:
-  `"[Factory Floor] Session resume failed, starting fresh. See /tmp/ff-... for details"`
+  `"[Dockyard] Session resume failed, starting fresh. See /tmp/ff-... for details"`
 - Clean up temp files on session end
 
 **Open questions:**
@@ -117,9 +117,9 @@ produces empty config. User thinks scripts aren't configured.
 
 ---
 
-## 6. ff-run launcher validation
+## 6. dy-run launcher validation
 
-**Current behavior:** If the ff-run binary is missing, the command string
+**Current behavior:** If the dy-run binary is missing, the command string
 references a nonexistent path. Shell exits immediately.
 
 **Proposed:**
@@ -153,7 +153,7 @@ duplicates or lose the surface permanently.
 | ScriptConfig error surfacing | Small | High | P1 |
 | Respawn race condition | Small | High | P1 |
 | Tmux error reporting | Small | High | P1 |
-| ff-run launcher validation | Small | Medium | P2 |
+| dy-run launcher validation | Small | Medium | P2 |
 | CommandBuilder fallback diagnostics | Small | Medium | P2 |
 
 ---

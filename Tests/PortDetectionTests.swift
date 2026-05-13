@@ -1,7 +1,7 @@
 // ABOUTME: Tests for run-script port detection and browser retargeting behavior.
 // ABOUTME: Covers launcher command building, port selection stabilization, and browser navigation policy.
 
-@testable import FactoryFloor
+@testable import Dockyard
 import XCTest
 
 final class PortDetectionTests: XCTestCase {
@@ -11,13 +11,13 @@ final class PortDetectionTests: XCTestCase {
         let command = runScriptCommand(
             script: "just dev",
             workstreamID: workstreamID,
-            launcherPath: "/Applications/Factory Floor.app/Contents/Helpers/ff-run",
+            launcherPath: "/Applications/Dockyard.app/Contents/Helpers/dy-run",
             shell: "/bin/zsh"
         )
 
         XCTAssertEqual(
             command,
-            "'/Applications/Factory Floor.app/Contents/Helpers/ff-run' --workstream-id 12345678-1234-1234-1234-123456789abc -- /bin/zsh -lic 'just dev'"
+            "'/Applications/Dockyard.app/Contents/Helpers/dy-run' --workstream-id 12345678-1234-1234-1234-123456789abc -- /bin/zsh -lic 'just dev'"
         )
     }
 
@@ -80,5 +80,24 @@ final class PortDetectionTests: XCTestCase {
             nextDefaultURL: "http://localhost:5173/",
             connectionError: false
         ))
+    }
+
+    func testInferExpectedPortFromRunCommand() {
+        XCTAssertEqual(RunLauncher.inferExpectedPort(runCommand: "python3 -m flask run --port 5001", projectDirectory: "/tmp"), 5001)
+        XCTAssertEqual(RunLauncher.inferExpectedPort(runCommand: "next dev -p 3000", projectDirectory: "/tmp"), 3000)
+        XCTAssertEqual(RunLauncher.inferExpectedPort(runCommand: "uvicorn app:app --port 8000", projectDirectory: "/tmp"), 8000)
+        XCTAssertEqual(RunLauncher.inferExpectedPort(runCommand: "PORT=8080 node server.js", projectDirectory: "/tmp"), 8080)
+        XCTAssertNil(RunLauncher.inferExpectedPort(runCommand: "npm run start", projectDirectory: "/tmp"))
+    }
+
+    func testInferExpectedPortFromEnvFile() {
+        let tempDir = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
+        try? FileManager.default.createDirectory(at: tempDir, withIntermediateDirectories: true)
+        defer { try? FileManager.default.removeItem(at: tempDir) }
+        
+        let envURL = tempDir.appendingPathComponent(".env")
+        try? "PORT=7777".write(to: envURL, atomically: true, encoding: .utf8)
+        
+        XCTAssertEqual(RunLauncher.inferExpectedPort(runCommand: "npm run start", projectDirectory: tempDir.path), 7777)
     }
 }

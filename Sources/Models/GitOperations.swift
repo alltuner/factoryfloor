@@ -4,7 +4,7 @@
 import Foundation
 import OSLog
 
-private let logger = Logger(subsystem: "factoryfloor", category: "git")
+private let logger = Logger(subsystem: "dockyard", category: "git")
 
 struct GitRepoInfo {
     let isRepo: Bool
@@ -100,7 +100,7 @@ enum GitOperations {
 
     /// Create a git worktree for a workstream, branching off the default branch.
     /// Returns the worktree path on success, nil on failure.
-    static func createWorktree(projectPath: String, projectName: String, workstreamName: String, branchPrefix: String = "ff", symlinkEnv: Bool = true) -> String? {
+    static func createWorktree(projectPath: String, projectName: String, workstreamName: String, branchPrefix: String = "dy", symlinkEnv: Bool = true) -> String? {
         let worktreeDir = AppConstants.worktreesDirectory
             .appendingPathComponent(sanitize(projectName))
             .appendingPathComponent(sanitize(workstreamName))
@@ -133,7 +133,7 @@ enum GitOperations {
             symlinkEnvFiles(from: projectPath, to: worktreeDir.path)
         }
 
-        addExcludeEntry(at: projectPath, pattern: ".factoryfloor-state/")
+        addExcludeEntry(at: projectPath, pattern: ".dockyard-state/")
 
         return worktreeDir.path
     }
@@ -216,6 +216,30 @@ enum GitOperations {
         let base = defaultBranch(at: projectPath)
         guard let output = run(args: ["log", "\(base)..HEAD", "--oneline"], in: path) else { return false }
         return !output.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+    }
+
+    /// Check if a remote exists for this repository.
+    /// Get the count of commits ahead of the default branch.
+    static func commitsAhead(at path: String, projectPath: String) -> Int {
+        let base = defaultBranch(at: projectPath)
+        guard let output = run(args: ["rev-list", "--count", "\(base)..HEAD"], in: path) else { return 0 }
+        return Int(output.trimmingCharacters(in: .whitespacesAndNewlines)) ?? 0
+    }
+
+    /// Get the count of uncommitted (modified/untracked) files.
+    static func uncommittedCount(at path: String) -> Int {
+        guard let status = run(args: ["status", "--porcelain", "--ignore-submodules=dirty"], in: path) else { return 0 }
+        let lines = status.components(separatedBy: .newlines).filter { !$0.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty }
+        return lines.count
+    }
+
+    /// Get the branch creation date (approximated as the oldest commit in base..HEAD).
+    static func branchCreatedDate(at path: String, projectPath: String) -> Date? {
+        let base = defaultBranch(at: projectPath)
+        guard let output = run(args: ["log", "--format=%ct", "\(base)..HEAD"], in: path) else { return nil }
+        let lines = output.components(separatedBy: .newlines).filter { !$0.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty }
+        guard let lastLine = lines.last, let timestamp = TimeInterval(lastLine) else { return nil }
+        return Date(timeIntervalSince1970: timestamp)
     }
 
     /// Check if a remote exists for this repository.

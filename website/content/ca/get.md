@@ -1,5 +1,5 @@
 ---
-title: Obtenir Factory Floor
+title: Obtenir Dockyard
 translationKey: get
 hideInstall: true
 layout: get

@@ -4,7 +4,7 @@
 import Foundation
 import OSLog
 
-private let logger = Logger(subsystem: "factoryfloor", category: "file-persistence")
+private let logger = Logger(subsystem: "dockyard", category: "file-persistence")
 
 enum FilePersistence {
     /// Write data atomically to a file, creating parent directories if needed.

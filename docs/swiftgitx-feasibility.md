@@ -178,14 +178,14 @@ hours/days). Contributing this upstream is realistic.
 
 - **`nonisolated(unsafe)` for repository pointer.** This is a pragmatic choice
   that works correctly when each `Repository` instance is used from one
-  context at a time. Factory Floor's `GitOperations` already runs all git
+  context at a time. Dockyard's `GitOperations` already runs all git
   calls from `Task.detached`, so this aligns with our usage pattern. But it
   means the library won't protect against concurrent access to the same
   `Repository` instance.
 
 ### XcodeGen Integration
 
-Factory Floor uses XcodeGen, not raw SPM. Adding an SPM package dependency
+Dockyard uses XcodeGen, not raw SPM. Adding an SPM package dependency
 in `project.yml` is supported:
 
 ```yaml

@@ -1,4 +1,4 @@
-// ABOUTME: Shared run-state types for ff-run and the app-side port monitor.
+// ABOUTME: Shared run-state types for dy-run and the app-side port monitor.
 // ABOUTME: Encodes detected localhost ports, selection rules, and state-file persistence.
 
 import Foundation

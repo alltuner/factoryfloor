@@ -1,14 +1,14 @@
-# Factory Floor
+# Dockyard
 
-> Factory Floor is a free, open-source native macOS app for AI-powered software development. It manages multiple parallel development tasks (called workstreams), each in its own git worktree with a dedicated Claude Code agent, terminal, and embedded browser. Built on Ghostty's GPU-rendered terminal engine.
+> Dockyard is a free, open-source native macOS app for AI-powered software development. It manages multiple parallel development tasks (called workstreams), each in its own git worktree with a dedicated coding agent, terminal, and embedded browser. Built on Ghostty's GPU-rendered terminal engine.
 
-Factory Floor lets developers run several AI coding agents in parallel on the same codebase without branch conflicts. Each workstream gets its own git worktree, Claude Code session, terminals, and a browser that auto-detects the dev server port.
+Dockyard lets developers run several AI coding agents in parallel on the same codebase without branch conflicts. Each workstream gets its own git worktree, coding CLI session, terminals, and a browser that auto-detects the dev server port.
 
 Key capabilities:
 
 - Git worktrees: each workstream operates on its own branch and worktree, no stashing needed
-- Claude Code integration: embedded AI agent with session persistence via tmux
-- Setup/run/teardown scripts: configured per project via `.factoryfloor.json`
+- Selectable Claude Code or Codex integration: embedded AI agent with session persistence via tmux
+- Setup/run/teardown scripts: configured per project via `.dockyard.json`
 - Embedded browser: WKWebView with automatic port detection from run scripts
 - GitHub integration: repo info, open PRs, and branch PR status via the `gh` CLI
 - Keyboard-first: every action has a shortcut
@@ -19,7 +19,7 @@ Key capabilities:
 Install via Homebrew:
 
 ```
-brew install --cask alltuner/tap/factoryfloor
+brew install --cask barnolacesc/tap/dockyard
 ```
 
 Or download from GitHub Releases.
@@ -33,12 +33,12 @@ ff ~/repos/myapp    # open a specific directory
 
 ## Configuration
 
-Add a `.factoryfloor.json` to your project root:
+Add a `.dockyard.json` to your project root:
 
 ```json
 {
   "setup": "npm install",
-  "run": "PORT=$FF_PORT npm run dev",
+  "run": "PORT=$DY_PORT npm run dev",
   "teardown": "docker-compose down"
 }
 ```
@@ -47,11 +47,11 @@ Add a `.factoryfloor.json` to your project root:
 
 Every workstream terminal has access to:
 
-- `FF_PROJECT` — project name
-- `FF_WORKSTREAM` — workstream name
-- `FF_PROJECT_DIR` — main repository path
-- `FF_WORKTREE_DIR` — worktree path for this workstream
-- `FF_PORT` — deterministic port (40001-49999)
+- `DY_PROJECT` — project name
+- `DY_WORKSTREAM` — workstream name
+- `DY_PROJECT_DIR` — main repository path
+- `DY_WORKTREE_DIR` — worktree path for this workstream
+- `DY_PORT` — deterministic port (40001-49999)
 
 ## Keyboard Shortcuts
 
@@ -90,12 +90,12 @@ Navigation:
 
 ## Links
 
-- [Website](https://factory-floor.com): Homepage with features, screenshots, and documentation
-- [GitHub](https://github.com/alltuner/factoryfloor): Source code, README, and issue tracker
-- [Download](https://factory-floor.com/get): Installation instructions and download links
-- [Releases](https://github.com/alltuner/factoryfloor/releases): Release history and changelog
+- [Website](https://francesc.barnola.net): Homepage with features, screenshots, and documentation
+- [GitHub](https://github.com/barnolacesc/dockyard): Source code, README, and issue tracker
+- [Download](https://francesc.barnola.net/get): Installation instructions and download links
+- [Releases](https://github.com/barnolacesc/dockyard/releases): Release history and changelog
 
 ## Optional
 
-- [Sponsor](https://factory-floor.com/sponsor): Support the project's development
-- [Privacy Policy](https://factory-floor.com/legal/privacy): Privacy and data handling
+- [Sponsor](https://francesc.barnola.net/sponsor): Support the project's development
+- [Privacy Policy](https://francesc.barnola.net/legal/privacy): Privacy and data handling

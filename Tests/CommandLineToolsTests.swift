@@ -1,7 +1,7 @@
 // ABOUTME: Tests for resolving absolute paths to app-launched command line tools.
 // ABOUTME: Guards against debug and release builds using different command lookup behavior.
 
-@testable import FactoryFloor
+@testable import Dockyard
 import XCTest
 
 final class CommandLineToolsTests: XCTestCase {
@@ -115,5 +115,20 @@ final class CommandLineToolsTests: XCTestCase {
         )
 
         XCTAssertEqual(resolved, "/usr/local/bin/git")
+    }
+
+    func testRecoversFromInvalidShellPathUsingSystemFallback() {
+        let resolved = CommandLineTools.path(
+            for: "codex",
+            environment: ["PATH": "", "SHELL": "/usr/bin/zsh"],
+            isExecutable: { $0 == "/Users/me/.npm-global/bin/codex" },
+            resolveFromPath: { _, _ in nil },
+            resolveFromShellPath: { shell in
+                XCTAssertNotEqual(shell, "/usr/bin/zsh")
+                return "/Users/me/.npm-global/bin:/usr/bin:/bin"
+            }
+        )
+
+        XCTAssertEqual(resolved, "/Users/me/.npm-global/bin/codex")
     }
 }

@@ -19,7 +19,7 @@ enum CommandLineTools {
         // their terminal would. GUI apps inherit a minimal PATH from launchd,
         // so we resolve the full login shell PATH first.
         if let shell = environment["SHELL"], !shell.isEmpty,
-           let shellPath = resolveFromShellPath(shell)
+           let shellPath = resolveFromShellPath(CommandBuilder.resolvedUserShell(environment: ["SHELL": shell]))
         {
             for directory in shellPath.split(separator: ":") {
                 let candidate = URL(fileURLWithPath: String(directory)).appendingPathComponent(name).path

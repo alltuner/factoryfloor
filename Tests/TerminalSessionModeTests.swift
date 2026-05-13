@@ -2,7 +2,7 @@
 // ABOUTME: Verifies tmux-enabled sessions wait for tool detection before launching terminals.
 
 import XCTest
-@testable import FactoryFloor
+@testable import Dockyard
 
 final class TerminalSessionModeTests: XCTestCase {
     func testTmuxModeWaitsForToolDetection() {

@@ -1,7 +1,7 @@
 # Generated Xcode project and Info.plist (regenerate with `xcodegen`)
 *.xcodeproj
 *.xcworkspace
-FactoryFloor/Info.plist
+Dockyard/Info.plist
 
 # SourceKit-LSP build server config (generated per-worktree with absolute paths)
 buildServer.json

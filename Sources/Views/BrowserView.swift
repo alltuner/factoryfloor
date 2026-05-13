@@ -5,8 +5,10 @@ import SwiftUI
 import WebKit
 
 extension Notification.Name {
-    static let focusAddressBar = Notification.Name("factoryfloor.focusAddressBar")
-    static let browserTitleChanged = Notification.Name("factoryfloor.browserTitleChanged")
+    static let focusAddressBar = Notification.Name("dockyard.focusAddressBar")
+    static let browserTitleChanged = Notification.Name("dockyard.browserTitleChanged")
+    static let browserReload = Notification.Name("dockyard.browserReload")
+    static let browserHardReload = Notification.Name("dockyard.browserHardReload")
 }
 
 /// Hides the "Open Link in New Window" context menu item since the app is single-window.
@@ -165,6 +167,12 @@ struct BrowserView: View {
         }
         .onReceive(NotificationCenter.default.publisher(for: .focusAddressBar)) { _ in
             urlFieldFocused = true
+        }
+        .onReceive(NotificationCenter.default.publisher(for: .browserReload)) { _ in
+            if isLoading { webView.stopLoading() } else { retry() }
+        }
+        .onReceive(NotificationCenter.default.publisher(for: .browserHardReload)) { _ in
+            webView.reloadFromOrigin()
         }
         .onChange(of: defaultURL) { oldURL, newURL in
             guard shouldRetargetBrowser(

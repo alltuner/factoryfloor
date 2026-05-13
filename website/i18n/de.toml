@@ -50,7 +50,7 @@ other = "Agent-Sitzungen überleben App-Neustarts dank tmux auf einem dedizierte
 [feat_scripts_title]
 other = "Setup- und Run-Skripte"
 [feat_scripts_desc]
-other = "Konfiguriere Setup-, Run- und Teardown-Skripte pro Projekt über .factoryfloor.json."
+other = "Konfiguriere Setup-, Run- und Teardown-Skripte pro Projekt über .dockyard.json."
 [feat_browser_title]
 other = "Integrierter Browser"
 [feat_browser_desc]
@@ -70,7 +70,7 @@ other = "Vom Repo zum laufenden Workstream in Sekunden. Jeder Workstream ist iso
 [step1_title]
 other = "Projekt hinzufügen"
 [step1_desc]
-other = "Ziehe ein Verzeichnis auf die Seitenleiste oder erstelle ein neues. Factory Floor erkennt Git-Repos, installierte Tools und GitHub-Verbindungen automatisch."
+other = "Ziehe ein Verzeichnis auf die Seitenleiste oder erstelle ein neues. Dockyard erkennt Git-Repos, installierte Tools und GitHub-Verbindungen automatisch."
 [step2_title]
 other = "Workstream erstellen"
 [step2_desc]
@@ -98,7 +98,7 @@ other = "Wann es läuft"
 [config_setup_desc]
 other = "Einmal, wenn ein Workstream erstellt wird. Zum Installieren von Abhängigkeiten oder Build-Schritten."
 [config_run_desc]
-other = "Auf Abruf über den Environment-Tab. Eingebettet in ff-run für automatische Port-Erkennung."
+other = "Auf Abruf über den Environment-Tab. Eingebettet in dy-run für automatische Port-Erkennung."
 [config_teardown_desc]
 other = "Wenn ein Workstream archiviert wird. Zum Aufräumen, wie das Stoppen von Containern."
 [config_optional_note]
@@ -186,7 +186,7 @@ other = "Open Source"
 [oss_title]
 other = "Frei und quelloffen."
 [oss_desc]
-other = "Factory Floor ist MIT-lizenziert und kostenlos nutzbar. Der Quellcode ist auf GitHub verfügbar. Beiträge, Fehlerberichte und Funktionswünsche sind willkommen."
+other = "Dockyard ist MIT-lizenziert und kostenlos nutzbar. Der Quellcode ist auf GitHub verfügbar. Beiträge, Fehlerberichte und Funktionswünsche sind willkommen."
 [oss_view]
 other = "Auf GitHub ansehen"
 [oss_star]
@@ -197,7 +197,7 @@ other = "Gemacht mit ❤️ in Poblenou, Barcelona 🇪🇺"
 
 # Sponsor
 [sponsor_intro]
-other = "Factory Floor ist frei und quelloffen."
+other = "Dockyard ist frei und quelloffen."
 [sponsor_intro_2]
 other = "Deine Unterstützung hilft bei der Weiterentwicklung und neuen Funktionen."
 [sponsor_financial]
@@ -215,7 +215,7 @@ other = "Schneller Einmalbeitrag."
 [sponsor_star]
 other = "Projekt auf GitHub mit Stern markieren"
 [sponsor_star_desc]
-other = "Sterne helfen anderen, Factory Floor zu entdecken."
+other = "Sterne helfen anderen, Dockyard zu entdecken."
 [sponsor_issues]
 other = "Fehler melden"
 [sponsor_issues_desc]
@@ -227,15 +227,15 @@ other = "Pull Requests für Fehlerbehebungen und Funktionen sind willkommen."
 [sponsor_translate]
 other = "App oder Website übersetzen"
 [sponsor_translate_desc]
-other = "Hilf dabei, Factory Floor in mehr Sprachen verfügbar zu machen."
+other = "Hilf dabei, Dockyard in mehr Sprachen verfügbar zu machen."
 [sponsor_ghostty]
 other = "Ghostty unterstützen"
 [sponsor_ghostty_desc]
-other = "Factory Floor basiert auf Ghosttys GPU-gerendertem Terminal."
+other = "Dockyard basiert auf Ghosttys GPU-gerendertem Terminal."
 
 # Get
 [get_title]
-other = "Factory Floor herunterladen"
+other = "Dockyard herunterladen"
 [get_desc]
 other = "Installiere über Homebrew oder lade die neueste Version herunter."
 [get_install]
@@ -253,4 +253,4 @@ other = "Alles was du wissen musst, nichts was du nicht brauchst."
 
 # Changelog
 [changelog_subtitle]
-other = "Versionshistorie für Factory Floor"
+other = "Versionshistorie für Dockyard"

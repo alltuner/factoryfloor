@@ -2,18 +2,18 @@
 
 ## Channels
 
-Factory Floor ships via two channels:
+Dockyard ships via two channels:
 
-1. **Homebrew cask** (primary): `brew install --cask alltuner/tap/factoryfloor`
+1. **Homebrew cask** (primary): `brew install --cask barnolacesc/tap/dockyard`
    - Installs the app and the `ff` CLI automatically
-   - Upgrade: `brew upgrade --cask factoryfloor`
+   - Upgrade: `brew upgrade --cask dockyard`
 2. **Direct DMG** via GitHub Releases
    - CLI available from Settings > Environment
 
 ## Update notification
 
 DMG users get automatic updates via Sparkle, which reads the appcast
-feed at `https://factory-floor.com/appcast.xml`.
+feed at `https://francesc.barnola.net/appcast.xml`.
 
 Homebrew users see a sidebar badge when a newer version is available.
 The app parses the version from the same appcast feed.
@@ -30,7 +30,7 @@ The app parses the version from the same appcast feed.
    - Notarize via stored keychain profile
    - Create and sign DMG
    - Upload DMG to GitHub release
-   - Update Homebrew cask in `alltuner/homebrew-tap`
+   - Update Homebrew cask in `barnolacesc/homebrew-tap`
    - Trigger website deploy (deploys appcast.xml from the release)
 5. Website deploys automatically (GitHub Pages)
 6. Users see update badge on next app launch
@@ -67,6 +67,6 @@ After a release, verify:
 
 1. GitHub release exists with notarized DMG attached
 2. Homebrew cask points to the new DMG
-3. `factory-floor.com/appcast.xml` reports the new version
+3. `francesc.barnola.net/appcast.xml` reports the new version
 4. `/get` page shows correct install/upgrade commands
 5. App shows update badge when running an older version

@@ -34,7 +34,7 @@ export default defineConfig({
       if (!code.includes('applyStateStackDiff')) return
       // Vite wraps dynamic import() in __vitePreload which destructures named exports.
       // For _virtual/main (exports { default, main }), this breaks because
-      // applyStateStackDiff/INITIAL are nested under 'main', not top-level.
+      // applyStateStackDidy/INITIAL are nested under 'main', not top-level.
       // Fix: replace the broken factory with one that returns the raw module.
       const re = /__vitePreload\(\s*async\s*\(\)\s*=>\s*\{\s*const\s*\{[\s\S]*?applyStateStackDiff[\s\S]*?\}\s*=\s*await import\(\s*'([^']+)'\s*\)[\s\S]*?\}[\s\S]*?import\.meta\.url\s*\)/g
       return code.replace(re, 'import(\'$1\')')

@@ -36,8 +36,13 @@ struct OnboardingView: View {
                             ProgressView()
                                 .scaleEffect(0.5)
                                 .frame(width: 12, height: 12)
-                        }
+                            }
                     }
+
+                    Text("Install Claude Code or Codex to use the Coding Agent.")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                        .frame(maxWidth: .infinity, alignment: .leading)
 
                     Form {
                         PrerequisiteRow(
@@ -48,11 +53,18 @@ struct OnboardingView: View {
                             installURL: URL(string: "https://docs.anthropic.com/en/docs/claude-code/overview")
                         )
                         PrerequisiteRow(
+                            name: "codex",
+                            label: "Codex",
+                            status: toolStatus.codex,
+                            version: toolStatus.codexVersion,
+                            installURL: URL(string: "https://developers.openai.com/codex")
+                        )
+                        PrerequisiteRow(
                             name: "gh",
                             label: "GitHub CLI",
                             status: toolStatus.gh,
                             version: toolStatus.ghVersion,
-                            detail: toolStatus.ghAuthDetail
+
                         )
                         PrerequisiteRow(
                             name: "git",

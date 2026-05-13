@@ -186,7 +186,7 @@ def test_item_contains_release_link() -> None:
     assert item is not None
     link = item.find("link")
     assert link is not None
-    assert link.text == "https://github.com/alltuner/factoryfloor/releases/tag/v1.4.0"
+    assert link.text == "https://github.com/barnolacesc/dockyard/releases/tag/v1.4.0"
     print("PASS: item_contains_release_link")
 
 
@@ -198,7 +198,7 @@ def test_merges_with_existing_appcast() -> None:
   <channel>
     <item>
       <title>Version 1.0.0</title>
-      <link>https://github.com/alltuner/factoryfloor/releases/tag/v1.0.0</link>
+      <link>https://github.com/barnolacesc/dockyard/releases/tag/v1.0.0</link>
       <description>First release</description>
       <enclosure url="https://example.com/app-1.0.0.dmg"
                  sparkle:version="1.0.0"

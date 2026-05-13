@@ -1,7 +1,7 @@
 // ABOUTME: Compile-time checks for types that cross concurrency boundaries.
 // ABOUTME: Ensures the Swift 6 migration keeps key models Sendable.
 
-@testable import FactoryFloor
+@testable import Dockyard
 import XCTest
 
 final class SwiftConcurrencySendableTests: XCTestCase {

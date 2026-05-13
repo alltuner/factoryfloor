@@ -5,21 +5,24 @@ import os
 import SwiftUI
 import WebKit
 
-private let logger = Logger(subsystem: "factoryfloor", category: "surface-cache")
+private let logger = Logger(subsystem: "dockyard", category: "surface-cache")
 
 extension Notification.Name {
-    static let terminalSurfaceClosed = Notification.Name("factoryfloor.terminalSurfaceClosed")
-    static let toggleInfo = Notification.Name("factoryfloor.toggleInfo")
-    static let toggleTerminal = Notification.Name("factoryfloor.toggleTerminal")
-    static let toggleBrowser = Notification.Name("factoryfloor.toggleBrowser")
-    static let focusAgent = Notification.Name("factoryfloor.focusAgent")
-    static let closeTerminal = Notification.Name("factoryfloor.closeTerminal")
-    static let nextTab = Notification.Name("factoryfloor.nextTab")
-    static let prevTab = Notification.Name("factoryfloor.prevTab")
-    static let terminalTitleChanged = Notification.Name("factoryfloor.terminalTitleChanged")
-    static let toggleEditor = Notification.Name("factoryfloor.toggleEditor")
-    static let saveEditor = Notification.Name("factoryfloor.saveEditor")
-    static let saveEditorAs = Notification.Name("factoryfloor.saveEditorAs")
+    static let terminalSurfaceClosed = Notification.Name("dockyard.terminalSurfaceClosed")
+    static let toggleInfo = Notification.Name("dockyard.toggleInfo")
+    static let toggleTerminal = Notification.Name("dockyard.toggleTerminal")
+    static let toggleBrowser = Notification.Name("dockyard.toggleBrowser")
+    static let focusAgent = Notification.Name("dockyard.focusAgent")
+    static let splitAgent = Notification.Name("dockyard.splitAgent")
+    static let splitTerminal = Notification.Name("dockyard.splitTerminal")
+    static let splitBrowser = Notification.Name("dockyard.splitBrowser")
+    static let closeTerminal = Notification.Name("dockyard.closeTerminal")
+    static let nextTab = Notification.Name("dockyard.nextTab")
+    static let prevTab = Notification.Name("dockyard.prevTab")
+    static let terminalTitleChanged = Notification.Name("dockyard.terminalTitleChanged")
+    static let toggleEditor = Notification.Name("dockyard.toggleEditor")
+    static let saveEditor = Notification.Name("dockyard.saveEditor")
+    static let saveEditorAs = Notification.Name("dockyard.saveEditorAs")
 }
 
 enum RestorableWorkspaceTab: String, Codable {
@@ -47,7 +50,7 @@ enum RestorableWorkspaceTab: String, Codable {
 }
 
 enum SetupStateStore {
-    private static let userDefaultsKey = "factoryfloor.setupCompleted"
+    private static let userDefaultsKey = "dockyard.setupCompleted"
 
     static func isCompleted(for workstreamID: UUID) -> Bool {
         guard let data = UserDefaults.standard.data(forKey: userDefaultsKey),
@@ -79,7 +82,7 @@ enum SetupStateStore {
 }
 
 enum WorkspaceStateStore {
-    private static let userDefaultsKey = "factoryfloor.workspaceTabs"
+    private static let userDefaultsKey = "dockyard.workspaceTabs"
 
     static func load(for workstreamID: UUID) -> RestorableWorkspaceTab? {
         guard let data = UserDefaults.standard.data(forKey: userDefaultsKey),
@@ -265,15 +268,17 @@ struct TerminalContainerView: View {
 
     @EnvironmentObject var surfaceCache: TerminalSurfaceCache
     @EnvironmentObject var appEnv: AppEnvironment
-    @AppStorage("factoryfloor.defaultBrowser") private var defaultBrowser: String = ""
-    @AppStorage("factoryfloor.tmuxMode") private var tmuxMode: Bool = false
-    @AppStorage("factoryfloor.agentTeams") private var agentTeams: Bool = false
-    @AppStorage("factoryfloor.autoRenameBranch") private var autoRenameBranch: Bool = false
-    @AppStorage("factoryfloor.allowOutsideWorktree") private var allowOutsideWorktree: Bool = false
-    @AppStorage("factoryfloor.quickActionDebug") private var quickActionDebug: Bool = false
-    @AppStorage("factoryfloor.editorTabActive") private var editorTabActive: Bool = false
-    @AppStorage("factoryfloor.editorFileDirty") private var editorFileDirty: Bool = false
+    @AppStorage("dockyard.codingCLI") private var codingCLIRaw: String = ""
+    @AppStorage("dockyard.defaultBrowser") private var defaultBrowser: String = ""
+    @AppStorage("dockyard.tmuxMode") private var tmuxMode: Bool = false
+    @AppStorage("dockyard.agentTeams") private var agentTeams: Bool = false
+    @AppStorage("dockyard.autoRenameBranch") private var autoRenameBranch: Bool = false
+    @AppStorage("dockyard.allowOutsideWorktree") private var allowOutsideWorktree: Bool = false
+    @AppStorage("dockyard.quickActionDebug") private var quickActionDebug: Bool = false
+    @AppStorage("dockyard.editorTabActive") private var editorTabActive: Bool = false
+    @AppStorage("dockyard.editorFileDirty") private var editorFileDirty: Bool = false
     @State private var activeTab: WorkspaceTab = .info
+    @State private var splitTab: WorkspaceTab?
     @State private var tabs: [WorkspaceTab] = [.info, .agent]
     @State private var terminalCount = 0
     @State private var browserCount = 0
@@ -289,7 +294,7 @@ struct TerminalContainerView: View {
     @State private var directoryWatcher: DirectoryWatcher?
     @State private var refreshGeneration = 0
     @State private var refreshDebounceTask: Task<Void, Never>?
-    @State private var cachedClaudeCommand: String?
+    @State private var cachedAgentCommand: String?
     @State private var draggedCustomTab: WorkspaceTab?
     @StateObject private var portDetector: PortDetector
     @State private var runStoppedManually = false
@@ -329,7 +334,15 @@ struct TerminalContainerView: View {
         _portDetector = StateObject(wrappedValue: PortDetector(workstreamID: workstreamID))
     }
 
-    private var claudeID: UUID {
+    private var selectedCodingCLI: CodingCLI {
+        appEnv.toolStatus.resolvedCodingCLI(storedValue: codingCLIRaw)
+    }
+
+    private var selectedCodingCLIPath: String? {
+        appEnv.toolStatus.path(for: selectedCodingCLI)
+    }
+
+    private var agentID: UUID {
         workstreamID
     }
 
@@ -353,15 +366,24 @@ struct TerminalContainerView: View {
 
     /// Surface IDs that should be rendering for the active tab.
     private var visibleSurfaceIDs: Set<UUID>? {
-        switch activeTab {
-        case .agent:
-            if setupGateState == .running || setupGateState == .failed {
-                return [setupGateID]
+        if activeTab == .info || splitTab == .info { return nil }
+        
+        var ids: Set<UUID> = []
+        let tabsToCheck = splitTab == nil ? [activeTab] : [activeTab, splitTab!]
+        
+        for tab in tabsToCheck {
+            switch tab {
+            case .agent: 
+                if setupGateState == .running || setupGateState == .failed {
+                    ids.insert(setupGateID)
+                } else {
+                    ids.insert(agentID)
+                }
+            case let .terminal(id): ids.insert(id)
+            case .info, .browser, .editor: break
             }
-            return [claudeID]
-        case let .terminal(id): return [id]
-        case .info, .browser, .editor: return []
         }
+        return ids
     }
 
     private var sessionMode: TerminalSessionMode {
@@ -398,65 +420,36 @@ struct TerminalContainerView: View {
         return appEnv.githubPR(for: projectDirectory, branch: branch)
     }
 
-    private func buildClaudeCommand() -> String? {
-        guard let basePath = appEnv.toolStatus.claude.path else { return nil }
-        let sessionID = workstreamID.uuidString.lowercased()
+    private func buildAgentCommand() -> String? {
+        guard let cliPath = selectedCodingCLIPath else { return nil }
 
-        var systemPromptParts: [String] = []
-        if !allowOutsideWorktree {
-            systemPromptParts.append(SystemPrompts.restrictToWorktreePrompt(worktreePath: workingDirectory))
-        }
-        if autoRenameBranch {
-            systemPromptParts.append(SystemPrompts.autoRenameBranchPrompt)
-        }
-        let combinedSystemPrompt = systemPromptParts.isEmpty ? nil : systemPromptParts.joined(separator: "\n\n")
-
-        var resume = CommandBuilder(basePath)
-        resume.option("--resume", sessionID)
-        if appEnv.toolStatus.claudeSupportsSessionName {
-            resume.option("--name", workstreamName)
-        }
-        if useTmux { resume.flag("--teammate-mode"); resume.arg("tmux") }
-        if bypassPermissions { resume.flag("--dangerously-skip-permissions") }
-        if let combinedSystemPrompt {
-            resume.option("--append-system-prompt", combinedSystemPrompt)
-        }
-
-        var fresh = CommandBuilder(basePath)
-        fresh.option("--session-id", sessionID)
-        if appEnv.toolStatus.claudeSupportsSessionName {
-            fresh.option("--name", workstreamName)
-        }
-        if useTmux { fresh.flag("--teammate-mode"); fresh.arg("tmux") }
-        if bypassPermissions { fresh.flag("--dangerously-skip-permissions") }
-        if let combinedSystemPrompt {
-            fresh.option("--append-system-prompt", combinedSystemPrompt)
-        }
-
-        let cmd = CommandBuilder.withFallback(
-            resume.command, fresh.command,
-            message: "Starting new session..."
+        let command = CodingCLICommandBuilder.buildAgentCommand(
+            cli: selectedCodingCLI,
+            cliPath: cliPath,
+            workingDirectory: workingDirectory,
+            projectName: projectName,
+            workstreamName: workstreamName,
+            workstreamID: workstreamID,
+            tmuxPath: appEnv.toolStatus.tmux.path,
+            useTmux: useTmux,
+            bypassPermissions: bypassPermissions,
+            allowOutsideWorktree: allowOutsideWorktree,
+            autoRenameBranch: autoRenameBranch,
+            envVars: envVars,
+            supportsSessionName: appEnv.toolStatus.supportsSessionName(for: selectedCodingCLI)
         )
-
-        let finalCommand: String
-        var intermediates = [resume.command, fresh.command, cmd]
-        if useTmux, let tmuxPath = appEnv.toolStatus.tmux.path {
-            let session = TmuxSession.sessionName(project: projectName, workstream: workstreamName, role: "agent")
-            finalCommand = TmuxSession.wrapCommand(tmuxPath: tmuxPath, sessionName: session, command: cmd, environmentVars: envVars, respawnOnExit: true)
-            intermediates.append(finalCommand)
-        } else {
-            finalCommand = cmd
-        }
 
         LaunchLogger.log(LaunchLogEntry(
             workstreamID: workstreamID,
             event: "agent-start",
-            finalCommand: finalCommand,
-            intermediateCommands: intermediates,
+            finalCommand: command.finalCommand,
+            intermediateCommands: command.intermediateCommands,
             environmentVariables: envVars,
             workingDirectory: workingDirectory,
             toolPaths: LaunchLogEntry.ToolPaths(
+                agentCLI: selectedCodingCLI.rawValue,
                 claude: appEnv.toolStatus.claude.path,
+                codex: appEnv.toolStatus.codex.path,
                 tmux: appEnv.toolStatus.tmux.path,
                 ffRun: RunLauncher.executableURL()?.path
             ),
@@ -470,11 +463,11 @@ struct TerminalContainerView: View {
             shell: CommandBuilder.userShell
         ))
 
-        return finalCommand
+        return command.finalCommand
     }
 
-    private func rebuildClaudeCommand() {
-        cachedClaudeCommand = buildClaudeCommand()
+    private func rebuildAgentCommand() {
+        cachedAgentCommand = buildAgentCommand()
     }
 
     private var fixedTabs: [WorkspaceTab] {
@@ -572,8 +565,8 @@ struct TerminalContainerView: View {
     }
 
     @ViewBuilder
-    private var tabContent: some View {
-        switch activeTab {
+    private func paneContent(for tab: WorkspaceTab) -> some View {
+        switch tab {
         case .info:
             WorkstreamInfoView(
                 workstreamID: workstreamID,
@@ -595,25 +588,25 @@ struct TerminalContainerView: View {
                 setupGateFailedView
             } else if sessionMode == .waitingForTools || appEnv.isDetecting {
                 terminalLoadingView(message: "Checking terminal tools...")
-            } else if appEnv.toolStatus.claude.path == nil {
+            } else if selectedCodingCLIPath == nil {
                 VStack(spacing: 16) {
                     Image(systemName: "sparkle")
                         .font(.system(size: 40))
                         .foregroundStyle(.tertiary)
-                    Text("Claude Code not found")
+                    Text(selectedCodingCLI.missingTitle)
                         .font(.title3)
                         .foregroundStyle(.secondary)
-                    Text("Install Claude Code to use the Coding Agent.")
+                    Text(selectedCodingCLI.missingDescription)
                         .foregroundStyle(.tertiary)
-                    Link("Install Claude Code", destination: URL(string: "https://docs.anthropic.com/en/docs/claude-code/overview")!)
+                    Link(selectedCodingCLI.installLabel, destination: selectedCodingCLI.installURL)
                         .buttonStyle(.bordered)
                 }
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
-            } else if let claudeCommand = cachedClaudeCommand {
+            } else if let agentCommand = cachedAgentCommand {
                 SingleTerminalView(
-                    surfaceID: claudeID,
+                    surfaceID: agentID,
                     workingDirectory: workingDirectory,
-                    command: claudeCommand,
+                    command: agentCommand,
                     isFocused: true,
                     environmentVars: envVars
                 )
@@ -665,13 +658,18 @@ struct TerminalContainerView: View {
 
     private var mainContent: some View {
         mainLayout
-            .onChange(of: tmuxMode) { rebuildClaudeCommand() }
-            .onChange(of: bypassPermissions) { rebuildClaudeCommand() }
-            .onChange(of: autoRenameBranch) { rebuildClaudeCommand() }
-            .onChange(of: allowOutsideWorktree) { rebuildClaudeCommand() }
-            .onChange(of: workstreamName) { rebuildClaudeCommand() }
+            .onChange(of: tmuxMode) { rebuildAgentCommand() }
+            .onChange(of: bypassPermissions) { rebuildAgentCommand() }
+            .onChange(of: autoRenameBranch) { rebuildAgentCommand() }
+            .onChange(of: allowOutsideWorktree) { rebuildAgentCommand() }
+            .onChange(of: workstreamName) { rebuildAgentCommand() }
+            .onChange(of: codingCLIRaw) {
+                surfaceCache.removeSurface(for: agentID)
+                rebuildAgentCommand()
+                preloadSurfaces()
+            }
             .onChange(of: appEnv.isDetecting) {
-                rebuildClaudeCommand()
+                rebuildAgentCommand()
                 if isActive { preloadSurfaces() }
             }
             .onReceive(NotificationCenter.default.publisher(for: .toggleInfo)) { _ in
@@ -702,13 +700,24 @@ struct TerminalContainerView: View {
                 guard isActive else { return }
                 if activeTab.isCloseable { closeTab(activeTab) }
             }
+            .onReceive(NotificationCenter.default.publisher(for: .splitAgent)) { _ in toggleSplit(for: .agent) }
+            .onReceive(NotificationCenter.default.publisher(for: .splitTerminal)) { _ in toggleSplit(for: .terminal) }
+            .onReceive(NotificationCenter.default.publisher(for: .splitBrowser)) { _ in toggleSplit(for: .browser) }
     }
 
     private var mainLayout: some View {
         VStack(spacing: 0) {
             tabBar
             Divider()
-            tabContent
+            HStack(spacing: 0) {
+                paneContent(for: activeTab)
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+                if let splitTab {
+                    Divider()
+                    paneContent(for: splitTab)
+                        .frame(maxWidth: .infinity, maxHeight: .infinity)
+                }
+            }
             if quickActionDebug {
                 Divider()
                 QuickActionDebugView(runner: quickActionRunner)
@@ -730,9 +739,33 @@ struct TerminalContainerView: View {
                 editorTabActive = isEditorTabActive
                 editorFileDirty = isActiveEditorDirty
             }
+            appEnv.refreshWorktreeState(for: workingDirectory, projectDirectory: projectDirectory)
+            cachedAgentCommand = buildAgentCommand()
+            scriptConfig = ScriptConfig.load(from: projectDirectory)
+            surfaceCache.respawnableIDs.insert(agentID)
+            if let snapshot = surfaceCache.restoreTabSnapshot(for: workstreamID) {
+                tabs = snapshot.tabs
+                terminalCount = snapshot.terminalCount
+                browserCount = snapshot.browserCount
+                activeTab = snapshot.activeTab
+                browserTitles = snapshot.browserTitles
+                terminalTitles = snapshot.terminalTitles
+                if scriptConfig.hasAnyScript && !tabs.contains(.info) {
+                    tabs.insert(.info, at: 0)
+                }
+            } else {
+                if scriptConfig.hasAnyScript && !tabs.contains(.info) {
+                    tabs.insert(.info, at: 0)
+                }
+                activeTab = initialTabState.activeTab
+            }
             if tabs.contains(where: { if case .editor = $0 { return true } else { return false } }) {
                 startFileTreeWatcherIfNeeded()
             }
+            splitTab = surfaceCache.splitTabs[workstreamID]
+        }
+        .onChange(of: splitTab) { _, newValue in
+            surfaceCache.splitTabs[workstreamID] = newValue
         }
         .onDisappear {
             if isActive {
@@ -910,6 +943,52 @@ struct TerminalContainerView: View {
             return "info"
         case .agent:
             return "agent"
+        }
+    }
+
+
+    private enum SplitTargetType {
+        case agent, terminal, browser
+    }
+
+    private func toggleSplit(for tabType: SplitTargetType) {
+        var target: WorkspaceTab?
+        switch tabType {
+        case .agent:
+            target = .agent
+        case .terminal:
+            if let lastTerminal = tabs.last(where: { if case .terminal = $0 { return true }; return false }) {
+                target = lastTerminal
+            } else {
+                terminalCount += 1
+                let id = derivedUUID(from: workstreamID, salt: "terminal-\(terminalCount)")
+                target = .terminal(id)
+                tabs.append(target!)
+                saveTabSnapshot()
+            }
+        case .browser:
+            if let lastBrowser = tabs.last(where: { if case .browser = $0 { return true }; return false }) {
+                target = lastBrowser
+            } else {
+                browserCount += 1
+                let id = derivedUUID(from: workstreamID, salt: "browser-\(browserCount)")
+                target = .browser(id)
+                tabs.append(target!)
+                saveTabSnapshot()
+            }
+        }
+
+        guard let target else { return }
+
+        if splitTab == target {
+            splitTab = nil
+        } else if activeTab == target {
+            if let split = splitTab {
+                activeTab = split
+                splitTab = nil
+            }
+        } else {
+            splitTab = target
         }
     }
 
@@ -1146,12 +1225,12 @@ struct TerminalContainerView: View {
             }
         }
         appEnv.refreshWorktreeState(for: workingDirectory, projectDirectory: projectDirectory)
-        cachedClaudeCommand = buildClaudeCommand()
+        cachedAgentCommand = buildAgentCommand()
         if scriptConfig.setup != nil, !SetupStateStore.isCompleted(for: workstreamID) {
             setupGateState = .running
         } else {
             setupGateState = .notNeeded
-            surfaceCache.respawnableIDs.insert(claudeID)
+            surfaceCache.respawnableIDs.insert(agentID)
         }
         preloadSurfaces()
         // Eagerly create the Monaco bridge so it's ready when the user opens
@@ -1180,9 +1259,9 @@ struct TerminalContainerView: View {
             }
         } else {
             // Agent surface
-            if let cmd = cachedClaudeCommand {
+            if let cmd = cachedAgentCommand {
                 _ = surfaceCache.surface(
-                    for: claudeID,
+                    for: agentID,
                     app: app,
                     workingDirectory: workingDirectory,
                     command: cmd,
@@ -1213,6 +1292,7 @@ struct TerminalContainerView: View {
             projectDirectory: projectDirectory,
             workingDirectory: workingDirectory,
             port: workstreamPort,
+            codingCLI: selectedCodingCLI,
             agentTeams: agentTeams,
             defaultBranch: defaultBranch,
             scriptSource: scriptConfig.source
@@ -1285,7 +1365,7 @@ struct TerminalContainerView: View {
         SetupStateStore.markCompleted(for: workstreamID)
         surfaceCache.removeSurface(for: setupGateID)
         setupGateState = .completed
-        surfaceCache.respawnableIDs.insert(claudeID)
+        surfaceCache.respawnableIDs.insert(agentID)
         preloadSurfaces()
         surfaceCache.updateOcclusion(visibleSurfaceIDs: visibleSurfaceIDs)
     }
@@ -1400,7 +1480,8 @@ private struct WorkspaceTabDropDelegate: DropDelegate {
 
 private struct GitHubActionMenu: View {
     @ObservedObject var runner: QuickActionRunner
-    let claudePath: String?
+    let codingCLI: CodingCLI
+    let codingCLIPath: String?
     let ghPath: String?
     let workingDirectory: String
     let branchName: String?
@@ -1491,8 +1572,8 @@ private struct GitHubActionMenu: View {
 
     private func disabledReason(for action: QuickAction) -> String? {
         if action.usesLLM {
-            if claudePath == nil {
-                return NSLocalizedString("Claude Code is not installed.", comment: "")
+            if codingCLIPath == nil {
+                return codingCLI.quickActionNotInstalledMessage
             }
             if !bypassPermissions {
                 return NSLocalizedString("Enable \"Bypass permission prompts\" in Settings.", comment: "")
@@ -1508,7 +1589,8 @@ private struct GitHubActionMenu: View {
         guard disabledReason(for: action) == nil else { return }
         runner.run(
             action: action,
-            claudePath: claudePath,
+            codingCLI: codingCLI,
+            codingCLIPath: codingCLIPath,
             ghPath: ghPath,
             workingDirectory: workingDirectory,
             branchName: branchName
@@ -1934,7 +2016,7 @@ private struct QuickActionDebugView: View {
 // MARK: - Surface cache
 
 extension Notification.Name {
-    static let terminalTabExited = Notification.Name("factoryfloor.terminalTabExited")
+    static let terminalTabExited = Notification.Name("dockyard.terminalTabExited")
 }
 
 @MainActor
@@ -1952,6 +2034,7 @@ final class TerminalSurfaceCache: ObservableObject {
     private(set) var failedSurfaces: [UUID: String] = [:]
     /// Tracks when each surface was created, for detecting immediate process death.
     private var creationTimes: [UUID: Date] = [:]
+    var splitTabs: [UUID: WorkspaceTab] = [:]
     /// Surfaces that died within this interval after creation are treated as launch failures.
     private static let healthCheckWindow: TimeInterval = 2.0
 

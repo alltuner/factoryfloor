@@ -1,7 +1,7 @@
 // ABOUTME: Tests for browser web view caching in TerminalSurfaceCache.
 // ABOUTME: Verifies cached WKWebView instances are reused across tab switches.
 
-@testable import FactoryFloor
+@testable import Dockyard
 import WebKit
 import XCTest
 
