@@ -55,9 +55,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCent
 
         // Contextual shortcuts via key monitor (avoids cluttering the menu bar)
         NSEvent.addLocalMonitorForEvents(matching: .keyDown) { event in
-            guard event.modifierFlags.intersection(.deviceIndependentFlagsMask) == .command,
-                  let chars = event.charactersIgnoringModifiers
-            else { return event }
+            let flags = event.modifierFlags.intersection(.deviceIndependentFlagsMask).subtracting([.numericPad, .function])
+            guard flags == .command, let chars = event.charactersIgnoringModifiers else { return event }
             if let digit = chars.first?.wholeNumberValue, (1 ... 9).contains(digit) {
                 NotificationCenter.default.post(name: .switchByNumber, object: digit)
                 return nil

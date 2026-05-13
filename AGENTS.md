@@ -170,6 +170,9 @@ When adding, removing, or changing keyboard shortcuts:
 5. Update website shortcuts section
 
 Current shortcuts:
+- **Cmd+N**: New workstream or project
+- **Cmd+Shift+N**: New project
+- **Cmd+,**: Settings
 - **Cmd+1**: Info
 - **Cmd+2**: Coding Agent
 - **Cmd+3-9**: Switch tab (all tabs in display order)
