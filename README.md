@@ -155,7 +155,7 @@ Every workstream terminal has access to:
 
 ### Supported Languages
 
-English, Catalan, Spanish, Swedish.
+English, Catalan, German, Spanish, Swedish.
 
 ---
 

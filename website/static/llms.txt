@@ -12,7 +12,7 @@ Key capabilities:
 - Embedded browser: WKWebView with automatic port detection from run scripts
 - GitHub integration: repo info, open PRs, and branch PR status via the `gh` CLI
 - Keyboard-first: every action has a shortcut
-- Localized in English, Catalan, Spanish, and Swedish
+- Localized in English, Catalan, German, Spanish, and Swedish
 
 ## Installation
 
@@ -61,22 +61,32 @@ Global:
 - `Cmd+Shift+N` — new project
 - `Cmd+,` — settings
 - `Cmd+/` — help
+- `Cmd+Option+S` — toggle sidebar
 
 Workstream:
 
+- `Cmd+1` — Info
+- `Cmd+2` — Coding Agent
+- `Cmd+3-9` — switch tab
+- `Cmd+Shift+[` / `]` — cycle tabs
 - `Cmd+Return` — focus Coding Agent
-- `Cmd+I` — info panel
-- `Cmd+E` — environment
 - `Cmd+T` — new terminal
 - `Cmd+B` — new browser
+- `Cmd+O` — new editor
+- `Cmd+S` — save (editor)
+- `Cmd+Shift+S` — save as (editor)
 - `Cmd+W` — close tab
+- `Cmd+Shift+W` — archive workstream
 - `Cmd+L` — address bar (browser)
+- `Cmd+Shift+Return` — start/rerun
+
+Navigation:
+
+- `Cmd+[` / `]` — cycle workstreams
+- `Cmd+Up/Down` — cycle projects
 - `Cmd+0` — back to project
-- `Cmd+1` — Info, `Cmd+2` — Coding Agent, `Cmd+3-9` — switch tab
-- `Ctrl+1-9` — switch workstream
-- `Cmd+Shift+[` / `]` — cycle tabs
-- `Ctrl+Shift+R` — rebuild setup
-- `Ctrl+Shift+S` — start/rerun
+- `Cmd+Option+B` — open in external browser
+- `Cmd+Option+T` — open in external terminal
 
 ## Links
 

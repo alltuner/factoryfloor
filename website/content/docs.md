@@ -122,7 +122,7 @@ Terminals are GPU-rendered via [Ghostty](https://ghostty.org). They're fast.
 
 You can drag files and text onto the terminal. Because sometimes the mouse is fine, actually.
 
-**⌘Shift+E** opens the workstream directory in your preferred external terminal app.
+**⌘Option+T** opens the workstream directory in your preferred external terminal app.
 
 ### The Browser
 
@@ -135,7 +135,7 @@ When your run script starts a dev server, Factory Floor detects the listening po
 #### Navigation
 
 - **⌘L** — focus the address bar
-- **⌘Shift+O** — open current URL in your external browser
+- **⌘Option+B** — open current URL in your external browser
 - **⌘Click** — opens links in your external browser
 
 The browser shows a connection error page with a retry button if the server isn't ready yet. It'll auto-navigate once the port is detected.
@@ -188,6 +188,11 @@ Factory Floor is keyboard-first. Here's everything.
 | ⌘↑ | Previous project |
 | ⌘↓ | Next project |
 | ⌘0 | Back to project |
+
+#### External Apps
+
+| Shortcut | Action |
+|----------|--------|
 | ⌘Option+B | Open in external browser |
 | ⌘Option+T | Open in external terminal |
 
@@ -256,7 +261,7 @@ Open with **⌘,** or click the gear icon.
 - **Branch prefix** — prefix for workstream branches (default: `ff`)
 - **Symlink .env files** — auto-symlink `.env` and `.env.local` to worktrees
 - **Theme** — System, Light, or Dark
-- **Language** — System default, English, Catalan, Spanish, or Swedish
+- **Language** — System default, English, Catalan, German, Spanish, or Swedish
 - **Confirm before quitting** — asks before closing with active workstreams
 - **Launch at login** — starts Factory Floor on boot
 
@@ -269,8 +274,8 @@ Open with **⌘,** or click the gear icon.
 
 #### Apps
 
-- **External Terminal** — which terminal app to open with ⌘Shift+E
-- **External Browser** — which browser for ⌘Shift+O and ⌘Click
+- **External Terminal** — which terminal app to open with ⌘Option+T
+- **External Browser** — which browser for ⌘Option+B and ⌘Click
 
 #### Advanced
 
