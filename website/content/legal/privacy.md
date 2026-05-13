@@ -6,22 +6,22 @@ translationKey: privacy
 
 ## The short version
 
-Factory Floor does not collect personal data. Your code stays on your machine. We collect anonymous crash reports to improve stability.
+Dockyard does not collect personal data. Your code stays on your machine. We collect anonymous crash reports to improve stability.
 
 ## The application
 
-Factory Floor is a native macOS application that runs entirely on your computer. It does not:
+Dockyard is a native macOS application that runs entirely on your computer. It does not:
 
 - Send your code, project contents, or terminal output to any server
 - Require an account or registration
 - Track your behavior or activity
 - Access files outside your project directories
 
-All project data (names, directories, workstream configurations) is stored locally on your machine in `~/.config/factoryfloor/`.
+All project data (names, directories, workstream configurations) is stored locally on your machine in `~/.config/dockyard/`.
 
 ## Crash reporting
 
-Factory Floor uses [Sentry](https://sentry.io/) to collect anonymous crash reports. This helps us identify and fix stability issues, especially in the embedded terminal engine.
+Dockyard uses [Sentry](https://sentry.io/) to collect anonymous crash reports. This helps us identify and fix stability issues, especially in the embedded terminal engine.
 
 **What is collected:**
 
@@ -41,17 +41,18 @@ Crash data is processed by Sentry in the EU (Frankfurt). You can review [Sentry'
 
 ## Third-party services
 
-Factory Floor integrates with tools you install and configure yourself:
+Dockyard integrates with tools you install and configure yourself:
 
-- **Claude Code** (Anthropic) - when using the Coding Agent, your code and conversation context are sent to Anthropic's API. This is a direct connection between your machine and Anthropic, subject to [Anthropic's privacy policy](https://www.anthropic.com/privacy). Factory Floor does not intercept, store, or relay this data.
+- **Claude Code** (Anthropic) - when using the Coding Agent, your code and conversation context are sent to Anthropic's API. This is a direct connection between your machine and Anthropic, subject to [Anthropic's privacy policy](https://www.anthropic.com/privacy). Dockyard does not intercept, store, or relay this data.
+- **Codex** (OpenAI) - when using Codex in the Coding Agent tab, your code and conversation context are sent to OpenAI's API. This is a direct connection between your machine and OpenAI, subject to [OpenAI's privacy policy](https://openai.com/policies/privacy-policy/). Dockyard does not intercept, store, or relay this data.
 - **GitHub CLI** - subject to [GitHub's privacy policy](https://docs.github.com/en/site-policy/privacy-policies/github-general-privacy-statement)
 - **Ghostty** - the embedded terminal engine runs locally with no network activity
 
-Factory Floor does not act as an intermediary for these services. Your API keys and credentials are managed by each tool directly.
+Dockyard does not act as an intermediary for these services. Your API keys and credentials are managed by each tool directly.
 
 ## This website
 
-The Factory Floor website (factory-floor.com) uses [Umami](https://umami.is/) for privacy-friendly analytics. Umami does not use cookies, does not collect personal data, and complies with GDPR, CCPA, and PECR. All data is aggregated and anonymous.
+The Dockyard website (francesc.barnola.net) uses [Umami](https://umami.is/) for privacy-friendly analytics. Umami does not use cookies, does not collect personal data, and complies with GDPR, CCPA, and PECR. All data is aggregated and anonymous.
 
 No other tracking scripts, advertising networks, or third-party analytics are used on this website.
 

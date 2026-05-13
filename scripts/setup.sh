@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# ABOUTME: Workstream setup for Factory Floor development.
+# ABOUTME: Workstream setup for Dockyard development.
 # ABOUTME: Initializes ghostty submodule, symlinks build artifacts, and runs a debug build.
 set -euo pipefail
 

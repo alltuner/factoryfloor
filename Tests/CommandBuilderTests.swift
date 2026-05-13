@@ -1,7 +1,7 @@
 // ABOUTME: Tests for CommandBuilder shell command composition and quoting.
 // ABOUTME: Validates escaping of special characters, spaces, quotes, and nested commands.
 
-@testable import FactoryFloor
+@testable import Dockyard
 import XCTest
 
 final class CommandBuilderTests: XCTestCase {
@@ -179,6 +179,33 @@ final class CommandBuilderTests: XCTestCase {
         XCTAssertTrue(result.contains("cmd1 || cmd2"))
     }
 
+    func testResolvedUserShellPrefersExecutableEnvironmentShell() {
+        let shell = CommandBuilder.resolvedUserShell(
+            environment: ["SHELL": "/opt/homebrew/bin/fish"],
+            isExecutable: { $0 == "/opt/homebrew/bin/fish" }
+        )
+
+        XCTAssertEqual(shell, "/opt/homebrew/bin/fish")
+    }
+
+    func testResolvedUserShellFallsBackWhenEnvironmentShellIsInvalid() {
+        let shell = CommandBuilder.resolvedUserShell(
+            environment: ["SHELL": "/usr/bin/zsh"],
+            isExecutable: { $0 == "/bin/zsh" }
+        )
+
+        XCTAssertEqual(shell, "/bin/zsh")
+    }
+
+    func testResolvedUserShellFallsBackToBashWhenZshUnavailable() {
+        let shell = CommandBuilder.resolvedUserShell(
+            environment: [:],
+            isExecutable: { $0 == "/bin/bash" }
+        )
+
+        XCTAssertEqual(shell, "/bin/bash")
+    }
+
     // MARK: - Shell syntax validation (integration tests)
 
     // These tests invoke real shell binaries to verify generated commands parse correctly.
@@ -249,5 +276,66 @@ final class CommandBuilderTests: XCTestCase {
         XCTAssertTrue(result.contains("--append-system-prompt"))
         // Backticks and angle brackets should be quoted
         XCTAssertTrue(result.contains("'"))
+    }
+
+    func testResolvedCodingCLIPrefersStoredValue() {
+        var status = ToolStatus()
+        status.claude = .found("/usr/local/bin/claude")
+        status.codex = .found("/usr/local/bin/codex")
+
+        XCTAssertEqual(status.resolvedCodingCLI(storedValue: "codex"), .codex)
+    }
+
+    func testResolvedCodingCLIAutoSelectsCodexWhenClaudeMissing() {
+        var status = ToolStatus()
+        status.codex = .found("/usr/local/bin/codex")
+
+        XCTAssertEqual(status.resolvedCodingCLI(storedValue: ""), .codex)
+    }
+
+    func testBuildCodexAgentCommandUsesResumeLastAndSandbox() {
+        let workstreamID = UUID(uuidString: "12345678-1234-1234-1234-123456789abc")!
+        let command = CodingCLICommandBuilder.buildAgentCommand(
+            cli: .codex,
+            cliPath: "/usr/local/bin/codex",
+            workingDirectory: "/tmp/worktree",
+            projectName: "dockyard",
+            workstreamName: "switch-cli",
+            workstreamID: workstreamID,
+            tmuxPath: nil,
+            useTmux: false,
+            bypassPermissions: true,
+            allowOutsideWorktree: false,
+            autoRenameBranch: true,
+            envVars: [:],
+            supportsSessionName: false
+        )
+
+        XCTAssertEqual(
+            command.intermediateCommands[0],
+            "/usr/local/bin/codex resume --last -C /tmp/worktree --sandbox workspace-write --ask-for-approval never"
+        )
+        XCTAssertEqual(
+            command.intermediateCommands[1],
+            "/usr/local/bin/codex -C /tmp/worktree --sandbox workspace-write --ask-for-approval never"
+        )
+        XCTAssertTrue(command.finalCommand.contains("codex resume --last"))
+        XCTAssertTrue(command.finalCommand.contains("Starting new session..."))
+    }
+
+    func testBuildCodexQuickActionCommandUsesExec() {
+        let command = CodingCLICommandBuilder.buildQuickActionCommand(
+            cli: .codex,
+            cliPath: "/usr/local/bin/codex",
+            prompt: "do thing",
+            workingDirectory: "/tmp/worktree"
+        )
+
+        XCTAssertEqual(command.shell, CommandBuilder.userShell)
+        XCTAssertEqual(
+            command.arguments,
+            ["-lic", "/usr/local/bin/codex exec --json --dangerously-bypass-approvals-and-sandbox -C /tmp/worktree 'do thing'"]
+        )
+        XCTAssertFalse(command.parseJSON)
     }
 }

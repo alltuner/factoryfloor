@@ -7,7 +7,7 @@ import Sparkle
 import SwiftUI
 import UserNotifications
 
-private let logger = Logger(subsystem: "factoryfloor", category: "app")
+private let logger = Logger(subsystem: "dockyard", category: "app")
 
 protocol NotificationAuthorizationRequesting {
     func requestAuthorization(
@@ -19,21 +19,21 @@ protocol NotificationAuthorizationRequesting {
 extension UNUserNotificationCenter: NotificationAuthorizationRequesting {}
 
 extension Notification.Name {
-    static let openDirectory = Notification.Name("factoryfloor.openDirectory")
-    static let openSettings = Notification.Name("factoryfloor.openSettings")
-    static let openHelp = Notification.Name("factoryfloor.openHelp")
-    static let switchToProject = Notification.Name("factoryfloor.switchToProject")
-    static let toggleSidebar = Notification.Name("factoryfloor.toggleSidebar")
-    static let switchByNumber = Notification.Name("factoryfloor.switchByNumber") // object: Int (1-9)
-    static let dismissOverlay = Notification.Name("factoryfloor.dismissOverlay")
-    static let openExternalBrowser = Notification.Name("factoryfloor.openExternalBrowser")
-    static let clearProjects = Notification.Name("factoryfloor.clearProjects")
-    static let openExternalTerminal = Notification.Name("factoryfloor.openExternalTerminal")
-    static let nextWorkstream = Notification.Name("factoryfloor.nextWorkstream")
-    static let prevWorkstream = Notification.Name("factoryfloor.prevWorkstream")
-    static let nextProject = Notification.Name("factoryfloor.nextProject")
-    static let prevProject = Notification.Name("factoryfloor.prevProject")
-    static let archiveWorkstream = Notification.Name("factoryfloor.archiveWorkstream")
+    static let openDirectory = Notification.Name("dockyard.openDirectory")
+    static let openSettings = Notification.Name("dockyard.openSettings")
+    static let openHelp = Notification.Name("dockyard.openHelp")
+    static let switchToProject = Notification.Name("dockyard.switchToProject")
+    static let toggleSidebar = Notification.Name("dockyard.toggleSidebar")
+    static let switchByNumber = Notification.Name("dockyard.switchByNumber") // object: Int (1-9)
+    static let dismissOverlay = Notification.Name("dockyard.dismissOverlay")
+    static let openExternalBrowser = Notification.Name("dockyard.openExternalBrowser")
+    static let clearProjects = Notification.Name("dockyard.clearProjects")
+    static let openExternalTerminal = Notification.Name("dockyard.openExternalTerminal")
+    static let nextWorkstream = Notification.Name("dockyard.nextWorkstream")
+    static let prevWorkstream = Notification.Name("dockyard.prevWorkstream")
+    static let nextProject = Notification.Name("dockyard.nextProject")
+    static let prevProject = Notification.Name("dockyard.prevProject")
+    static let archiveWorkstream = Notification.Name("dockyard.archiveWorkstream")
 }
 
 @MainActor
@@ -47,7 +47,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCent
         guard !isRunningXCTest() else { return }
 
         // Debug settings should not persist across launches
-        UserDefaults.standard.set(false, forKey: "factoryfloor.quickActionDebug")
+        UserDefaults.standard.set(false, forKey: "dockyard.quickActionDebug")
 
         let center = UNUserNotificationCenter.current()
         center.delegate = self
@@ -55,9 +55,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCent
 
         // Contextual shortcuts via key monitor (avoids cluttering the menu bar)
         NSEvent.addLocalMonitorForEvents(matching: .keyDown) { event in
-            guard event.modifierFlags.intersection(.deviceIndependentFlagsMask) == .command,
-                  let chars = event.charactersIgnoringModifiers
-            else { return event }
+            let flags = event.modifierFlags.intersection(.deviceIndependentFlagsMask).subtracting([.numericPad, .function])
+            guard flags == .command, let chars = event.charactersIgnoringModifiers else { return event }
             if let digit = chars.first?.wholeNumberValue, (1 ... 9).contains(digit) {
                 NotificationCenter.default.post(name: .switchByNumber, object: digit)
                 return nil
@@ -126,10 +125,17 @@ final class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCent
 
     func applicationWillTerminate(_: Notification) {
         guard !isRunningXCTest() else { return }
+        let tmuxPath = ToolStatus.detect().tmux.path
+        if let tmuxPath {
+            // Run kill-server asynchronously so it doesn't block the main thread and sluggishly delay app closing.
+            DispatchQueue.global(qos: .userInitiated).async {
+                TmuxSession.killAllSessions(tmuxPath: tmuxPath)
+            }
+        }
     }
 
     func applicationShouldTerminate(_: NSApplication) -> NSApplication.TerminateReply {
-        let confirmQuit = UserDefaults.standard.object(forKey: "factoryfloor.confirmQuit") as? Bool ?? true
+        let confirmQuit = UserDefaults.standard.object(forKey: "dockyard.confirmQuit") as? Bool ?? true
         guard confirmQuit else { return .terminateNow }
         let projects = ProjectStore.load()
         let hasWorkstreams = projects.contains { !$0.workstreams.isEmpty }
@@ -137,7 +143,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCent
         guard let window = NSApp.keyWindow ?? NSApp.mainWindow else { return .terminateNow }
 
         let alert = NSAlert()
-        alert.messageText = NSLocalizedString("Quit Factory Floor?", comment: "")
+        alert.messageText = NSLocalizedString("Quit Dockyard?", comment: "")
         alert.informativeText = NSLocalizedString("Active workstreams will be stopped.", comment: "")
         alert.alertStyle = .warning
         alert.addButton(withTitle: NSLocalizedString("Quit", comment: ""))
@@ -151,17 +157,17 @@ final class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCent
 }
 
 @main
-struct FF2App: App {
+struct DockyardApp: App {
     @NSApplicationDelegateAdaptor(AppDelegate.self) var appDelegate
     @StateObject private var updater = Updater()
-    @AppStorage("factoryfloor.editorTabActive") private var isEditorActive = false
-    @AppStorage("factoryfloor.editorFileDirty") private var isEditorDirty = false
+    @AppStorage("dockyard.editorTabActive") private var isEditorActive = false
+    @AppStorage("dockyard.editorFileDirty") private var isEditorDirty = false
     @State private var pendingURLDirectory: String?
 
     init() {
         guard !isRunningXCTest() else { return }
 
-        let crashReportingEnabled = UserDefaults.standard.object(forKey: "factoryfloor.crashReportingEnabled") as? Bool ?? true
+        let crashReportingEnabled = UserDefaults.standard.object(forKey: "dockyard.crashReportingEnabled") as? Bool ?? true
         if crashReportingEnabled {
             SentrySDK.start { options in
                 options.dsn = "https://45310bb703b438b38aee17e84e10d32e@o4511060356956160.ingest.de.sentry.io/4511060370391120"
@@ -180,7 +186,7 @@ struct FF2App: App {
 
         guard ghostty_init(UInt(CommandLine.argc), CommandLine.unsafeArgv) == GHOSTTY_SUCCESS else {
             let alert = NSAlert()
-            alert.messageText = NSLocalizedString("Factory Floor cannot start", comment: "")
+            alert.messageText = NSLocalizedString("Dockyard cannot start", comment: "")
             alert.informativeText = NSLocalizedString(
                 "The terminal engine (Ghostty) failed to initialize. This may indicate a system compatibility issue.",
                 comment: ""
@@ -318,10 +324,30 @@ struct FF2App: App {
                 }
                 .keyboardShortcut("t", modifiers: .command)
 
+                Button("Split Terminal") {
+                    NotificationCenter.default.post(name: .splitTerminal, object: nil)
+                }
+                .keyboardShortcut("t", modifiers: [.command, .shift])
+
                 Button("New Browser") {
                     NotificationCenter.default.post(name: .toggleBrowser, object: nil)
                 }
                 .keyboardShortcut("b", modifiers: .command)
+
+                Button("Split Browser") {
+                    NotificationCenter.default.post(name: .splitBrowser, object: nil)
+                }
+                .keyboardShortcut("b", modifiers: [.command, .shift])
+
+                Button("New Editor") {
+                    NotificationCenter.default.post(name: .toggleEditor, object: nil)
+                }
+                .keyboardShortcut("o", modifiers: .command)
+
+                Button("Split Browser") {
+                    NotificationCenter.default.post(name: .splitBrowser, object: nil)
+                }
+                .keyboardShortcut("b", modifiers: [.command, .shift])
 
                 Button("New Editor") {
                     NotificationCenter.default.post(name: .toggleEditor, object: nil)
@@ -345,8 +371,23 @@ struct FF2App: App {
                 }
                 .keyboardShortcut("[", modifiers: [.command, .shift])
 
+                Button("Reload") {
+                    NotificationCenter.default.post(name: .browserReload, object: nil)
+                }
+                .keyboardShortcut("r", modifiers: .command)
+
+                Button("Hard Reload") {
+                    NotificationCenter.default.post(name: .browserHardReload, object: nil)
+                }
+                .keyboardShortcut("r", modifiers: [.command, .shift])
+
                 Button("Back to Project") {
                     NotificationCenter.default.post(name: .switchToProject, object: nil)
+                }
+                .keyboardShortcut("[", modifiers: [.command, .shift])
+
+                Button("Address Bar") {
+                    NotificationCenter.default.post(name: .focusAddressBar, object: nil)
                 }
                 .keyboardShortcut("0", modifiers: .command)
 
@@ -373,6 +414,11 @@ struct FF2App: App {
                 .keyboardShortcut(.upArrow, modifiers: .command)
 
                 Divider()
+
+                Button("Split Agent") {
+                    NotificationCenter.default.post(name: .splitAgent, object: nil)
+                }
+                .keyboardShortcut(.return, modifiers: [.command, .shift])
 
                 Button("Open in External Browser") {
                     NotificationCenter.default.post(name: .openExternalBrowser, object: nil)

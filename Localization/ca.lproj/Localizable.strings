@@ -109,13 +109,13 @@
 "Symlink .env and .env.local from the main repository into new worktrees." = "Crea enllaços simbòlics de .env i .env.local del repositori principal als nous arbres de treball.";
 
 /* Quit confirmation */
-"Quit Factory Floor?" = "Sortir de Factory Floor?";
+"Quit Dockyard?" = "Sortir de Dockyard?";
 "Active workstreams will be stopped." = "Els fluxos de treball actius s'aturaran.";
 "Quit" = "Sortir";
 "Confirm before quitting" = "Confirma abans de sortir";
 "Show a confirmation dialog when quitting with active workstreams." = "Mostra un diàleg de confirmació en sortir amb fluxos de treball actius.";
 "Launch at login" = "Obre en iniciar sessió";
-"Automatically open Factory Floor when you log in." = "Obre Factory Floor automàticament en iniciar sessió.";
+"Automatically open Dockyard when you log in." = "Obre Dockyard automàticament en iniciar sessió.";
 "Detailed logging" = "Registre detallat";
 "Log setup, run, and teardown script output to files for debugging." = "Registra la sortida dels scripts de configuració, execució i desmuntatge en fitxers per a depuració.";
 "Open Logs Directory" = "Obre el directori de registres";
@@ -138,16 +138,21 @@
 "Dark" = "Fosc";
 
 /* Settings - Coding Agent */
+"Claude Code" = "Claude Code";
+"Codex" = "Codex";
+"Coding CLI" = "CLI de codi";
 "Agent Teams" = "Equips d'agents";
 "Enables experimental multi-agent coordination. Agents can spawn teammates, delegate tasks, and collaborate across workstreams." = "Activa la coordinació experimental multi-agent. Els agents poden crear companys d'equip, delegar tasques i col·laborar entre fluxos de treball.";
+"Agent Teams is only available with Claude Code." = "Els equips d'agents només estan disponibles amb Claude Code.";
 "Auto-rename branch" = "Canvia el nom de la branca automàticament";
 "On the first request, the agent renames the branch to match the task and writes a short description visible in the sidebar." = "A la primera sol·licitud, l'agent canvia el nom de la branca per coincidir amb la tasca i escriu una breu descripció visible a la barra lateral.";
+"Auto-rename branch is only available with Claude Code." = "El canvi automàtic del nom de la branca només està disponible amb Claude Code.";
 "External Browser" = "Navegador extern";
 
 /* Settings - Advanced */
 "Advanced" = "Avançat";
 "Usage analytics" = "Analítiques d'ús";
-"Send anonymous usage data to help improve Factory Floor. We collect: app version, build type, macOS version, locale, and screen resolution. No project names, file contents, or personal data." = "Envia dades d'ús anònimes per ajudar a millorar Factory Floor. Recollim: versió de l'aplicació, tipus de compilació, versió de macOS, idioma i resolució de pantalla. Cap nom de projecte, contingut de fitxers ni dades personals.";
+"Send anonymous usage data to help improve Dockyard. We collect: app version, build type, macOS version, locale, and screen resolution. No project names, file contents, or personal data." = "Envia dades d'ús anònimes per ajudar a millorar Dockyard. Recollim: versió de l'aplicació, tipus de compilació, versió de macOS, idioma i resolució de pantalla. Cap nom de projecte, contingut de fitxers ni dades personals.";
 "Crash reports" = "Informes d'errors";
 "Send crash reports and performance data. Requires restart to take effect." = "Envia informes d'errors i dades de rendiment. Requereix reiniciar l'aplicació.";
 "Bleeding edge" = "Últimes novetats";
@@ -196,6 +201,9 @@
 "Claude Code not found" = "Claude Code no trobat";
 "Install Claude Code to use the Coding Agent." = "Instal·la Claude Code per utilitzar l'agent de codi.";
 "Install Claude Code" = "Instal·la Claude Code";
+"Codex not found" = "Codex no trobat";
+"Install Codex to use the Coding Agent." = "Instal·la Codex per utilitzar l'agent de codi.";
+"Install Codex" = "Instal·la Codex";
 
 /* BrowserView */
 "Server not responding" = "El servidor no respon";
@@ -215,7 +223,7 @@
 "Description" = "Descripció";
 
 /* Initialization errors */
-"Factory Floor cannot start" = "Factory Floor no pot iniciar-se";
+"Dockyard cannot start" = "Dockyard no pot iniciar-se";
 "The terminal engine (Ghostty) failed to initialize. This may indicate a system compatibility issue." = "El motor de terminal (Ghostty) no s'ha pogut inicialitzar. Això pot indicar un problema de compatibilitat del sistema.";
 
 /* EnvironmentTabView */
@@ -224,8 +232,8 @@
 "Restart %@ script" = "Reinicia l'script de %@";
 "Start %@ script" = "Inicia l'script de %@";
 "No %@ script configured" = "No hi ha cap script de %@ configurat";
-"Add a %@ field to .factoryfloor.json:" = "Afegeix un camp %@ a .factoryfloor.json:";
-"Also supports .factoryfloor/config.json." = "També compatible amb .factoryfloor/config.json.";
+"Add a %@ field to .dockyard.json:" = "Afegeix un camp %@ a .dockyard.json:";
+"Also supports .dockyard/config.json." = "També compatible amb .dockyard/config.json.";
 
 /* Tab labels */
 "Info" = "Informació";
@@ -291,7 +299,28 @@
 "This branch has been merged." = "Aquesta branca s'ha fusionat.";
 "gh CLI is not installed." = "gh CLI no està instal·lat.";
 "Claude Code is not installed." = "Claude Code no està instal·lat.";
+"Codex is not installed." = "Codex no està instal·lat.";
+"Install Claude Code or Codex to use the Coding Agent." = "Instal·la Claude Code o Codex per utilitzar l'agent de codi.";
 "Enable \"Bypass permission prompts\" in Settings." = "Activa \"Ometre els permisos\" a Configuració.";
 "No GitHub remote found for this project." = "No s'ha trobat cap remot de GitHub per a aquest projecte.";
 "Quick action debug" = "Depuració d'accions ràpides";
 "Show a debug panel with command output from quick actions (Create PR, Commit & Push)." = "Mostra un panell de depuració amb la sortida de les accions ràpides (Crear PR, Commit i Push).";
+
+/* Workstream Info Git Stats */
+"Ahead" = "Ahead";
+"Uncommitted" = "Uncommitted";
+"Base" = "Base";
+"Worktree Age" = "Worktree Age";
+"Clean" = "Clean";
+"Created today" = "Created today";
+
+/* Split Panes */
+"Split Agent" = "Dividir tauler de l'agent";
+"Split Terminal" = "Dividir tauler del terminal";
+"Split Browser" = "Dividir tauler del navegador";
+
+/* Browser */
+"Reload" = "Recarregar";
+"Hard Reload" = "Recarregar (sense memòria cau)";
+"Reload browser" = "Recarregar el navegador";
+"Hard reload browser" = "Recarregar el navegador (sense memòria cau)";

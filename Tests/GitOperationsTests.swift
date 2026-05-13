@@ -1,7 +1,7 @@
 // ABOUTME: Tests for GitOperations worktree resolution.
 // ABOUTME: Validates detection of worktree directories and resolution to main repository.
 
-@testable import FactoryFloor
+@testable import Dockyard
 import XCTest
 
 final class GitOperationsTests: XCTestCase {
@@ -179,9 +179,9 @@ final class GitOperationsTests: XCTestCase {
              "commit", "--allow-empty", "-m", "init"], in: repoDir)
 
         let worktreeDir = tempDir.appendingPathComponent("wt")
-        git(["worktree", "add", "-b", "ff/my-feature", worktreeDir.path], in: repoDir)
+        git(["worktree", "add", "-b", "dy/my-feature", worktreeDir.path], in: repoDir)
 
-        XCTAssertEqual(GitOperations.currentBranch(at: worktreeDir.path), "ff/my-feature")
+        XCTAssertEqual(GitOperations.currentBranch(at: worktreeDir.path), "dy/my-feature")
     }
 
     // MARK: - deleteLocalBranch

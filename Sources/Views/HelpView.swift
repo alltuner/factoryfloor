@@ -8,7 +8,7 @@ struct HelpView: View {
         { page in
             let lang = Locale.current.language.languageCode?.identifier ?? "en"
             let path = lang == "en" ? "/\(page)" : "/\(lang)/\(page)"
-            return URL(string: "https://factory-floor.com\(path)")!
+            return URL(string: "https://francesc.barnola.net\(path)")!
         }
     }
 
@@ -61,10 +61,10 @@ struct HelpView: View {
                     Link(destination: localizedURL("sponsor")) {
                         Label("Sponsor", systemImage: "heart")
                     }
-                    Link(destination: URL(string: "https://github.com/alltuner/factoryfloor/issues/new?template=bug_report.yml")!) {
+                    Link(destination: URL(string: "https://github.com/barnolacesc/dockyard/issues/new?template=bug_report.yml")!) {
                         Label("Report a Bug", systemImage: "ladybug")
                     }
-                    Link(destination: URL(string: "https://github.com/alltuner/factoryfloor/issues/new?template=feature_request.yml")!) {
+                    Link(destination: URL(string: "https://github.com/barnolacesc/dockyard/issues/new?template=feature_request.yml")!) {
                         Label("Request a Feature", systemImage: "lightbulb")
                     }
                 }
@@ -89,18 +89,28 @@ struct HelpView: View {
                         ShortcutRow(keys: "1", description: "Info")
                         ShortcutRow(keys: "2", description: "Coding Agent")
                         ShortcutRow(keys: "3-9", description: "Switch tab")
-                        ShortcutRow(keys: "[", shift: true, description: "Previous tab")
-                        ShortcutRow(keys: "]", shift: true, description: "Next tab")
                         ShortcutRow(keys: "Return", description: "Focus Coding Agent")
+                        ShortcutRow(keys: "Return", shift: true, description: "Split Agent pane")
+                        ShortcutRow(keys: "I", description: "Info panel")
+                        ShortcutRow(keys: "E", description: "Environment")
                         ShortcutRow(keys: "T", description: "New Terminal")
+                        ShortcutRow(keys: "T", shift: true, description: "Split Terminal pane")
                         ShortcutRow(keys: "B", description: "New Browser")
+                        ShortcutRow(keys: "B", shift: true, description: "Split Browser pane")
                         ShortcutRow(keys: "O", description: "New Editor")
                         ShortcutRow(keys: "S", description: "Save (Editor)")
                         ShortcutRow(keys: "S", shift: true, description: "Save As (Editor)")
                         ShortcutRow(keys: "W", description: "Close tab")
                         ShortcutRow(keys: "W", shift: true, description: "Archive workstream")
-                        ShortcutRow(keys: "L", description: "Address bar")
-                        ShortcutRow(keys: "Return", shift: true, description: "Start/Rerun")
+                        ShortcutRow(keys: "R", description: "Reload browser")
+                        ShortcutRow(keys: "R", shift: true, description: "Hard reload browser")
+                        ShortcutRow(keys: "L", description: "Address bar (browser)")
+                        ShortcutRow(keys: "0", description: "Back to project")
+                        ShortcutRow(keys: "1-9", description: "Switch tab")
+                        ShortcutRow(keys: "[", shift: true, description: "Previous tab")
+                        ShortcutRow(keys: "]", shift: true, description: "Next tab")
+                        ShortcutRow(keys: "R", description: "Reload browser")
+                        ShortcutRow(keys: "R", shift: true, description: "Hard reload browser")
                     } header: {
                         ShortcutSectionHeader(title: "Workstream", description: "When a workstream is active")
                     }
@@ -135,7 +145,7 @@ struct HelpView: View {
                         Text("with the support of")
                             .font(.caption)
                             .foregroundStyle(.tertiary)
-                        Link("All Tuner Labs", destination: URL(string: "https://alltuner.com")!)
+                        Link("David Poblador i Garcia", destination: URL(string: "https://barnolacesc.com")!)
                             .font(.caption)
                     }
                     Link("davidpoblador.com", destination: URL(string: "https://davidpoblador.com")!)

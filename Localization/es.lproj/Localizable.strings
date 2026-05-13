@@ -109,13 +109,13 @@
 "Symlink .env and .env.local from the main repository into new worktrees." = "Crea enlaces simbólicos de .env y .env.local del repositorio principal en los nuevos árboles de trabajo.";
 
 /* Quit confirmation */
-"Quit Factory Floor?" = "¿Salir de Factory Floor?";
+"Quit Dockyard?" = "¿Salir de Dockyard?";
 "Active workstreams will be stopped." = "Los flujos de trabajo activos se detendrán.";
 "Quit" = "Salir";
 "Confirm before quitting" = "Confirmar antes de salir";
 "Show a confirmation dialog when quitting with active workstreams." = "Muestra un diálogo de confirmación al salir con flujos de trabajo activos.";
 "Launch at login" = "Abrir al iniciar sesión";
-"Automatically open Factory Floor when you log in." = "Abre Factory Floor automáticamente al iniciar sesión.";
+"Automatically open Dockyard when you log in." = "Abre Dockyard automáticamente al iniciar sesión.";
 "Detailed logging" = "Registro detallado";
 "Log setup, run, and teardown script output to files for debugging." = "Registra la salida de los scripts de configuración, ejecución y desmontaje en archivos para depuración.";
 "Open Logs Directory" = "Abrir directorio de registros";
@@ -138,16 +138,21 @@
 "Dark" = "Oscuro";
 
 /* Settings - Coding Agent */
+"Claude Code" = "Claude Code";
+"Codex" = "Codex";
+"Coding CLI" = "CLI de código";
 "Agent Teams" = "Equipos de agentes";
 "Enables experimental multi-agent coordination. Agents can spawn teammates, delegate tasks, and collaborate across workstreams." = "Activa la coordinación experimental multi-agente. Los agentes pueden crear compañeros, delegar tareas y colaborar entre flujos de trabajo.";
+"Agent Teams is only available with Claude Code." = "Los equipos de agentes solo están disponibles con Claude Code.";
 "Auto-rename branch" = "Renombrar rama automáticamente";
 "On the first request, the agent renames the branch to match the task and writes a short description visible in the sidebar." = "En la primera solicitud, el agente renombra la rama para coincidir con la tarea y escribe una breve descripción visible en la barra lateral.";
+"Auto-rename branch is only available with Claude Code." = "El renombrado automático de la rama solo está disponible con Claude Code.";
 "External Browser" = "Navegador externo";
 
 /* Settings - Advanced */
 "Advanced" = "Avanzado";
 "Usage analytics" = "Analíticas de uso";
-"Send anonymous usage data to help improve Factory Floor. We collect: app version, build type, macOS version, locale, and screen resolution. No project names, file contents, or personal data." = "Envía datos de uso anónimos para ayudar a mejorar Factory Floor. Recopilamos: versión de la aplicación, tipo de compilación, versión de macOS, idioma y resolución de pantalla. Sin nombres de proyectos, contenidos de archivos ni datos personales.";
+"Send anonymous usage data to help improve Dockyard. We collect: app version, build type, macOS version, locale, and screen resolution. No project names, file contents, or personal data." = "Envía datos de uso anónimos para ayudar a mejorar Dockyard. Recopilamos: versión de la aplicación, tipo de compilación, versión de macOS, idioma y resolución de pantalla. Sin nombres de proyectos, contenidos de archivos ni datos personales.";
 "Crash reports" = "Informes de errores";
 "Send crash reports and performance data. Requires restart to take effect." = "Envía informes de errores y datos de rendimiento. Requiere reiniciar la aplicación.";
 "Bleeding edge" = "Últimas novedades";
@@ -196,6 +201,9 @@
 "Claude Code not found" = "Claude Code no encontrado";
 "Install Claude Code to use the Coding Agent." = "Instala Claude Code para usar el agente de código.";
 "Install Claude Code" = "Instalar Claude Code";
+"Codex not found" = "Codex no encontrado";
+"Install Codex to use the Coding Agent." = "Instala Codex para usar el agente de código.";
+"Install Codex" = "Instalar Codex";
 
 /* BrowserView */
 "Server not responding" = "El servidor no responde";
@@ -215,7 +223,7 @@
 "Description" = "Descripción";
 
 /* Initialization errors */
-"Factory Floor cannot start" = "Factory Floor no puede iniciarse";
+"Dockyard cannot start" = "Dockyard no puede iniciarse";
 "The terminal engine (Ghostty) failed to initialize. This may indicate a system compatibility issue." = "El motor de terminal (Ghostty) no se pudo inicializar. Esto puede indicar un problema de compatibilidad del sistema.";
 
 /* EnvironmentTabView */
@@ -224,8 +232,8 @@
 "Restart %@ script" = "Reiniciar script de %@";
 "Start %@ script" = "Iniciar script de %@";
 "No %@ script configured" = "No hay ningún script de %@ configurado";
-"Add a %@ field to .factoryfloor.json:" = "Añade un campo %@ a .factoryfloor.json:";
-"Also supports .factoryfloor/config.json." = "También compatible con .factoryfloor/config.json.";
+"Add a %@ field to .dockyard.json:" = "Añade un campo %@ a .dockyard.json:";
+"Also supports .dockyard/config.json." = "También compatible con .dockyard/config.json.";
 
 /* Tab labels */
 "Info" = "Información";
@@ -291,7 +299,28 @@
 "This branch has been merged." = "Esta rama ha sido fusionada.";
 "gh CLI is not installed." = "gh CLI no está instalado.";
 "Claude Code is not installed." = "Claude Code no está instalado.";
+"Codex is not installed." = "Codex no está instalado.";
+"Install Claude Code or Codex to use the Coding Agent." = "Instala Claude Code o Codex para usar el agente de código.";
 "Enable \"Bypass permission prompts\" in Settings." = "Activa \"Omitir permisos\" en Configuración.";
 "No GitHub remote found for this project." = "No se encontró un remoto de GitHub para este proyecto.";
 "Quick action debug" = "Depuración de acciones rápidas";
 "Show a debug panel with command output from quick actions (Create PR, Commit & Push)." = "Muestra un panel de depuración con la salida de las acciones rápidas (Crear PR, Commit y Push).";
+
+/* Workstream Info Git Stats */
+"Ahead" = "Ahead";
+"Uncommitted" = "Uncommitted";
+"Base" = "Base";
+"Worktree Age" = "Worktree Age";
+"Clean" = "Clean";
+"Created today" = "Created today";
+
+/* Split Panes */
+"Split Agent" = "Dividir panel del agente";
+"Split Terminal" = "Dividir panel del terminal";
+"Split Browser" = "Dividir panel del navegador";
+
+/* Browser */
+"Reload" = "Recargar";
+"Hard Reload" = "Recargar (sin caché)";
+"Reload browser" = "Recargar el navegador";
+"Hard reload browser" = "Recargar el navegador (sin caché)";

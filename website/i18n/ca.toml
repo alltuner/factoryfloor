@@ -20,7 +20,7 @@ other = "entorn de desenvolupament"
 [hero_title_2]
 other = "amb IA."
 [hero_desc]
-other = "App nativa de macOS sobre el terminal GPU de <a href=\"https://ghostty.org\" class=\"text-wine-light hover:underline\">Ghostty</a>. Gestiona git worktrees, sessions de <a href=\"https://docs.anthropic.com/en/docs/claude-code/overview\" class=\"text-wine-light hover:underline\">Claude Code</a> i servidors dev des d'una sola finestra. Cada workstream té branch, terminal i agent propis, tot en paral·lel, tot a velocitat nativa."
+other = "App nativa de macOS sobre el terminal GPU de <a href=\"https://ghostty.org\" class=\"text-wine-light hover:underline\">Ghostty</a>. Gestiona git worktrees, sessions d'agent de codi i servidors dev des d'una sola finestra. Cada workstream té branch, terminal i agent propis, tot en paral·lel, tot a velocitat nativa."
 [hero_demo_tab]
 other = "Demo"
 [hero_download]
@@ -40,9 +40,9 @@ other = "Git Worktrees"
 [feat_worktrees_desc]
 other = "Cada workstream té branch i worktree propis. Canvia de tasca sense stash, amb fitxers .env symlinkats automàticament."
 [feat_claude_title]
-other = "Claude Code"
+other = "Claude Code o Codex"
 [feat_claude_desc]
-other = "Agent <a href='https://docs.anthropic.com/en/docs/claude-code/overview' class='text-wine-light no-underline hover:underline'>Claude Code</a> integrat amb persistència de sessió. Reprèn converses entre reinicis amb session IDs automàtics."
+other = "Tria <a href='https://docs.anthropic.com/en/docs/claude-code/overview' class='text-wine-light no-underline hover:underline'>Claude Code</a> o <a href='https://developers.openai.com/codex' class='text-wine-light no-underline hover:underline'>Codex</a> per a la pestanya d'agent integrada, amb represa de sessió entre reinicis."
 [feat_tmux_title]
 other = "Persistència tmux"
 [feat_tmux_desc]
@@ -50,7 +50,7 @@ other = "Les sessions d'agent sobreviuen reinicis via tmux en un socket dedicat.
 [feat_scripts_title]
 other = "Setup & Run Scripts"
 [feat_scripts_desc]
-other = "Configura scripts de setup, run i teardown per projecte via .factoryfloor.json."
+other = "Configura scripts de setup, run i teardown per projecte via .dockyard.json."
 [feat_browser_title]
 other = "Browser integrat"
 [feat_browser_desc]
@@ -70,15 +70,15 @@ other = "Del repo a un workstream actiu en segons. Cada workstream és aïllat i
 [step1_title]
 other = "Afegeix un projecte"
 [step1_desc]
-other = "Arrossega un directori al sidebar o crea'n un de nou. Factory Floor detecta repos git, eines instal·lades i connexions GitHub automàticament."
+other = "Arrossega un directori al sidebar o crea'n un de nou. Dockyard detecta repos git, eines instal·lades i connexions GitHub automàticament."
 [step2_title]
 other = "Crea un workstream"
 [step2_desc]
-other = "Un worktree nou amb branch, sessió de Claude Code, terminal i tab de browser. La detecció de port és automàtica — el browser obre el teu servidor dev tan bon punt comença a escoltar."
+other = "Un worktree nou amb branch, el CLI de codi que hagis triat, terminal i tab de browser. La detecció de port és automàtica — el browser obre el teu servidor dev tan bon punt comença a escoltar."
 [step3_title]
 other = "Programa amb IA"
 [step3_desc]
-other = "L'agent adapta el nom de la branca a la tasca. Els setup scripts instal·len dependències. Canvia entre workstreams sense perdre estat."
+other = "L'agent es posa a treballar immediatament. Els setup scripts instal·len dependències. Canvia entre workstreams sense perdre estat."
 
 # Config
 [config_label]
@@ -98,7 +98,7 @@ other = "Quan s'executa"
 [config_setup_desc]
 other = "Un cop, quan es crea un workstream. Per instal·lar dependències o passos de build."
 [config_run_desc]
-other = "Sota demanda des de la pestanya Environment. Embolcallat amb ff-run per detectar ports automàticament."
+other = "Sota demanda des de la pestanya Environment. Embolcallat amb dy-run per detectar ports automàticament."
 [config_teardown_desc]
 other = "Quan s'arxiva un workstream. Per netejar recursos com aturar contenidors."
 [config_optional_note]
@@ -186,7 +186,7 @@ other = "Open Source"
 [oss_title]
 other = "Gratuït i open source."
 [oss_desc]
-other = "Factory Floor té llicència MIT i és gratuït. Codi font disponible a GitHub. Contribucions, bug reports i feature requests són benvinguts."
+other = "Dockyard té llicència MIT i és gratuït. Codi font disponible a GitHub. Contribucions, bug reports i feature requests són benvinguts."
 [oss_view]
 other = "Veure a GitHub"
 [oss_star]
@@ -197,7 +197,7 @@ other = "Fet amb ❤️ al Poblenou, Barcelona 🇪🇺"
 
 # Sponsor
 [sponsor_intro]
-other = "Factory Floor és gratuït i open source."
+other = "Dockyard és gratuït i open source."
 [sponsor_intro_2]
 other = "El teu suport ajuda a finançar el desenvolupament continuat i noves funcionalitats."
 [sponsor_financial]
@@ -215,7 +215,7 @@ other = "Contribució ràpida puntual."
 [sponsor_star]
 other = "Posa-hi una estrella a GitHub"
 [sponsor_star_desc]
-other = "Les estrelles ajuden altres a descobrir Factory Floor."
+other = "Les estrelles ajuden altres a descobrir Dockyard."
 [sponsor_issues]
 other = "Reporta problemes"
 [sponsor_issues_desc]
@@ -227,15 +227,15 @@ other = "Els pull requests per correccions i funcionalitats són benvinguts."
 [sponsor_translate]
 other = "Tradueix l'app o el web"
 [sponsor_translate_desc]
-other = "Ajuda a fer Factory Floor accessible en més idiomes."
+other = "Ajuda a fer Dockyard accessible en més idiomes."
 [sponsor_ghostty]
 other = "Dona suport a Ghostty"
 [sponsor_ghostty_desc]
-other = "Factory Floor està construït sobre el terminal GPU de Ghostty."
+other = "Dockyard està construït sobre el terminal GPU de Ghostty."
 
 # Get
 [get_title]
-other = "Obtenir Factory Floor"
+other = "Obtenir Dockyard"
 [get_desc]
 other = "Instal·la via Homebrew o descarrega l'última versió."
 [get_install]
@@ -253,4 +253,4 @@ other = "Tot el que necessites saber, res del que no."
 
 # Changelog
 [changelog_subtitle]
-other = "Historial de versions de Factory Floor"
+other = "Historial de versions de Dockyard"

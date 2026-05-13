@@ -1,13 +1,13 @@
 #!/bin/bash
-# ABOUTME: CLI launcher for Factory Floor.
-# ABOUTME: Opens a directory in the app via the factoryfloor:// URL scheme.
+# ABOUTME: CLI launcher for Dockyard.
+# ABOUTME: Opens a directory in the app via the dockyard:// URL scheme.
 
 set -e
 
 usage() {
   echo "Usage: ff [directory]"
   echo ""
-  echo "Open a directory in Factory Floor."
+  echo "Open a directory in Dockyard."
   echo "If no directory is specified, opens the current directory."
   echo ""
   echo "Options:"
@@ -54,12 +54,12 @@ if [ -z "$RESOLVED" ]; then
   exit 1
 fi
 
-open "factoryfloor://$RESOLVED"
+open "dockyard://$RESOLVED"
 
 # Show sponsor message occasionally (~1 in 5 runs)
 if [ $(( RANDOM % 2 )) -eq 0 ]; then
   echo ""
-  echo "  ☕ Enjoying Factory Floor? Support development:"
-  echo "     https://buymeacoffee.com/alltuner"
+  echo "  ☕ Enjoying Dockyard? Support development:"
+  echo "     https://buymeacoffee.com/barnolacesc"
   echo ""
 fi

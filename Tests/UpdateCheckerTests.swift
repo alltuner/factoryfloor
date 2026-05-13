@@ -1,7 +1,7 @@
 // ABOUTME: Tests for parsing versions and release notes from a Sparkle appcast XML feed.
 // ABOUTME: Covers single-item, multi-item, version filtering, and malformed XML scenarios.
 
-@testable import FactoryFloor
+@testable import Dockyard
 import XCTest
 
 final class UpdateCheckerTests: XCTestCase {
@@ -49,7 +49,7 @@ final class UpdateCheckerTests: XCTestCase {
           <channel>
             <item>
               <title>Version 0.2.0</title>
-              <link>https://factory-floor.com/changelog/0.2.0</link>
+              <link>https://francesc.barnola.net/changelog/0.2.0</link>
               <enclosure url="https://example.com/app.dmg"
                          sparkle:version="0.2.0"
                          sparkle:shortVersionString="0.2.0"
@@ -62,7 +62,7 @@ final class UpdateCheckerTests: XCTestCase {
         let releases = UpdateChecker.parseAppcast(from: Data(xml.utf8))
         XCTAssertEqual(releases.count, 1)
         XCTAssertEqual(releases[0].version, "0.2.0")
-        XCTAssertEqual(releases[0].releaseNotesURL, URL(string: "https://factory-floor.com/changelog/0.2.0"))
+        XCTAssertEqual(releases[0].releaseNotesURL, URL(string: "https://francesc.barnola.net/changelog/0.2.0"))
     }
 
     func testParsesAppcastWithoutReleaseNotesURL() {
@@ -94,7 +94,7 @@ final class UpdateCheckerTests: XCTestCase {
           <channel>
             <item>
               <title>Version 0.3.0</title>
-              <link>https://github.com/alltuner/factoryfloor/releases/tag/v0.3.0</link>
+              <link>https://github.com/barnolacesc/dockyard/releases/tag/v0.3.0</link>
               <description>&lt;p&gt;Added feature X&lt;/p&gt;</description>
               <enclosure url="https://example.com/app-0.3.0.dmg"
                          sparkle:version="0.3.0"
@@ -104,7 +104,7 @@ final class UpdateCheckerTests: XCTestCase {
             </item>
             <item>
               <title>Version 0.2.0</title>
-              <link>https://github.com/alltuner/factoryfloor/releases/tag/v0.2.0</link>
+              <link>https://github.com/barnolacesc/dockyard/releases/tag/v0.2.0</link>
               <description>&lt;p&gt;Fixed bug Y&lt;/p&gt;</description>
               <enclosure url="https://example.com/app-0.2.0.dmg"
                          sparkle:version="0.2.0"
@@ -130,7 +130,7 @@ final class UpdateCheckerTests: XCTestCase {
         XCTAssertEqual(releases[0].releaseNotes, "<p>Added feature X</p>")
         XCTAssertEqual(
             releases[0].releaseNotesURL,
-            URL(string: "https://github.com/alltuner/factoryfloor/releases/tag/v0.3.0")
+            URL(string: "https://github.com/barnolacesc/dockyard/releases/tag/v0.3.0")
         )
 
         XCTAssertEqual(releases[1].version, "0.2.0")

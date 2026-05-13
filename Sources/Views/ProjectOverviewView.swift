@@ -11,12 +11,12 @@ struct ProjectOverviewView: View {
     let onProjectChanged: () -> Void
 
     @EnvironmentObject var appEnv: AppEnvironment
-    @AppStorage("factoryfloor.workstreamSortOrder") private var workstreamSortOrder: ProjectSortOrder = .recent
+    @AppStorage("dockyard.workstreamSortOrder") private var workstreamSortOrder: ProjectSortOrder = .recent
     @State private var worktrees: [WorktreeInfo] = []
     @State private var showingPruneConfirm = false
     @State private var isPruning = false
 
-    @AppStorage("factoryfloor.defaultTerminal") private var defaultTerminal: String = ""
+    @AppStorage("dockyard.defaultTerminal") private var defaultTerminal: String = ""
     @State private var docFiles: [DocFile] = []
     @State private var selectedDoc: String?
 

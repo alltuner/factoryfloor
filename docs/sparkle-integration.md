@@ -4,8 +4,8 @@ GitHub issue: #39
 
 ## Background
 
-Factory Floor notifies Homebrew users about new versions by parsing the
-appcast feed at `factory-floor.com/appcast.xml` and showing a badge in
+Dockyard notifies Homebrew users about new versions by parsing the
+appcast feed at `francesc.barnola.net/appcast.xml` and showing a badge in
 the sidebar (see `UpdateChecker.swift`). DMG users get automatic
 updates via Sparkle, which reads the same appcast feed.
 
@@ -47,7 +47,7 @@ verifies the signature before installing.
 
 ### 2. Add Sparkle SPM Dependency
 
-In `project.yml`, add the package and link it to the `FactoryFloor`
+In `project.yml`, add the package and link it to the `Dockyard`
 target:
 
 ```yaml
@@ -57,7 +57,7 @@ packages:
     from: "2.9.0"
 
 targets:
-  FactoryFloor:
+  Dockyard:
     dependencies:
       - package: Sparkle
         product: Sparkle
@@ -72,7 +72,7 @@ pattern ghostty and cmux use).
 | Key | Value | Notes |
 |-----|-------|-------|
 | `SUPublicEDKey` | (empty or placeholder) | Overwritten by CI with real public key |
-| `SUFeedURL` | `https://factory-floor.com/appcast.xml` | Points to the appcast hosted on the website |
+| `SUFeedURL` | `https://francesc.barnola.net/appcast.xml` | Points to the appcast hosted on the website |
 | `SUEnableAutomaticChecks` | `false` | Let users opt in via Settings |
 
 The appcast is hosted on the website and updated by the deploy workflow
@@ -117,7 +117,7 @@ everything: scheduling background checks, showing the standard Sparkle
 update dialog, downloading, verifying, and installing. This is the
 simplest integration path.
 
-**Modify: `FF2App.swift`**
+**Modify: `DockyardApp.swift`**
 
 - Instantiate `Updater` as a `@StateObject`.
 - Add a "Check for Updates" menu item wired to `updater.checkForUpdates()`.
@@ -224,7 +224,7 @@ simplified: we only need one channel and one item (the latest release).
 
 ### 7. Appcast Hosting
 
-The appcast is hosted on the website at `factory-floor.com/appcast.xml`.
+The appcast is hosted on the website at `francesc.barnola.net/appcast.xml`.
 The deploy-website workflow downloads the appcast from the latest GitHub
 release and includes it in the static site. This ensures the feed URL
 only updates after assets are fully uploaded, avoiding a race condition
@@ -271,7 +271,7 @@ ghostty).
 
 ### Non-sandboxed App
 
-Factory Floor runs without the App Sandbox (`com.apple.security.app-sandbox = false`).
+Dockyard runs without the App Sandbox (`com.apple.security.app-sandbox = false`).
 This simplifies Sparkle integration because:
 - No need for Sparkle's XPC services for privileged installation.
 - The updater can replace the app bundle directly.
@@ -292,7 +292,7 @@ and replace the running copy.
 | `project.yml` | Add Sparkle SPM package and dependency |
 | `Resources/Info.plist` | Add `SUPublicEDKey`, `SUFeedURL`, `SUEnableAutomaticChecks` |
 | `Sources/Models/Updater.swift` | New: Sparkle controller |
-| `Sources/Views/FF2App.swift` | Add "Check for Updates" menu item |
+| `Sources/Views/DockyardApp.swift` | Add "Check for Updates" menu item |
 | `Sources/Views/SettingsView.swift` | Add auto-update toggle |
 | `.github/workflows/release.yml` | Setup Sparkle, inject keys, sign frameworks, generate appcast, upload |
 | `scripts/generate_appcast.py` | New: builds appcast.xml from release metadata |

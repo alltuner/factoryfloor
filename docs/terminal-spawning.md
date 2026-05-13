@@ -1,6 +1,6 @@
 # Terminal Spawning Architecture
 
-How Factory Floor spawns terminals, delivers commands to Ghostty, and manages
+How Dockyard spawns terminals, delivers commands to Ghostty, and manages
 the coding agent, setup scripts, and run scripts in both tmux and non-tmux modes.
 
 ## How Ghostty Receives a Command
@@ -23,12 +23,12 @@ builds the environment injected into every workstream terminal:
 
 | Variable | Value |
 |----------|-------|
-| `FF_PROJECT` | Project name |
-| `FF_WORKSTREAM` | Workstream name |
-| `FF_PROJECT_DIR` | Project root directory |
-| `FF_WORKTREE_DIR` | Worktree / working directory |
-| `FF_PORT` | Port number derived from working directory |
-| `FF_DEFAULT_BRANCH` | Default branch (main, master, etc.) |
+| `DY_PROJECT` | Project name |
+| `DY_WORKSTREAM` | Workstream name |
+| `DY_PROJECT_DIR` | Project root directory |
+| `DY_WORKTREE_DIR` | Worktree / working directory |
+| `DY_PORT` | Port number derived from working directory |
+| `DY_DEFAULT_BRANCH` | Default branch (main, master, etc.) |
 | `CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS` | `1` if agent teams flag is on |
 
 For non-tmux terminal tabs, `TMUX` and `TMUX_PANE` are explicitly cleared to
@@ -47,7 +47,7 @@ prevent session inheritance from a parent tmux.
 
 ### 2. Setup Script
 
-Loaded from `.factoryfloor.json` via `ScriptConfig.load()`. Wrapped as:
+Loaded from `.dockyard.json` via `ScriptConfig.load()`. Wrapped as:
 
 ```
 shell -lic 'setup-command; printf "\nSetup completed in this terminal.\n"'
@@ -57,17 +57,17 @@ Preloaded before the UI is visible via `preloadSurfaces()`.
 
 ### 3. Run Script
 
-Also from `.factoryfloor.json`. Only starts when the user clicks "Start".
+Also from `.dockyard.json`. Only starts when the user clicks "Start".
 
-If the ff-run launcher is available, the command is wrapped as:
+If the dy-run launcher is available, the command is wrapped as:
 
 ```
-ff-run --workstream-id <uuid> -- shell -lic 'command'
+dy-run --workstream-id <uuid> -- shell -lic 'command'
 ```
 
 The launcher `exec`s the user's command (preserving PID and PTY) while forking a
 monitor child that polls for listening TCP ports via `proc_*` APIs and writes
-state to `~/Library/Caches/factoryfloor/run-state/<workstream-id>.json`.
+state to `~/Library/Caches/dockyard/run-state/<workstream-id>.json`.
 
 ## Tmux Mode vs Non-Tmux Mode
 
@@ -81,17 +81,17 @@ The command goes straight to Ghostty. The terminal dies with the surface.
 
 ```
 shell -lc "exec sh -c '
-  (tmux -L factoryfloor start-server;
-   tmux -L factoryfloor source-file /path/to/tmux.conf;
-   tmux -L factoryfloor set-hook -gu pane-died);
-  exec tmux -L factoryfloor new-session -A -s <session> [-e VAR=VAL ...] <command>
+  (tmux -L dockyard start-server;
+   tmux -L dockyard source-file /path/to/tmux.conf;
+   tmux -L dockyard set-hook -gu pane-died);
+  exec tmux -L dockyard new-session -A -s <session> [-e VAR=VAL ...] <command>
 '"
 ```
 
 Key details:
 
-- **Dedicated socket** `-L factoryfloor` isolates from the user's tmux.
-- **Session naming**: `factoryfloor/project/workstream/role` where role is
+- **Dedicated socket** `-L dockyard` isolates from the user's tmux.
+- **Session naming**: `dockyard/project/workstream/role` where role is
   `agent`, `setup`, or `run`.
 - **`new-session -A`** attaches to an existing session if present, providing
   persistence across app restarts.
@@ -106,7 +106,7 @@ Worst case for a run script with tmux (3 layers):
 ```
 User clicks "Start"
   -> runScriptCommand():
-       "ff-run --workstream-id UUID -- shell -lic '...'"
+       "dy-run --workstream-id UUID -- shell -lic '...'"
   -> TmuxSession.wrapCommand():
        "shell -lc 'exec sh -c ...tmux new-session...'"
   -> TerminalView(command: finalCommand)
@@ -153,8 +153,8 @@ surfaces auto-respawn on close; terminal tabs close and remove themselves.
 | `Sources/Views/Workspace/TerminalContainerView.swift` | Tab management, surface cache, command building |
 | `Sources/Models/CommandBuilder.swift` | Shell command escaping and construction |
 | `Sources/Models/TmuxSession.swift` | Tmux session naming, command wrapping, config |
-| `Sources/Models/ScriptConfig.swift` | Loads setup/run/teardown from .factoryfloor.json |
+| `Sources/Models/ScriptConfig.swift` | Loads setup/run/teardown from .dockyard.json |
 | `Sources/Views/Workspace/EnvironmentTabView.swift` | UI for setup/run scripts, launch logic |
-| `Sources/Models/RunLauncher.swift` | ff-run binary discovery and command wrapping |
+| `Sources/Models/RunLauncher.swift` | dy-run binary discovery and command wrapping |
 | `Sources/Launcher/main.swift` | Port monitor implementation |
 | `Sources/Models/WorkstreamEnvironment.swift` | Environment variable injection |

@@ -36,7 +36,7 @@
 - [x] Auto-rename branch via --append-system-prompt
 - [x] Per-workstream permission mode (bypass prompts, context menu on +)
 - [x] Agent Teams setting (CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS)
-- [x] Deterministic port allocation per workstream (FF_PORT env var, DJB2 hash)
+- [x] Deterministic port allocation per workstream (DY_PORT env var, DJB2 hash)
 - [x] Dynamic workspace tabs (Info + Agent + Environment, Terminal/Browser on demand)
 - [x] Terminal tabs auto-close on shell exit, agent respawns
 - [x] Multi-terminal support with proper Ghostty focus management
@@ -52,20 +52,20 @@
 - [x] Project overview with editable name, git info, GitHub info, worktree list with prune, doc tabs
 - [x] Workstream info with project icon, branch copy, directory, PR status, scripts, docs
 - [x] Drag-and-drop directories to sidebar
-- [x] factoryfloor:// URL scheme for single-instance behavior
+- [x] dockyard:// URL scheme for single-instance behavior
 - [x] CLI launcher (ff) installed via Homebrew cask binary directive
 - [x] Auto-generated workstream names (operation-adjective-component)
 - [x] Workstream name syncs from branch rename (every 15s)
-- [x] Sidebar state persisted across restarts (JSON files in ~/.config/factoryfloor/)
+- [x] Sidebar state persisted across restarts (JSON files in ~/.config/dockyard/)
 - [x] Async git repo info, path validity, branch names (parallelized via TaskGroup)
 - [x] Auto-remove projects with missing directories (with user notification)
 - [x] Worktree path validation with visual feedback
 - [x] Archive warning for uncommitted changes
 - [x] Workstream sorting in project view (recent / A-Z)
 - [x] Localization: en, ca, es, sv (all strings translated)
-- [x] Script config: .factoryfloor.json
+- [x] Script config: .dockyard.json
 - [x] Environment tab: setup (auto) / run (on-demand) with Rebuild and Start/Rerun shortcuts
-- [x] Port detection: ff-run launcher with libproc process tree scanning and auto browser retarget
+- [x] Port detection: dy-run launcher with libproc process tree scanning and auto browser retarget
 - [x] Tmux session restore for run scripts on app relaunch
 - [x] Preload agent and setup terminals in background
 - [x] Occlude non-visible terminal surfaces (ghostty_surface_set_occlusion)
@@ -74,7 +74,7 @@
 - [x] Project icon detection (icon.svg, icon.png, logo.svg, logo.png)
 - [x] Ghostty submodule pinned to v1.3.1, weekly CI compatibility test
 - [x] Code signing, notarization, release-please, CI pipeline (security hardened)
-- [x] Homebrew tap (alltuner/homebrew-tap) with cask and CLI binary
+- [x] Homebrew tap (barnolacesc/homebrew-tap) with cask and CLI binary
 - [x] Website: Hugo + Tailwind, i18n (4 langs), sponsor page, privacy, SEO, OG image, /get page
 - [x] Distribution: docs/distribution.md with automated versions.json in release workflow
 - [x] Onboarding view with prerequisites, getting started, key concepts

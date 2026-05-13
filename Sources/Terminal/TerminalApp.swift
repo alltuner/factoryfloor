@@ -5,7 +5,7 @@ import Cocoa
 import os
 import UserNotifications
 
-private let logger = Logger(subsystem: "factoryfloor", category: "terminal-app")
+private let logger = Logger(subsystem: "dockyard", category: "terminal-app")
 
 protocol NotificationRequestAdding {
     func add(

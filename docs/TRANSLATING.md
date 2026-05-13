@@ -1,8 +1,8 @@
-# Translating Factory Floor
+# Translating Dockyard
 
-Factory Floor is localized in four languages: English (en), Catalan (ca), Spanish (es), and Swedish (sv). Contributions to improve existing translations or add new languages are welcome.
+Dockyard is localized in four languages: English (en), Catalan (ca), Spanish (es), and Swedish (sv). Contributions to improve existing translations or add new languages are welcome.
 
-There are two independent translation surfaces: the **app** (native macOS UI) and the **website** (factory-floor.com). You can contribute to either or both.
+There are two independent translation surfaces: the **app** (native macOS UI) and the **website** (francesc.barnola.net). You can contribute to either or both.
 
 ## Translation philosophy
 
@@ -165,4 +165,4 @@ In `Localizable.strings`, the key is the English string itself. This means if yo
 
 ## Questions?
 
-Open an [issue](https://github.com/alltuner/factoryfloor/issues) or ask in your PR if anything is unclear.
+Open an [issue](https://github.com/barnolacesc/dockyard/issues) or ask in your PR if anything is unclear.

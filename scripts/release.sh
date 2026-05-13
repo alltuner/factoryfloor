@@ -1,14 +1,14 @@
 #!/usr/bin/env bash
-# ABOUTME: Builds, signs, notarizes, and packages Factory Floor as a DMG.
+# ABOUTME: Builds, signs, notarizes, and packages Dockyard as a DMG.
 # ABOUTME: Usage: ./scripts/release.sh [version]
 
 set -euo pipefail
 
 SIGNING_IDENTITY="Developer ID Application: ALL TUNER LABS S.L. (J5TAY75Q3F)"
-NOTARIZE_PROFILE="factoryfloor"
-APP_NAME="Factory Floor"
-SCHEME="FactoryFloor"
-PROJECT="FactoryFloor.xcodeproj"
+NOTARIZE_PROFILE="dockyard"
+APP_NAME="Dockyard"
+SCHEME="Dockyard"
+PROJECT="Dockyard.xcodeproj"
 VERSION="${1:-$(python3 -c "import json; print(json.load(open('.release-please-manifest.json'))['.'])")}"
 DMG_NAME="${SCHEME}.dmg"
 BUILD_DIR="build/release"
@@ -70,7 +70,7 @@ done
 
 # Sign the main app binary (not --deep, nested code is already signed above)
 codesign --force --sign "$SIGNING_IDENTITY" --timestamp --options=runtime \
-  --entitlements Resources/ff2.entitlements "$APP_PATH"
+  --entitlements Resources/dy.entitlements "$APP_PATH"
 
 echo "==> Verifying signature..."
 codesign --verify --verbose=2 --deep --strict "$APP_PATH"

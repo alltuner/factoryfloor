@@ -6,19 +6,19 @@
       <p class="text-fg-muted max-w-[560px] leading-relaxed">
         {{ T "config_desc" }}
         {{ T "config_add" }}
-        <code class="font-mono text-[0.9em] px-1.5 py-0.5 rounded bg-bg-elevated">.factoryfloor.json</code>
+        <code class="font-mono text-[0.9em] px-1.5 py-0.5 rounded bg-bg-elevated">.dockyard.json</code>
         {{ T "config_or_use" }}
       </p>
     </div>
     <div class="max-w-[560px] mt-14 reveal">
       <div class="rounded-[10px] overflow-hidden border border-fg-faint bg-bg-surface">
         <div class="flex items-center justify-between px-4 py-3 bg-bg-elevated border-b border-fg-faint font-mono text-[0.7rem] text-fg-muted">
-          <span>.factoryfloor.json</span>
+          <span>.dockyard.json</span>
           <span class="opacity-50">project root</span>
         </div>
         <pre class="p-5 font-mono text-[0.78rem] leading-relaxed overflow-x-auto"><code><span class="text-fg-muted">{</span>
   <span class="text-code-key">"setup"</span><span class="text-fg-muted">:</span> <span class="text-code-str">"npm install"</span><span class="text-fg-muted">,</span>
-  <span class="text-code-key">"run"</span><span class="text-fg-muted">:</span> <span class="text-code-str">"PORT=$FF_PORT npm run dev"</span><span class="text-fg-muted">,</span>
+  <span class="text-code-key">"run"</span><span class="text-fg-muted">:</span> <span class="text-code-str">"PORT=$DY_PORT npm run dev"</span><span class="text-fg-muted">,</span>
   <span class="text-code-key">"teardown"</span><span class="text-fg-muted">:</span> <span class="text-code-str">"docker-compose down"</span>
 <span class="text-fg-muted">}</span></code></pre>
       </div>

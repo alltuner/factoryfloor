@@ -57,42 +57,34 @@ enum AppConstants {
     }
 
     static var displayVersion: String {
-        #if DEBUG
-            let build = Bundle.main.infoDictionary?["CFBundleVersion"] as? String
-            if let build, build != "1", build != version {
-                return "\(version) (\(build))"
-            }
-            return "\(version) (Debug)"
-        #else
-            return version
-        #endif
+        return "\(version) (\(AppCommit.hash))"
     }
 
-    /// Config directory: ~/.config/factoryfloor/ (respects XDG_CONFIG_HOME).
-    /// XCTest uses ~/.config/factoryfloor-tests/ to keep test data isolated.
+    /// Config directory: ~/.config/dockyard/ (respects XDG_CONFIG_HOME).
+    /// XCTest uses ~/.config/dockyard-tests/ to keep test data isolated.
     static var configDirectory: URL {
         resolvedConfigDirectory(
-            configDirectoryName: "factoryfloor",
+            configDirectoryName: "dockyard",
             environment: ProcessInfo.processInfo.environment,
             defaultConfigBase: FileManager.default.homeDirectoryForCurrentUser.appendingPathComponent(".config"),
             isRunningTests: isRunningXCTest()
         )
     }
 
-    /// Cache directory: ~/Library/Caches/factoryfloor/.
+    /// Cache directory: ~/Library/Caches/dockyard/.
     /// Used for transient files like run-state and tmux config.
     static var cacheDirectory: URL {
         let base = FileManager.default.urls(for: .cachesDirectory, in: .userDomainMask).first!
         let dirName = isRunningXCTest()
-            ? "factoryfloor-tests"
-            : "factoryfloor"
+            ? "dockyard-tests"
+            : "dockyard"
         return base.appendingPathComponent(dirName)
     }
 
     /// Worktrees are always shared between debug and release builds.
     static var worktreesDirectory: URL {
         FileManager.default.homeDirectoryForCurrentUser
-            .appendingPathComponent(".factoryfloor")
+            .appendingPathComponent(".dockyard")
             .appendingPathComponent("worktrees")
     }
 }

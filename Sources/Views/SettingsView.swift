@@ -4,24 +4,25 @@
 import SwiftUI
 
 struct SettingsView: View {
-    @AppStorage("factoryfloor.languageOverride") private var languageOverride: String = ""
-    @AppStorage("factoryfloor.tmuxMode") private var tmuxMode: Bool = false
-    @AppStorage("factoryfloor.bypassPermissions") private var bypassPermissions: Bool = false
-    @AppStorage("factoryfloor.allowOutsideWorktree") private var allowOutsideWorktree: Bool = false
-    @AppStorage("factoryfloor.agentTeams") private var agentTeams: Bool = false
-    @AppStorage("factoryfloor.autoRenameBranch") private var autoRenameBranch: Bool = false
-    @AppStorage("factoryfloor.defaultTerminal") private var defaultTerminal: String = ""
-    @AppStorage("factoryfloor.defaultBrowser") private var defaultBrowser: String = ""
-    @AppStorage("factoryfloor.branchPrefix") private var branchPrefix: String = "ff"
-    @AppStorage("factoryfloor.appearance") private var appearance: String = "system"
-    @AppStorage("factoryfloor.symlinkEnv") private var symlinkEnv: Bool = true
-    @AppStorage("factoryfloor.confirmQuit") private var confirmQuit: Bool = true
-    @AppStorage("factoryfloor.telemetryEnabled") private var telemetryEnabled: Bool = true
-    @AppStorage("factoryfloor.crashReportingEnabled") private var crashReportingEnabled: Bool = true
-    @AppStorage("factoryfloor.detailedLogging") private var detailedLogging: Bool = false
-    @AppStorage("factoryfloor.quickActionDebug") private var quickActionDebug: Bool = false
-    @AppStorage("factoryfloor.bleedingEdge") private var bleedingEdge: Bool = false
-    @AppStorage("factoryfloor.baseDirectory") private var baseDirectory: String = NSSearchPathForDirectoriesInDomains(.documentDirectory, .userDomainMask, true).first ?? ""
+    @AppStorage("dockyard.languageOverride") private var languageOverride: String = ""
+    @AppStorage("dockyard.codingCLI") private var codingCLIRaw: String = ""
+    @AppStorage("dockyard.tmuxMode") private var tmuxMode: Bool = false
+    @AppStorage("dockyard.bypassPermissions") private var bypassPermissions: Bool = false
+    @AppStorage("dockyard.allowOutsideWorktree") private var allowOutsideWorktree: Bool = false
+    @AppStorage("dockyard.agentTeams") private var agentTeams: Bool = false
+    @AppStorage("dockyard.autoRenameBranch") private var autoRenameBranch: Bool = false
+    @AppStorage("dockyard.defaultTerminal") private var defaultTerminal: String = ""
+    @AppStorage("dockyard.defaultBrowser") private var defaultBrowser: String = ""
+    @AppStorage("dockyard.branchPrefix") private var branchPrefix: String = "dy"
+    @AppStorage("dockyard.appearance") private var appearance: String = "system"
+    @AppStorage("dockyard.symlinkEnv") private var symlinkEnv: Bool = true
+    @AppStorage("dockyard.confirmQuit") private var confirmQuit: Bool = true
+    @AppStorage("dockyard.telemetryEnabled") private var telemetryEnabled: Bool = true
+    @AppStorage("dockyard.crashReportingEnabled") private var crashReportingEnabled: Bool = true
+    @AppStorage("dockyard.detailedLogging") private var detailedLogging: Bool = false
+    @AppStorage("dockyard.quickActionDebug") private var quickActionDebug: Bool = false
+    @AppStorage("dockyard.bleedingEdge") private var bleedingEdge: Bool = false
+    @AppStorage("dockyard.baseDirectory") private var baseDirectory: String = NSSearchPathForDirectoriesInDomains(.documentDirectory, .userDomainMask, true).first ?? ""
 
     @State private var launchAtLogin = LaunchAtLogin.isEnabled
 
@@ -30,9 +31,20 @@ struct SettingsView: View {
     #if DEBUG
         private static let cliName = "ff-debug"
     #else
-        private static let cliName = "ff"
+        private static let cliName = "dy"
     #endif
     @State private var cliInstalled = Self.isCliCorrectlyInstalled()
+
+    private var selectedCodingCLI: CodingCLI {
+        appEnv.toolStatus.resolvedCodingCLI(storedValue: codingCLIRaw)
+    }
+
+    private var codingCLIBinding: Binding<String> {
+        Binding(
+            get: { selectedCodingCLI.rawValue },
+            set: { codingCLIRaw = $0 }
+        )
+    }
 
     var body: some View {
         Form {
@@ -45,10 +57,24 @@ struct SettingsView: View {
                     version: appEnv.toolStatus.claudeVersion
                 )
                 ToolRow(
+                    name: "codex",
+                    status: appEnv.toolStatus.codex,
+                    version: appEnv.toolStatus.codexVersion
+                )
+                ToolRow(
+                    name: "opencode",
+                    status: appEnv.toolStatus.opencode,
+                    version: appEnv.toolStatus.opencodeVersion
+                )
+                ToolRow(
+                    name: "gemini",
+                    status: appEnv.toolStatus.gemini,
+                    version: appEnv.toolStatus.geminiVersion
+                )
+                ToolRow(
                     name: "gh",
                     status: appEnv.toolStatus.gh,
                     version: appEnv.toolStatus.ghVersion,
-                    detail: appEnv.toolStatus.ghAuthDetail
                 )
                 ToolRow(
                     name: "git",
@@ -129,7 +155,7 @@ struct SettingsView: View {
                         .textFieldStyle(.roundedBorder)
                         .frame(maxWidth: 150)
                     }
-                    Text("e.g. \(branchPrefix.isEmpty ? "ff" : branchPrefix)/deploy-ludicrous-speed")
+                    Text("e.g. \(branchPrefix.isEmpty ? "dy" : branchPrefix)/deploy-ludicrous-speed")
                         .font(.system(.caption, design: .monospaced))
                         .foregroundStyle(.tertiary)
                 }
@@ -173,7 +199,7 @@ struct SettingsView: View {
                 SettingToggle(
                     "Launch at login",
                     isOn: $launchAtLogin,
-                    description: "Automatically open Factory Floor when you log in."
+                    description: "Automatically open Dockyard when you log in."
                 )
                 .onChange(of: launchAtLogin) { _, newValue in
                     LaunchAtLogin.setEnabled(newValue)
@@ -183,6 +209,12 @@ struct SettingsView: View {
             // MARK: - Coding Agent
 
             Section("Coding Agent") {
+                Picker("Coding CLI", selection: codingCLIBinding) {
+                    ForEach(CodingCLI.allCases) { cli in
+                        Text(cli.displayName).tag(cli.rawValue)
+                    }
+                }
+
                 SettingToggle(
                     "Bypass permission prompts",
                     isOn: $bypassPermissions,
@@ -202,12 +234,26 @@ struct SettingsView: View {
                     isOn: $agentTeams,
                     description: "Enables experimental multi-agent coordination. Agents can spawn teammates, delegate tasks, and collaborate across workstreams."
                 )
+                .disabled(!selectedCodingCLI.supportsAgentTeams)
+
+                if !selectedCodingCLI.supportsAgentTeams {
+                    Text("Agent Teams is only available with Claude Code.")
+                        .font(.caption)
+                        .foregroundStyle(.orange)
+                }
 
                 SettingToggle(
                     "Auto-rename branch",
                     isOn: $autoRenameBranch,
                     description: "On the first request, the agent renames the branch to match the task and writes a short description visible in the sidebar."
                 )
+                .disabled(!selectedCodingCLI.supportsAutoRenameBranch)
+
+                if !selectedCodingCLI.supportsAutoRenameBranch {
+                    Text("Auto-rename branch is only available with Claude Code.")
+                        .font(.caption)
+                        .foregroundStyle(.orange)
+                }
 
                 SettingToggle(
                     "Tmux Mode",
@@ -273,7 +319,7 @@ struct SettingsView: View {
                 SettingToggle(
                     "Usage analytics",
                     isOn: $telemetryEnabled,
-                    description: "Send anonymous usage data to help improve Factory Floor. We collect: app version, build type, macOS version, locale, and screen resolution. No project names, file contents, or personal data."
+                    description: "Send anonymous usage data to help improve Dockyard. We collect: app version, build type, macOS version, locale, and screen resolution. No project names, file contents, or personal data."
                 )
 
                 SettingToggle(
@@ -469,9 +515,14 @@ struct ToolStatus {
     var claude: BinaryStatus = .notFound
     var claudeVersion: String?
     var claudeSupportsSessionName: Bool = false
+    var codex: BinaryStatus = .notFound
+    var codexVersion: String?
+    var opencode: BinaryStatus = .notFound
+    var opencodeVersion: String?
+    var gemini: BinaryStatus = .notFound
+    var geminiVersion: String?
     var gh: BinaryStatus = .notFound
     var ghVersion: String?
-    var ghAuthDetail: String?
     var git: BinaryStatus = .notFound
     var gitVersion: String?
 
@@ -489,10 +540,24 @@ struct ToolStatus {
             status.claudeSupportsSessionName = helpContainsFlag(path, flag: "--name")
         }
 
+        status.codex = findBinary("codex")
+        if let path = status.codex.path {
+            status.codexVersion = runForVersion(path, args: ["--version"])
+        }
+
+        status.opencode = findBinary("opencode")
+        if let path = status.opencode.path {
+            status.opencodeVersion = runForVersion(path, args: ["--version"])
+        }
+
+        status.gemini = findBinary("gemini")
+        if let path = status.gemini.path {
+            status.geminiVersion = runForVersion(path, args: ["--version"])
+        }
+
         status.gh = findBinary("gh")
         if let path = status.gh.path {
             status.ghVersion = runForVersion(path, args: ["--version"])
-            status.ghAuthDetail = checkGhAuth(path)
         }
 
         status.git = findBinary("git")
@@ -502,7 +567,6 @@ struct ToolStatus {
 
         return status
     }
-
     private static func findBinary(_ name: String) -> BinaryStatus {
         guard let path = CommandLineTools.path(for: name) else { return .notFound }
         return .found(path)
@@ -513,6 +577,7 @@ struct ToolStatus {
         let trimmed = output
             .replacingOccurrences(of: "tmux ", with: "")
             .replacingOccurrences(of: "gh version ", with: "")
+            .replacingOccurrences(of: "codex-cli ", with: "")
         return trimmed.components(separatedBy: .newlines).first?.trimmingCharacters(in: .whitespaces)
     }
 

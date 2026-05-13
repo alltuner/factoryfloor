@@ -15,23 +15,23 @@ You need two things: a Mac and a vague sense that your current workflow could be
 brew install --cask factory-floor
 ```
 
-<a href="https://github.com/alltuner/factoryfloor/releases/latest/download/FactoryFloor.dmg" class="docs-download"><svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg> Download DMG</a>
+<a href="https://github.com/barnolacesc/dockyard/releases/latest/download/Dockyard.dmg" class="docs-download"><svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg> Download DMG</a>
 
-Factory Floor works best when these are installed (it'll tell you if they're missing):
+Dockyard works best when these are installed (it'll tell you if they're missing):
 
-- **[Claude Code](https://docs.anthropic.com/en/docs/claude-code/overview)** — the whole point, really
+- **[Claude Code](https://docs.anthropic.com/en/docs/claude-code/overview)** or **[Codex](https://developers.openai.com/codex)** — pick the coding CLI you want in the Agent tab
 - **git** — you probably have this
 - **[gh](https://cli.github.com/)** — GitHub CLI, for PR status and quick actions
 - **[tmux](https://github.com/tmux/tmux)** — optional, enables session persistence
 
 #### Your first 30 seconds
 
-1. Open Factory Floor
+1. Open Dockyard
 2. Drop a git repository onto the sidebar (or click **+** to pick one)
 3. Hit **⌘N** to create a workstream
 4. That's it. You're coding with AI now.
 
-No config files required. Factory Floor detects your git setup, installed tools, and GitHub connections automatically.
+No config files required. Dockyard detects your git setup, installed tools, and GitHub connections automatically.
 
 ---
 
@@ -41,7 +41,7 @@ The three things you'll interact with every day.
 
 ### Projects
 
-A project is a git repository. Drop a directory on the sidebar or click the **+** button. Factory Floor checks if it's a git repo (and offers to initialize one if it's not).
+A project is a git repository. Drop a directory on the sidebar or click the **+** button. Dockyard checks if it's a git repo (and offers to initialize one if it's not).
 
 The project overview shows repository info, GitHub details (stars, forks, open issues), up to 5 recent PRs, and auto-discovered markdown documentation from your repo.
 
@@ -66,7 +66,7 @@ The UI shows up instantly — worktree creation happens in the background.
 #### Workstream tabs
 
 - **Info** — branch name, PR status, project docs
-- **Agent** (⌘Return) — your Claude Code session
+- **Agent** (⌘Return) — your selected coding CLI session
 - **Environment** — setup and run script controls
 - **Terminal** (⌘T) — additional terminal tabs, as many as you want
 - **Browser** (⌘B) — embedded browser with auto-port detection
@@ -74,36 +74,37 @@ The UI shows up instantly — worktree creation happens in the background.
 
 #### Branch auto-rename
 
-With **Auto-rename branch** enabled in settings, the coding agent renames your branch to match the task on the first prompt. So `ff/coral-tidal-reef` becomes `ff/fix-login-timeout`.
+With **Auto-rename branch** enabled in settings, the coding agent renames your branch to match the task on the first prompt. So `dy/coral-tidal-reef` becomes `dy/fix-login-timeout`.
 
 #### Removing vs. purging
 
 - **Remove** — kills terminals and agent, but the worktree stays on disk
 - **Purge** — permanently deletes the worktree and branch (asks for confirmation if there are uncommitted changes)
 
-When a PR is merged, Factory Floor shows a "Purge" badge so you know it's safe to clean up.
+When a PR is merged, Dockyard shows a "Purge" badge so you know it's safe to clean up.
 
 ### The Coding Agent
 
-The coding agent tab runs [Claude Code](https://docs.anthropic.com/en/docs/claude-code/overview) in an embedded terminal. It sits right after the Info tab in every workstream.
+The coding agent tab runs either [Claude Code](https://docs.anthropic.com/en/docs/claude-code/overview) or [Codex](https://developers.openai.com/codex) in an embedded terminal. Choose the CLI in Settings, then use the same Agent tab in every workstream.
 
 #### Agent settings
 
 - **Bypass permission prompts** — skips confirmation dialogs. Useful if you trust your agent (and live dangerously).
 - **Tmux mode** — wraps agent sessions in tmux so they survive app restarts. Requires tmux.
-- **Auto-rename branch** — lets the agent rename the branch to match the task.
-- **Agent Teams** — experimental multi-agent coordination, courtesy of Claude Code. We trust Anthropic, don't we?
+- **Auto-rename branch** — lets Claude Code rename the branch to match the task.
+- **Coding CLI** — switches the Agent tab between Claude Code and Codex.
+- **Agent Teams** — experimental multi-agent coordination, currently available with Claude Code.
 
 #### Quick actions
 
-Quick actions run one-shot Claude tasks from the sidebar:
+Quick actions run one-shot coding CLI tasks from the sidebar:
 
 - **Commit** — stages and commits with an AI-generated message
 - **Push** — pushes the current branch to origin
 - **Create PR** — creates a pull request with AI-generated title and description
 - **Close PR** — closes the PR
 
-These run as background `claude -p` calls. Enable **Quick action debug mode** in settings if you want to know how the sausage is made. Trust us, [David](https://davidpoblador.com) spent more time than he can admit debugging weird behaviors in there.
+These run as background Claude Code or Codex commands, depending on the selected CLI. Enable **Quick action debug mode** in settings if you want to know how the sausage is made. Trust us, [David](https://davidpoblador.com) spent more time than he can admit debugging weird behaviors in there.
 
 ---
 
@@ -122,7 +123,7 @@ Terminals are GPU-rendered via [Ghostty](https://ghostty.org). They're fast.
 
 You can drag files and text onto the terminal. Because sometimes the mouse is fine, actually.
 
-**⌘Shift+E** opens the workstream directory in your preferred external terminal app.
+**⌘Option+T** opens the workstream directory in your preferred external terminal app.
 
 ### The Browser
 
@@ -130,12 +131,12 @@ Every workstream can have browser tabs (⌘B). The browser is embedded — no wi
 
 #### Port detection
 
-When your run script starts a dev server, Factory Floor detects the listening port automatically and navigates the browser to it. No configuration needed. The `ff-run` launcher monitors the process tree for TCP listeners.
+When your run script starts a dev server, Dockyard detects the listening port automatically and navigates the browser to it. No configuration needed. The `dy-run` launcher monitors the process tree for TCP listeners.
 
 #### Navigation
 
 - **⌘L** — focus the address bar
-- **⌘Shift+O** — open current URL in your external browser
+- **⌘Option+B** — open current URL in your external browser
 - **⌘Click** — opens links in your external browser
 
 The browser shows a connection error page with a retry button if the server isn't ready yet. It'll auto-navigate once the port is detected.
@@ -147,7 +148,7 @@ Each workstream can have editor tabs (⌘O). The editor is Monaco — the same e
 
 ### Keyboard Shortcuts
 
-Factory Floor is keyboard-first. Here's everything.
+Dockyard is keyboard-first. Here's everything.
 
 #### Global
 
@@ -188,6 +189,11 @@ Factory Floor is keyboard-first. Here's everything.
 | ⌘↑ | Previous project |
 | ⌘↓ | Next project |
 | ⌘0 | Back to project |
+
+#### External Apps
+
+| Shortcut | Action |
+|----------|--------|
 | ⌘Option+B | Open in external browser |
 | ⌘Option+T | Open in external terminal |
 
@@ -199,12 +205,12 @@ How to automate the boring parts.
 
 ### Scripts & Lifecycle
 
-Drop a `.factoryfloor.json` in your project root to automate the workstream lifecycle.
+Drop a `.dockyard.json` in your project root to automate the workstream lifecycle.
 
 ```json
 {
   "setup": "npm install",
-  "run": "PORT=$FF_PORT npm run dev",
+  "run": "PORT=$DY_PORT npm run dev",
   "teardown": "docker-compose down"
 }
 ```
@@ -212,12 +218,12 @@ Drop a `.factoryfloor.json` in your project root to automate the workstream life
 | Hook | When it runs |
 |------|-------------|
 | `setup` | Once, when a workstream is created. Install dependencies, run migrations, whatever. |
-| `run` | On demand via the Environment tab. Wrapped in `ff-run` for port detection. |
+| `run` | On demand via the Environment tab. Wrapped in `dy-run` for port detection. |
 | `teardown` | When a workstream is archived or purged. Stop containers, clean up. |
 
-All fields are optional. Scripts run in the workstream directory using your login shell. Yes, even [fish](https://github.com/alltuner/factoryfloor/pull/324). Don't ask how long that took.
+All fields are optional. Scripts run in the workstream directory using your login shell. Yes, even [fish](https://github.com/barnolacesc/dockyard/pull/324). Don't ask how long that took.
 
-Factory Floor also reads `.emdash.json`, `conductor.json`, and `.superset/config.json` if `.factoryfloor.json` doesn't exist. Because compatibility is polite. (Time for a [standard](https://xkcd.com/927/)?) When using a fallback config, Factory Floor injects compatibility environment variables so scripts work without modification (e.g. `CONDUCTOR_PORT`, `EMDASH_PORT`, `SUPERSET_PORT_BASE`).
+Dockyard also reads `.emdash.json`, `conductor.json`, and `.superset/config.json` if `.dockyard.json` doesn't exist. Because compatibility is polite. (Time for a [standard](https://xkcd.com/927/)?) When using a fallback config, Dockyard injects compatibility environment variables so scripts work without modification (e.g. `CONDUCTOR_PORT`, `EMDASH_PORT`, `SUPERSET_PORT_BASE`).
 
 #### The Environment tab
 
@@ -231,20 +237,20 @@ Every terminal, setup script, and run command in a workstream has these variable
 
 | Variable | What it is | Example |
 |----------|-----------|---------|
-| `FF_PROJECT` | Project name | `my-app` |
-| `FF_WORKSTREAM` | Workstream name | `coral-tidal-reef` |
-| `FF_PROJECT_DIR` | Main repository path | `/Users/you/my-app` |
-| `FF_WORKTREE_DIR` | Worktree path | `~/.factoryfloor/worktrees/my-app/coral-tidal-reef` |
-| `FF_PORT` | Deterministic port (40001-49999) | `42847` |
-| `FF_DEFAULT_BRANCH` | Default branch (main, master, etc.) | `main` |
+| `DY_PROJECT` | Project name | `my-app` |
+| `DY_WORKSTREAM` | Workstream name | `coral-tidal-reef` |
+| `DY_PROJECT_DIR` | Main repository path | `/Users/you/my-app` |
+| `DY_WORKTREE_DIR` | Worktree path | `~/.dockyard/worktrees/my-app/coral-tidal-reef` |
+| `DY_PORT` | Deterministic port (40001-49999) | `42847` |
+| `DY_DEFAULT_BRANCH` | Default branch (main, master, etc.) | `main` |
 
-#### About FF_PORT
+#### About DY_PORT
 
-Each workstream gets a deterministic port based on a hash of the worktree path. Same workstream, same port, every time. No port conflicts between workstreams. Use it in your run script: `PORT=$FF_PORT npm run dev`. If your thing is running thousands of workstreams simultaneously, you might get a collision 🎲 but hopefully you run out of memory first.
+Each workstream gets a deterministic port based on a hash of the worktree path. Same workstream, same port, every time. No port conflicts between workstreams. Use it in your run script: `PORT=$DY_PORT npm run dev`. If your thing is running thousands of workstreams simultaneously, you might get a collision 🎲 but hopefully you run out of memory first.
 
 #### .env symlink
 
-When enabled (Settings > General), Factory Floor symlinks `.env` and `.env.local` from your main repo into each worktree. So your secrets follow you without copy-pasting. Speaking of secrets, have we told you about [Vaultuner](https://vaultuner.alltuner.com)?
+When enabled (Settings > General), Dockyard symlinks `.env` and `.env.local` from your main repo into each worktree. So your secrets follow you without copy-pasting. Speaking of secrets, have we told you about [Vaultuner](https://vaultuner.barnolacesc.com)?
 
 ### Settings
 
@@ -256,9 +262,9 @@ Open with **⌘,** or click the gear icon.
 - **Branch prefix** — prefix for workstream branches (default: `ff`)
 - **Symlink .env files** — auto-symlink `.env` and `.env.local` to worktrees
 - **Theme** — System, Light, or Dark
-- **Language** — System default, English, Catalan, Spanish, or Swedish
+- **Language** — System default, English, Catalan, German, Spanish, or Swedish
 - **Confirm before quitting** — asks before closing with active workstreams
-- **Launch at login** — starts Factory Floor on boot
+- **Launch at login** — starts Dockyard on boot
 
 #### Coding Agent
 
@@ -269,8 +275,8 @@ Open with **⌘,** or click the gear icon.
 
 #### Apps
 
-- **External Terminal** — which terminal app to open with ⌘Shift+E
-- **External Browser** — which browser for ⌘Shift+O and ⌘Click
+- **External Terminal** — which terminal app to open with ⌘Option+T
+- **External Browser** — which browser for ⌘Option+B and ⌘Click
 
 #### Advanced
 
@@ -285,7 +291,7 @@ Open with **⌘,** or click the gear icon.
 
 ## Integrations
 
-Connecting Factory Floor to everything else.
+Connecting Dockyard to everything else.
 
 ### CLI
 
@@ -295,7 +301,7 @@ Install the `ff` command from Settings > Environment > Install CLI. Then:
 ff /path/to/your/project
 ```
 
-Opens the directory in Factory Floor. That's all it does, and that's all it needs to do.
+Opens the directory in Dockyard. That's all it does, and that's all it needs to do.
 
 ### GitHub
 
@@ -307,11 +313,11 @@ Requires the [gh CLI](https://cli.github.com/) with authentication (`gh auth log
 
 #### Quick actions
 
-From the sidebar, run one-click operations: **Create PR** (AI-generated title and description), **Push** (to origin with `-u`), or **Close PR** (closes with a comment). Because if you're tired of typing "now commit, push, and open a PR" into Claude for the hundredth time, you're not alone.
+From the sidebar, run one-click operations: **Create PR** (AI-generated title and description), **Push** (to origin with `-u`), or **Close PR** (closes with a comment). Because if you're tired of typing "now commit, push, and open a PR" into your agent for the hundredth time, you're not alone.
 
 ### Updates
 
-Factory Floor shows a badge in the sidebar when a newer version is available. You can also check manually from **Factory Floor > Check for Updates...**
+Dockyard shows a badge in the sidebar when a newer version is available. You can also check manually from **Dockyard > Check for Updates...**
 
 **Homebrew users:**
 
@@ -319,7 +325,7 @@ Factory Floor shows a badge in the sidebar when a newer version is available. Yo
 brew upgrade factory-floor
 ```
 
-**DMG users:** updates are handled automatically via [Sparkle](https://sparkle-project.org). Check manually from the menu: **Factory Floor > Check for Updates...**
+**DMG users:** updates are handled automatically via [Sparkle](https://sparkle-project.org). Check manually from the menu: **Dockyard > Check for Updates...**
 
 Enable **Bleeding edge updates** in Settings > Advanced for pre-release builds. For those who like to live on the edge and file bug reports.
 
@@ -329,7 +335,7 @@ Enable **Bleeding edge updates** in Settings > Advanced for pre-release builds. 
 
 ### Full IDE
 
-Nope. There's a built-in editor (⌘O) for quick looks and small edits — but we're not building an IDE. For serious editing sessions, you should be using the tools you already love: [Zed](https://zed.dev), [VS Code](https://code.visualstudio.com), whatever. Factory Floor gives you a coding agent, a browser, a worktree, and just enough editor to not have to leave. Besides, who's writing code anymore?
+Nope. There's a built-in editor (⌘O) for quick looks and small edits — but we're not building an IDE. For serious editing sessions, you should be using the tools you already love: [Zed](https://zed.dev), [VS Code](https://code.visualstudio.com), whatever. Dockyard gives you a coding agent, a browser, a worktree, and just enough editor to not have to leave. Besides, who's writing code anymore?
 
 ### Merge Viewer
 
@@ -341,7 +347,7 @@ Also nope. Your git client already does this better than we ever would. We just 
 
 #### "Tools not found"
 
-Factory Floor detects tools from your login shell. If `claude`, `gh`, `git`, or `tmux` aren't showing up:
+Dockyard detects tools from your login shell. If `claude`, `codex`, `gh`, `git`, or `tmux` aren't showing up:
 
 - Make sure they're in your shell's PATH
 - Fish 4.0 and Nix users: the app handles these environments, but if something's off, check Settings > Environment
@@ -349,16 +355,16 @@ Factory Floor detects tools from your login shell. If `claude`, `gh`, `git`, or 
 #### Tmux sessions not persisting
 
 - Verify tmux is installed and detected (Settings > Environment)
-- Factory Floor uses its own tmux socket (`-L factoryfloor`), so your personal tmux config won't interfere
+- Dockyard uses its own tmux socket (`-L dockyard`), so your personal tmux config won't interfere
 
 #### Port not detected
 
-- Make sure your run script uses `$FF_PORT` (or the port gets detected from the process tree)
-- The `ff-run` launcher wraps the run script — it monitors child processes for listening TCP ports
+- Make sure your run script uses `$DY_PORT` (or the port gets detected from the process tree)
+- The `dy-run` launcher wraps the run script — it monitors child processes for listening TCP ports
 - Check Settings > Advanced > Detailed logging for debug output
 
 #### Something else broken?
 
-- [Report a bug](https://github.com/alltuner/factoryfloor/issues/new?template=bug_report.yml) — tell us what went wrong
-- [Submit a fix prompt](https://github.com/alltuner/factoryfloor/issues/new?template=fix_prompt.yml) — write the prompt, we'll let the agent take a crack at it
-- [Something else](https://github.com/alltuner/factoryfloor/issues/new) — ideas, questions, existential doubts
+- [Report a bug](https://github.com/barnolacesc/dockyard/issues/new?template=bug_report.yml) — tell us what went wrong
+- [Submit a fix prompt](https://github.com/barnolacesc/dockyard/issues/new?template=fix_prompt.yml) — write the prompt, we'll let the agent take a crack at it
+- [Something else](https://github.com/barnolacesc/dockyard/issues/new) — ideas, questions, existential doubts

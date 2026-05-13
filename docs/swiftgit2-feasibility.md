@@ -54,7 +54,7 @@ Key concerns:
 | **`worktree list --porcelain`** | `git_worktree_list` | **No** | Critical gap |
 | **`worktree prune`** | `git_worktree_prune` | **No** | Critical gap |
 
-**Worktree operations are the core of Factory Floor's workstream lifecycle, and
+**Worktree operations are the core of Dockyard's workstream lifecycle, and
 SwiftGit2 does not support any of them.**
 
 ## Benefits (if it worked)
@@ -69,7 +69,7 @@ SwiftGit2 does not support any of them.**
 ## Risks and Blockers
 
 1. **No worktree support.** This is a hard blocker. Worktree operations are
-   Factory Floor's most important git operations, and SwiftGit2 does not expose
+   Dockyard's most important git operations, and SwiftGit2 does not expose
    them. The underlying libgit2 v1.1.0 that SwiftGit2 bundles does have
    worktree APIs, but nobody has written Swift bindings for them.
 
@@ -77,7 +77,7 @@ SwiftGit2 does not support any of them.**
    years of bug fixes, security patches, and feature improvements (including
    better worktree support added in v1.8.0).
 
-3. **No SPM support.** Factory Floor uses XcodeGen, and integrating a
+3. **No SPM support.** Dockyard uses XcodeGen, and integrating a
    Carthage-only dependency adds build complexity. The SPM migration PR has
    stalled.
 
@@ -121,7 +121,7 @@ codebase already does in `AppEnvironment`).
 
 ## Recommendation: Do Not Adopt
 
-**SwiftGit2 is not a viable option for Factory Floor.** The missing worktree
+**SwiftGit2 is not a viable option for Dockyard.** The missing worktree
 support is a hard blocker, and the project's maintenance trajectory does not
 suggest it will be added. The stale libgit2 version, lack of SPM support, and
 Swift 6 incompatibility compound the problem.

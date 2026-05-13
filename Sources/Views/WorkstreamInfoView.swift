@@ -17,7 +17,7 @@ struct WorkstreamInfoView: View {
     var sessionMode: TerminalSessionMode = .standard
 
     @EnvironmentObject var appEnv: AppEnvironment
-    @AppStorage("factoryfloor.defaultTerminal") private var defaultTerminal: String = ""
+    @AppStorage("dockyard.defaultTerminal") private var defaultTerminal: String = ""
     @State private var branchName: String?
     @State private var copiedBranch = false
     @State private var copiedPath = false
@@ -81,6 +81,50 @@ struct WorkstreamInfoView: View {
                             }
                         } label: {
                             Text("Branch")
+                        }
+                        
+                        let state = appEnv.worktreeState(for: workingDirectory)
+                        
+                        if state.commitsAhead > 0 {
+                            LabeledContent {
+                                Text("↑ \(state.commitsAhead) commits")
+                                    .font(.system(.body, design: .monospaced))
+                                    .foregroundStyle(.secondary)
+                            } label: {
+                                Text("Ahead")
+                            }
+                        }
+                        
+                        LabeledContent {
+                            if state.uncommittedCount > 0 {
+                                Text("\(state.uncommittedCount) files")
+                                    .font(.system(.body, design: .monospaced))
+                                    .foregroundStyle(.yellow)
+                            } else {
+                                Text("Clean")
+                                    .font(.system(.body, design: .monospaced))
+                                    .foregroundStyle(.secondary)
+                            }
+                        } label: {
+                            Text("Uncommitted")
+                        }
+                        
+                        LabeledContent {
+                            Text(formattedBaseString(baseBranch: state.baseBranch, createdDate: state.branchCreatedDate))
+                                .font(.system(.body, design: .monospaced))
+                                .foregroundStyle(.secondary)
+                        } label: {
+                            Text("Base")
+                        }
+                        
+                        if workingDirectory != projectDirectory, let worktreeCreated = state.worktreeCreatedDate {
+                            LabeledContent {
+                                Text(formatWorktreeAge(worktreeCreated))
+                                    .font(.system(.body, design: .monospaced))
+                                    .foregroundStyle(.secondary)
+                            } label: {
+                                Text("Worktree Age")
+                            }
                         }
                     }
 
@@ -209,6 +253,7 @@ struct WorkstreamInfoView: View {
                     EnvironmentTabView(
                         workstreamID: workstreamID,
                         workingDirectory: workingDirectory,
+                        projectDirectory: projectDirectory,
                         projectName: projectName,
                         workstreamName: workstreamName,
                         scriptConfig: scriptConfig,
@@ -249,6 +294,29 @@ struct WorkstreamInfoView: View {
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .onAppear { loadInfo() }
     } // body
+
+    private func formattedBaseString(baseBranch: String, createdDate: Date?) -> String {
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateFormat = "MMM d"
+        let dateStr = createdDate.map { dateFormatter.string(from: $0) } ?? ""
+        return baseBranch + (dateStr.isEmpty ? "" : " · \(dateStr)")
+    }
+
+    private func formatWorktreeAge(_ date: Date) -> String {
+        let calendar = Calendar.current
+        if calendar.isDateInToday(date) {
+            return String(localized: "Created today")
+        }
+        let components = calendar.dateComponents([.month, .weekOfYear, .day], from: calendar.startOfDay(for: date), to: calendar.startOfDay(for: Date()))
+        if let month = components.month, month > 0 {
+            return "\(month) \(month == 1 ? "month" : "months")"
+        } else if let week = components.weekOfYear, week > 0 {
+            return "\(week) \(week == 1 ? "week" : "weeks")"
+        } else if let day = components.day, day > 0 {
+            return "\(day) \(day == 1 ? "day" : "days")"
+        }
+        return String(localized: "Created today")
+    }
 
     private func openInTerminal(path: String) {
         if !defaultTerminal.isEmpty,

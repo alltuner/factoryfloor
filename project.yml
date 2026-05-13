@@ -1,6 +1,6 @@
-name: FactoryFloor
+name: Dockyard
 options:
-  bundleIdPrefix: com.alltuner
+  bundleIdPrefix: com.barnolacesc
   deploymentTarget:
     macOS: "14.0"
   xcodeVersion: "16.0"
@@ -10,7 +10,7 @@ settings:
   base:
     SWIFT_VERSION: "6.0"
     SWIFT_STRICT_CONCURRENCY: complete
-    SWIFT_OBJC_BRIDGING_HEADER: Resources/FactoryFloor-Bridging-Header.h
+    SWIFT_OBJC_BRIDGING_HEADER: Resources/Dockyard-Bridging-Header.h
     HEADER_SEARCH_PATHS:
       - $(PROJECT_DIR)/ghostty/include
     OTHER_SWIFT_FLAGS:
@@ -34,11 +34,11 @@ packages:
     from: "2.9.1"
 
 targets:
-  FactoryFloor:
+  Dockyard:
     type: application
     platform: macOS
     info:
-      path: FactoryFloor/Info.plist
+      path: Dockyard/Info.plist
       properties:
         CFBundleDisplayName: $(PRODUCT_NAME)
         CFBundleVersion: "0.1.75" # x-release-please-version
@@ -50,27 +50,27 @@ targets:
         NSAppTransportSecurity:
           NSAllowsArbitraryLoads: true
         SUPublicEDKey: "grC1rloxT0gFZ2mQVIuDTZlkNFXwXLZhn9+xs4YGuXo="
-        SUFeedURL: https://factory-floor.com/appcast.xml
-        SUEnableAutomaticChecks: true
+        SUFeedURL: https://francesc.barnola.net/appcast.xml
+        SUEnableAutomaticChecks: false
         CFBundleURLTypes:
-          - CFBundleURLName: com.alltuner.factoryfloor.open
+          - CFBundleURLName: com.barnolacesc.dockyard.open
             CFBundleURLSchemes:
-              - $(FF_URL_SCHEME)
-        NSAppleEventsUsageDescription: A program running within Factory Floor would like to use AppleScript.
-        NSAudioCaptureUsageDescription: A program running within Factory Floor would like to access your system's audio.
-        NSBluetoothAlwaysUsageDescription: A program running within Factory Floor would like to use Bluetooth.
-        NSCalendarsUsageDescription: A program running within Factory Floor would like to access your Calendar.
-        NSCameraUsageDescription: A program running within Factory Floor would like to use the camera.
-        NSContactsUsageDescription: A program running within Factory Floor would like to access your Contacts.
-        NSLocalNetworkUsageDescription: A program running within Factory Floor would like to access the local network.
-        NSLocationTemporaryUsageDescriptionDictionary: A program running within Factory Floor would like to use your location temporarily.
-        NSLocationUsageDescription: A program running within Factory Floor would like to access your location information.
-        NSMicrophoneUsageDescription: A program running within Factory Floor would like to use your microphone.
-        NSMotionUsageDescription: A program running within Factory Floor would like to access motion data.
-        NSPhotoLibraryUsageDescription: A program running within Factory Floor would like to access your Photo Library.
-        NSRemindersUsageDescription: A program running within Factory Floor would like to access your reminders.
-        NSSpeechRecognitionUsageDescription: A program running within Factory Floor would like to use speech recognition.
-        NSSystemAdministrationUsageDescription: A program running within Factory Floor requires elevated privileges.
+              - $(DY_URL_SCHEME)
+        NSAppleEventsUsageDescription: A program running within Dockyard would like to use AppleScript.
+        NSAudioCaptureUsageDescription: A program running within Dockyard would like to access your system's audio.
+        NSBluetoothAlwaysUsageDescription: A program running within Dockyard would like to use Bluetooth.
+        NSCalendarsUsageDescription: A program running within Dockyard would like to access your Calendar.
+        NSCameraUsageDescription: A program running within Dockyard would like to use the camera.
+        NSContactsUsageDescription: A program running within Dockyard would like to access your Contacts.
+        NSLocalNetworkUsageDescription: A program running within Dockyard would like to access the local network.
+        NSLocationTemporaryUsageDescriptionDictionary: A program running within Dockyard would like to use your location temporarily.
+        NSLocationUsageDescription: A program running within Dockyard would like to access your location information.
+        NSMicrophoneUsageDescription: A program running within Dockyard would like to use your microphone.
+        NSMotionUsageDescription: A program running within Dockyard would like to access motion data.
+        NSPhotoLibraryUsageDescription: A program running within Dockyard would like to access your Photo Library.
+        NSRemindersUsageDescription: A program running within Dockyard would like to access your reminders.
+        NSSpeechRecognitionUsageDescription: A program running within Dockyard would like to use speech recognition.
+        NSSystemAdministrationUsageDescription: A program running within Dockyard requires elevated privileges.
     sources:
       - path: Sources
         excludes:
@@ -97,7 +97,7 @@ targets:
         buildPhase: resources
       - path: Localization/de.lproj/InfoPlist.strings
         buildPhase: resources
-      - path: Resources/Scripts/ff
+      - path: Resources/Scripts/dy
         buildPhase: resources
       - path: Resources/notification.wav
         buildPhase: resources
@@ -112,8 +112,8 @@ targets:
         buildPhase: resources
     settings:
       base:
-        PRODUCT_MODULE_NAME: FactoryFloor
-        CODE_SIGN_ENTITLEMENTS: Resources/ff2.entitlements
+        PRODUCT_MODULE_NAME: Dockyard
+        CODE_SIGN_ENTITLEMENTS: Resources/dy.entitlements
         ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
         LD_RUNPATH_SEARCH_PATHS:
           - "@executable_path/../Frameworks"
@@ -135,15 +135,17 @@ targets:
           - -framework Carbon
       configs:
         Debug:
-          PRODUCT_BUNDLE_IDENTIFIER: com.alltuner.dockyard.debug
+        Debug:
+          PRODUCT_BUNDLE_IDENTIFIER: com.barnolacesc.dockyard.debug
           PRODUCT_NAME: Dockyard Debug
           ASSETCATALOG_COMPILER_APPICON_NAME: AppIconDebug
           SWIFT_ACTIVE_COMPILATION_CONDITIONS: DEBUG
           FF_URL_SCHEME: dockyard-debug
         Release:
-          PRODUCT_BUNDLE_IDENTIFIER: com.alltuner.dockyard
+          PRODUCT_BUNDLE_IDENTIFIER: com.barnolacesc.dockyard
           PRODUCT_NAME: Dockyard
           FF_URL_SCHEME: dockyard
+          DY_URL_SCHEME: dockyard
           DEBUG_INFORMATION_FORMAT: dwarf-with-dsym
     dependencies:
       - target: FFRun
@@ -172,41 +174,46 @@ targets:
       - script: |
           set -e
           mkdir -p "${TARGET_BUILD_DIR}/${CONTENTS_FOLDER_PATH}/Helpers"
-          cp -f "${BUILT_PRODUCTS_DIR}/ff-run" "${TARGET_BUILD_DIR}/${CONTENTS_FOLDER_PATH}/Helpers/ff-run"
-          chmod +x "${TARGET_BUILD_DIR}/${CONTENTS_FOLDER_PATH}/Helpers/ff-run"
-          codesign --force --sign "${EXPANDED_CODE_SIGN_IDENTITY}" --timestamp --options=runtime --generate-entitlement-der "${TARGET_BUILD_DIR}/${CONTENTS_FOLDER_PATH}/Helpers/ff-run"
-        name: Bundle ff-run
+          cp -f "${BUILT_PRODUCTS_DIR}/dy-run" "${TARGET_BUILD_DIR}/${CONTENTS_FOLDER_PATH}/Helpers/dy-run"
+          chmod +x "${TARGET_BUILD_DIR}/${CONTENTS_FOLDER_PATH}/Helpers/dy-run"
+          codesign --force --sign "${EXPANDED_CODE_SIGN_IDENTITY}" --timestamp --options=runtime --generate-entitlement-der "${TARGET_BUILD_DIR}/${CONTENTS_FOLDER_PATH}/Helpers/dy-run"
+        name: Bundle dy-run
         outputFiles:
-          - $(TARGET_BUILD_DIR)/$(CONTENTS_FOLDER_PATH)/Helpers/ff-run
+          - $(TARGET_BUILD_DIR)/$(CONTENTS_FOLDER_PATH)/Helpers/dy-run
 
   FFRun:
     type: tool
     platform: macOS
+    preBuildScripts:
+      - script: |
+          set -e
+          HASH=$(git rev-parse --short HEAD || echo "unknown")
+          echo "enum AppCommit { static let hash = \"$HASH\" }" > "${PROJECT_DIR}/Sources/Models/AppCommit.swift"
+        name: Generate AppCommit
     sources:
-      - path: Sources
-        includes:
-          - Launcher/**
-          - Models/AppConstants.swift
-          - Models/FilePersistence.swift
-          - Models/RunState.swift
+      - path: Sources/Launcher
+      - path: Sources/Models/AppConstants.swift
+      - path: Sources/Models/AppCommit.swift
+      - path: Sources/Models/FilePersistence.swift
+      - path: Sources/Models/RunState.swift
     settings:
       base:
-        PRODUCT_NAME: ff-run
+        PRODUCT_NAME: dy-run
         OTHER_LDFLAGS:
           - -lproc
       configs:
         Debug:
           SWIFT_ACTIVE_COMPILATION_CONDITIONS: DEBUG
 
-  FactoryFloorTests:
+  DockyardTests:
     type: bundle.unit-test
     platform: macOS
     sources:
       - Tests
     dependencies:
-      - target: FactoryFloor
+      - target: Dockyard
     settings:
       base:
-        PRODUCT_BUNDLE_IDENTIFIER: com.alltuner.factoryfloor.tests
+        PRODUCT_BUNDLE_IDENTIFIER: com.barnolacesc.dockyard.tests
         GENERATE_INFOPLIST_FILE: true
         TEST_HOST: "$(BUILT_PRODUCTS_DIR)/Dockyard Debug.app/Contents/MacOS/Dockyard Debug"

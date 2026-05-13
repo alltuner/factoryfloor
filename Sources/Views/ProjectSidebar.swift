@@ -5,7 +5,7 @@ import OSLog
 import SwiftUI
 import UniformTypeIdentifiers
 
-private let logger = Logger(subsystem: "factoryfloor", category: "sidebar")
+private let logger = Logger(subsystem: "dockyard", category: "sidebar")
 
 func expandedProjectIDs(afterSelecting selection: SidebarSelection?, current: Set<UUID>, projectIDByWorkstreamID: [UUID: UUID]) -> Set<UUID> {
     guard let selection else { return current }
@@ -24,8 +24,8 @@ func expandedProjectIDs(afterSelecting selection: SidebarSelection?, current: Se
 }
 
 extension Notification.Name {
-    static let addProject = Notification.Name("factoryfloor.addProject")
-    static let addNew = Notification.Name("factoryfloor.addNew")
+    static let addProject = Notification.Name("dockyard.addProject")
+    static let addNew = Notification.Name("dockyard.addNew")
 }
 
 struct ProjectSidebar: View {
@@ -49,7 +49,11 @@ struct ProjectSidebar: View {
     @State private var cachedWorkstreamIndex: [UUID: (Int, Int)] = [:]
     @State private var showWorktreeError = false
     @State private var showNotGitRepoError = false
-    @AppStorage("factoryfloor.sortOrder") private var sortOrder: ProjectSortOrder = .recent
+    @AppStorage("dockyard.sortOrder") private var sortOrder: ProjectSortOrder = .recent
+
+    private var currentVersionLooksLikeRelease: Bool {
+        AppConstants.version.range(of: "^[0-9]+\\.[0-9]+\\.[0-9]+$", options: .regularExpression) != nil
+    }
 
     private func recomputeSortedIDs() -> [UUID] {
         switch sortOrder {
@@ -189,29 +193,32 @@ struct ProjectSidebar: View {
 
     private var bottomBar: some View {
         VStack(spacing: 4) {
-            if let version = updateChecker.availableVersion {
+            #if !DEBUG
+            if currentVersionLooksLikeRelease, let version = updateChecker.availableVersion {
                 UpdateBanner(
                     version: version,
                     pendingReleases: updateChecker.pendingReleases,
                     updater: updater
                 )
             }
+            #endif
+
+            Text(AppConstants.displayVersion)
+                .font(.system(size: 10, design: .monospaced))
+                .foregroundStyle(.tertiary)
+                .padding(.bottom, 4)
 
             // Credit
             VStack(spacing: 2) {
                 HStack(spacing: 0) {
-                    Text("by ")
+                    Text("from ")
                         .foregroundStyle(.tertiary)
-                    Link("David Poblador i Garcia.", destination: URL(string: "https://davidpoblador.com/")!)
+                    Link("barnolacesclabs", destination: URL(string: "https://davidpoblador.com/")!)
                         .foregroundStyle(.secondary)
-                }
-                HStack(spacing: 0) {
-                    Text("Help ")
+                    Text(", tuned by ")
                         .foregroundStyle(.tertiary)
-                    Link("supporting", destination: sponsorURL)
+                    Link("barnolacesc", destination: URL(string: "https://github.com/barnolacesc")!)
                         .foregroundStyle(.secondary)
-                    Text(" the development.")
-                        .foregroundStyle(.tertiary)
                 }
             }
             .font(.system(size: 10))
@@ -424,8 +431,8 @@ struct ProjectSidebar: View {
 
     // MARK: - Workstream management
 
-    @AppStorage("factoryfloor.bypassPermissions") private var defaultBypass: Bool = false
-    @AppStorage("factoryfloor.symlinkEnv") private var symlinkEnv: Bool = true
+    @AppStorage("dockyard.bypassPermissions") private var defaultBypass: Bool = false
+    @AppStorage("dockyard.symlinkEnv") private var symlinkEnv: Bool = true
 
     private func addWorkstream(for projectID: UUID, bypassPermissions: Bool? = nil) {
         logger.warning("[FF] addWorkstream called for projectID=\(projectID, privacy: .public)")
@@ -567,11 +574,11 @@ struct ProjectSidebar: View {
     private var sponsorURL: URL {
         let lang = Locale.current.language.languageCode?.identifier ?? "en"
         let path = lang == "en" ? "/sponsor" : "/\(lang)/sponsor"
-        return URL(string: "https://factory-floor.com\(path)")!
+        return URL(string: "https://francesc.barnola.net\(path)")!
     }
 
-    @AppStorage("factoryfloor.baseDirectory") private var baseDirectory: String = NSSearchPathForDirectoriesInDomains(.documentDirectory, .userDomainMask, true).first ?? ""
-    @AppStorage("factoryfloor.branchPrefix") private var branchPrefix: String = "ff"
+    @AppStorage("dockyard.baseDirectory") private var baseDirectory: String = NSSearchPathForDirectoriesInDomains(.documentDirectory, .userDomainMask, true).first ?? ""
+    @AppStorage("dockyard.branchPrefix") private var branchPrefix: String = "dy"
 
     private func openDirectoryPicker() {
         let panel = NSOpenPanel()
@@ -652,7 +659,7 @@ func copyTextToPasteboard(_ text: String) {
 
 /// Opens a directory in the user's configured terminal, falling back to Apple Terminal.
 func openDirectoryInTerminal(_ directory: String) {
-    let terminalBundleID = UserDefaults.standard.string(forKey: "factoryfloor.defaultTerminal") ?? ""
+    let terminalBundleID = UserDefaults.standard.string(forKey: "dockyard.defaultTerminal") ?? ""
     let appURL: URL?
     if !terminalBundleID.isEmpty {
         appURL = NSWorkspace.shared.urlForApplication(withBundleIdentifier: terminalBundleID)

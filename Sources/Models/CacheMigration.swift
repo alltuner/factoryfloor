@@ -1,4 +1,4 @@
-// ABOUTME: Moves run-state and tmux.conf from ~/.config/factoryfloor/ to ~/Library/Caches/factoryfloor/.
+// ABOUTME: Moves run-state and tmux.conf from ~/.config/dockyard/ to ~/Library/Caches/dockyard/.
 // ABOUTME: Runs once on launch; removes the old config directory if empty afterward.
 
 import Foundation

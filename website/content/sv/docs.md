@@ -15,9 +15,9 @@ Du behöver två saker: en Mac och en vag känsla av att ditt nuvarande arbetsfl
 brew install --cask factory-floor
 ```
 
-<a href="https://github.com/alltuner/factoryfloor/releases/latest/download/FactoryFloor.dmg" class="docs-download"><svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg> Ladda ner DMG</a>
+<a href="https://github.com/barnolacesc/dockyard/releases/latest/download/Dockyard.dmg" class="docs-download"><svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg> Ladda ner DMG</a>
 
-Factory Floor fungerar bäst när dessa är installerade (appen berättar om något saknas):
+Dockyard fungerar bäst när dessa är installerade (appen berättar om något saknas):
 
 - **[Claude Code](https://docs.anthropic.com/en/docs/claude-code/overview)** — hela poängen, egentligen
 - **git** — du har förmodligen redan detta
@@ -26,12 +26,12 @@ Factory Floor fungerar bäst när dessa är installerade (appen berättar om nå
 
 #### Dina första 30 sekunder {#your-first-30-seconds}
 
-1. Öppna Factory Floor
+1. Öppna Dockyard
 2. Dra ett git-repository till sidebar (eller klicka **+** för att välja ett)
 3. Tryck **⌘N** för att skapa en workstream
 4. Klart. Du kodar med AI nu.
 
-Inga konfigurationsfiler behövs. Factory Floor upptäcker din git-konfiguration, installerade verktyg och GitHub-anslutningar automatiskt.
+Inga konfigurationsfiler behövs. Dockyard upptäcker din git-konfiguration, installerade verktyg och GitHub-anslutningar automatiskt.
 
 ---
 
@@ -41,7 +41,7 @@ De tre sakerna du kommer att interagera med varje dag.
 
 ### Projekt {#projects}
 
-Ett projekt är ett git-repository. Dra en katalog till sidebar eller klicka på **+**-knappen. Factory Floor kontrollerar om det är ett git-repo (och erbjuder att initiera ett om det inte är det).
+Ett projekt är ett git-repository. Dra en katalog till sidebar eller klicka på **+**-knappen. Dockyard kontrollerar om det är ett git-repo (och erbjuder att initiera ett om det inte är det).
 
 Projektöversikten visar repository-info, GitHub-detaljer (stjärnor, forks, öppna issues), upp till 5 senaste PRs, och automatiskt upptäckt markdown-dokumentation från ditt repo.
 
@@ -73,14 +73,14 @@ Gränssnittet dyker upp direkt, worktree-skapandet sker i bakgrunden.
 
 #### Branch auto-rename {#branch-auto-rename}
 
-Med **Auto-rename branch** aktiverat i inställningarna byter coding agent namn på din branch för att matcha uppgiften vid första prompten. Så `ff/coral-tidal-reef` blir `ff/fix-login-timeout`.
+Med **Auto-rename branch** aktiverat i inställningarna byter coding agent namn på din branch för att matcha uppgiften vid första prompten. Så `dy/coral-tidal-reef` blir `dy/fix-login-timeout`.
 
 #### Ta bort vs. rensa {#removing-vs-purging}
 
 - **Remove** — stänger terminals och agent, men worktree finns kvar på disken
 - **Purge** — raderar permanent worktree och branch (frågar om bekräftelse om det finns uncommittade ändringar)
 
-När en PR är mergad visar Factory Floor en "Purge" badge så att du vet att det är säkert att städa upp.
+När en PR är mergad visar Dockyard en "Purge" badge så att du vet att det är säkert att städa upp.
 
 ### Coding Agent {#the-coding-agent}
 
@@ -121,7 +121,7 @@ Terminals är GPU-renderade via [Ghostty](https://ghostty.org). De är snabba.
 
 Du kan dra filer och text till terminal. För ibland är musen helt okej, faktiskt.
 
-**⌘Shift+E** öppnar workstream-katalogen i din föredragna externa terminal-app.
+**⌘Option+T** öppnar workstream-katalogen i din föredragna externa terminal-app.
 
 ### Browser {#the-browser}
 
@@ -129,19 +129,19 @@ Varje workstream kan ha browser tabs (⌘B). Browser är inbäddad, inget fönst
 
 #### Port detection {#port-detection}
 
-När ditt run-script startar en dev-server upptäcker Factory Floor den lyssnande porten automatiskt och navigerar browser dit. Ingen konfiguration behövs. `ff-run`-launchern övervakar processträdet efter TCP-lyssnare.
+När ditt run-script startar en dev-server upptäcker Dockyard den lyssnande porten automatiskt och navigerar browser dit. Ingen konfiguration behövs. `dy-run`-launchern övervakar processträdet efter TCP-lyssnare.
 
 #### Navigering {#navigation}
 
 - **⌘L** — fokusera adressfältet
-- **⌘Shift+O** — öppna aktuell URL i din externa browser
+- **⌘Option+B** — öppna aktuell URL i din externa browser
 - **⌘Click** — öppnar länkar i din externa browser
 
 Browser visar en anslutningsfel-sida med en retry-knapp om servern inte är redo ännu. Den auto-navigerar när porten upptäcks.
 
 ### Tangentbordsgenvägar {#keyboard-shortcuts}
 
-Factory Floor är tangentbord-först. Här är allt.
+Dockyard är tangentbord-först. Här är allt.
 
 #### Globala {#global}
 
@@ -190,12 +190,12 @@ Hur man automatiserar de tråkiga delarna.
 
 ### Script och livscykel {#scripts--lifecycle}
 
-Lägg en `.factoryfloor.json` i projektets rotkatalog för att automatisera workstream-livscykeln.
+Lägg en `.dockyard.json` i projektets rotkatalog för att automatisera workstream-livscykeln.
 
 ```json
 {
   "setup": "npm install",
-  "run": "PORT=$FF_PORT npm run dev",
+  "run": "PORT=$DY_PORT npm run dev",
   "teardown": "docker-compose down"
 }
 ```
@@ -203,12 +203,12 @@ Lägg en `.factoryfloor.json` i projektets rotkatalog för att automatisera work
 | Hook | När det körs |
 |------|-------------|
 | `setup` | En gång, när en workstream skapas. Installera beroenden, kör migreringar, vad som helst. |
-| `run` | På begäran via Environment-tabben. Kapslad i `ff-run` för port detection. |
+| `run` | På begäran via Environment-tabben. Kapslad i `dy-run` för port detection. |
 | `teardown` | När en workstream arkiveras eller rensas. Stoppa containrar, städa upp. |
 
-Alla fält är valfria. Script körs i workstream-katalogen med ditt login shell. Ja, även [fish](https://github.com/alltuner/factoryfloor/pull/324). Fråga inte hur lång tid det tog.
+Alla fält är valfria. Script körs i workstream-katalogen med ditt login shell. Ja, även [fish](https://github.com/barnolacesc/dockyard/pull/324). Fråga inte hur lång tid det tog.
 
-Factory Floor läser också `.emdash.json`, `conductor.json` och `.superset/config.json` om `.factoryfloor.json` inte finns. För kompatibilitet är artigt. (Dags för en [standard](https://xkcd.com/927/)?) Vid fallback-konfiguration injicerar Factory Floor kompatibla miljövariabler så att script fungerar utan ändring (t.ex. `CONDUCTOR_PORT`, `EMDASH_PORT`, `SUPERSET_PORT_BASE`).
+Dockyard läser också `.emdash.json`, `conductor.json` och `.superset/config.json` om `.dockyard.json` inte finns. För kompatibilitet är artigt. (Dags för en [standard](https://xkcd.com/927/)?) Vid fallback-konfiguration injicerar Dockyard kompatibla miljövariabler så att script fungerar utan ändring (t.ex. `CONDUCTOR_PORT`, `EMDASH_PORT`, `SUPERSET_PORT_BASE`).
 
 #### Environment-tabben {#the-environment-tab}
 
@@ -222,20 +222,20 @@ Varje terminal, setup-script och run-kommando i en workstream har dessa variable
 
 | Variabel | Vad det är | Exempel |
 |----------|-----------|---------|
-| `FF_PROJECT` | Projektnamn | `my-app` |
-| `FF_WORKSTREAM` | Workstream-namn | `coral-tidal-reef` |
-| `FF_PROJECT_DIR` | Huvudrepots sökväg | `/Users/you/my-app` |
-| `FF_WORKTREE_DIR` | Worktree-sökväg | `~/.factoryfloor/worktrees/my-app/coral-tidal-reef` |
-| `FF_PORT` | Deterministisk port (40001-49999) | `42847` |
-| `FF_DEFAULT_BRANCH` | Standardgren (main, master, etc.) | `main` |
+| `DY_PROJECT` | Projektnamn | `my-app` |
+| `DY_WORKSTREAM` | Workstream-namn | `coral-tidal-reef` |
+| `DY_PROJECT_DIR` | Huvudrepots sökväg | `/Users/you/my-app` |
+| `DY_WORKTREE_DIR` | Worktree-sökväg | `~/.dockyard/worktrees/my-app/coral-tidal-reef` |
+| `DY_PORT` | Deterministisk port (40001-49999) | `42847` |
+| `DY_DEFAULT_BRANCH` | Standardgren (main, master, etc.) | `main` |
 
-#### Om FF_PORT {#about-ff_port}
+#### Om DY_PORT {#about-dy_port}
 
-Varje workstream får en deterministisk port baserad på en hash av worktree-sökvägen. Samma workstream, samma port, varje gång. Inga portkonflikter mellan workstreams. Använd den i ditt run-script: `PORT=$FF_PORT npm run dev`. Om du kör tusentals workstreams samtidigt kanske du får en kollision 🎲 men förhoppningsvis tar minnet slut först.
+Varje workstream får en deterministisk port baserad på en hash av worktree-sökvägen. Samma workstream, samma port, varje gång. Inga portkonflikter mellan workstreams. Använd den i ditt run-script: `PORT=$DY_PORT npm run dev`. Om du kör tusentals workstreams samtidigt kanske du får en kollision 🎲 men förhoppningsvis tar minnet slut först.
 
 #### .env symlink {#env-symlink}
 
-När aktiverat (Settings > General) skapar Factory Floor symlinks för `.env` och `.env.local` från ditt huvudrepo till varje worktree. Så dina hemligheter följer med utan kopiera-klistra. På tal om hemligheter, har vi berättat om [Vaultuner](https://vaultuner.alltuner.com)?
+När aktiverat (Settings > General) skapar Dockyard symlinks för `.env` och `.env.local` från ditt huvudrepo till varje worktree. Så dina hemligheter följer med utan kopiera-klistra. På tal om hemligheter, har vi berättat om [Vaultuner](https://vaultuner.barnolacesc.com)?
 
 ### Inställningar {#settings}
 
@@ -249,7 +249,7 @@ När aktiverat (Settings > General) skapar Factory Floor symlinks för `.env` oc
 - **Theme** — System, Ljust eller Mörkt
 - **Language** — Systemstandard, English, Catalan, Spanish eller Swedish
 - **Confirm before quitting** — frågar innan stängning med aktiva workstreams
-- **Launch at login** — startar Factory Floor vid uppstart
+- **Launch at login** — startar Dockyard vid uppstart
 
 #### Coding Agent {#coding-agent}
 
@@ -260,8 +260,8 @@ När aktiverat (Settings > General) skapar Factory Floor symlinks för `.env` oc
 
 #### Appar {#apps}
 
-- **External Terminal** — vilken terminal-app som öppnas med ⌘Shift+E
-- **External Browser** — vilken browser för ⌘Shift+O och ⌘Click
+- **External Terminal** — vilken terminal-app som öppnas med ⌘Option+T
+- **External Browser** — vilken browser för ⌘Option+B och ⌘Click
 
 #### Avancerat {#advanced}
 
@@ -276,7 +276,7 @@ När aktiverat (Settings > General) skapar Factory Floor symlinks för `.env` oc
 
 ## Integrationer {#integrations}
 
-Koppla Factory Floor till allt annat.
+Koppla Dockyard till allt annat.
 
 ### CLI {#cli}
 
@@ -286,7 +286,7 @@ Installera `ff`-kommandot från Settings > Environment > Install CLI. Sedan:
 ff /path/to/your/project
 ```
 
-Öppnar katalogen i Factory Floor. Det är allt det gör, och det är allt det behöver göra.
+Öppnar katalogen i Dockyard. Det är allt det gör, och det är allt det behöver göra.
 
 ### GitHub {#github}
 
@@ -302,7 +302,7 @@ Från sidebar, kör ett-klicks-operationer: **Create PR** (AI-genererad titel oc
 
 ### Uppdateringar {#updates}
 
-Factory Floor visar en badge i sidebar när en nyare version finns tillgänglig. Du kan också kontrollera manuellt från **Factory Floor > Check for Updates...**
+Dockyard visar en badge i sidebar när en nyare version finns tillgänglig. Du kan också kontrollera manuellt från **Dockyard > Check for Updates...**
 
 **Homebrew-användare:**
 
@@ -310,7 +310,7 @@ Factory Floor visar en badge i sidebar när en nyare version finns tillgänglig.
 brew upgrade factory-floor
 ```
 
-**DMG-användare:** uppdateringar hanteras automatiskt via [Sparkle](https://sparkle-project.org). Kontrollera manuellt från menyn: **Factory Floor > Check for Updates...**
+**DMG-användare:** uppdateringar hanteras automatiskt via [Sparkle](https://sparkle-project.org). Kontrollera manuellt från menyn: **Dockyard > Check for Updates...**
 
 Aktivera **Bleeding edge updates** i Settings > Advanced för förhandsversioner. För dig som gillar att leva på kanten och skicka buggrapporter.
 
@@ -320,7 +320,7 @@ Aktivera **Bleeding edge updates** i Settings > Advanced för förhandsversioner
 
 ### Kodredigerare {#code-editor}
 
-Nä. Ingen syntaxmarkering, ingen autocomplete, ingen minimap. Våra obefintliga riskkapitalister har inte drivit någon företagsagenda. Vi tänker att du ska använda verktygen du redan älskar: [Zed](https://zed.dev), [VS Code](https://code.visualstudio.com), vad som helst. Factory Floor ger dig en coding agent, en browser och en worktree. Dessutom, vem skriver kod längre?
+Nä. Ingen syntaxmarkering, ingen autocomplete, ingen minimap. Våra obefintliga riskkapitalister har inte drivit någon företagsagenda. Vi tänker att du ska använda verktygen du redan älskar: [Zed](https://zed.dev), [VS Code](https://code.visualstudio.com), vad som helst. Dockyard ger dig en coding agent, en browser och en worktree. Dessutom, vem skriver kod längre?
 
 ### Merge-visare {#merge-viewer}
 
@@ -332,7 +332,7 @@ Också nä. Din git-klient gör redan detta bättre än vi någonsin skulle kunn
 
 #### "Tools not found" {#tools-not-found}
 
-Factory Floor upptäcker verktyg från ditt login shell. Om `claude`, `gh`, `git` eller `tmux` inte dyker upp:
+Dockyard upptäcker verktyg från ditt login shell. Om `claude`, `gh`, `git` eller `tmux` inte dyker upp:
 
 - Se till att de finns i din shells PATH
 - Fish 4.0- och Nix-användare: appen hanterar dessa miljöer, men om något är fel, kolla Settings > Environment
@@ -340,16 +340,16 @@ Factory Floor upptäcker verktyg från ditt login shell. Om `claude`, `gh`, `git
 #### Tmux-sessioner som inte persisterar {#tmux-sessions-not-persisting}
 
 - Verifiera att tmux är installerat och upptäckt (Settings > Environment)
-- Factory Floor använder sin egen tmux socket (`-L factoryfloor`), så din personliga tmux-konfiguration stör inte
+- Dockyard använder sin egen tmux socket (`-L dockyard`), så din personliga tmux-konfiguration stör inte
 
 #### Port inte upptäckt {#port-not-detected}
 
-- Se till att ditt run-script använder `$FF_PORT` (eller att porten upptäcks från processträdet)
-- `ff-run`-launchern kapslar run-scriptet, den övervakar barnprocesser efter lyssnande TCP-portar
+- Se till att ditt run-script använder `$DY_PORT` (eller att porten upptäcks från processträdet)
+- `dy-run`-launchern kapslar run-scriptet, den övervakar barnprocesser efter lyssnande TCP-portar
 - Kolla Settings > Advanced > Detailed logging för debug-utdata
 
 #### Något annat som inte fungerar? {#something-else-broken}
 
-- [Rapportera en bugg](https://github.com/alltuner/factoryfloor/issues/new?template=bug_report.yml) — berätta vad som gick fel
-- [Skicka en fix-prompt](https://github.com/alltuner/factoryfloor/issues/new?template=fix_prompt.yml) — skriv prompten, vi låter agenten ta sig an det
-- [Något annat](https://github.com/alltuner/factoryfloor/issues/new) — idéer, frågor, existentiella tvivel
+- [Rapportera en bugg](https://github.com/barnolacesc/dockyard/issues/new?template=bug_report.yml) — berätta vad som gick fel
+- [Skicka en fix-prompt](https://github.com/barnolacesc/dockyard/issues/new?template=fix_prompt.yml) — skriv prompten, vi låter agenten ta sig an det
+- [Något annat](https://github.com/barnolacesc/dockyard/issues/new) — idéer, frågor, existentiella tvivel

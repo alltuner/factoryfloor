@@ -5,14 +5,14 @@ import AppKit
 import OSLog
 import SwiftUI
 
-private let logger = Logger(subsystem: "factoryfloor", category: "content-view")
+private let logger = Logger(subsystem: "dockyard", category: "content-view")
 
 extension Notification.Name {
-    static let workstreamCreated = Notification.Name("factoryfloor.workstreamCreated")
-    static let workstreamWorktreeReady = Notification.Name("factoryfloor.workstreamWorktreeReady")
-    static let workstreamCreationFailed = Notification.Name("factoryfloor.workstreamCreationFailed")
-    static let projectCreated = Notification.Name("factoryfloor.projectCreated")
-    static let purgeWorkstream = Notification.Name("factoryfloor.purgeWorkstream")
+    static let workstreamCreated = Notification.Name("dockyard.workstreamCreated")
+    static let workstreamWorktreeReady = Notification.Name("dockyard.workstreamWorktreeReady")
+    static let workstreamCreationFailed = Notification.Name("dockyard.workstreamCreationFailed")
+    static let projectCreated = Notification.Name("dockyard.projectCreated")
+    static let purgeWorkstream = Notification.Name("dockyard.purgeWorkstream")
 }
 
 final class ProjectList: ObservableObject {
@@ -58,20 +58,33 @@ func cycledWorkstreamID(
     return sorted[next].id
 }
 
-func commandKeyNotification(charactersIgnoringModifiers: String?, modifierFlags: NSEvent.ModifierFlags) -> Notification.Name? {
-    guard let charactersIgnoringModifiers else { return nil }
-    let flags = modifierFlags.intersection(.deviceIndependentFlagsMask)
-    guard flags.contains(.command), !flags.contains(.option), !flags.contains(.control) else { return nil }
+func commandKeyNotification(event: NSEvent) -> Notification.Name? {
+    let flags = event.modifierFlags.intersection(.deviceIndependentFlagsMask).subtracting([.numericPad, .function])
+    let hasCommand = flags.contains(.command)
     let hasShift = flags.contains(.shift)
+    let hasOption = flags.contains(.option)
+    let hasControl = flags.contains(.control)
 
-    switch (charactersIgnoringModifiers, hasShift) {
-    case ("[", false): return .prevWorkstream
-    case ("]", false): return .nextWorkstream
-    case ("[", true): return .prevTab
-    case ("]", true): return .nextTab
-    case ("w", false): return .closeTerminal
-    default: return nil
+    if hasCommand && !hasControl && !hasOption {
+        if let chars = event.charactersIgnoringModifiers {
+            switch (chars, hasShift) {
+            case ("[", false): return .prevWorkstream
+            case ("]", false): return .nextWorkstream
+            case ("[", true): return .prevTab
+            case ("]", true): return .nextTab
+            case ("w", false): return .closeTerminal
+            default: break
+            }
+        }
+        
+        // Use keycodes for arrows to be reliable
+        switch (event.keyCode, hasShift) {
+        case (125, false): return .nextProject // Down arrow
+        case (126, false): return .prevProject // Up arrow
+        default: break
+        }
     }
+    return nil
 }
 
 struct ContentView: View {
@@ -94,7 +107,7 @@ struct ContentView: View {
     @State private var workstreamToPurge: UUID?
     @State private var purgeWarningMessage: String?
     @State private var removedProjectNames: [String] = []
-    @AppStorage("factoryfloor.sortOrder") private var sortOrder: ProjectSortOrder = .recent
+    @AppStorage("dockyard.sortOrder") private var sortOrder: ProjectSortOrder = .recent
     @State private var keyMonitorInstalled = false
 
     private static func initialSelection() -> SidebarSelection? {
@@ -326,10 +339,7 @@ struct ContentView: View {
                 guard !keyMonitorInstalled else { return }
                 keyMonitorInstalled = true
                 NSEvent.addLocalMonitorForEvents(matching: .keyDown) { event in
-                    if let notification = commandKeyNotification(
-                        charactersIgnoringModifiers: event.charactersIgnoringModifiers,
-                        modifierFlags: event.modifierFlags
-                    ) {
+                    if let notification = commandKeyNotification(event: event) {
                         NotificationCenter.default.post(name: notification, object: nil)
                         return nil // swallow the event
                     }
@@ -361,7 +371,7 @@ struct ContentView: View {
             appEnvironment.fetchOrigin(projects: projects)
             updateChecker.check()
             // Apply saved appearance
-            switch UserDefaults.standard.string(forKey: "factoryfloor.appearance") ?? "system" {
+            switch UserDefaults.standard.string(forKey: "dockyard.appearance") ?? "system" {
             case "light": NSApp.appearance = NSAppearance(named: .aqua)
             case "dark": NSApp.appearance = NSAppearance(named: .darkAqua)
             default: NSApp.appearance = nil
@@ -473,7 +483,7 @@ struct ContentView: View {
             dir = nil
         }
         guard let dir else { return }
-        let terminalBundleID = UserDefaults.standard.string(forKey: "factoryfloor.defaultTerminal") ?? ""
+        let terminalBundleID = UserDefaults.standard.string(forKey: "dockyard.defaultTerminal") ?? ""
         if !terminalBundleID.isEmpty,
            let appURL = NSWorkspace.shared.urlForApplication(withBundleIdentifier: terminalBundleID)
         {
@@ -570,7 +580,7 @@ struct ContentView: View {
 }
 
 enum ProjectStore {
-    private static let userDefaultsKey = "factoryfloor.projects"
+    private static let userDefaultsKey = "dockyard.projects"
 
     static func load(defaults: UserDefaults = .standard) -> [Project] {
         guard let data = defaults.data(forKey: userDefaultsKey),

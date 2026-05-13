@@ -9,22 +9,22 @@ import os
 final class Telemetry {
     static let shared = Telemetry()
 
-    private let logger = Logger(subsystem: "com.alltuner.factoryfloor", category: "telemetry")
-    private let endpoint = URL(string: "https://meta.factory-floor.com/api/send")!
+    private let logger = Logger(subsystem: "com.barnolacesc.dockyard", category: "telemetry")
+    private let endpoint = URL(string: "https://meta.francesc.barnola.net/api/send")!
     private let websiteID = "0ad50276-0a54-4b71-b3f2-b953326a9452"
-    private let hostname = "app.factory-floor.com"
+    private let hostname = "app.francesc.barnola.net"
 
     var isEnabled: Bool {
         #if DEBUG
             return false
         #else
-            return UserDefaults.standard.object(forKey: "factoryfloor.telemetryEnabled") as? Bool ?? true
+            return UserDefaults.standard.object(forKey: "dockyard.telemetryEnabled") as? Bool ?? true
         #endif
     }
 
     /// Anonymous installation identifier, generated on first launch.
     var installationID: String {
-        let key = "factoryfloor.installationID"
+        let key = "dockyard.installationID"
         if let existing = UserDefaults.standard.string(forKey: key) {
             return existing
         }
@@ -111,6 +111,6 @@ final class Telemetry {
             let arch = "unknown"
         #endif
         let locale = Locale.current.identifier
-        return "FactoryFloor/\(AppConstants.version) (Macintosh; macOS \(osVersion); \(arch); \(locale))"
+        return "Dockyard/\(AppConstants.version) (Macintosh; macOS \(osVersion); \(arch); \(locale))"
     }()
 }

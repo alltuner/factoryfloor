@@ -4,13 +4,18 @@
 import OSLog
 import SwiftUI
 
-private let logger = Logger(subsystem: "factoryfloor", category: "environment")
+private let logger = Logger(subsystem: "dockyard", category: "environment")
 
 struct WorktreeState {
     var hasUncommittedChanges: Bool = false
     var hasUnpushedCommits: Bool = false
     var hasBranchCommits: Bool = false
     var hasRemote: Bool = false
+    var commitsAhead: Int = 0
+    var uncommittedCount: Int = 0
+    var branchCreatedDate: Date? = nil
+    var worktreeCreatedDate: Date? = nil
+    var baseBranch: String = "main"
 }
 
 @MainActor
@@ -212,7 +217,12 @@ final class AppEnvironment: ObservableObject {
                 hasUncommittedChanges: GitOperations.hasUncommittedChanges(at: path),
                 hasUnpushedCommits: GitOperations.hasUnpushedCommits(at: path),
                 hasBranchCommits: GitOperations.hasBranchCommits(at: path, projectPath: projectDir),
-                hasRemote: GitOperations.hasRemote(at: path)
+                hasRemote: GitOperations.hasRemote(at: path),
+                commitsAhead: GitOperations.commitsAhead(at: path, projectPath: projectDir),
+                uncommittedCount: GitOperations.uncommittedCount(at: path),
+                branchCreatedDate: GitOperations.branchCreatedDate(at: path, projectPath: projectDir),
+                worktreeCreatedDate: (try? FileManager.default.attributesOfItem(atPath: path)[.creationDate]) as? Date,
+                baseBranch: GitOperations.defaultBranch(at: projectDir)
             )
             await self.deferWorktreeStateUpdate(state, for: path)
         }
@@ -273,7 +283,7 @@ final class AppEnvironment: ObservableObject {
                     if valid {
                         validPaths.append(path)
                         let descURL = URL(fileURLWithPath: path)
-                            .appendingPathComponent(".factoryfloor-state/description")
+                            .appendingPathComponent(".dockyard-state/description")
                         if let data = try? Data(contentsOf: descURL),
                            let text = String(data: data, encoding: .utf8)
                         {
@@ -325,7 +335,12 @@ final class AppEnvironment: ObservableObject {
                             hasUncommittedChanges: GitOperations.hasUncommittedChanges(at: path),
                             hasUnpushedCommits: GitOperations.hasUnpushedCommits(at: path),
                             hasBranchCommits: GitOperations.hasBranchCommits(at: path, projectPath: projectDir),
-                            hasRemote: GitOperations.hasRemote(at: path)
+                            hasRemote: GitOperations.hasRemote(at: path),
+                            commitsAhead: GitOperations.commitsAhead(at: path, projectPath: projectDir),
+                            uncommittedCount: GitOperations.uncommittedCount(at: path),
+                            branchCreatedDate: GitOperations.branchCreatedDate(at: path, projectPath: projectDir),
+                            worktreeCreatedDate: (try? FileManager.default.attributesOfItem(atPath: path)[.creationDate]) as? Date,
+                            baseBranch: GitOperations.defaultBranch(at: projectDir)
                         )
                         return (path, state)
                     }
@@ -355,7 +370,7 @@ final class AppEnvironment: ObservableObject {
     // MARK: - GitHub
 
     var ghAvailable: Bool {
-        toolStatus.gh.isInstalled && toolStatus.ghAuthDetail != "Not authenticated"
+        toolStatus.gh.isInstalled 
     }
 
     func githubRepo(for directory: String) -> GitHubRepoInfo? {
