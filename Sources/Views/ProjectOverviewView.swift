@@ -189,10 +189,14 @@ struct ProjectOverviewView: View {
                 if !worktrees.isEmpty {
                     Section {
                         ForEach(worktrees) { wt in
+                            let matchingWorkstream = project.workstreams.first { ws in
+                                guard let path = ws.worktreePath else { return false }
+                                return Self.standardizedPath(path) == Self.standardizedPath(wt.path)
+                            }
                             WorktreeInfoRow(
                                 worktree: wt,
                                 projectDirectory: project.directory,
-                                isWorkstream: workstreamPaths.contains(Self.standardizedPath(wt.path)),
+                                workstreamID: matchingWorkstream?.id,
                                 onAdopt: { adoptWorktree(wt) }
                             )
                         }
@@ -363,10 +367,11 @@ struct ProjectOverviewView: View {
 private struct WorktreeInfoRow: View {
     let worktree: WorktreeInfo
     let projectDirectory: String
-    let isWorkstream: Bool
+    let workstreamID: UUID?
     let onAdopt: () -> Void
 
     @EnvironmentObject var appEnv: AppEnvironment
+    @EnvironmentObject var activityTracker: WorkstreamActivityTracker
 
     private var pr: GitHubPR? {
         guard let branch = worktree.branch else { return nil }
@@ -375,10 +380,20 @@ private struct WorktreeInfoRow: View {
 
     var body: some View {
         HStack {
-            Image(systemName: worktree.isMain ? "folder.fill" : "arrow.triangle.branch")
-                .foregroundStyle(worktree.isMain ? .blue : .secondary)
-                .frame(width: 20, alignment: .top)
+            if let workstreamID {
+                ActivityIndicator(
+                    isActive: activityTracker.isActive(workstreamID),
+                    isPathValid: appEnv.isPathValid(worktree.path),
+                    needsAttention: activityTracker.needsAttention(workstreamID)
+                )
                 .padding(.top, 4)
+                .frame(width: 20, alignment: .top)
+            } else {
+                Image(systemName: worktree.isMain ? "folder.fill" : "arrow.triangle.branch")
+                    .foregroundStyle(worktree.isMain ? .blue : .secondary)
+                    .frame(width: 20, alignment: .top)
+                    .padding(.top, 4)
+            }
             VStack(alignment: .leading, spacing: 2) {
                 Text(worktree.branch ?? "detached")
                     .font(.system(.body, design: .monospaced))
@@ -430,7 +445,7 @@ private struct WorktreeInfoRow: View {
                 Text("main")
                     .font(.caption)
                     .foregroundStyle(.secondary)
-            } else if !isWorkstream {
+            } else if workstreamID == nil {
                 Button(action: onAdopt) {
                     HStack(spacing: 4) {
                         Image(systemName: "plus.rectangle.on.folder")

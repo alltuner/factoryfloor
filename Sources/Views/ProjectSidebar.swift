@@ -911,7 +911,7 @@ private struct WorkstreamRow: View {
     }
 }
 
-private struct ActivityIndicator: View {
+struct ActivityIndicator: View {
     let isActive: Bool
     let isPathValid: Bool
     var needsAttention: Bool = false

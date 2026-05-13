@@ -8,7 +8,7 @@ This guide explains how to properly configure your repository to ensure environm
 
 Factory Floor looks for a configuration file in the root of your repository to understand how to build and run your project. 
 
-Create a `.factoryfloor.json` file in the root of your project:
+Create a `.dockyard.json` file in the root of your project:
 
 ```json
 {
@@ -27,7 +27,7 @@ Create a `.factoryfloor.json` file in the root of your project:
 
 ## 2. Environment Variables (`.env`)
 
-When Factory Floor creates a new workstream, it isolates the branch in a dedicated Git worktree (under `~/.factoryfloor/worktrees/`). 
+When Dockyard creates a new workstream, it isolates the branch in a dedicated Git worktree (under `~/.dockyard/worktrees/`). 
 
 To ensure your environment variables are correctly picked up without manually copying `.env` files around:
 
@@ -52,10 +52,10 @@ Because Factory Floor uses Git worktrees to parallelize work:
 
 ## 5. Adding to `.gitignore`
 
-It's highly recommended to commit `.factoryfloor.json` to your repository so your entire team benefits from zero-config onboarding.
+It's highly recommended to commit `.dockyard.json` to your repository so your entire team benefits from zero-config onboarding.
 
-You generally **do not** need to add Factory Floor worktree directories to your `.gitignore`, because Factory Floor provisions worktrees entirely outside of your project path (specifically in `~/.factoryfloor/worktrees/`).
+You generally **do not** need to add Dockyard worktree directories to your `.gitignore`, because Dockyard provisions worktrees entirely outside of your project path (specifically in `~/.dockyard/worktrees/`).
 
 ---
 
-By adding a simple `.factoryfloor.json` to your repository root, Factory Floor will seamlessly manage your environment, automate installations, and connect your embedded browser automatically!
+By adding a simple `.dockyard.json` to your repository root, Dockyard will seamlessly manage your environment, automate installations, and connect your embedded browser automatically!
