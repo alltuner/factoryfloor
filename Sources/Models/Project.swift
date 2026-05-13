@@ -3,7 +3,7 @@
 
 import Foundation
 
-struct Workstream: Identifiable, Hashable, Codable, Sendable {
+struct Workstream: Identifiable, Hashable, Codable {
     let id: UUID
     var name: String
     var worktreePath: String?
@@ -33,7 +33,7 @@ struct Workstream: Identifiable, Hashable, Codable, Sendable {
     }
 }
 
-struct Project: Identifiable, Hashable, Codable, Sendable {
+struct Project: Identifiable, Hashable, Codable {
     let id: UUID
     var name: String
     var directory: String
@@ -57,7 +57,7 @@ struct Project: Identifiable, Hashable, Codable, Sendable {
     }
 }
 
-enum ProjectSortOrder: String, CaseIterable, Sendable {
+enum ProjectSortOrder: String, CaseIterable {
     case recent = "Recent"
     case alphabetical = "A-Z"
 }
