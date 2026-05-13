@@ -215,6 +215,7 @@ func workspaceEnvironmentVariables(
     projectDirectory: String,
     workingDirectory: String,
     port: Int,
+    codingCLI: CodingCLI,
     agentTeams: Bool,
     defaultBranch: String,
     scriptSource: String?
@@ -226,6 +227,7 @@ func workspaceEnvironmentVariables(
         projectDirectory: projectDirectory,
         workingDirectory: workingDirectory,
         port: port,
+        codingCLI: codingCLI,
         agentTeams: agentTeams,
         defaultBranch: defaultBranch,
         scriptSource: scriptSource
@@ -757,7 +759,6 @@ struct TerminalContainerView: View {
                 if scriptConfig.hasAnyScript && !tabs.contains(.info) {
                     tabs.insert(.info, at: 0)
                 }
-                activeTab = initialTabState.activeTab
             }
             if tabs.contains(where: { if case .editor = $0 { return true } else { return false } }) {
                 startFileTreeWatcherIfNeeded()
@@ -862,7 +863,8 @@ struct TerminalContainerView: View {
 
                         GitHubActionMenu(
                             runner: quickActionRunner,
-                            claudePath: appEnv.toolStatus.claude.path,
+                            codingCLI: selectedCodingCLI,
+                            codingCLIPath: selectedCodingCLIPath,
                             ghPath: appEnv.toolStatus.gh.path,
                             workingDirectory: workingDirectory,
                             branchName: appEnv.branchName(for: workingDirectory),

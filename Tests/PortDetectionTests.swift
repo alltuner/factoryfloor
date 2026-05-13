@@ -17,7 +17,7 @@ final class PortDetectionTests: XCTestCase {
 
         XCTAssertEqual(
             command,
-            "'/Applications/Dockyard.app/Contents/Helpers/dy-run' --workstream-id 12345678-1234-1234-1234-123456789abc -- /bin/zsh -lic 'just dev'"
+            "/Applications/Dockyard.app/Contents/Helpers/dy-run --workstream-id 12345678-1234-1234-1234-123456789abc -- /bin/zsh -lic 'just dev'"
         )
     }
 

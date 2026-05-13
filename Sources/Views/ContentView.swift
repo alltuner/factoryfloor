@@ -58,33 +58,44 @@ func cycledWorkstreamID(
     return sorted[next].id
 }
 
+func commandKeyNotification(charactersIgnoringModifiers chars: String?, modifierFlags: NSEvent.ModifierFlags) -> Notification.Name? {
+    let flags = modifierFlags.intersection(.deviceIndependentFlagsMask).subtracting([.numericPad, .function])
+    let hasCommand = flags.contains(.command)
+    let hasShift = flags.contains(.shift)
+    let hasOption = flags.contains(.option)
+    let hasControl = flags.contains(.control)
+
+    guard hasCommand, !hasControl, !hasOption, let chars else { return nil }
+
+    switch (chars, hasShift) {
+    case ("[", false): return .prevWorkstream
+    case ("]", false): return .nextWorkstream
+    case ("[", true): return .prevTab
+    case ("]", true): return .nextTab
+    case ("w", false): return .closeTerminal
+    default: return nil
+    }
+}
+
 func commandKeyNotification(event: NSEvent) -> Notification.Name? {
+    if let name = commandKeyNotification(charactersIgnoringModifiers: event.charactersIgnoringModifiers, modifierFlags: event.modifierFlags) {
+        return name
+    }
+
     let flags = event.modifierFlags.intersection(.deviceIndependentFlagsMask).subtracting([.numericPad, .function])
     let hasCommand = flags.contains(.command)
     let hasShift = flags.contains(.shift)
     let hasOption = flags.contains(.option)
     let hasControl = flags.contains(.control)
 
-    if hasCommand && !hasControl && !hasOption {
-        if let chars = event.charactersIgnoringModifiers {
-            switch (chars, hasShift) {
-            case ("[", false): return .prevWorkstream
-            case ("]", false): return .nextWorkstream
-            case ("[", true): return .prevTab
-            case ("]", true): return .nextTab
-            case ("w", false): return .closeTerminal
-            default: break
-            }
-        }
-        
-        // Use keycodes for arrows to be reliable
-        switch (event.keyCode, hasShift) {
-        case (125, false): return .nextProject // Down arrow
-        case (126, false): return .prevProject // Up arrow
-        default: break
-        }
+    guard hasCommand, !hasControl, !hasOption else { return nil }
+
+    // Use keycodes for arrows to be reliable
+    switch (event.keyCode, hasShift) {
+    case (125, false): return .nextProject // Down arrow
+    case (126, false): return .prevProject // Up arrow
+    default: return nil
     }
-    return nil
 }
 
 struct ContentView: View {

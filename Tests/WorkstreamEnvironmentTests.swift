@@ -25,6 +25,7 @@ final class WorkstreamEnvironmentTests: XCTestCase {
             projectDirectory: baseParams.3,
             workingDirectory: baseParams.4,
             port: baseParams.5,
+            codingCLI: .claude,
             agentTeams: baseParams.6,
             defaultBranch: "main",
             scriptSource: nil
@@ -47,6 +48,7 @@ final class WorkstreamEnvironmentTests: XCTestCase {
             projectDirectory: baseParams.3,
             workingDirectory: baseParams.4,
             port: baseParams.5,
+            codingCLI: .claude,
             agentTeams: true,
             defaultBranch: "main",
             scriptSource: nil
@@ -64,6 +66,7 @@ final class WorkstreamEnvironmentTests: XCTestCase {
             projectDirectory: baseParams.3,
             workingDirectory: baseParams.4,
             port: baseParams.5,
+            codingCLI: .claude,
             agentTeams: baseParams.6,
             defaultBranch: "main",
             scriptSource: "conductor.json"
@@ -85,6 +88,7 @@ final class WorkstreamEnvironmentTests: XCTestCase {
             projectDirectory: baseParams.3,
             workingDirectory: baseParams.4,
             port: baseParams.5,
+            codingCLI: .claude,
             agentTeams: baseParams.6,
             defaultBranch: "develop",
             scriptSource: ".emdash.json"
@@ -107,6 +111,7 @@ final class WorkstreamEnvironmentTests: XCTestCase {
             projectDirectory: baseParams.3,
             workingDirectory: baseParams.4,
             port: baseParams.5,
+            codingCLI: .claude,
             agentTeams: baseParams.6,
             defaultBranch: "main",
             scriptSource: ".superset/config.json"
@@ -126,6 +131,7 @@ final class WorkstreamEnvironmentTests: XCTestCase {
             projectDirectory: baseParams.3,
             workingDirectory: baseParams.4,
             port: baseParams.5,
+            codingCLI: .claude,
             agentTeams: baseParams.6,
             defaultBranch: "main",
             scriptSource: ".dockyard.json"
@@ -143,6 +149,7 @@ final class WorkstreamEnvironmentTests: XCTestCase {
             projectDirectory: baseParams.3,
             workingDirectory: baseParams.4,
             port: baseParams.5,
+            codingCLI: .claude,
             agentTeams: baseParams.6,
             defaultBranch: "main",
             scriptSource: nil

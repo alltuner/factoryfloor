@@ -169,6 +169,7 @@ final class WorkspaceTabSnapshotTests: XCTestCase {
             projectDirectory: "/app",
             workingDirectory: "/app/task",
             port: 3000,
+            codingCLI: .claude,
             agentTeams: false,
             defaultBranch: "develop",
             scriptSource: "conductor.json"
