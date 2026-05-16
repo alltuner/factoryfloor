@@ -73,7 +73,7 @@ La interfície apareix a l'instant, la creació del worktree passa en segon pla.
 
 #### Branch auto-rename {#branch-auto-rename}
 
-Amb **Auto-rename branch** activat a la configuració, el coding agent canvia el nom de la teva branch per coincidir amb la tasca al primer prompt. Així `dy/coral-tidal-reef` es converteix en `dy/fix-login-timeout`.
+Amb **Auto-rename branch** activat a la configuració, el coding agent canvia automàticament el nom de la teva branch per coincidir amb la teva tasca actual basat en els teus prompts. Així `dy/coral-tidal-reef` es converteix en `dy/fix-login-timeout`.
 
 #### Eliminar vs. purgar {#removing-vs-purging}
 
@@ -255,7 +255,7 @@ Obre amb **⌘,** o fes clic a la icona d'engranatge.
 
 - **Bypass permission prompts** — desactiva la confirmació per accions de l'agent
 - **Agent Teams** — mode multi-agent experimental
-- **Auto-rename branch** — l'agent canvia el nom de la branch al primer prompt
+- **Auto-rename branch** — l'agent canvia automàticament el nom de la branch basat en la intenció
 - **Tmux mode** — persistència de sessions via tmux
 
 #### Apps {#apps}

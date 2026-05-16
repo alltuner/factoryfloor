@@ -73,7 +73,7 @@ Die Oberfläche erscheint sofort — die Worktree-Erstellung läuft im Hintergru
 
 #### Branch Auto-Rename {#branch-auto-rename}
 
-Mit aktiviertem **Auto-rename branch** in den Einstellungen benennt der Coding-Agent deinen Branch beim ersten Prompt passend zur Aufgabe um. So wird `dy/coral-tidal-reef` zu `dy/fix-login-timeout`.
+Mit aktiviertem **Auto-rename branch** in den Einstellungen benennt der Coding-Agent deinen Branch automatisch passend zu deiner aktuellen Aufgabe basierend auf deinen Prompts um. So wird `dy/coral-tidal-reef` zu `dy/fix-login-timeout`.
 
 #### Entfernen vs. Bereinigen {#removing-vs-purging}
 
@@ -255,7 +255,7 @@ Wenn aktiviert (Settings > General), erstellt Dockyard Symlinks für `.env` und 
 
 - **Bypass permission prompts** — deaktiviert Bestätigungen für Agent-Aktionen
 - **Agent Teams** — experimenteller Multi-Agent-Modus
-- **Auto-rename branch** — Agent benennt Branch beim ersten Prompt um
+- **Auto-rename branch** — Agent benennt Branch automatisch basierend auf der Absicht um
 - **Tmux mode** — Sitzungspersistenz über tmux
 
 #### Apps {#apps}

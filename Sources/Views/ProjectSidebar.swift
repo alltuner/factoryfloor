@@ -200,18 +200,38 @@ struct ProjectSidebar: View {
 
             // Credit
             VStack(spacing: 2) {
-                HStack(spacing: 0) {
-                    Text("from ")
-                        .foregroundStyle(.tertiary)
-                    Link("barnolacesclabs", destination: URL(string: "https://davidpoblador.com/")!)
-                        .foregroundStyle(.secondary)
-                    Text(", tuned by ")
-                        .foregroundStyle(.tertiary)
-                    Link("barnolacesc", destination: URL(string: "https://github.com/barnolacesc")!)
-                        .foregroundStyle(.secondary)
+                ViewThatFits(in: .horizontal) {
+                    HStack(spacing: 0) {
+                        Text("from ")
+                            .foregroundStyle(.tertiary)
+                        Link("alltunerlabs", destination: URL(string: "https://davidpoblador.com/")!)
+                            .foregroundStyle(.secondary)
+                        Text(", tuned by ")
+                            .foregroundStyle(.tertiary)
+                        Link("barnolacesc", destination: URL(string: "https://github.com/barnolacesc")!)
+                            .foregroundStyle(.secondary)
+                    }
+                    VStack(spacing: 2) {
+                        HStack(spacing: 0) {
+                            Text("from ")
+                                .foregroundStyle(.tertiary)
+                            Link("alltunerlabs", destination: URL(string: "https://davidpoblador.com/")!)
+                                .foregroundStyle(.secondary)
+                            Text(",")
+                                .foregroundStyle(.tertiary)
+                        }
+                        HStack(spacing: 0) {
+                            Text("tuned by ")
+                                .foregroundStyle(.tertiary)
+                            Link("barnolacesc", destination: URL(string: "https://github.com/barnolacesc")!)
+                                .foregroundStyle(.secondary)
+                        }
+                    }
                 }
             }
             .font(.system(size: 10))
+            .lineLimit(1)
+            .minimumScaleFactor(0.8)
 
             HStack {
                 SidebarBottomButton(icon: "plus") {

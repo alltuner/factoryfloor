@@ -145,7 +145,7 @@
 "Enables experimental multi-agent coordination. Agents can spawn teammates, delegate tasks, and collaborate across workstreams." = "Enables experimental multi-agent coordination. Agents can spawn teammates, delegate tasks, and collaborate across workstreams.";
 "Agent Teams is only available with Claude Code." = "Agent Teams is only available with Claude Code.";
 "Auto-rename branch" = "Auto-rename branch";
-"On the first request, the agent renames the branch to match the task and writes a short description visible in the sidebar." = "On the first request, the agent renames the branch to match the task and writes a short description visible in the sidebar.";
+"The agent automatically renames the branch to match your current task, updating the tab name and sidebar description." = "The agent automatically renames the branch to match your current task, updating the tab name and sidebar description.";
 "Auto-rename branch is only available with Claude Code." = "Auto-rename branch is only available with Claude Code.";
 "External Browser" = "External Browser";
 

@@ -274,7 +274,7 @@ struct TerminalContainerView: View {
     @AppStorage("dockyard.defaultBrowser") private var defaultBrowser: String = ""
     @AppStorage("dockyard.tmuxMode") private var tmuxMode: Bool = false
     @AppStorage("dockyard.agentTeams") private var agentTeams: Bool = false
-    @AppStorage("dockyard.autoRenameBranch") private var autoRenameBranch: Bool = false
+    @AppStorage("dockyard.autoRenameBranch") private var autoRenameBranch: Bool = true
     @AppStorage("dockyard.allowOutsideWorktree") private var allowOutsideWorktree: Bool = false
     @AppStorage("dockyard.quickActionDebug") private var quickActionDebug: Bool = false
     @AppStorage("dockyard.editorTabActive") private var editorTabActive: Bool = false

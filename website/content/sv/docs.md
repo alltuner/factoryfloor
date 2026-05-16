@@ -73,7 +73,7 @@ Gränssnittet dyker upp direkt, worktree-skapandet sker i bakgrunden.
 
 #### Branch auto-rename {#branch-auto-rename}
 
-Med **Auto-rename branch** aktiverat i inställningarna byter coding agent namn på din branch för att matcha uppgiften vid första prompten. Så `dy/coral-tidal-reef` blir `dy/fix-login-timeout`.
+Med **Auto-rename branch** aktiverat i inställningarna byter coding agent automatiskt namn på din branch för att matcha din nuvarande uppgift baserat på dina promptar. Så `dy/coral-tidal-reef` blir `dy/fix-login-timeout`.
 
 #### Ta bort vs. rensa {#removing-vs-purging}
 
@@ -255,7 +255,7 @@ När aktiverat (Settings > General) skapar Dockyard symlinks för `.env` och `.e
 
 - **Bypass permission prompts** — inaktiverar bekräftelse för agent-åtgärder
 - **Agent Teams** — experimentellt multi-agent-läge
-- **Auto-rename branch** — agenten byter namn på branch vid första prompten
+- **Auto-rename branch** — agenten byter automatiskt namn på branch baserat på avsikt
 - **Tmux mode** — sessionspersistens via tmux
 
 #### Appar {#apps}

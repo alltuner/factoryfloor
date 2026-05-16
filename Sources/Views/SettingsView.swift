@@ -10,7 +10,7 @@ struct SettingsView: View {
     @AppStorage("dockyard.bypassPermissions") private var bypassPermissions: Bool = false
     @AppStorage("dockyard.allowOutsideWorktree") private var allowOutsideWorktree: Bool = false
     @AppStorage("dockyard.agentTeams") private var agentTeams: Bool = false
-    @AppStorage("dockyard.autoRenameBranch") private var autoRenameBranch: Bool = false
+    @AppStorage("dockyard.autoRenameBranch") private var autoRenameBranch: Bool = true
     @AppStorage("dockyard.defaultTerminal") private var defaultTerminal: String = ""
     @AppStorage("dockyard.defaultBrowser") private var defaultBrowser: String = ""
     @AppStorage("dockyard.branchPrefix") private var branchPrefix: String = "dy"
@@ -244,7 +244,7 @@ struct SettingsView: View {
                 SettingToggle(
                     "Auto-rename branch",
                     isOn: $autoRenameBranch,
-                    description: "On the first request, the agent renames the branch to match the task and writes a short description visible in the sidebar."
+                    description: "The agent automatically renames the branch to match your current task, updating the tab name and sidebar description."
                 )
                 .disabled(!selectedCodingCLI.supportsAutoRenameBranch)
 

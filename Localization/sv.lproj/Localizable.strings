@@ -145,7 +145,7 @@
 "Enables experimental multi-agent coordination. Agents can spawn teammates, delegate tasks, and collaborate across workstreams." = "Aktiverar experimentell multi-agentkoordinering. Agenter kan skapa teammedlemmar, delegera uppgifter och samarbeta mellan arbetsflöden.";
 "Agent Teams is only available with Claude Code." = "Agentteam är bara tillgängligt med Claude Code.";
 "Auto-rename branch" = "Byt namn på gren automatiskt";
-"On the first request, the agent renames the branch to match the task and writes a short description visible in the sidebar." = "Vid den första förfrågan byter agenten namn på grenen för att matcha uppgiften och skriver en kort beskrivning synlig i sidofältet.";
+"The agent automatically renames the branch to match your current task, updating the tab name and sidebar description." = "Agenten byter automatiskt namn på grenen för att matcha din nuvarande uppgift, vilket uppdaterar fliknamnet och beskrivningen i sidofältet.";
 "Auto-rename branch is only available with Claude Code." = "Automatiskt namnbyte av gren är bara tillgängligt med Claude Code.";
 "External Browser" = "Extern webbläsare";
 
