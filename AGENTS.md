@@ -187,7 +187,8 @@ Current shortcuts:
 - **Cmd+Shift+W**: Archive workstream
 - **Cmd+L**: Address bar (browser)
 - **Cmd+Shift+Return**: Start/Rerun
-- **Cmd+[/]**: Cycle workstreams
+- **Cmd+[/]**: Cycle workstreams (current project)
+- **Ctrl+Tab / Ctrl+Shift+Tab**: Cycle workstreams (globally)
 - **Cmd+Up/Down**: Cycle projects
 - **Cmd+0**: Back to project
 - **Cmd+Option+S**: Toggle sidebar

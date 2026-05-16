@@ -116,8 +116,10 @@ struct HelpView: View {
                     }
 
                     Section {
-                        ShortcutRow(keys: "[", description: "Previous workstream")
-                        ShortcutRow(keys: "]", description: "Next workstream")
+                        ShortcutRow(keys: "[", description: "Previous workstream (current project)")
+                        ShortcutRow(keys: "]", description: "Next workstream (current project)")
+                        ShortcutRow(keys: "⇥", ctrl: true, shift: true, cmd: false, description: "Previous workstream (globally)")
+                        ShortcutRow(keys: "⇥", ctrl: true, cmd: false, description: "Next workstream (globally)")
                         ShortcutRow(keys: "↑", description: "Previous project")
                         ShortcutRow(keys: "↓", description: "Next project")
                         ShortcutRow(keys: "0", description: "Back to project")

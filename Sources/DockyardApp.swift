@@ -30,6 +30,8 @@ extension Notification.Name {
     static let openExternalTerminal = Notification.Name("dockyard.openExternalTerminal")
     static let nextWorkstream = Notification.Name("dockyard.nextWorkstream")
     static let prevWorkstream = Notification.Name("dockyard.prevWorkstream")
+    static let nextGlobalWorkstream = Notification.Name("dockyard.nextGlobalWorkstream")
+    static let prevGlobalWorkstream = Notification.Name("dockyard.prevGlobalWorkstream")
     static let nextProject = Notification.Name("dockyard.nextProject")
     static let prevProject = Notification.Name("dockyard.prevProject")
     static let archiveWorkstream = Notification.Name("dockyard.archiveWorkstream")
@@ -384,6 +386,16 @@ struct DockyardApp: App {
                     NotificationCenter.default.post(name: .prevWorkstream, object: nil)
                 }
                 .keyboardShortcut("[", modifiers: .command)
+
+                Button("Next Global Workstream") {
+                    NotificationCenter.default.post(name: .nextGlobalWorkstream, object: nil)
+                }
+                .keyboardShortcut(.tab, modifiers: .control)
+
+                Button("Previous Global Workstream") {
+                    NotificationCenter.default.post(name: .prevGlobalWorkstream, object: nil)
+                }
+                .keyboardShortcut(.tab, modifiers: [.control, .shift])
 
                 Button("Next Project") {
                     NotificationCenter.default.post(name: .nextProject, object: nil)

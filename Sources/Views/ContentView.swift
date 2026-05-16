@@ -402,6 +402,12 @@ struct ContentView: View {
         .onReceive(NotificationCenter.default.publisher(for: .prevWorkstream)) { _ in
             cycleWorkstream(direction: -1)
         }
+        .onReceive(NotificationCenter.default.publisher(for: .nextGlobalWorkstream)) { _ in
+            cycleGlobalWorkstream(direction: 1)
+        }
+        .onReceive(NotificationCenter.default.publisher(for: .prevGlobalWorkstream)) { _ in
+            cycleGlobalWorkstream(direction: -1)
+        }
         .onReceive(NotificationCenter.default.publisher(for: .nextProject)) { _ in
             cycleProject(direction: 1)
         }
@@ -535,6 +541,40 @@ struct ContentView: View {
         if selection?.workstreamID != nil || selection?.projectID != nil {
             guard let id = cycledWorkstreamID(in: project, selectedWorkstreamID: selection?.workstreamID, direction: direction) else { return }
             deferSelection(.workstream(id))
+        }
+    }
+
+    /// Cycle through all workstreams globally across all projects.
+    private func cycleGlobalWorkstream(direction: Int) {
+        // Build a flat list of all workstreams across all projects, sorted by project order then by workstream accessed order
+        let sortedProjects: [Project]
+        switch sortOrder {
+        case .recent:
+            sortedProjects = projects.sorted { $0.lastAccessedAt > $1.lastAccessedAt }
+        case .alphabetical:
+            sortedProjects = projects.sorted { $0.name.localizedCaseInsensitiveCompare($1.name) == .orderedAscending }
+        }
+
+        var allWorkstreams: [(Project, Workstream)] = []
+        for project in sortedProjects {
+            let sortedWorkstreams = project.workstreams
+                .filter { workstreamHasUsablePath($0) }
+                .sorted { $0.lastAccessedAt > $1.lastAccessedAt }
+            for ws in sortedWorkstreams {
+                allWorkstreams.append((project, ws))
+            }
+        }
+
+        guard !allWorkstreams.isEmpty else { return }
+
+        if let currentWsID = selection?.workstreamID,
+           let currentIndex = allWorkstreams.firstIndex(where: { $0.1.id == currentWsID }) {
+            let nextIndex = (currentIndex + direction + allWorkstreams.count) % allWorkstreams.count
+            deferSelection(.workstream(allWorkstreams[nextIndex].1.id))
+        } else {
+            // If nothing is selected, select the first or last depending on direction
+            let index = direction > 0 ? 0 : allWorkstreams.count - 1
+            deferSelection(.workstream(allWorkstreams[index].1.id))
         }
     }
 

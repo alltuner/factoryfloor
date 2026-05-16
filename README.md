@@ -148,7 +148,8 @@ Every workstream terminal has access to:
 
 | Shortcut | Action |
 |---|---|
-| `Cmd+[` / `]` | Cycle workstreams |
+| `Cmd+[` / `]` | Cycle workstreams (current project) |
+| `Ctrl+Tab` / `Ctrl+Shift+Tab` | Cycle workstreams (globally) |
 | `Cmd+Up` / `Down` | Cycle projects |
 | `Cmd+0` | Back to project |
 
