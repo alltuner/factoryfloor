@@ -365,9 +365,12 @@ enum GitOperations {
 
     /// Return the current branch name, or nil if detached or not a repo.
     static func currentBranch(at path: String) -> String? {
-        guard let raw = run(args: ["rev-parse", "--abbrev-ref", "HEAD"], in: path)?
-            .trimmingCharacters(in: .whitespacesAndNewlines) else { return nil }
-        return raw == "HEAD" ? nil : raw
+        run(args: ["rev-parse", "--abbrev-ref", "HEAD"], in: path)?.trimmingCharacters(in: .whitespacesAndNewlines)
+    }
+
+    /// Rename the current branch.
+    static func renameBranch(at path: String, to newName: String) -> Bool {
+        run(args: ["branch", "-m", newName], in: path) != nil
     }
 
     /// Delete a local branch by name.

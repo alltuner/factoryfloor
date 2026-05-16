@@ -39,6 +39,8 @@ struct ProjectSidebar: View {
     @State private var newProjectError = ""
     @State private var isDropTargeted = false
     @State private var projectToDelete: UUID?
+    @State private var workstreamToRename: UUID?
+    @State private var newWorkstreamName = ""
     @State private var workstreamToRemove: UUID?
     @State private var workstreamToPurge: UUID?
     @State private var purgeWarningMessage: String?
@@ -172,7 +174,11 @@ struct ProjectSidebar: View {
                             prNumber: pr?.number,
                             prState: pr?.state,
                             onRemove: { workstreamToRemove = workstream.id },
-                            onPurge: { confirmPurge(workstream) }
+                            onPurge: { confirmPurge(workstream) },
+                            onRename: {
+                                workstreamToRename = workstream.id
+                                newWorkstreamName = workstream.name
+                            }
                         )
                         .tag(SidebarSelection.workstream(workstream.id))
                         .padding(.leading, 28)
@@ -349,6 +355,24 @@ struct ProjectSidebar: View {
                     onCancel: { showingNewProjectName = false }
                 )
             }
+            .alert(
+                Text("Rename Workstream"),
+                isPresented: Binding(
+                    get: { workstreamToRename != nil },
+                    set: { if !$0 { workstreamToRename = nil } }
+                )
+            ) {
+                TextField("New Name", text: $newWorkstreamName)
+                Button("Rename") {
+                    renameWorkstream()
+                }
+                .keyboardShortcut(.defaultAction)
+                Button("Cancel", role: .cancel) {
+                    workstreamToRename = nil
+                }
+            } message: {
+                Text("This will rename the git branch. Use kebab-case without spaces.")
+            }
             .onReceive(NotificationCenter.default.publisher(for: .addProject)) { _ in
                 showingAddProjectChoice = true
             }
@@ -513,6 +537,36 @@ struct ProjectSidebar: View {
     @EnvironmentObject private var surfaceCache: TerminalSurfaceCache
     @EnvironmentObject private var appEnv: AppEnvironment
     @EnvironmentObject private var activityTracker: WorkstreamActivityTracker
+
+    private func renameWorkstream() {
+        guard let wsID = workstreamToRename,
+              let pi = projects.firstIndex(where: { $0.workstreams.contains(where: { $0.id == wsID }) }),
+              let wi = projects[pi].workstreams.firstIndex(where: { $0.id == wsID })
+        else {
+            workstreamToRename = nil
+            return
+        }
+
+        let newName = newWorkstreamName.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !newName.isEmpty else {
+            workstreamToRename = nil
+            return
+        }
+
+        let workstream = projects[pi].workstreams[wi]
+        if let worktreePath = workstream.worktreePath, appEnv.isPathValid(worktreePath) {
+            let currentBranch = appEnv.branchName(for: worktreePath) ?? workstream.name
+            let prefix = currentBranch.contains("/") ? String(currentBranch.split(separator: "/").dropLast().joined(separator: "/")) + "/" : ""
+            let newBranchName = prefix + newName
+            
+            if GitOperations.renameBranch(at: worktreePath, to: newBranchName) {
+                projects[pi].workstreams[wi].name = newName
+                ProjectStore.save(projects)
+                appEnv.refreshAllRepoInfo(projects: projects)
+            }
+        }
+        workstreamToRename = nil
+    }
 
     private func confirmPurge(_ workstream: Workstream) {
         purgeWarningMessage = WorkstreamArchiver.purgeWarning(for: workstream)
@@ -805,6 +859,7 @@ private struct WorkstreamRow: View {
     var prState: String?
     let onRemove: () -> Void
     let onPurge: () -> Void
+    var onRename: (() -> Void)? = nil
 
     @State private var isHovering = false
 
@@ -893,6 +948,11 @@ private struct WorkstreamRow: View {
             }
             if worktreePath != nil || githubURL != nil {
                 Divider()
+            }
+            if let onRename {
+                Button(action: onRename) {
+                    Label("Rename", systemImage: "pencil")
+                }
             }
             if let branchName {
                 Button {
