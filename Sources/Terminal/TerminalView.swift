@@ -8,9 +8,9 @@ private let logger = Logger(subsystem: "dockyard", category: "terminal-view")
 
 extension Notification.Name {
     static let terminalChildExited = Notification.Name("dockyard.terminalChildExited")
-    static let terminalActivity = Notification.Name("ff2.terminalActivity")
-    static let terminalNeedsAttention = Notification.Name("ff2.terminalNeedsAttention")
-    static let terminalClearAttention = Notification.Name("ff2.terminalClearAttention")
+    static let terminalActivity = Notification.Name("dockyard.terminalActivity")
+    static let terminalNeedsAttention = Notification.Name("dockyard.terminalNeedsAttention")
+    static let terminalClearAttention = Notification.Name("dockyard.terminalClearAttention")
 }
 
 @MainActor
@@ -23,6 +23,7 @@ final class TerminalView: NSView {
     }
 
     private(set) nonisolated(unsafe) var surface: ghostty_surface_t?
+    nonisolated(unsafe) var surfaceID: UUID?
     nonisolated(unsafe) var workstreamID: UUID?
     /// Last logical (point) size reported to the surface. Stored so
     /// `viewDidChangeBackingProperties` can re-report the correct framebuffer
@@ -355,7 +356,8 @@ final class TerminalView: NSView {
         NotificationCenter.default.post(name: .terminalClearAttention, object: workstreamID)
 
         guard activityDebounceWork == nil else { return }
-        NotificationCenter.default.post(name: .terminalActivity, object: workstreamID)
+        let userInfo: [AnyHashable: Any] = surfaceID != nil ? ["surfaceID": surfaceID!] : [:]
+        NotificationCenter.default.post(name: .terminalActivity, object: workstreamID, userInfo: userInfo)
         let work = DispatchWorkItem { [weak self] in
             self?.activityDebounceWork = nil
         }

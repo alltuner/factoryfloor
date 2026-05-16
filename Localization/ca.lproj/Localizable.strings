@@ -280,12 +280,8 @@
 "Continue to Agent" = "Continuar a l'Agent";
 
 "Restarting..." = "Reiniciant...";
-"Preparing workstream..." = "Preparant el flux de treball...";
-
-/* Update Banner */
-"v%@ available" = "v%@ disponible";
-"Release Notes" = "Notes de la versió";
-"Using scripts from %@" = "S'utilitzen els scripts de %@";
+"Preparing workstream..." = "Preparant espai de treball...";
+"Using scripts from %@" = "Utilitzant scripts de %@";
 
 /* Quick Actions */
 "Quick Actions" = "Accions ràpides";

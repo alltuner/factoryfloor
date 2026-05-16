@@ -271,7 +271,7 @@ final class AppEnvironment: ObservableObject {
                 var isDir: ObjCBool = false
                 let exists = FileManager.default.fileExists(atPath: project.directory, isDirectory: &isDir) && isDir.boolValue
                 if !exists {
-                    logger.warning("[FF] refreshPathValidity: project \(project.name, privacy: .public) directory MISSING: \(project.directory, privacy: .public)")
+                    logger.warning("[Dockyard] refreshPathValidity: project \(project.name, privacy: .public) directory MISSING: \(project.directory, privacy: .public)")
                     missing.insert(project.id)
                 }
 

@@ -270,10 +270,6 @@
 
 "Restarting..." = "Wird neu gestartet...";
 "Preparing workstream..." = "Workstream wird vorbereitet...";
-
-/* Update Banner */
-"v%@ available" = "v%@ verfügbar";
-"Release Notes" = "Versionshinweise";
 "Using scripts from %@" = "Verwendet Skripte aus %@";
 
 /* Quick Actions */

@@ -141,7 +141,7 @@ struct ProjectSidebar: View {
                 } : nil,
                 isGitRepo: appEnv.isGitRepo(project.directory),
                 githubURL: appEnv.githubURL(for: project.directory),
-                onAdd: { logger.warning("[FF] onAdd button tapped for project \(project.name, privacy: .public)"); addWorkstream(for: project.id) },
+                onAdd: { logger.warning("[Dockyard] onAdd button tapped for project \(project.name, privacy: .public)"); addWorkstream(for: project.id) },
                 onAddWithPermissions: { addWorkstream(for: project.id, bypassPermissions: true) },
                 onAddWithoutPermissions: { addWorkstream(for: project.id, bypassPermissions: false) },
                 onDelete: { projectToDelete = project.id }
@@ -425,24 +425,24 @@ struct ProjectSidebar: View {
     @AppStorage("dockyard.symlinkEnv") private var symlinkEnv: Bool = true
 
     private func addWorkstream(for projectID: UUID, bypassPermissions: Bool? = nil) {
-        logger.warning("[FF] addWorkstream called for projectID=\(projectID, privacy: .public)")
+        logger.warning("[Dockyard] addWorkstream called for projectID=\(projectID, privacy: .public)")
         guard let index = projects.firstIndex(where: { $0.id == projectID }) else {
-            logger.warning("[FF] addWorkstream: project not found")
+            logger.warning("[Dockyard] addWorkstream: project not found")
             return
         }
         let project = projects[index]
-        logger.warning("[FF] addWorkstream: project=\(project.name, privacy: .public) dir=\(project.directory, privacy: .public)")
+        logger.warning("[Dockyard] addWorkstream: project=\(project.name, privacy: .public) dir=\(project.directory, privacy: .public)")
 
         guard GitOperations.isGitRepo(at: project.directory) else {
-            logger.warning("[FF] addWorkstream: not a git repo")
+            logger.warning("[Dockyard] addWorkstream: not a git repo")
             showNotGitRepoError = true
             return
         }
-        logger.warning("[FF] addWorkstream: is git repo")
+        logger.warning("[Dockyard] addWorkstream: is git repo")
 
         let existingNames = Set(project.workstreams.map(\.name))
         let name = NameGenerator.generate(avoiding: existingNames)
-        logger.warning("[FF] addWorkstream: generated name=\(name, privacy: .public)")
+        logger.warning("[Dockyard] addWorkstream: generated name=\(name, privacy: .public)")
 
         let bypass = bypassPermissions ?? defaultBypass
         let workstream = Workstream(name: name, worktreePath: nil, bypassPermissions: bypass)
@@ -453,7 +453,7 @@ struct ProjectSidebar: View {
             userInfo: ["projectID": projectID, "workstream": workstream]
         )
         rebuildIndices()
-        logger.warning("[FF] addWorkstream: posted notification (optimistic), starting background worktree creation")
+        logger.warning("[Dockyard] addWorkstream: posted notification (optimistic), starting background worktree creation")
 
         let projectPath = project.directory
         let projectName = project.name
@@ -471,14 +471,14 @@ struct ProjectSidebar: View {
             )
             DispatchQueue.main.async {
                 if let worktreePath {
-                    logger.warning("[FF] addWorkstream: worktree created at \(worktreePath, privacy: .public)")
+                    logger.warning("[Dockyard] addWorkstream: worktree created at \(worktreePath, privacy: .public)")
                     NotificationCenter.default.post(
                         name: .workstreamWorktreeReady,
                         object: nil,
                         userInfo: ["workstreamID": workstreamID, "worktreePath": worktreePath]
                     )
                 } else {
-                    logger.warning("[FF] addWorkstream: createWorktree FAILED, rolling back")
+                    logger.warning("[Dockyard] addWorkstream: createWorktree FAILED, rolling back")
                     NotificationCenter.default.post(
                         name: .workstreamCreationFailed,
                         object: nil,
@@ -492,8 +492,6 @@ struct ProjectSidebar: View {
 
     @EnvironmentObject private var surfaceCache: TerminalSurfaceCache
     @EnvironmentObject private var appEnv: AppEnvironment
-    @EnvironmentObject private var updateChecker: UpdateChecker
-    @EnvironmentObject private var updater: Updater
     @EnvironmentObject private var activityTracker: WorkstreamActivityTracker
 
     private func confirmPurge(_ workstream: Workstream) {
