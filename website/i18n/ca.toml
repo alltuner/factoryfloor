@@ -152,9 +152,11 @@ other = "Canvia de tab"
 [sc_cycle]
 other = "Cicla tabs"
 [sc_archive]
-other = "Arxiva workstream"
+other = "Arxiva la via de treball"
 [sc_cycle_ws]
-other = "Cicla workstreams"
+other = "Canvia de via de treball (projecte actual)"
+[sc_cycle_ws_global]
+other = "Canvia de via de treball (globalment)"
 [sc_cycle_project]
 other = "Cicla projectes"
 [sc_editor]

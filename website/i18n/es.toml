@@ -146,9 +146,11 @@ other = "Cambiar tab"
 [sc_cycle]
 other = "Recorrer tabs"
 [sc_archive]
-other = "Archivar workstream"
+other = "Archivar rama de trabajo"
 [sc_cycle_ws]
-other = "Recorrer workstreams"
+other = "Cambiar de rama de trabajo (proyecto actual)"
+[sc_cycle_ws_global]
+other = "Cambiar de rama de trabajo (globalmente)"
 [sc_cycle_project]
 other = "Recorrer proyectos"
 [sc_editor]

@@ -154,7 +154,9 @@ other = "Tabs durchschalten"
 [sc_archive]
 other = "Workstream archivieren"
 [sc_cycle_ws]
-other = "Workstreams durchschalten"
+other = "Workstreams wechseln (aktuelles Projekt)"
+[sc_cycle_ws_global]
+other = "Workstreams wechseln (global)"
 [sc_cycle_project]
 other = "Projekte durchschalten"
 [sc_editor]

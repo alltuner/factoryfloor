@@ -145,9 +145,11 @@ other = "Byt tab"
 [sc_cycle]
 other = "Växla tabs"
 [sc_archive]
-other = "Arkivera workstream"
+other = "Arkivera arbetsström"
 [sc_cycle_ws]
-other = "Växla workstreams"
+other = "Växla arbetsström (aktuellt projekt)"
+[sc_cycle_ws_global]
+other = "Växla arbetsström (globalt)"
 [sc_cycle_project]
 other = "Växla projekt"
 [sc_editor]
