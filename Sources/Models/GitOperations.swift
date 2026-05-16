@@ -406,9 +406,9 @@ enum GitOperations {
         // Reset the working tree only if it is clean
         if !hasUncommittedChanges(at: path) {
             _ = run(args: ["reset", "--hard", "--quiet"], in: path)
-            logger.info("[FF] Updated \(branch, privacy: .public) to latest")
+            logger.info("[Dockyard] Updated \(branch, privacy: .public) to latest")
         } else {
-            logger.info("[FF] Updated \(branch, privacy: .public) ref but working tree has local changes, skipping reset")
+            logger.info("[Dockyard] Updated \(branch, privacy: .public) ref but working tree has local changes, skipping reset")
         }
     }
 
@@ -494,7 +494,7 @@ enum GitOperations {
 
         if group.wait(timeout: deadline) == .timedOut {
             process.terminate()
-            logger.info("[FF] git \(args.joined(separator: " "), privacy: .public) timed out after \(timeout, privacy: .public)s")
+            logger.info("[Dockyard] git \(args.joined(separator: " "), privacy: .public) timed out after \(timeout, privacy: .public)s")
             return nil
         }
 
@@ -515,7 +515,7 @@ enum GitOperations {
 
     private static func run(args: [String], in directory: String) -> String? {
         guard let gitPath else {
-            logger.warning("[FF] git run: gitPath is nil")
+            logger.warning("[Dockyard] git run: gitPath is nil")
             return nil
         }
         let process = Process()
@@ -532,13 +532,13 @@ enum GitOperations {
             let errData = errPipe.fileHandleForReading.readDataToEndOfFile()
             let errStr = String(data: errData, encoding: .utf8) ?? ""
             guard process.terminationStatus == 0 else {
-                logger.warning("[FF] git \(args.joined(separator: " "), privacy: .public) failed (exit \(process.terminationStatus, privacy: .public)): \(errStr, privacy: .public)")
+                logger.warning("[Dockyard] git \(args.joined(separator: " "), privacy: .public) failed (exit \(process.terminationStatus, privacy: .public)): \(errStr, privacy: .public)")
                 return nil
             }
             let data = pipe.fileHandleForReading.readDataToEndOfFile()
             return String(data: data, encoding: .utf8)
         } catch {
-            logger.warning("[FF] git \(args.joined(separator: " "), privacy: .public) threw: \(error, privacy: .public)")
+            logger.warning("[Dockyard] git \(args.joined(separator: " "), privacy: .public) threw: \(error, privacy: .public)")
             return nil
         }
     }

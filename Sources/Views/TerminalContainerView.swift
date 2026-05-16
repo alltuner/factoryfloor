@@ -285,6 +285,7 @@ struct TerminalContainerView: View {
     @State private var terminalCount = 0
     @State private var browserCount = 0
     @State private var editorCount = 0
+    @State private var unreadTabs = Set<WorkspaceTab>()
     @State private var scriptConfig: ScriptConfig = .empty
     @State private var browserTitles: [UUID: String] = [:]
     @State private var terminalTitles: [UUID: String] = [:]
@@ -548,6 +549,7 @@ struct TerminalContainerView: View {
             shortcut: shortcut,
             isActive: activeTab == tab,
             isDirty: isEditorDirty(tab),
+            isUnread: unreadTabs.contains(tab),
             onSelect: { activeTab = tab },
             onClose: tab.isCloseable ? { closeTab(tab) } : nil
         )
@@ -607,6 +609,7 @@ struct TerminalContainerView: View {
             } else if let agentCommand = cachedAgentCommand {
                 SingleTerminalView(
                     surfaceID: agentID,
+                    workstreamID: workstreamID,
                     workingDirectory: workingDirectory,
                     command: agentCommand,
                     isFocused: true,
@@ -618,6 +621,7 @@ struct TerminalContainerView: View {
         case let .terminal(id):
             SingleTerminalView(
                 surfaceID: id,
+                workstreamID: workstreamID,
                 workingDirectory: workingDirectory,
                 isFocused: true,
                 environmentVars: terminalEnvVars
@@ -778,6 +782,7 @@ struct TerminalContainerView: View {
         }
         .onChange(of: activeTab) {
             guard isActive else { return }
+            unreadTabs.remove(activeTab)
             editorTabActive = isEditorTabActive
             editorFileDirty = isActiveEditorDirty
             surfaceCache.updateOcclusion(visibleSurfaceIDs: visibleSurfaceIDs)
@@ -785,8 +790,14 @@ struct TerminalContainerView: View {
             appEnv.refreshWorktreeState(for: workingDirectory, projectDirectory: projectDirectory)
         }
         .onReceive(NotificationCenter.default.publisher(for: .terminalActivity)) { notification in
-            guard isActive else { return }
             guard let wsID = notification.object as? UUID, wsID == workstreamID else { return }
+            if let surfaceID = notification.userInfo?["surfaceID"] as? UUID {
+                let tab: WorkspaceTab = surfaceID == agentID ? .agent : .terminal(surfaceID)
+                if tab != activeTab {
+                    unreadTabs.insert(tab)
+                }
+            }
+            guard isActive else { return }
             appEnv.refreshWorktreeState(for: workingDirectory, projectDirectory: projectDirectory)
         }
     }
@@ -1252,6 +1263,7 @@ struct TerminalContainerView: View {
             if let cmd = buildSetupGateCommand() {
                 _ = surfaceCache.surface(
                     for: setupGateID,
+                    workstreamID: workstreamID,
                     app: app,
                     workingDirectory: workingDirectory,
                     command: cmd,
@@ -1264,6 +1276,7 @@ struct TerminalContainerView: View {
             if let cmd = cachedAgentCommand {
                 _ = surfaceCache.surface(
                     for: agentID,
+                    workstreamID: workstreamID,
                     app: app,
                     workingDirectory: workingDirectory,
                     command: cmd,
@@ -1317,6 +1330,7 @@ struct TerminalContainerView: View {
             Divider()
             SingleTerminalView(
                 surfaceID: setupGateID,
+                workstreamID: workstreamID,
                 workingDirectory: workingDirectory,
                 command: buildSetupGateCommand() ?? "",
                 isFocused: true,
@@ -1346,6 +1360,7 @@ struct TerminalContainerView: View {
             Divider()
             SingleTerminalView(
                 surfaceID: setupGateID,
+                workstreamID: workstreamID,
                 workingDirectory: workingDirectory,
                 command: buildSetupGateCommand() ?? "",
                 isFocused: false,
@@ -1393,6 +1408,7 @@ private struct WorkspaceTabButton: View {
     var shortcut: String? = nil
     let isActive: Bool
     var isDirty: Bool = false
+    var isUnread: Bool = false
     let onSelect: () -> Void
     var onClose: (() -> Void)?
 
@@ -1403,6 +1419,10 @@ private struct WorkspaceTabButton: View {
             if isDirty {
                 Circle()
                     .fill(Color.primary.opacity(0.6))
+                    .frame(width: 6, height: 6)
+            } else if isUnread && !isActive {
+                Circle()
+                    .fill(Color.accentColor)
                     .frame(width: 6, height: 6)
             }
             Image(systemName: icon)
@@ -1830,6 +1850,7 @@ private struct AddTabButton: View {
 
 struct SingleTerminalView: View {
     let surfaceID: UUID
+    let workstreamID: UUID
     let workingDirectory: String
     var command: String?
     var isFocused: Bool = true
@@ -1846,6 +1867,7 @@ struct SingleTerminalView: View {
             GeometryReader { geo in
                 TerminalSurfaceView(
                     surfaceID: surfaceID,
+                    workstreamID: workstreamID,
                     workingDirectory: workingDirectory,
                     command: command,
                     isFocused: isFocused,
@@ -1884,6 +1906,7 @@ private struct SurfaceErrorView: View {
 
 private struct TerminalSurfaceView: NSViewRepresentable {
     let surfaceID: UUID
+    let workstreamID: UUID
     let workingDirectory: String
     var command: String?
     var isFocused: Bool = true
@@ -1903,6 +1926,7 @@ private struct TerminalSurfaceView: NSViewRepresentable {
 
         let terminalView = surfaceCache.surface(
             for: surfaceID,
+            workstreamID: workstreamID,
             app: app,
             workingDirectory: workingDirectory,
             command: command,
@@ -2070,13 +2094,15 @@ final class TerminalSurfaceCache: ObservableObject {
         }
     }
 
-    func surface(for id: UUID, app: ghostty_app_t, workingDirectory: String, command: String? = nil, initialInput: String? = nil, environmentVars: [String: String] = [:], waitAfterCommand: Bool = true) -> TerminalView {
+    func surface(for id: UUID, workstreamID: UUID, app: ghostty_app_t, workingDirectory: String, command: String? = nil, initialInput: String? = nil, environmentVars: [String: String] = [:], waitAfterCommand: Bool = true) -> TerminalView {
         if let existing = surfaces[id] {
-            existing.workstreamID = id
+            existing.surfaceID = id
+            existing.workstreamID = workstreamID
             return existing
         }
         let view = TerminalView(app: app, workingDirectory: workingDirectory, command: command, initialInput: initialInput, environmentVars: environmentVars, waitAfterCommand: waitAfterCommand)
-        view.workstreamID = id
+        view.surfaceID = id
+        view.workstreamID = workstreamID
         surfaces[id] = view
         surfaceParams[id] = SurfaceParams(workingDirectory: workingDirectory, command: command, initialInput: initialInput, environmentVars: environmentVars, waitAfterCommand: waitAfterCommand)
         if view.surface == nil {

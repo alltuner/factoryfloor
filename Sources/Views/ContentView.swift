@@ -110,9 +110,7 @@ struct ContentView: View {
 
     @StateObject private var surfaceCache = TerminalSurfaceCache()
     @StateObject private var appEnvironment = AppEnvironment()
-    @StateObject private var updateChecker = UpdateChecker()
     @StateObject private var activityTracker = WorkstreamActivityTracker()
-    @EnvironmentObject private var updater: Updater
     @State private var saveWork: DispatchWorkItem?
     @State private var workstreamToRemove: UUID?
     @State private var workstreamToPurge: UUID?
@@ -129,17 +127,17 @@ struct ContentView: View {
 
     private var activeProject: Project? {
         guard let selection else {
-            logger.warning("[FF] activeProject: selection is nil")
+            logger.warning("[Dockyard] activeProject: selection is nil")
             return nil
         }
         switch selection {
         case let .project(id):
             let found = projects.first(where: { $0.id == id })
-            if found == nil { logger.warning("[FF] activeProject: project \(id, privacy: .public) not found in \(projects.count, privacy: .public) projects") }
+            if found == nil { logger.warning("[Dockyard] activeProject: project \(id, privacy: .public) not found in \(projects.count, privacy: .public) projects") }
             return found
         case let .workstream(wsID):
             let found = projects.first(where: { $0.workstreams.contains(where: { $0.id == wsID }) })
-            if found == nil { logger.warning("[FF] activeProject: workstream \(wsID, privacy: .public) not found in any project") }
+            if found == nil { logger.warning("[Dockyard] activeProject: workstream \(wsID, privacy: .public) not found in any project") }
             return found
         case .settings, .help:
             return nil
@@ -302,9 +300,9 @@ struct ContentView: View {
         navigationViewBase
             .onChange(of: appEnvironment.missingProjectIDs) { _, missing in
                 guard !missing.isEmpty else { return }
-                logger.warning("[FF] missingProjectIDs changed: \(missing.count, privacy: .public) missing, \(projects.count, privacy: .public) total projects")
+                logger.warning("[Dockyard] missingProjectIDs changed: \(missing.count, privacy: .public) missing, \(projects.count, privacy: .public) total projects")
                 let names = projects.filter { missing.contains($0.id) }.map(\.name)
-                logger.warning("[FF] removing projects: \(names, privacy: .public)")
+                logger.warning("[Dockyard] removing projects: \(names, privacy: .public)")
                 for id in missing {
                     if let project = projects.first(where: { $0.id == id }) {
                         for ws in project.workstreams {
@@ -323,7 +321,7 @@ struct ContentView: View {
                 removedProjectNames = names
             }
             .onChange(of: selection) { oldValue, newValue in
-                logger.warning("[FF] selection changed: \(String(describing: oldValue), privacy: .public) -> \(String(describing: newValue), privacy: .public)")
+                logger.warning("[Dockyard] selection changed: \(String(describing: oldValue), privacy: .public) -> \(String(describing: newValue), privacy: .public)")
                 if newValue == .settings || newValue == .help {
                     selectionBeforeSettings = oldValue
                 }
@@ -372,15 +370,12 @@ struct ContentView: View {
         }
         .environmentObject(surfaceCache)
         .environmentObject(appEnvironment)
-        .environmentObject(updateChecker)
-        .environmentObject(updater)
         .environmentObject(activityTracker)
         .onAppear {
             appEnvironment.refresh()
             appEnvironment.refreshAllRepoInfo(projects: projects)
             appEnvironment.refreshPathValidity(projects: projects)
             appEnvironment.fetchOrigin(projects: projects)
-            updateChecker.check()
             // Apply saved appearance
             switch UserDefaults.standard.string(forKey: "dockyard.appearance") ?? "system" {
             case "light": NSApp.appearance = NSAppearance(named: .aqua)
@@ -427,7 +422,7 @@ struct ContentView: View {
             projects[index].workstreams.append(workstream)
             selection = .workstream(workstream.id)
             ProjectStore.save(projects)
-            logger.warning("[FF] workstreamCreated notification handled: \(workstream.name, privacy: .public)")
+            logger.warning("[Dockyard] workstreamCreated notification handled: \(workstream.name, privacy: .public)")
         }
         .onReceive(NotificationCenter.default.publisher(for: .workstreamWorktreeReady)) { notification in
             guard let info = notification.userInfo,
@@ -438,7 +433,7 @@ struct ContentView: View {
                     projects[pi].workstreams[wi].worktreePath = worktreePath
                     ProjectStore.save(projects)
                     appEnvironment.refreshPathValidity(projects: projects)
-                    logger.warning("[FF] workstreamWorktreeReady: updated \(workstreamID, privacy: .public) with path \(worktreePath, privacy: .public)")
+                    logger.warning("[Dockyard] workstreamWorktreeReady: updated \(workstreamID, privacy: .public) with path \(worktreePath, privacy: .public)")
                     Telemetry.shared.track("workstream_created", url: "/workstream/create", title: "Workstream Created")
                     return
                 }
@@ -454,7 +449,7 @@ struct ContentView: View {
                 selection = .project(projectID)
             }
             ProjectStore.save(projects)
-            logger.warning("[FF] workstreamCreationFailed: removed \(workstreamID, privacy: .public)")
+            logger.warning("[Dockyard] workstreamCreationFailed: removed \(workstreamID, privacy: .public)")
         }
         .onReceive(NotificationCenter.default.publisher(for: .projectCreated)) { notification in
             guard let project = notification.userInfo?["project"] as? Project else { return }
@@ -463,7 +458,7 @@ struct ContentView: View {
             ProjectStore.save(projects)
             appEnvironment.refreshPathValidity(projects: projects)
             appEnvironment.refreshAllRepoInfo(projects: projects)
-            logger.warning("[FF] projectCreated notification handled: \(project.name, privacy: .public)")
+            logger.warning("[Dockyard] projectCreated notification handled: \(project.name, privacy: .public)")
         }
         .onReceive(NotificationCenter.default.publisher(for: .purgeWorkstream)) { notification in
             if let wsID = notification.object as? UUID {
@@ -476,9 +471,6 @@ struct ContentView: View {
             appEnvironment.refreshAllBranchPRs(projects: projects)
             appEnvironment.fetchOrigin(projects: projects)
             syncWorkstreamNamesFromBranches()
-        }
-        .onReceive(Timer.publish(every: 6 * 60 * 60, on: .main, in: .common).autoconnect()) { _ in
-            updateChecker.check()
         }
     }
 

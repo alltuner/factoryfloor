@@ -133,6 +133,7 @@ struct EnvironmentTabView: View {
                 if runStarted && !runRestarting {
                     SingleTerminalView(
                         surfaceID: runID,
+                        workstreamID: workstreamID,
                         workingDirectory: workingDirectory,
                         command: envCommand(script: script, role: "run"),
                         isFocused: false,
