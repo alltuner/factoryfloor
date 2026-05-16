@@ -412,7 +412,7 @@ struct DockyardApp: App {
                 Button("Split Agent") {
                     NotificationCenter.default.post(name: .splitAgent, object: nil)
                 }
-                .keyboardShortcut(.return, modifiers: [.command, .shift])
+                .keyboardShortcut(.return, modifiers: [.command, .option])
 
                 Button("Open in External Browser") {
                     NotificationCenter.default.post(name: .openExternalBrowser, object: nil)

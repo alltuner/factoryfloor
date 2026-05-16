@@ -141,7 +141,7 @@
 "Agent Teams" = "Agent-Teams";
 "Enables experimental multi-agent coordination. Agents can spawn teammates, delegate tasks, and collaborate across workstreams." = "Aktiviert experimentelle Multi-Agent-Koordination. Agenten können Teammitglieder erstellen, Aufgaben delegieren und workstream-übergreifend zusammenarbeiten.";
 "Auto-rename branch" = "Branch automatisch umbenennen";
-"On the first request, the agent renames the branch to match the task and writes a short description visible in the sidebar." = "Bei der ersten Anfrage benennt der Agent den Branch passend zur Aufgabe um und schreibt eine kurze Beschreibung, die in der Seitenleiste sichtbar ist.";
+"The agent automatically renames the branch to match your current task, updating the tab name and sidebar description." = "Der Agent benennt den Branch automatisch passend zu deiner aktuellen Aufgabe um, wodurch der Tab-Name und die Beschreibung in der Seitenleiste aktualisiert werden.";
 "External Browser" = "Externer Browser";
 
 /* Settings - Advanced */

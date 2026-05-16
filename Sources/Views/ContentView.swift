@@ -162,7 +162,7 @@ struct ContentView: View {
                 .navigationSubtitle(AppConstants.appName)
         } else if let workstream = activeWorkstream, let project = activeProject {
             if let workstreamID = renderableWorkstreamID(in: project, selectedWorkstreamID: workstream.id) {
-                let scriptConfig = ScriptConfig.load(from: project.directory)
+                let scriptConfig = ScriptConfig.load(from: workstream.workingDirectory(projectDirectory: project.directory), fallbackDirectory: project.directory)
                 let initialTabState = startupWorkspaceTabState(
                     snapshot: surfaceCache.restoreTabSnapshot(for: workstreamID),
                     savedTab: WorkspaceStateStore.load(for: workstreamID)

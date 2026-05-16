@@ -74,7 +74,7 @@ The UI shows up instantly — worktree creation happens in the background.
 
 #### Branch auto-rename
 
-With **Auto-rename branch** enabled in settings, the coding agent renames your branch to match the task on the first prompt. So `dy/coral-tidal-reef` becomes `dy/fix-login-timeout`.
+With **Auto-rename branch** enabled in settings, the coding agent automatically renames your branch to match your current task based on your prompts. So `dy/coral-tidal-reef` becomes `dy/fix-login-timeout`.
 
 #### Removing vs. purging
 
@@ -270,7 +270,7 @@ Open with **⌘,** or click the gear icon.
 
 - **Bypass permission prompts** — disables confirmation for agent actions
 - **Agent Teams** — experimental multi-agent mode
-- **Auto-rename branch** — agent renames branch on first prompt
+- **Auto-rename branch** — agent automatically renames branch based on intent
 - **Tmux mode** — session persistence via tmux
 
 #### Apps

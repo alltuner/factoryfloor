@@ -274,7 +274,7 @@ struct TerminalContainerView: View {
     @AppStorage("dockyard.defaultBrowser") private var defaultBrowser: String = ""
     @AppStorage("dockyard.tmuxMode") private var tmuxMode: Bool = false
     @AppStorage("dockyard.agentTeams") private var agentTeams: Bool = false
-    @AppStorage("dockyard.autoRenameBranch") private var autoRenameBranch: Bool = false
+    @AppStorage("dockyard.autoRenameBranch") private var autoRenameBranch: Bool = true
     @AppStorage("dockyard.allowOutsideWorktree") private var allowOutsideWorktree: Bool = false
     @AppStorage("dockyard.quickActionDebug") private var quickActionDebug: Bool = false
     @AppStorage("dockyard.editorTabActive") private var editorTabActive: Bool = false
@@ -747,7 +747,7 @@ struct TerminalContainerView: View {
             }
             appEnv.refreshWorktreeState(for: workingDirectory, projectDirectory: projectDirectory)
             cachedAgentCommand = buildAgentCommand()
-            scriptConfig = ScriptConfig.load(from: projectDirectory)
+            scriptConfig = ScriptConfig.load(from: workingDirectory, fallbackDirectory: projectDirectory)
             surfaceCache.respawnableIDs.insert(agentID)
             if let snapshot = surfaceCache.restoreTabSnapshot(for: workstreamID) {
                 tabs = snapshot.tabs

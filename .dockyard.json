@@ -1,0 +1,4 @@
+{
+  "setup": "./scripts/setup.sh",
+  "run": "./scripts/dev.sh br"
+}
