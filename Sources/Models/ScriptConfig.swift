@@ -18,23 +18,26 @@ struct ScriptConfig {
 
     /// Load script config for a project directory.
     /// Checks .dockyard.json first, then .emdash.json, conductor.json, then .superset/config.json.
-    static func load(from directory: String) -> ScriptConfig {
-        let dir = URL(fileURLWithPath: directory)
+    static func load(from directory: String, fallbackDirectory: String? = nil) -> ScriptConfig {
+        let directories = [directory] + (fallbackDirectory != nil ? [fallbackDirectory!] : [])
+        
+        for dirPath in directories {
+            let dir = URL(fileURLWithPath: dirPath)
+            let candidates: [(path: String, source: String, loader: (String) throws -> ScriptConfig)] = [
+                (dir.appendingPathComponent(".dockyard.json").path, ".dockyard.json", loadDockyard),
+                (dir.appendingPathComponent(".emdash.json").path, ".emdash.json", loadEmdash),
+                (dir.appendingPathComponent("conductor.json").path, "conductor.json", loadConductor),
+                (dir.appendingPathComponent(".superset/config.json").path, ".superset/config.json", loadSuperset),
+            ]
 
-        let candidates: [(path: String, source: String, loader: (String) throws -> ScriptConfig)] = [
-            (dir.appendingPathComponent(".dockyard.json").path, ".dockyard.json", loadDockyard),
-            (dir.appendingPathComponent(".emdash.json").path, ".emdash.json", loadEmdash),
-            (dir.appendingPathComponent("conductor.json").path, "conductor.json", loadConductor),
-            (dir.appendingPathComponent(".superset/config.json").path, ".superset/config.json", loadSuperset),
-        ]
-
-        for candidate in candidates {
-            guard FileManager.default.fileExists(atPath: candidate.path) else { continue }
-            do {
-                return try candidate.loader(candidate.path)
-            } catch {
-                logger.error("Failed to load \(candidate.path): \(error.localizedDescription)")
-                return ScriptConfig(setup: nil, run: nil, teardown: nil, expectedPort: nil, source: candidate.source, loadError: error.localizedDescription)
+            for candidate in candidates {
+                guard FileManager.default.fileExists(atPath: candidate.path) else { continue }
+                do {
+                    return try candidate.loader(candidate.path)
+                } catch {
+                    logger.error("Failed to load \(candidate.path): \(error.localizedDescription)")
+                    return ScriptConfig(setup: nil, run: nil, teardown: nil, expectedPort: nil, source: candidate.source, loadError: error.localizedDescription)
+                }
             }
         }
 
@@ -47,7 +50,7 @@ struct ScriptConfig {
 
     /// Run the teardown script synchronously in the given directory.
     static func runTeardown(in directory: String, projectDirectory: String) {
-        let config = load(from: projectDirectory)
+        let config = load(from: directory, fallbackDirectory: projectDirectory)
         guard let teardown = config.teardown else { return }
         let process = Process()
         process.executableURL = URL(fileURLWithPath: CommandBuilder.userShell)

@@ -747,7 +747,7 @@ struct TerminalContainerView: View {
             }
             appEnv.refreshWorktreeState(for: workingDirectory, projectDirectory: projectDirectory)
             cachedAgentCommand = buildAgentCommand()
-            scriptConfig = ScriptConfig.load(from: projectDirectory)
+            scriptConfig = ScriptConfig.load(from: workingDirectory, fallbackDirectory: projectDirectory)
             surfaceCache.respawnableIDs.insert(agentID)
             if let snapshot = surfaceCache.restoreTabSnapshot(for: workstreamID) {
                 tabs = snapshot.tabs
