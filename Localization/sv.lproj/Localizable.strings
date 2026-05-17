@@ -318,3 +318,15 @@
 "Hard Reload" = "Ladda om (rensa cache)";
 "Reload browser" = "Ladda om webbläsaren";
 "Hard reload browser" = "Ladda om webbläsaren (rensa cache)";
+
+"Setup running…" = "Konfiguration körs…";
+
+"Setup failed (exit %d)" = "Konfigurationen misslyckades (avslut %d)";
+
+"Setup not run" = "Konfigurationen har inte körts";
+
+"Run setup" = "Kör konfiguration";
+
+"Run in terminal" = "Kör i terminal";
+
+"View log" = "Visa logg";

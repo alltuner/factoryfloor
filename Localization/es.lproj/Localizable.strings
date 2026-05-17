@@ -318,3 +318,15 @@
 "Hard Reload" = "Recargar (sin caché)";
 "Reload browser" = "Recargar el navegador";
 "Hard reload browser" = "Recargar el navegador (sin caché)";
+
+"Setup running…" = "Configuración en ejecución…";
+
+"Setup failed (exit %d)" = "Configuración fallida (salida %d)";
+
+"Setup not run" = "Configuración no ejecutada";
+
+"Run setup" = "Ejecutar configuración";
+
+"Run in terminal" = "Ejecutar en terminal";
+
+"View log" = "Ver registro";

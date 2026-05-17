@@ -252,13 +252,6 @@ enum TerminalSessionMode: Equatable {
     }
 }
 
-enum SetupGateState: Equatable {
-    case notNeeded
-    case running
-    case failed
-    case completed
-}
-
 struct TerminalContainerView: View {
     let workstreamID: UUID
     let workingDirectory: String
@@ -300,11 +293,11 @@ struct TerminalContainerView: View {
     @State private var cachedAgentCommand: String?
     @State private var draggedCustomTab: WorkspaceTab?
     @StateObject private var portDetector: PortDetector
+    @StateObject private var setupRunner: SetupRunner
     @State private var runStoppedManually = false
     @State private var runStarted = false
     @State private var workspaceStarted = false
     @State private var defaultBranch = "main"
-    @State private var setupGateState: SetupGateState = .notNeeded
     init(
         workstreamID: UUID,
         workingDirectory: String,
@@ -335,6 +328,7 @@ struct TerminalContainerView: View {
         _runStoppedManually = State(initialValue: initialTabState.runStoppedManually)
         _runStarted = State(initialValue: initialTabState.runStarted)
         _portDetector = StateObject(wrappedValue: PortDetector(workstreamID: workstreamID))
+        _setupRunner = StateObject(wrappedValue: SetupRunner(workstreamID: workstreamID))
     }
 
     private var selectedCodingCLI: CodingCLI {
@@ -347,10 +341,6 @@ struct TerminalContainerView: View {
 
     private var agentID: UUID {
         workstreamID
-    }
-
-    private var setupGateID: UUID {
-        derivedUUID(from: workstreamID, salt: "setup-gate")
     }
 
     private var quickActionRunner: QuickActionRunner {
@@ -377,11 +367,7 @@ struct TerminalContainerView: View {
         for tab in tabsToCheck {
             switch tab {
             case .agent: 
-                if setupGateState == .running || setupGateState == .failed {
-                    ids.insert(setupGateID)
-                } else {
-                    ids.insert(agentID)
-                }
+                ids.insert(agentID)
             case let .terminal(id): ids.insert(id)
             case .info, .browser, .editor: break
             }
@@ -583,14 +569,12 @@ struct TerminalContainerView: View {
                 environmentVars: terminalEnvVars,
                 runStoppedManually: $runStoppedManually,
                 runStarted: $runStarted,
-                sessionMode: sessionMode
+                sessionMode: sessionMode,
+                setupRunner: setupRunner,
+                onRunSetupInTerminal: { runSetupInNewTerminal() }
             )
         case .agent:
-            if setupGateState == .running {
-                setupGateRunningView
-            } else if setupGateState == .failed {
-                setupGateFailedView
-            } else if sessionMode == .waitingForTools || appEnv.isDetecting {
+            if sessionMode == .waitingForTools || appEnv.isDetecting {
                 terminalLoadingView(message: "Checking terminal tools...")
             } else if selectedCodingCLIPath == nil {
                 VStack(spacing: 16) {
@@ -821,18 +805,8 @@ struct TerminalContainerView: View {
                 guard let currentIndex = tabs.firstIndex(of: activeTab) else { return }
                 activeTab = tabs[(currentIndex - 1 + tabs.count) % tabs.count]
             }
-            .onReceive(NotificationCenter.default.publisher(for: .terminalChildExited)) { notification in
-                guard let surfaceID = notification.object as? UUID, surfaceID == setupGateID,
-                      let exitCode = notification.userInfo?["exitCode"] as? Int32
-                else { return }
-                handleSetupChildExited(exitCode: exitCode)
-            }
             .onReceive(NotificationCenter.default.publisher(for: .terminalTabExited)) { notification in
                 guard let surfaceID = notification.object as? UUID else { return }
-                if surfaceID == setupGateID, setupGateState == .failed {
-                    launchAgentAfterSetup()
-                    return
-                }
                 if let tab = tabs.first(where: {
                     if case let .terminal(id) = $0 { return id == surfaceID }
                     return false
@@ -1239,11 +1213,9 @@ struct TerminalContainerView: View {
         }
         appEnv.refreshWorktreeState(for: workingDirectory, projectDirectory: projectDirectory)
         cachedAgentCommand = buildAgentCommand()
-        if scriptConfig.setup != nil, !SetupStateStore.isCompleted(for: workstreamID) {
-            setupGateState = .running
-        } else {
-            setupGateState = .notNeeded
-            surfaceCache.respawnableIDs.insert(agentID)
+        surfaceCache.respawnableIDs.insert(agentID)
+        if scriptConfig.setup != nil && !SetupStateStore.isCompleted(for: workstreamID) {
+            setupRunner.start(script: scriptConfig.setup!, workingDirectory: workingDirectory, environmentVars: terminalEnvVars)
         }
         preloadSurfaces()
         // Eagerly create the Monaco bridge so it's ready when the user opens
@@ -1258,37 +1230,17 @@ struct TerminalContainerView: View {
         guard sessionMode != .waitingForTools else { return }
         guard let app = TerminalApp.shared.app else { return }
 
-        if setupGateState == .running {
-            // Setup gate: only preload setup surface, agent waits.
-            if let cmd = buildSetupGateCommand() {
-                _ = surfaceCache.surface(
-                    for: setupGateID,
-                    workstreamID: workstreamID,
-                    app: app,
-                    workingDirectory: workingDirectory,
-                    command: cmd,
-                    environmentVars: terminalEnvVars,
-                    waitAfterCommand: false
-                )
-            }
-        } else {
-            // Agent surface
-            if let cmd = cachedAgentCommand {
-                _ = surfaceCache.surface(
-                    for: agentID,
-                    workstreamID: workstreamID,
-                    app: app,
-                    workingDirectory: workingDirectory,
-                    command: cmd,
-                    environmentVars: envVars
-                )
-            }
+        // Agent surface
+        if let cmd = cachedAgentCommand {
+            _ = surfaceCache.surface(
+                for: agentID,
+                workstreamID: workstreamID,
+                app: app,
+                workingDirectory: workingDirectory,
+                command: cmd,
+                environmentVars: envVars
+            )
         }
-    }
-
-    private func buildSetupGateCommand() -> String? {
-        guard let setup = scriptConfig.setup else { return nil }
-        return scriptCommand(script: setup, role: "setup")
     }
 
     /// Env vars for plain terminal tabs. Clears tmux vars to prevent inheritance.
@@ -1314,79 +1266,6 @@ struct TerminalContainerView: View {
         )
     }
 
-    private var setupGateRunningView: some View {
-        VStack(spacing: 0) {
-            HStack(spacing: 6) {
-                ProgressView()
-                    .controlSize(.small)
-                Text("Running setup...")
-                    .font(.system(size: 11))
-                    .foregroundStyle(.secondary)
-                Spacer()
-            }
-            .padding(.horizontal, 8)
-            .padding(.vertical, 4)
-            .background(.bar)
-            Divider()
-            SingleTerminalView(
-                surfaceID: setupGateID,
-                workstreamID: workstreamID,
-                workingDirectory: workingDirectory,
-                command: buildSetupGateCommand() ?? "",
-                isFocused: true,
-                environmentVars: terminalEnvVars
-            )
-        }
-    }
-
-    private var setupGateFailedView: some View {
-        VStack(spacing: 0) {
-            HStack(spacing: 6) {
-                Image(systemName: "exclamationmark.triangle.fill")
-                    .foregroundStyle(.yellow)
-                    .font(.system(size: 11))
-                Text("Setup failed.")
-                    .font(.system(size: 11))
-                    .foregroundStyle(.secondary)
-                Spacer()
-                Button("Continue to Agent") {
-                    launchAgentAfterSetup()
-                }
-                .controlSize(.small)
-            }
-            .padding(.horizontal, 8)
-            .padding(.vertical, 4)
-            .background(.bar)
-            Divider()
-            SingleTerminalView(
-                surfaceID: setupGateID,
-                workstreamID: workstreamID,
-                workingDirectory: workingDirectory,
-                command: buildSetupGateCommand() ?? "",
-                isFocused: false,
-                environmentVars: terminalEnvVars
-            )
-        }
-    }
-
-    private func handleSetupChildExited(exitCode: Int32) {
-        guard setupGateState == .running else { return }
-        if exitCode == 0 {
-            launchAgentAfterSetup()
-        } else {
-            setupGateState = .failed
-        }
-    }
-
-    private func launchAgentAfterSetup() {
-        SetupStateStore.markCompleted(for: workstreamID)
-        surfaceCache.removeSurface(for: setupGateID)
-        setupGateState = .completed
-        surfaceCache.respawnableIDs.insert(agentID)
-        preloadSurfaces()
-        surfaceCache.updateOcclusion(visibleSurfaceIDs: visibleSurfaceIDs)
-    }
-
     private func terminalLoadingView(message: String) -> some View {
         VStack(spacing: 12) {
             ProgressView()
@@ -1396,6 +1275,24 @@ struct TerminalContainerView: View {
                 .foregroundStyle(.secondary)
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
+    }
+    private func runSetupInNewTerminal() {
+        guard let setupScript = scriptConfig.setup, !setupScript.isEmpty else { return }
+        guard let app = TerminalApp.shared.app else { return }
+        terminalCount += 1
+        let id = derivedUUID(from: workstreamID, salt: "setup-terminal-\(terminalCount)")
+        let tab = WorkspaceTab.terminal(id)
+        tabs.append(tab)
+        activeTab = tab
+        saveTabSnapshot()
+        _ = surfaceCache.surface(
+            for: id,
+            workstreamID: workstreamID,
+            app: app,
+            workingDirectory: workingDirectory,
+            command: scriptCommand(script: setupScript, role: "setup"),
+            environmentVars: terminalEnvVars
+        )
     }
 }
 

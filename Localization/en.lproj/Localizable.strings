@@ -318,3 +318,15 @@
 "Hard Reload" = "Hard Reload";
 "Reload browser" = "Reload browser";
 "Hard reload browser" = "Hard reload browser";
+
+"Setup running…" = "Setup running…";
+
+"Setup failed (exit %d)" = "Setup failed (exit %d)";
+
+"Setup not run" = "Setup not run";
+
+"Run setup" = "Run setup";
+
+"Run in terminal" = "Run in terminal";
+
+"View log" = "View log";

@@ -318,3 +318,15 @@
 "Hard Reload" = "Recarregar (sense memòria cau)";
 "Reload browser" = "Recarregar el navegador";
 "Hard reload browser" = "Recarregar el navegador (sense memòria cau)";
+
+"Setup running…" = "Configuració en execució…";
+
+"Setup failed (exit %d)" = "Ha fallat la configuració (sortida %d)";
+
+"Setup not run" = "Configuració no executada";
+
+"Run setup" = "Executa la configuració";
+
+"Run in terminal" = "Executa al terminal";
+
+"View log" = "Mostra el registre";

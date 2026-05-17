@@ -15,6 +15,8 @@ struct WorkstreamInfoView: View {
     @Binding var runStoppedManually: Bool
     @Binding var runStarted: Bool
     var sessionMode: TerminalSessionMode = .standard
+    @ObservedObject var setupRunner: SetupRunner
+    var onRunSetupInTerminal: () -> Void = {}
 
     @EnvironmentObject var appEnv: AppEnvironment
     @AppStorage("dockyard.defaultTerminal") private var defaultTerminal: String = ""
@@ -27,6 +29,16 @@ struct WorkstreamInfoView: View {
 
     var body: some View {
         VStack(spacing: 0) {
+            if scriptConfig.setup != nil, setupRunner.state != .succeeded {
+                SetupStatusBanner(
+                    script: scriptConfig.setup!,
+                    state: setupRunner.state,
+                    logTail: setupRunner.logTail,
+                    onStart: { setupRunner.start(script: scriptConfig.setup!, workingDirectory: workingDirectory, environmentVars: environmentVars) },
+                    onCancel: { setupRunner.cancel() },
+                    onRunInTerminal: { onRunSetupInTerminal() }
+                )
+            }
             Form {
                 // Hero header
                 Section {
@@ -531,5 +543,79 @@ struct DocTabButton: View {
         }
         .buttonStyle(.borderless)
         .onHover { isHovering = $0 }
+    }
+}
+
+private struct SetupStatusBanner: View {
+    let script: String
+    let state: SetupRunner.State
+    let logTail: String
+    let onStart: () -> Void
+    let onCancel: () -> Void
+    let onRunInTerminal: () -> Void
+
+    var body: some View {
+        VStack(spacing: 0) {
+            HStack(spacing: 6) {
+                switch state {
+                case .idle:
+                    Image(systemName: "info.circle.fill").foregroundStyle(.blue)
+                    Text("Setup not run").font(.system(size: 11)).foregroundStyle(.secondary)
+                    Spacer()
+                    Button("Run setup") { onStart() }
+                        .controlSize(.small)
+                case .running:
+                    ProgressView().controlSize(.small)
+                    Text("Setup running…").font(.system(size: 11)).foregroundStyle(.secondary)
+                    Text(script).font(.system(size: 11, design: .monospaced)).foregroundStyle(.secondary)
+                        .lineLimit(1).truncationMode(.middle).frame(maxWidth: 150)
+                    Spacer()
+                    Button("Cancel") { onCancel() }
+                        .controlSize(.small)
+                case let .failed(code):
+                    Image(systemName: "exclamationmark.triangle.fill").foregroundStyle(.red)
+                    Text("Setup failed (exit \(code))").font(.system(size: 11)).foregroundStyle(.secondary)
+                    Spacer()
+                    Button("Run in terminal") { onRunInTerminal() }
+                        .controlSize(.small)
+                    Button("Retry") { onStart() }
+                        .controlSize(.small)
+                case .succeeded:
+                    EmptyView()
+                }
+            }
+            .padding(.horizontal, 8)
+            .padding(.vertical, 4)
+            .background(backgroundColor.opacity(0.15))
+            
+            if case .failed = state, !logTail.isEmpty {
+                Divider()
+                DisclosureGroup("View log") {
+                    ScrollView {
+                        Text(logTail)
+                            .font(.system(size: 10, design: .monospaced))
+                            .foregroundStyle(.secondary)
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                            .textSelection(.enabled)
+                    }
+                    .frame(maxHeight: 120)
+                    .padding(.top, 4)
+                }
+                .font(.system(size: 11))
+                .padding(.horizontal, 8)
+                .padding(.vertical, 4)
+                .background(backgroundColor.opacity(0.1))
+            }
+            Divider()
+        }
+    }
+
+    private var backgroundColor: Color {
+        switch state {
+        case .idle: return .blue
+        case .running: return .yellow
+        case .failed: return .red
+        case .succeeded: return .clear
+        }
     }
 }

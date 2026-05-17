@@ -286,3 +286,15 @@
 "No GitHub remote found for this project." = "Kein GitHub-Remote für dieses Projekt gefunden.";
 "Quick action debug" = "Schnellaktionen-Debug";
 "Show a debug panel with command output from quick actions (Create PR, Commit & Push)." = "Zeige ein Debug-Panel mit Befehlsausgaben der Schnellaktionen (PR erstellen, Commit & Push).";
+
+"Setup running…" = "Setup läuft…";
+
+"Setup failed (exit %d)" = "Setup fehlgeschlagen (Code %d)";
+
+"Setup not run" = "Setup nicht ausgeführt";
+
+"Run setup" = "Setup ausführen";
+
+"Run in terminal" = "Im Terminal ausführen";
+
+"View log" = "Protokoll anzeigen";
