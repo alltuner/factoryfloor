@@ -660,6 +660,7 @@ struct TerminalContainerView: View {
             }
             .onChange(of: appEnv.isDetecting) {
                 rebuildAgentCommand()
+                startSetupIfNeeded()
                 if isActive { preloadSurfaces() }
             }
             .onReceive(NotificationCenter.default.publisher(for: .toggleInfo)) { _ in
@@ -1196,6 +1197,20 @@ struct TerminalContainerView: View {
         draggedCustomTab = nil
     }
 
+    private func startSetupIfNeeded() {
+        guard workspaceStarted else { return }
+        guard !appEnv.isDetecting else { return }
+        guard let setupScript = scriptConfig.setup else { return }
+        guard !SetupStateStore.isCompleted(for: workstreamID) else { return }
+        guard setupRunner.state == .idle else { return }
+        
+        setupRunner.start(
+            script: setupScript,
+            workingDirectory: workingDirectory,
+            environmentVars: terminalEnvVars
+        )
+    }
+
     @MainActor
     private func startWorkspace(defaultBranch: String) {
         workspaceStarted = true
@@ -1214,9 +1229,7 @@ struct TerminalContainerView: View {
         appEnv.refreshWorktreeState(for: workingDirectory, projectDirectory: projectDirectory)
         cachedAgentCommand = buildAgentCommand()
         surfaceCache.respawnableIDs.insert(agentID)
-        if scriptConfig.setup != nil && !SetupStateStore.isCompleted(for: workstreamID) {
-            setupRunner.start(script: scriptConfig.setup!, workingDirectory: workingDirectory, environmentVars: terminalEnvVars)
-        }
+        startSetupIfNeeded()
         preloadSurfaces()
         // Eagerly create the Monaco bridge so it's ready when the user opens
         // an editor tab. The WKWebView is created lazily when MonacoEditorView
