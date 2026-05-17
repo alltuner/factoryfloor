@@ -564,12 +564,24 @@ final class TerminalView: NSView {
         []
     }
 
-    func firstRect(forCharacterRange _: NSRange, actualRange _: NSRangePointer?) -> NSRect {
+    func firstRect(forCharacterRange range: NSRange, actualRange _: NSRangePointer?) -> NSRect {
         guard let surface else { return .zero }
-        var x: Double = 0, y: Double = 0, w: Double = 0, h: Double = 0
-        ghostty_surface_ime_point(surface, &x, &y, &w, &h)
-        let point = window?.convertPoint(toScreen: convert(NSPoint(x: x, y: y), to: nil)) ?? .zero
-        return NSRect(x: point.x, y: point.y, width: w, height: h)
+        var x: Double = 0, y: Double = 0, width: Double = 0, height: Double = 0
+        ghostty_surface_ime_point(surface, &x, &y, &width, &height)
+
+        // The dictation microphone indicator anchors on this rect. A positive
+        // width prevents it from rendering, so collapse to zero width when
+        // there's no marked range (ghostty upstream issue #8493).
+        if range.length == 0 {
+            width = 0
+        }
+
+        // ghostty returns coordinates in top-left origin; AppKit windows are
+        // bottom-left, so flip Y before converting to screen coordinates.
+        let viewRect = NSRect(x: x, y: frame.size.height - y, width: width, height: height)
+        let winRect = convert(viewRect, to: nil)
+        guard let window else { return winRect }
+        return window.convertToScreen(winRect)
     }
 
     func characterIndex(for _: NSPoint) -> Int {
