@@ -11,8 +11,21 @@ extension Notification.Name {
     static let browserHardReload = Notification.Name("dockyard.browserHardReload")
 }
 
+func browserWebViewConfiguration() -> WKWebViewConfiguration {
+    let configuration = WKWebViewConfiguration()
+    configuration.mediaTypesRequiringUserActionForPlayback = []
+    configuration.preferences.setValue(true, forKey: "mediaDevicesEnabled")
+    configuration.preferences.setValue(true, forKey: "mediaStreamEnabled")
+    configuration.preferences.setValue(true, forKey: "peerConnectionEnabled")
+    return configuration
+}
+
 /// Hides the "Open Link in New Window" context menu item since the app is single-window.
 class BrowserWebView: WKWebView {
+    convenience init() {
+        self.init(frame: .zero, configuration: browserWebViewConfiguration())
+    }
+
     override func willOpenMenu(_ menu: NSMenu, with event: NSEvent) {
         menu.items.removeAll { $0.identifier?.rawValue == "WKMenuItemIdentifierOpenLinkInNewWindow" }
         super.willOpenMenu(menu, with: event)
