@@ -154,6 +154,26 @@ case "${1:-build}" in
     echo "==> Launching Dockyard..."
     open "$TARGET_DIR"
     ;;
+  install-bg)
+    # 1. Build a local release version
+    "$0" release
+    
+    APP_BUNDLE="build/release-local/derived/Build/Products/Release/Dockyard.app"
+    TARGET_DIR="/Applications/Dockyard.app"
+    
+    echo "==> Background installing local build to $TARGET_DIR..."
+    
+    # 2. We don't kill the app! Just remove the old bundle and replace it
+    rm -rf "$TARGET_DIR"
+    cp -R "$APP_BUNDLE" "/Applications/"
+    
+    # 3. Force Spotlight reindexing so Cmd+Space finds it instantly
+    touch "$TARGET_DIR"
+    mdimport "$TARGET_DIR" || true
+    
+    echo "==> Installed successfully in background!"
+    echo "==> Restart Dockyard when you're ready to use the new version."
+    ;;
   clean)
     xcodebuild -project "$PROJECT" -scheme "$SCHEME" -configuration Debug clean 2>/dev/null || true
     rm -rf build/debug build/release-local "$SPM_CACHE"
