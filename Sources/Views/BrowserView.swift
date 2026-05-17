@@ -312,6 +312,18 @@ struct WebViewRepresentable: NSViewRepresentable {
             }
             return nil
         }
+        
+        @MainActor
+        @available(macOS 12.0, *)
+        func webView(
+            _ webView: WKWebView,
+            requestMediaCapturePermissionFor origin: WKSecurityOrigin,
+            initiatedByFrame frame: WKFrameInfo,
+            type: WKMediaCaptureType,
+            decisionHandler: @escaping @MainActor @Sendable (WKPermissionDecision) -> Void
+        ) {
+            decisionHandler(.grant)
+        }
 
         // MARK: - WKNavigationDelegate
 
