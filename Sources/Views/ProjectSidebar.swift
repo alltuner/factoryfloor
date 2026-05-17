@@ -33,6 +33,8 @@ struct ProjectSidebar: View {
     @Binding var selection: SidebarSelection?
     let onProjectsChanged: () -> Void
 
+    @StateObject private var appUpdater = AppUpdater()
+
     @State private var showingAddProjectChoice = false
     @State private var showingNewProjectName = false
     @State private var newProjectName = ""
@@ -199,10 +201,34 @@ struct ProjectSidebar: View {
 
     private var bottomBar: some View {
         VStack(spacing: 4) {
-            Text(AppConstants.displayVersion)
-                .font(.system(size: 10, design: .monospaced))
-                .foregroundStyle(.tertiary)
-                .padding(.bottom, 4)
+            HStack(alignment: .center, spacing: 6) {
+                Text(AppConstants.displayVersion)
+                    .font(.system(size: 10, design: .monospaced))
+                    .foregroundStyle(.tertiary)
+                
+                if appUpdater.isChecking {
+                    ProgressView()
+                        .controlSize(.mini)
+                } else if appUpdater.commitsAhead > 0 {
+                    Button(action: {
+                        appUpdater.applyUpdate()
+                    }) {
+                        HStack(spacing: 2) {
+                            Image(systemName: "arrow.up.circle.fill")
+                            Text("Update (\(appUpdater.commitsAhead))")
+                        }
+                        .font(.system(size: 10, weight: .medium))
+                        .foregroundStyle(.white)
+                        .padding(.horizontal, 6)
+                        .padding(.vertical, 2)
+                        .background(Color.accentColor)
+                        .cornerRadius(8)
+                    }
+                    .buttonStyle(.plain)
+                    .help("Pull latest changes from main and rebuild")
+                }
+            }
+            .padding(.bottom, 4)
 
             // Credit
             VStack(spacing: 2) {

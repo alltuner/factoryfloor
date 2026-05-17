@@ -183,7 +183,7 @@ targets:
       - script: |
           set -e
           HASH=$(git rev-parse --short HEAD || echo "unknown")
-          echo "enum AppCommit { static let hash = \"$HASH\" }" > "${PROJECT_DIR}/Sources/Models/AppCommit.swift"
+          echo "enum AppCommit { static let hash = \"$HASH\"; static let sourcePath = \"${PROJECT_DIR}\"; static let configuration = \"${CONFIGURATION}\" }" > "${PROJECT_DIR}/Sources/Models/AppCommit.swift"
         name: Generate AppCommit
     sources:
       - path: Sources/Launcher
