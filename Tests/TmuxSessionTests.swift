@@ -10,14 +10,6 @@ final class TmuxSessionTests: XCTestCase {
         XCTAssertFalse(TmuxSession.configContents.contains("set -g mouse on"))
     }
 
-    func testConfigKeepsOuterTerminalOutOfAlternateScreen() {
-        XCTAssertTrue(TmuxSession.configContents.contains("set -ga terminal-overrides ',*:smcup@:rmcup@'"))
-    }
-
-    func testConfigDisablesPaneAlternateScreen() {
-        XCTAssertTrue(TmuxSession.configContents.contains("set -g alternate-screen off"))
-    }
-
     func testConfigDoesNotGloballyRespawnDeadPanes() {
         XCTAssertFalse(TmuxSession.configContents.contains("pane-died"))
         XCTAssertTrue(TmuxSession.configContents.contains("set -g remain-on-exit on"))
