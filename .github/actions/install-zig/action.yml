@@ -1,0 +1,29 @@
+# ABOUTME: Composite action that installs a pinned Zig toolchain on macOS runners.
+# ABOUTME: Downloads from ziglang.org and verifies the archive against the published checksum.
+name: Install Zig
+description: Download and install a pinned Zig toolchain with checksum verification
+
+inputs:
+  version:
+    description: Zig version to install (e.g. 0.15.2)
+    required: true
+
+runs:
+  using: composite
+  steps:
+    - shell: bash
+      run: |
+        set -euo pipefail
+        version="${{ inputs.version }}"
+        case "$(uname -m)" in
+          arm64 | aarch64) arch=aarch64 ;;
+          x86_64) arch=x86_64 ;;
+          *) echo "::error::Unsupported architecture $(uname -m)"; exit 1 ;;
+        esac
+        tarball="zig-${arch}-macos-${version}.tar.xz"
+        expected=$(curl -fsSL https://ziglang.org/download/index.json \
+          | python3 -c "import json,sys;print(json.load(sys.stdin)['${version}']['${arch}-macos']['shasum'])")
+        curl -fsSL -o "${tarball}" "https://ziglang.org/download/${version}/${tarball}"
+        echo "${expected}  ${tarball}" | shasum -a 256 -c -
+        tar -xf "${tarball}"
+        echo "${PWD}/zig-${arch}-macos-${version}" >> "$GITHUB_PATH"

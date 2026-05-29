@@ -45,18 +45,15 @@ jobs:
           xcodebuild -version
           swift --version
 
-      - uses: xavierLowmiller/xcodegen-action@1.2.4
-        with:
-          install: true
-          run: false
+      - name: Install XcodeGen
+        run: brew install xcodegen
 
-      - uses: mlugg/setup-zig@v2
+      - name: Install Zig
+        uses: ./.github/actions/install-zig
         with:
           version: 0.15.2
 
       - uses: oven-sh/setup-bun@v2
-
-      - uses: astral-sh/setup-uv@v8.1.0
 
       - name: Cache SPM packages
         uses: actions/cache@v5
