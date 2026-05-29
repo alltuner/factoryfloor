@@ -1,5 +1,49 @@
 # Changelog
 
+## [0.1.76](https://github.com/alltuner/factoryfloor/compare/v0.1.75...v0.1.76) (2026-05-29)
+
+
+### Features
+
+* **telemetry:** enrich Umami payloads and broaden tracked events ([#450](https://github.com/alltuner/factoryfloor/issues/450)) ([7648189](https://github.com/alltuner/factoryfloor/commit/7648189bd5caa57fa884d9d499d79ce448b89e43))
+
+
+### Bug Fixes
+
+* **deps:** update monaco-vscode to v31 ([#459](https://github.com/alltuner/factoryfloor/issues/459)) ([f1b1347](https://github.com/alltuner/factoryfloor/commit/f1b1347afb2b7a6694181279cad1e1200c1c2875))
+* **deps:** update monaco-vscode to v33 ([#471](https://github.com/alltuner/factoryfloor/issues/471)) ([8ecc30e](https://github.com/alltuner/factoryfloor/commit/8ecc30e17e3f81e733805082ad9dc3c2d8c828dd))
+* enable extended-keys in tmux config for Shift+Enter support ([#441](https://github.com/alltuner/factoryfloor/issues/441)) ([4e54e75](https://github.com/alltuner/factoryfloor/commit/4e54e75d46b9223f599fb8cded1d2e873695712f))
+* propagate window resize to Ghostty ([#443](https://github.com/alltuner/factoryfloor/issues/443)) ([93f4da1](https://github.com/alltuner/factoryfloor/commit/93f4da143fa6a3937e95509484b58a059111afb7))
+* sync IME preedit state with libghostty ([#458](https://github.com/alltuner/factoryfloor/issues/458)) ([a582cc2](https://github.com/alltuner/factoryfloor/commit/a582cc2048eb715576d86afb0a25c112c372d153))
+* **terminal:** restore scrollback by reverting tmux alternate-screen overrides ([#479](https://github.com/alltuner/factoryfloor/issues/479)) ([e6491c7](https://github.com/alltuner/factoryfloor/commit/e6491c72ff3c9827512a0a7b8772b75aee2fd110)), closes [#395](https://github.com/alltuner/factoryfloor/issues/395)
+
+
+### Performance
+
+* reduce SwiftUI main-thread churn from AppEnvironment ([#453](https://github.com/alltuner/factoryfloor/issues/453)) ([6d16635](https://github.com/alltuner/factoryfloor/commit/6d1663532cc75f06bbc0597ef74510b747b74498))
+
+
+### Miscellaneous
+
+* **deps:** update astral-sh/setup-uv action to v8 ([#452](https://github.com/alltuner/factoryfloor/issues/452)) ([76752aa](https://github.com/alltuner/factoryfloor/commit/76752aa880890af7aab05ad6b243cd7f50b4b482))
+* **deps:** update dependency macos to v26 ([#472](https://github.com/alltuner/factoryfloor/issues/472)) ([411d724](https://github.com/alltuner/factoryfloor/commit/411d724388c200f0b70279e5584aa3196b410264))
+* **deps:** update dependency sentry to v9.10.0 ([#446](https://github.com/alltuner/factoryfloor/issues/446)) ([1917c85](https://github.com/alltuner/factoryfloor/commit/1917c85b6be8712bc344a8c5fbcbce0ad5bc2485))
+* **deps:** update dependency sentry to v9.11.0 ([#456](https://github.com/alltuner/factoryfloor/issues/456)) ([4fbd7da](https://github.com/alltuner/factoryfloor/commit/4fbd7da9ac051c60ce05be24e38ef3748a084ea1))
+* **deps:** update dependency sentry to v9.12.0 ([#460](https://github.com/alltuner/factoryfloor/issues/460)) ([dca1ee8](https://github.com/alltuner/factoryfloor/commit/dca1ee867bb0d0f7836f96dea0f53253362deae8))
+* **deps:** update dependency sentry to v9.15.0 ([#464](https://github.com/alltuner/factoryfloor/issues/464)) ([dddafad](https://github.com/alltuner/factoryfloor/commit/dddafadd8cd762278c57670971bf2d6df8cbb2d2))
+* **deps:** update dependency sparkle to v2.9.1 ([#445](https://github.com/alltuner/factoryfloor/issues/445)) ([18bcdd6](https://github.com/alltuner/factoryfloor/commit/18bcdd6782f23a6eeebf5197438cbcebfabf90ae))
+* **deps:** update dependency sparkle to v2.9.2 ([#475](https://github.com/alltuner/factoryfloor/issues/475)) ([f90feab](https://github.com/alltuner/factoryfloor/commit/f90feabc40e4c9c50555e93cf73371b15317caf5))
+* **deps:** update dependency swift-cmark to v0.7.1 ([#447](https://github.com/alltuner/factoryfloor/issues/447)) ([b278da9](https://github.com/alltuner/factoryfloor/commit/b278da914d2d975dd84e36e27474d7dc97852624))
+* **deps:** update dependency swift-cmark to v0.8.0 ([#466](https://github.com/alltuner/factoryfloor/issues/466)) ([f3b9845](https://github.com/alltuner/factoryfloor/commit/f3b9845d89b8d89e320fcaea66d1c0de2a35e45f))
+* **deps:** update googleapis/release-please-action action to v5 ([#455](https://github.com/alltuner/factoryfloor/issues/455)) ([bae2bc3](https://github.com/alltuner/factoryfloor/commit/bae2bc332407cb431ab8e55353532aaf4a733962))
+
+
+### CI/CD
+
+* allow revert as a conventional PR title type ([#463](https://github.com/alltuner/factoryfloor/issues/463)) ([009971c](https://github.com/alltuner/factoryfloor/commit/009971c7d6a765f7f4669cd0a2c2b06c2cca1a79))
+* replace deprecated Node 20 actions with controlled install steps ([#478](https://github.com/alltuner/factoryfloor/issues/478)) ([865cdb2](https://github.com/alltuner/factoryfloor/commit/865cdb2d29944df379547a1780af95af1c3651b6)), closes [#151](https://github.com/alltuner/factoryfloor/issues/151) [#229](https://github.com/alltuner/factoryfloor/issues/229)
+* validate PR titles as conventional commits ([#462](https://github.com/alltuner/factoryfloor/issues/462)) ([5207d20](https://github.com/alltuner/factoryfloor/commit/5207d2030937c3c3478441acf862baea984dbd71))
+
 ## [0.1.75](https://github.com/alltuner/factoryfloor/compare/v0.1.74...v0.1.75) (2026-04-13)
 
 
