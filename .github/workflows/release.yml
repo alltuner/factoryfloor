@@ -36,7 +36,7 @@ jobs:
       PROJECT: "FactoryFloor.xcodeproj"
       SPARKLE_VERSION: "2.9.0"
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
         with:
           submodules: true
 
