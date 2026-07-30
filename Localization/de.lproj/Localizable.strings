@@ -265,10 +265,13 @@
 "Report a Bug" = "Fehler melden";
 "Documentation" = "Dokumentation";
 "Request a Feature" = "Funktion vorschlagen";
-"Rebuild" = "Neu bauen";
 "Rerun" = "Erneut ausführen";
 "Start" = "Starten";
 "Stop" = "Stoppen";
+
+"Running setup..." = "Setup läuft...";
+"Setup failed." = "Setup fehlgeschlagen.";
+"Continue to Agent" = "Weiter zum Agenten";
 
 "Restarting..." = "Wird neu gestartet...";
 "Preparing workstream..." = "Workstream wird vorbereitet...";
