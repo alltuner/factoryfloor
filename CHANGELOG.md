@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.1.78](https://github.com/alltuner/factoryfloor/compare/v0.1.77...v0.1.78) (2026-07-30)
+
+
+### Bug Fixes
+
+* **build:** restore ghostty submodule gitlink ([233c9c8](https://github.com/alltuner/factoryfloor/commit/233c9c848cdb35f51cf453a609d13614bad57b83))
+
 ## [0.1.77](https://github.com/alltuner/factoryfloor/compare/v0.1.76...v0.1.77) (2026-07-30)
 
 
