@@ -1,5 +1,24 @@
 # Changelog
 
+## [0.1.79](https://github.com/alltuner/factoryfloor/compare/v0.1.78...v0.1.79) (2026-07-30)
+
+
+### Bug Fixes
+
+* **ci:** keep appcast history when a previous release has no assets ([#492](https://github.com/alltuner/factoryfloor/issues/492)) ([92eae05](https://github.com/alltuner/factoryfloor/commit/92eae051519c7e4520f17ce8b58c34ee615cbc86))
+* **i18n:** add the missing German setup gate strings ([#493](https://github.com/alltuner/factoryfloor/issues/493)) ([fe042f2](https://github.com/alltuner/factoryfloor/commit/fe042f286f12d70cc4b1102244c9ff493bc968fc))
+
+
+### Documentation
+
+* credit the script approval fix in the changelog ([c5614bb](https://github.com/alltuner/factoryfloor/commit/c5614bbd29728ecd007f2988e89e5507ad80ec12))
+* fix the reporter credit links in the changelog ([e482665](https://github.com/alltuner/factoryfloor/commit/e48266578eff6a0212d1343323d9bcf46878e879))
+
+
+### CI/CD
+
+* **website:** generate the German changelog page ([e049960](https://github.com/alltuner/factoryfloor/commit/e0499609660b09e91cb726cb5dbd1db4a11f81b2))
+
 ## [0.1.78](https://github.com/alltuner/factoryfloor/compare/v0.1.77...v0.1.78) (2026-07-30)
 
 
