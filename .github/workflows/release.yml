@@ -257,12 +257,20 @@ jobs:
             exit 1
           fi
 
-          # Download existing appcast from previous release to merge with (preserves items
-          # for the Homebrew update popover). Cannot use --latest because release-please
-          # already created the current (empty) release.
-          PREV_TAG=$(gh release list --repo "$GITHUB_REPOSITORY" --limit 10 --json tagName --jq "[.[] | select(.tagName != \"$TAG_NAME\")][0].tagName")
-          if [ -n "$PREV_TAG" ]; then
-            gh release download "$PREV_TAG" --repo "$GITHUB_REPOSITORY" --pattern "appcast.xml" --output existing-appcast.xml || true
+          # Download an existing appcast to merge with (preserves items for the Homebrew
+          # update popover). Cannot use --latest because release-please already created
+          # the current (empty) release. Walk back through previous releases until one
+          # actually yields an appcast: a release whose build failed carries no assets,
+          # and stopping at it would silently drop every historical item.
+          for CANDIDATE in $(gh release list --repo "$GITHUB_REPOSITORY" --limit 10 --json tagName --jq "[.[] | select(.tagName != \"$TAG_NAME\")][].tagName"); do
+            rm -f existing-appcast.xml
+            if gh release download "$CANDIDATE" --repo "$GITHUB_REPOSITORY" --pattern "appcast.xml" --output existing-appcast.xml 2>/dev/null; then
+              echo "Carrying forward appcast items from $CANDIDATE"
+              break
+            fi
+          done
+          if [ ! -f existing-appcast.xml ]; then
+            echo "::warning::No previous appcast found; this release's appcast will contain only its own item"
           fi
 
           DMG_URL="https://github.com/alltuner/factoryfloor/releases/download/v${VERSION}/${DMG_NAME}"
