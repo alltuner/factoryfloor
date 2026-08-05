@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <style>
+    :root {
+      color-scheme: light dark;
+    }
+    html, body {
+      margin: 0;
+      padding: 0;
+      width: 100%;
+      height: 100%;
+      overflow-x: hidden;
+      overflow-y: auto;
+      background: var(--vscode-editor-background, light-dark(#ffffff, #1e1e1e));
+    }
+    /* Hide content until all diff editors have computed their diffs.
+       The loading class stays on until diff.js calls reveal(). */
+    body.loading #container {
+      opacity: 0;
+    }
+
+    #container {
+      width: 100%;
+      min-height: 100%;
+      padding-bottom: 32px;
+      transition: opacity 0.12s ease-in;
+    }
+
+    #empty-state {
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      color: light-dark(rgba(0,0,0,0.35), rgba(255,255,255,0.35));
+      font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+      gap: 12px;
+    }
+    #empty-state.visible {
+      display: flex;
+    }
+    #empty-state .icon {
+      font-size: 36px;
+      opacity: 0.5;
+    }
+    #empty-state .message {
+      font-size: 13px;
+    }
+
+    .diff-section + .diff-section {
+      margin-top: 16px;
+    }
+
+    .diff-header {
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 4px 8px;
+      padding: 10px 16px;
+      font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+      font-size: 12px;
+      font-weight: 500;
+      color: light-dark(rgba(0,0,0,0.7), rgba(255,255,255,0.7));
+      background: light-dark(#f5f5f5, #252526);
+      border-bottom: 1px solid light-dark(rgba(0,0,0,0.08), rgba(255,255,255,0.08));
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+
+    .diff-header .file-path {
+      flex: 1;
+      font-family: Menlo, monospace;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    .diff-header .file-path .dir {
+      opacity: 0.5;
+    }
+
+    .diff-header .status-badge {
+      font-size: 10px;
+      font-weight: 700;
+      font-family: Menlo, monospace;
+      padding: 1px 5px;
+      border-radius: 4px;
+    }
+    .status-badge.added {
+      color: #3fb950;
+      background: rgba(63, 185, 80, 0.15);
+    }
+    .status-badge.modified {
+      color: #d29922;
+      background: rgba(210, 153, 34, 0.15);
+    }
+    .status-badge.deleted {
+      color: #f85149;
+      background: rgba(248, 81, 73, 0.15);
+    }
+    .status-badge.renamed {
+      color: #58a6ff;
+      background: rgba(88, 166, 255, 0.15);
+    }
+
+    .diff-editor-container {
+      width: 100%;
+      /* Height set dynamically by JS */
+    }
+
+    /* Review guide: reason subtitle below file name */
+    .review-reason {
+      width: 100%;
+      font-style: italic;
+      font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+      font-size: 11px;
+      font-weight: 400;
+      color: light-dark(rgba(0,0,0,0.4), rgba(255,255,255,0.35));
+      padding-left: 30px; /* align with file-path (badge width + gap) */
+    }
+
+    /* Review guide: scrollable summary block */
+    .review-summary {
+      padding: 16px 20px;
+      margin-bottom: 4px;
+      font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+      background: light-dark(rgba(59, 130, 246, 0.05), rgba(59, 130, 246, 0.06));
+      border-bottom: 1px solid light-dark(rgba(59, 130, 246, 0.1), rgba(59, 130, 246, 0.15));
+    }
+    .review-summary .review-title {
+      font-size: 14px;
+      font-weight: 600;
+      color: light-dark(rgba(0,0,0,0.85), rgba(255,255,255,0.9));
+      margin: 0 0 6px 0;
+    }
+    .review-summary .review-body {
+      font-size: 12px;
+      line-height: 1.6;
+      color: light-dark(rgba(0,0,0,0.55), rgba(255,255,255,0.5));
+      margin: 0;
+    }
+
+    /* Review guide: inline annotation view zones */
+    .annotation-zone {
+      display: flex;
+      flex-wrap: nowrap;
+      align-items: flex-start;
+      gap: 8px;
+      padding: 10px 16px;
+      margin: 6px 0;
+      font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+      font-size: 12px;
+      line-height: 1.5;
+      color: light-dark(rgba(0,0,0,0.8), rgba(255,255,255,0.85));
+      background: light-dark(rgba(59, 130, 246, 0.1), rgba(59, 130, 246, 0.12));
+      border-left: 3px solid light-dark(rgba(59, 130, 246, 0.5), rgba(59, 130, 246, 0.6));
+      border-radius: 0 4px 4px 0;
+      box-sizing: border-box;
+    }
+    .annotation-icon {
+      flex: 0 0 14px;
+      width: 14px;
+      height: 14px;
+      margin-top: 2px;
+      color: light-dark(rgba(59, 130, 246, 0.7), rgba(59, 130, 246, 0.8));
+    }
+    .annotation-icon svg {
+      display: block;
+      width: 14px;
+      height: 14px;
+      fill: currentColor;
+    }
+    .annotation-content {
+      flex: 1 1 0;
+      min-width: 0;
+    }
+    .annotation-content p {
+      margin: 0;
+      padding: 0;
+    }
+    .annotation-content p + p {
+      margin-top: 4px;
+    }
+
+    /* Range highlight for multi-line annotations */
+    .annotation-highlight {
+      background: light-dark(rgba(59, 130, 246, 0.08), rgba(59, 130, 246, 0.1)) !important;
+    }
+
+    /* macOS-style overlay scrollbars */
+    .monaco-scrollable-element > .scrollbar {
+      background: transparent !important;
+      transition: opacity 0.8s ease-out !important;
+    }
+    .monaco-scrollable-element > .scrollbar > .slider {
+      background: light-dark(rgba(0, 0, 0, 0.25), rgba(255, 255, 255, 0.2)) !important;
+      border-radius: 4px !important;
+      transition: background 0.2s ease !important;
+    }
+    .monaco-scrollable-element > .scrollbar > .slider:hover {
+      background: light-dark(rgba(0, 0, 0, 0.4), rgba(255, 255, 255, 0.35)) !important;
+    }
+    .monaco-scrollable-element > .scrollbar > .slider.active {
+      background: light-dark(rgba(0, 0, 0, 0.55), rgba(255, 255, 255, 0.5)) !important;
+    }
+  </style>
+</head>
+<body class="loading">
+  <div id="container">
+    <div id="empty-state" class="visible">
+      <div class="icon">&#x2714;</div>
+      <div class="message">No changes</div>
+    </div>
+  </div>
+  <script type="module" src="./src/diff.js"></script>
+</body>
+</html>

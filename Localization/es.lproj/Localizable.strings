@@ -142,6 +142,8 @@
 "Enables experimental multi-agent coordination. Agents can spawn teammates, delegate tasks, and collaborate across workstreams." = "Activa la coordinación experimental multi-agente. Los agentes pueden crear compañeros, delegar tareas y colaborar entre flujos de trabajo.";
 "Auto-rename branch" = "Renombrar rama automáticamente";
 "On the first request, the agent renames the branch to match the task and writes a short description visible in the sidebar." = "En la primera solicitud, el agente renombra la rama para coincidir con la tarea y escribe una breve descripción visible en la barra lateral.";
+"Review guide" = "Guía de revisión";
+"The agent maintains a review guide explaining design choices, reading order, and inline annotations visible in the Changes tab." = "El agente mantiene una guía de revisión que explica las decisiones de diseño, el orden de lectura y las anotaciones en línea visibles en la pestaña de cambios.";
 "External Browser" = "Navegador externo";
 
 /* Settings - Advanced */
@@ -230,6 +232,15 @@
 /* Tab labels */
 "Info" = "Información";
 "Agent" = "Agente";
+"Changes" = "Cambios";
+
+/* ChangesView */
+"%d file(s) changed" = "%d archivo(s) modificado(s)";
+"No changes" = "Sin cambios";
+"Loading changes..." = "Cargando cambios...";
+"Refresh changes" = "Actualizar cambios";
+"Branch" = "Rama";
+"Uncommitted" = "Sin confirmar";
 
 /* ProjectSidebar - context menu */
 "New workstream (full permissions)" = "Nuevo flujo de trabajo (permisos completos)";
