@@ -1,0 +1,12 @@
+# ABOUTME: Task runner for the website. `just site` builds it into public/, with the changelog
+# ABOUTME: and the latest release's appcast.xml; `just dev` serves it locally.
+
+site:
+    bun install --frozen-lockfile
+    bun run assets
+    curl -fsSL -o static/appcast.xml https://github.com/alltuner/factoryfloor/releases/latest/download/appcast.xml
+    bunx hugo
+
+dev:
+    bun install
+    bun run dev
