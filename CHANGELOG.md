@@ -1,5 +1,19 @@
 # Changelog
 
+## [0.1.80](https://github.com/alltuner/factoryfloor/compare/v0.1.79...v0.1.80) (2026-10-27)
+
+
+### Miscellaneous
+
+* **website:** give English content its own directory ([#501](https://github.com/alltuner/factoryfloor/issues/501)) ([2d5aed3](https://github.com/alltuner/factoryfloor/commit/2d5aed31c3c149820fdb7c0acea7d1de8e333218))
+* **website:** replace deprecated Hugo language config keys ([#500](https://github.com/alltuner/factoryfloor/issues/500)) ([62efd7d](https://github.com/alltuner/factoryfloor/commit/62efd7d932bed10b6bd9b716056cdf4480693857))
+* **website:** stop tracking the generated stylesheet ([#502](https://github.com/alltuner/factoryfloor/issues/502)) ([3c8a73d](https://github.com/alltuner/factoryfloor/commit/3c8a73d9d2a2c6d247c4809fb0cec3eb235efdbe))
+
+
+### CI/CD
+
+* build the docs with just site and deploy with Wrangler ([#498](https://github.com/alltuner/factoryfloor/issues/498)) ([4d3f91a](https://github.com/alltuner/factoryfloor/commit/4d3f91a9b9dadb3a955237f817cf33b6b20b641c))
+
 ## [0.1.79](https://github.com/alltuner/factoryfloor/compare/v0.1.78...v0.1.79) (2026-07-30)
 
 
