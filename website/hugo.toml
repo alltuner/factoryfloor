@@ -9,7 +9,7 @@ defaultContentLanguage = "en"
   locale = "en"
   label = "English"
   weight = 1
-  contentDir = "content"
+  contentDir = "content/en"
 
 [languages.ca]
   locale = "ca"
