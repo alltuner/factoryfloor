@@ -62,20 +62,24 @@ website/
 ├── i18n/
 │   ├── en.toml                # Template UI strings (English)
 │   ├── ca.toml
+│   ├── de.toml
 │   ├── es.toml
 │   └── sv.toml
 └── content/
-    ├── _index.md              # Homepage (English)
-    ├── docs.md                # Docs (English)
-    ├── get.md
-    ├── sponsor.md
-    ├── legal/privacy.md
+    ├── en/                    # English content
+    │   ├── _index.md          # Homepage
+    │   ├── docs.md            # Docs
+    │   ├── get.md
+    │   ├── sponsor.md
+    │   └── legal/privacy.md
     ├── ca/                    # Catalan content
     │   ├── _index.md
     │   ├── docs.md
     │   ├── get.md
     │   ├── sponsor.md
     │   └── legal/privacy.md
+    ├── de/                    # German content
+    │   └── ...
     ├── es/                    # Spanish content
     │   └── ...
     └── sv/                    # Swedish content
@@ -96,7 +100,7 @@ other = "Download"
 
 ### Content pages
 
-Full-page content lives in `website/content/`. English pages are at the root, and translations go in language-specific subdirectories (`ca/`, `es/`, `sv/`). Each translated page must have the same filename as its English counterpart.
+Full-page content lives in `website/content/`, with one subdirectory per language (`en/`, `ca/`, `de/`, `es/`, `sv/`). Each translated page must have the same path as its English counterpart, which is how Hugo links translations together.
 
 ### Testing website translations locally
 
@@ -130,9 +134,9 @@ Adding a new language touches several files across the app and website. Here's t
 1. Add a language section to `website/hugo.toml`:
    ```toml
    [languages.<lang>]
-     languageCode = "<lang>"
-     languageName = "Language Name"
-     weight = 5
+     locale = "<lang>"
+     label = "Language Name"
+     weight = 6
      contentDir = "content/<lang>"
    ```
 2. Create `website/i18n/<lang>.toml` by copying `en.toml` and translating all values
@@ -143,12 +147,16 @@ Adding a new language touches several files across the app and website. Here's t
 
 ## Known gotchas
 
-### Hugo: do not use `.AllTranslations`
+### Hugo: keep each language's `contentDir` separate
 
-Hugo's `.AllTranslations` function returns duplicates because our localized `contentDir` directories are nested inside the English `content/` directory. Instead, the language switcher uses a hardcoded list:
+Every language, English included, has its own directory under `content/`. Never point one language's `contentDir` at a parent of another's: Hugo would build the nested pages a second time in the parent language, which produces duplicate `hreflang` alternates and puts other languages' pages in that language's sitemap.
+
+### Hugo: the language switcher uses a hardcoded list
+
+The language switcher links to every language, whether or not a page has a translation, so it uses a hardcoded list:
 
 ```go
-{{ $codes := slice "en" "ca" "es" "sv" }}
+{{ $codes := slice "en" "ca" "de" "es" "sv" }}
 ```
 
 If you add a new language, you must update this list in `docs.html` and `footer.html`. Grep for `codes := slice` to find all occurrences.

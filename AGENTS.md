@@ -96,7 +96,7 @@ Breaking changes: add `!` after the type or include `BREAKING CHANGE:` in the fo
 - `Resources/MonacoEditor/` - Built Monaco editor bundle (gitignored, built by `scripts/build-editor.sh`)
 - `editor/` - Monaco editor Vite project (source for `Resources/MonacoEditor/`). Built with bun.
 - `ghostty/` - Git submodule (do not modify, pinned to stable release tag)
-- `website/` - Hugo + Tailwind CSS site for factory-floor.com. **Do not use `.AllTranslations`** in Hugo templates; it returns duplicates because localized contentDirs are nested inside the English `content/` dir. Use a hardcoded language code list instead (see `footer.html` or `docs.html` for the pattern).
+- `website/` - Hugo + Tailwind CSS site for factory-floor.com. Each language has its own `content/<lang>/` contentDir, English included; never nest one inside another, or Hugo builds the nested pages twice and emits duplicate `hreflang` alternates. The language switchers use a hardcoded language code list (see `footer.html` or `docs.html`).
 - `scripts/` - Release and build automation
 - `docs/` - Distribution guide and reference docs
 
