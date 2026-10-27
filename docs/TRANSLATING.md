@@ -1,6 +1,6 @@
 # Translating Factory Floor
 
-Factory Floor is localized in four languages: English (en), Catalan (ca), Spanish (es), and Swedish (sv). Contributions to improve existing translations or add new languages are welcome.
+Factory Floor is localized in five languages: English (en), Catalan (ca), German (de), Spanish (es), and Swedish (sv). Contributions to improve existing translations or add new languages are welcome.
 
 There are two independent translation surfaces: the **app** (native macOS UI) and the **website** (factory-floor.com). You can contribute to either or both.
 
@@ -22,6 +22,8 @@ Localization/
 ├── ca.lproj/
 │   ├── Localizable.strings
 │   └── InfoPlist.strings
+├── de.lproj/
+│   └── ...
 ├── es.lproj/
 │   └── ...
 └── sv.lproj/
@@ -48,7 +50,7 @@ The key (left side) is always the English string. The value (right side) is the 
 
 ### Adding a string
 
-When adding a new user-facing string to the app, it **must** be added to all four language files. If you don't speak one of the languages, add the English string as a placeholder and note it in your PR so someone else can translate it.
+When adding a new user-facing string to the app, it **must** be added to all five language files. If you don't speak one of the languages, add the English string as a placeholder and note it in your PR so someone else can translate it.
 
 ## Website translations
 
@@ -106,7 +108,7 @@ Full-page content lives in `website/content/`, with one subdirectory per languag
 
 ```bash
 cd website
-hugo server
+just dev
 ```
 
 Then visit `http://localhost:1313/` for English, `http://localhost:1313/ca/` for Catalan, etc.
@@ -163,7 +165,7 @@ If you add a new language, you must update this list in `docs.html` and `footer.
 
 ### App strings use the English text as the key
 
-In `Localizable.strings`, the key is the English string itself. This means if you change the English text, you need to update the key in **all four** language files.
+In `Localizable.strings`, the key is the English string itself. This means if you change the English text, you need to update the key in **all five** language files.
 
 ### SwiftUI vs AppKit localization
 

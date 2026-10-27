@@ -65,7 +65,7 @@ The website uses Hugo with Tailwind CSS. To build locally:
 
 ```bash
 cd website
-hugo server
+just dev
 ```
 
 ## Code conventions
