@@ -1,37 +1,37 @@
 # ABOUTME: Hugo configuration for the Factory Floor website.
-# ABOUTME: Multi-language site deployed to factory-floor.com via GitHub Pages.
+# ABOUTME: Multi-language site for factory-floor.com.
 
 baseURL = "https://factory-floor.com"
 title = "Factory Floor"
 defaultContentLanguage = "en"
 
 [languages.en]
-  languageCode = "en"
-  languageName = "English"
+  locale = "en"
+  label = "English"
   weight = 1
   contentDir = "content"
 
 [languages.ca]
-  languageCode = "ca"
-  languageName = "Catala"
+  locale = "ca"
+  label = "Catala"
   weight = 2
   contentDir = "content/ca"
 
 [languages.es]
-  languageCode = "es"
-  languageName = "Espanol"
+  locale = "es"
+  label = "Espanol"
   weight = 3
   contentDir = "content/es"
 
 [languages.sv]
-  languageCode = "sv"
-  languageName = "Svenska"
+  locale = "sv"
+  label = "Svenska"
   weight = 4
   contentDir = "content/sv"
 
 [languages.de]
-  languageCode = "de"
-  languageName = "Deutsch"
+  locale = "de"
+  label = "Deutsch"
   weight = 5
   contentDir = "content/de"
 

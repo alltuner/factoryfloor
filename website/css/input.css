@@ -1,6 +1,7 @@
 @import "tailwindcss";
 @plugin "daisyui";
 @source "../layouts";
+@source not "../hugo.toml";
 
 @theme {
   --font-mono: 'JetBrains Mono', 'SF Mono', 'Fira Code', monospace;
