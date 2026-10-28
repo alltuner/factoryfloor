@@ -15,7 +15,7 @@
     "tailwindcss": "^4.2.1"
   },
   "dependencies": {
-    "hugo-extended": "0.168.0"
+    "hugo-extended": "0.169.0"
   },
   "trustedDependencies": [
     "hugo-extended"
