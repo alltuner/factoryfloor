@@ -52,10 +52,22 @@ other = "Konfigurera setup, run och teardown scripts per projekt via .factoryflo
 other = "Inbyggd browser"
 [feat_browser_desc]
 other = "Inbyggd browser med automatisk portdetektering. Run scriptets lyssningsport detekteras automatiskt och browsern navigerar dit. Previewa din app utan att lämna workspace."
+[feat_review_title]
+other = "Review guide"
+[feat_review_desc]
+other = "Granska ändringar med tillförsikt. Agenten förklarar sitt resonemang med läsordning och inline-annotationer i varje worktree."
+[feat_editor_title]
+other = "Kodredigerare"
+[feat_editor_desc]
+other = "Inbyggd Monaco-editor med syntaxmarkering och språkstöd. Snabba redigeringar utan att lämna workspace."
 [feat_github_title]
 other = "GitHub-integration"
 [feat_github_desc]
 other = "Repo-info, öppna PRs och branch PR-status direkt i projektvyn. Via gh CLI."
+[feat_soon_title]
+other = "Mer på väg"
+[feat_soon_desc]
+other = "Nya funktioner är på gång."
 
 [how_label]
 other = "Hur det funkar"

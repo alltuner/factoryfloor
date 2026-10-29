@@ -142,6 +142,8 @@
 "Enables experimental multi-agent coordination. Agents can spawn teammates, delegate tasks, and collaborate across workstreams." = "Enables experimental multi-agent coordination. Agents can spawn teammates, delegate tasks, and collaborate across workstreams.";
 "Auto-rename branch" = "Auto-rename branch";
 "On the first request, the agent renames the branch to match the task and writes a short description visible in the sidebar." = "On the first request, the agent renames the branch to match the task and writes a short description visible in the sidebar.";
+"Review guide" = "Review guide";
+"The agent maintains a review guide explaining design choices, reading order, and inline annotations visible in the Changes tab." = "The agent maintains a review guide explaining design choices, reading order, and inline annotations visible in the Changes tab.";
 "External Browser" = "External Browser";
 
 /* Settings - Advanced */
@@ -230,6 +232,15 @@
 /* Tab labels */
 "Info" = "Info";
 "Agent" = "Agent";
+"Changes" = "Changes";
+
+/* ChangesView */
+"%d file(s) changed" = "%d file(s) changed";
+"No changes" = "No changes";
+"Loading changes..." = "Loading changes...";
+"Refresh changes" = "Refresh changes";
+"Branch" = "Branch";
+"Uncommitted" = "Uncommitted";
 
 /* ProjectSidebar - context menu */
 "New workstream (full permissions)" = "New workstream (full permissions)";

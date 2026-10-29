@@ -142,6 +142,8 @@
 "Enables experimental multi-agent coordination. Agents can spawn teammates, delegate tasks, and collaborate across workstreams." = "Activa la coordinació experimental multi-agent. Els agents poden crear companys d'equip, delegar tasques i col·laborar entre fluxos de treball.";
 "Auto-rename branch" = "Canvia el nom de la branca automàticament";
 "On the first request, the agent renames the branch to match the task and writes a short description visible in the sidebar." = "A la primera sol·licitud, l'agent canvia el nom de la branca per coincidir amb la tasca i escriu una breu descripció visible a la barra lateral.";
+"Review guide" = "Guia de revisió";
+"The agent maintains a review guide explaining design choices, reading order, and inline annotations visible in the Changes tab." = "L'agent manté una guia de revisió que explica les decisions de disseny, l'ordre de lectura i les anotacions en línia visibles a la pestanya de canvis.";
 "External Browser" = "Navegador extern";
 
 /* Settings - Advanced */
@@ -230,6 +232,15 @@
 /* Tab labels */
 "Info" = "Informació";
 "Agent" = "Agent";
+"Changes" = "Canvis";
+
+/* ChangesView */
+"%d file(s) changed" = "%d fitxer(s) modificat(s)";
+"No changes" = "Sense canvis";
+"Loading changes..." = "Carregant canvis...";
+"Refresh changes" = "Actualitzar canvis";
+"Branch" = "Branca";
+"Uncommitted" = "Sense confirmar";
 
 /* ProjectSidebar - context menu */
 "New workstream (full permissions)" = "Nou flux de treball (permisos complets)";

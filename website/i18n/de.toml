@@ -55,10 +55,22 @@ other = "Konfiguriere Setup-, Run- und Teardown-Skripte pro Projekt über .facto
 other = "Integrierter Browser"
 [feat_browser_desc]
 other = "Integrierter Browser mit automatischer Port-Erkennung. Der lauschende Port des Run-Skripts wird automatisch erkannt und der Browser navigiert dorthin. Sieh dir deine App an, ohne den Arbeitsbereich zu verlassen."
+[feat_review_title]
+other = "Review-Guide"
+[feat_review_desc]
+other = "Änderungen sicher reviewen. Der Agent erklärt sein Vorgehen mit Lesereihenfolge und Inline-Annotationen in jedem Worktree."
+[feat_editor_title]
+other = "Code-Editor"
+[feat_editor_desc]
+other = "Integrierter Monaco-Editor mit Syntax-Highlighting und Sprachunterstützung. Schnelle Bearbeitungen ohne den Arbeitsbereich zu verlassen."
 [feat_github_title]
 other = "GitHub-Integration"
 [feat_github_desc]
 other = "Sieh Repo-Infos, offene PRs und Branch-PR-Status direkt in der Projektansicht. Unterstützt durch die gh CLI."
+[feat_soon_title]
+other = "Mehr kommt"
+[feat_soon_desc]
+other = "Neue Funktionen sind in Arbeit."
 
 # How it works
 [how_label]

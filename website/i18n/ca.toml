@@ -55,10 +55,22 @@ other = "Configura scripts de setup, run i teardown per projecte via .factoryflo
 other = "Browser integrat"
 [feat_browser_desc]
 other = "Browser integrat amb detecció automàtica de port. El port d'escolta del run script es detecta automàticament i el browser hi navega. Previsualitza l'app sense sortir del workspace."
+[feat_review_title]
+other = "Guia de revisió"
+[feat_review_desc]
+other = "Revisa canvis amb confiança. L'agent explica el seu raonament amb ordre de lectura i anotacions inline a cada worktree."
+[feat_editor_title]
+other = "Editor de codi"
+[feat_editor_desc]
+other = "Editor Monaco integrat amb resaltat de sintaxi i suport de llenguatges. Edicions ràpides sense sortir del workspace."
 [feat_github_title]
 other = "Integració GitHub"
 [feat_github_desc]
 other = "Info del repo, PRs obertes i estat de PRs per branch, directament a la vista del projecte. Via gh CLI."
+[feat_soon_title]
+other = "Més per venir"
+[feat_soon_desc]
+other = "Noves funcionalitats en camí."
 
 # How it works
 [how_label]
