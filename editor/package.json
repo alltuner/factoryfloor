@@ -6,17 +6,17 @@
     "build": "vite build"
   },
   "dependencies": {
-    "@codingame/monaco-vscode-api": "33.0.9",
-    "monaco-editor": "npm:@codingame/monaco-vscode-editor-api@33.0.9",
-    "@codingame/monaco-vscode-textmate-service-override": "33.0.9",
-    "@codingame/monaco-vscode-theme-service-override": "33.0.9",
-    "@codingame/monaco-vscode-languages-service-override": "33.0.9",
-    "@codingame/monaco-vscode-theme-defaults-default-extension": "33.0.9",
-    "@codingame/monaco-vscode-all-language-default-extensions": "33.0.9",
-    "@codingame/monaco-vscode-standalone-typescript-language-features": "33.0.9",
-    "@codingame/monaco-vscode-standalone-json-language-features": "33.0.9",
-    "@codingame/monaco-vscode-standalone-css-language-features": "33.0.9",
-    "@codingame/monaco-vscode-standalone-html-language-features": "33.0.9"
+    "@codingame/monaco-vscode-api": "39.0.4",
+    "monaco-editor": "npm:@codingame/monaco-vscode-editor-api@39.0.4",
+    "@codingame/monaco-vscode-textmate-service-override": "39.0.4",
+    "@codingame/monaco-vscode-theme-service-override": "39.0.4",
+    "@codingame/monaco-vscode-languages-service-override": "39.0.4",
+    "@codingame/monaco-vscode-theme-defaults-default-extension": "39.0.4",
+    "@codingame/monaco-vscode-all-language-default-extensions": "39.0.4",
+    "@codingame/monaco-vscode-standalone-typescript-language-features": "39.0.4",
+    "@codingame/monaco-vscode-standalone-json-language-features": "39.0.4",
+    "@codingame/monaco-vscode-standalone-css-language-features": "39.0.4",
+    "@codingame/monaco-vscode-standalone-html-language-features": "39.0.4"
   },
   "devDependencies": {
     "vite": "^8.0.0"
